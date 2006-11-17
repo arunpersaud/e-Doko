@@ -69,6 +69,7 @@ function save_status()
   return;
 }
 
+$history=array();
 
 /* check for status file and read it, if possible */
 
@@ -173,7 +174,7 @@ if(sizeof($lines)<2)
      $game["init"]=0;
      
      $tmp = explode( ":",$lines[0]);
-     $hash[]   = $tmp[0];
+     $hash[0]   = $tmp[0];
      $player[$tmp[0]]["number"] = 0;
      $player[$tmp[0]]["hash"]   = $tmp[0];
      $player[$tmp[0]]["name"]   = $tmp[1];
@@ -183,7 +184,7 @@ if(sizeof($lines)<2)
      if(ereg("s",$tmp[3])) $game["init"]++;
 
      $tmp = explode( ":",$lines[1]);
-     $hash[]   = $tmp[0];
+     $hash[1]   = $tmp[0];
      $player[$tmp[0]]["number"] = 1;
      $player[$tmp[0]]["hash"]   = $tmp[0];
      $player[$tmp[0]]["name"]   = $tmp[1];
@@ -193,7 +194,7 @@ if(sizeof($lines)<2)
      if(ereg("s",$tmp[3])) $game["init"]++;
      
      $tmp = explode( ":",$lines[2]);
-     $hash[]   = $tmp[0];
+     $hash[2]   = $tmp[0];
      $player[$tmp[0]]["number"] = 2;
      $player[$tmp[0]]["hash"]   = $tmp[0];
      $player[$tmp[0]]["name"]   = $tmp[1];
@@ -203,7 +204,7 @@ if(sizeof($lines)<2)
      if(ereg("s",$tmp[3])) $game["init"]++;
      
      $tmp = explode( ":",$lines[3]);
-     $hash[]   = $tmp[0];
+     $hash[3]   = $tmp[0];
      $player[$tmp[0]]["number"] = 3;
      $player[$tmp[0]]["hash"]   = $tmp[0];
      $player[$tmp[0]]["name"]   = $tmp[1];
@@ -215,9 +216,13 @@ if(sizeof($lines)<2)
      /* save the game history */
      for($i=4;$i<sizeof($lines);$i++)
        {
-	 if($lines[$i]!="\n")
-	   $history[]=$lines[$i];
+	 if(!ereg("^[[:space:]]*$",trim($lines[$i])))
+	   {
+	     $history[] = $lines[$i];
+	   }
        }
+     if(sizeof($history)== 0)
+       $history[] = "0:";
 
 /*     **
  *    *  *
@@ -235,7 +240,7 @@ if(sizeof($lines)<2)
 	   {
 	     echo "just wait for the game to start";
 	   }
-	 else 
+	 else  if( !ereg("[is]",$player[$a]["option"]) )
 	   {
 
  ?>
@@ -266,7 +271,7 @@ if(sizeof($lines)<2)
        {
 	 $b=$_REQUEST["b"];
 	 
-	 if( ereg("[is]",$player[$b]["option"])  && $game["init"]<4)
+	 if( ereg("s",$player[$b]["option"])  && $game["init"]<4)
 	   {
 	     echo "just wait for the game to start";
 	   }
@@ -348,76 +353,146 @@ if(sizeof($lines)<2)
 	 else
 	   {
 	     $me = $_REQUEST["me"];
-	     if(isset($_REQUEST["card"]))
-	       {
-		 $card=$_REQUEST["card"];
-		 echo "EMAIL: you played $card <br>";
-		 echo "check,if card correct  remove card from deck <br>";
-		 
 
-		 $tmp = explode(":",$history[sizeof($history)-1]);
-		 $tmp[sizeof($tmp)-1] = "".$player[$me]["number"]."->".$card.":";
-		 $history[sizeof($history)-1]=join(":",$tmp);
-
-		 save_status();
-	       }
 	     echo "game in progress and you are in it<br>";
 	     foreach($history as $play)
 	       {
-		 $trick = explode(":",$play);
+		 echo "<br />";
 
-		 $last=-1;
+		 $trick = explode(":",$play);
+		 
+		 $last=-2;
 		 /* found old trick, display it */
 		 for($i=0;$i<sizeof($trick)-1;$i++)
 		   {
 		     $card=$trick[$i];
-		     $tmp = explode("->",$card);
-		     echo $player[$hash[$tmp[0]]]["name"]." played ";
-		     display_card($tmp[1]);
-		     $last=$tmp[0];
+		     if(ereg("->",$card))
+		       {
+			 $tmp = explode("->",$card);
+			 echo $player[$hash[$tmp[0]]]["name"]." played ";
+			 display_card($tmp[1]);
+			 $last=$tmp[0];
+		       }
+		   }
+	       }
+	     
+	     $next = $last + 1;
+	     if ($next>=4) 
+	       $next -= 4 ;
+	     if($last<0)
+	       {
+		 $next=$history[sizeof($history)-1][0];
+	       }
+
+
+	     if(isset($_REQUEST["card"]))
+	       {
+		 if($hash[$next]==$me)
+		   {
+		     $card=$_REQUEST["card"];
+		     echo "EMAIL: you played $card ";
+		     $mycards = explode(";",$player[$me]["cards"]);
+		     if(in_array($card,$mycards))
+		       {
+			 $tmp=array();
+			 echo "<br>";
+			 foreach($mycards as $m)
+			   {
+			     if($m!=$card)
+			       {
+				 $tmp[]=$m;
+				 echo "adding card $m <br>";
+			       }
+			   }
+			 $tmp2="";
+			 for($i=0;$i<sizeof($tmp)-1;$i++)
+			   {
+			     $tmp2.=$tmp[$i].";";
+			     echo "adding card $tmp2 at $i <br>";
+			   }
+			 $tmp2.=$tmp[$i];
+			 echo "adding card $tmp2 at $i *<br>";
+			 $player[$me]["cards"]=$tmp2;
+			 
+			 if($last<0)
+			   {
+			     $history[sizeof($history)-1]="".$player[$me]["number"]."->".$card.":\n";
+			   }
+			 else
+			   {
+			     $tmp = explode(":",$history[sizeof($history)-1]);
+			     $tmp[sizeof($tmp)-1] = "".$player[$me]["number"]."->".$card.":";
+			     $history[sizeof($history)-1]=join(":",$tmp);
+			   }
+			 save_status();
+			 
+			 display_card($card);
+		       }
+		     else
+		       echo "seems like you don't have that card<br>";
+			  
+		   }
+		 
+	       }
+	     else if(isset($_REQUEST["win"]) && strlen($history[sizeof($history)-1])>3)
+	       {
+		 $win=$_REQUEST["win"];
+		 $history[]=$win.":\n";
+		 echo "juhu someone won:$win <br>";
+
+		 save_status();
+	       }
+	     echo "<br />";
+
+	     $tmp = explode(":",$history[sizeof($history)-1]);
+
+	     echo sizeof($tmp)." tmp ;;".strlen($tmp[0])." len tmp0  <br>";
+
+	     if(sizeof($tmp)==5)
+	       {
+		 ?>
+<form action="index.php" method="post">
+			  
+ 
+   player1<input type="radio" name="win" value="0" />
+   player2<input type="radio" name="win" value="1" />
+   player3<input type="radio" name="win" value="2" />
+   player4<input type="radio" name="win" value="3" />
+<input type="hidden" name="me" value="hash1" />
+<input type="submit" value="who will win?" />
+
+</form>
+<?php
+	       }
+	     else if(sizeof($tmp)<5 && 1<sizeof($tmp) && !isset($_REQUEST["card"]))
+	       {		 
+		 if(sizeof($tmp)==2 && strlen($tmp[0])==1)
+		   {
+		     $next=$tmp[0];
+		     echo "found the start of a new trick at $next<br>";
+		   }
+		 if($hash[$next]==$me)
+		   {
+		     
+		     echo "ITS YOUR TURN<br>";
+		     $allcards = $player[$me]["cards"];
+		     $mycards = explode(";",$allcards);
+		     
+		     sort($mycards);
+		     echo "your cards are <br>";
+		     foreach($mycards as $card) 
+		       {
+			 display_link_card($card,$me);
+		       }
+		     echo "<br />\n";   
 		   }
 		 echo "<br />";
 		 
-		 
-		 $next = $last + 1;
-		 if ($next>=4) 
-		   $next -= 4 ;
-		     
-		 switch(sizeof($trick))
-		   {
-		   case 1:
-		     echo "new trick , next player ".$trick[0]." <br>";
-		     break;
-		   case 4:
-		     echo "figure out who will win<br>";
-		   case 2:
-		   case 3:
-		     echo "some played $next";
-		     if($hash[$next]==$me)
-		       {
-			 
-		       echo "ITS YOUR TURN<br>";
-		       $allcards = $player[$me]["cards"];
-		       $mycards = explode(";",$allcards);
-		       
-		       sort($mycards);
-		       echo "your cards are <br>";
-		       foreach($mycards as $card) 
-			 {
-			   display_link_card($card,$me);
-			 }
-		       echo "<br />\n";   
-		       }
-		     echo "<br />";
-		     break;
-		   default:
-		     echo "default<br>";
-		   }
 	       }
 	   }
        }
-     
-}      /* is this the last player that needs to accept? */
+
+ }      /* is this the last player that needs to accept? */
          /* yes, figure out who starts, send out email to first player */
    /* no, email the rest to cancel game */
 
