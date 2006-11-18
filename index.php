@@ -12,6 +12,163 @@
 <?php
 /* helper function */
 
+function card_to_name($card)
+{
+  switch($card)
+    {
+      case 1:
+      case 2:
+        return "ten of hearts";
+      case 3:
+      case 4:
+      return "queen of clubs";
+      case 5:
+      case 6:
+      return "queen of spades";
+      case 7:
+      case 8:
+      return "queen of hearts";
+      case 9:
+      case 10:
+      return "queen of diamonds";
+      case 11:
+      case 12:
+      return "jack of clubs";
+      case 13:
+      case 14:
+      return "jack of spades";
+      case 15:
+      case 16:
+      return "jack of hearts";
+      case 17:
+      case 18:
+      return "jack of diamonds";
+      case 19:
+      case 20:
+      return "ace of diamonds";
+      case 21:
+      case 22:
+      return "ten of diamonds";
+      case 23:
+      case 24:
+      return "king of diamonds";
+      case 25:
+      case 26:
+      return "nine of diamonds";;
+      case 27:
+      case 28:
+      return "ace of clubs";
+      case 29:
+      case 30:
+      return "ten of clubs";
+      case 31:
+      case 32:
+      return "king of clubs";
+      case 33:
+      case 34:
+      return "nine of clubs";
+      case 35:
+      case 36:
+      return "ace of spades";
+      case 37:
+      case 38:
+      return "ten of spades";
+      case 39:
+      case 40:
+      return "king of spades";
+      case 41:
+      case 42:
+      return "nine of spades";
+      case 43:
+      case 44:
+      return "ace of hearts";
+      case 45:
+      case 46:
+      return "ace of diamonds";
+      case 47:
+      case 48:
+      return "nine of diamonds";
+      default:
+      return "something went wrong, please contact the admin";
+    }
+}
+
+function card_value($card)
+{
+  switch($card-1)
+    {
+      case 0:
+      case 1:
+        return 10;
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+        return 3;
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      case 15:
+      case 16:
+      case 17:
+        return 2;
+      case 18:
+      case 19:
+        return 11;
+      case 20:
+      case 21:
+        return 10;
+      case 22:
+      case 23:
+        return 4;
+      case 24:
+      case 25:
+      return 0;
+      case 26:
+      case 27:
+      return 11;
+      case 28:
+      case 29:
+      return 10;
+      case 30:
+      case 31:
+      return 4;
+      case 32:
+      case 33:
+      return 0;
+      case 34:
+      case 35:
+      return 11;
+      case 36:
+      case 37:
+      return 10;
+      case 38:
+      case 39:
+      return 4;
+      case 40:
+      case 41:
+      return 0;
+      case 42:
+      case 43:
+      return 11;
+      case 44:
+      case 45:
+      return 4;
+      case 46:
+      case 47:
+      return 0;
+      default:
+      echo "something went wrong, please contact the admin <br>";
+      return 0;
+    }
+}
+
 function display_card($card)
 {
   if( $card/2 - (int)($card/2) == 0.5)
@@ -53,6 +210,7 @@ function save_status()
 	  fwrite($output,"".$player[$key]["name"].":" );
 	  fwrite($output,"".$player[$key]["email"].":" );
 	  fwrite($output,"".$player[$key]["option"].":" );
+	  fwrite($output,"".$player[$key]["points"].":" );
 	  fwrite($output,"".$player[$key]["cards"] .":");
 	  fwrite($output,"\n");
 	}
@@ -117,25 +275,25 @@ if( isset($_REQUEST["PlayerA"]) &&
     $output = fopen("status.txt","w");
     if ($output)
       {
-	fwrite($output, "hash1:".$PlayerA.":".$EmailA."::" );
+	fwrite($output, "hash1:$PlayerA:$EmailA:::" );
 	for($i=0;$i<11;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[11]:" ); $i++;
 	fwrite($output,"\n");
 	
-	fwrite($output, "hash2:$PlayerB:$EmailB::" );
+	fwrite($output, "hash2:$PlayerB:$EmailB:::" );
 	for(;$i<23;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[23]:" ); $i++;
 	fwrite($output,"\n");
 	
-	fwrite($output, "hash3:$PlayerC:$EmailC::" );
+	fwrite($output, "hash3:$PlayerC:$EmailC:::" );
 	for(;$i<35;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[35]:" ); $i++;
 	fwrite($output,"\n");
 	
-	fwrite($output, "hash4:$PlayerD:$EmailD::");
+	fwrite($output, "hash4:$PlayerD:$EmailD:::");
 	for(;$i<47;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[47]:" );
@@ -180,7 +338,8 @@ if(sizeof($lines)<2)
      $player[$tmp[0]]["name"]   = $tmp[1];
      $player[$tmp[0]]["email"]  = $tmp[2];
      $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["cards"]  = $tmp[4];
+     $player[$tmp[0]]["points"] = $tmp[4];
+     $player[$tmp[0]]["cards"]  = $tmp[5];
      if(ereg("s",$tmp[3])) $game["init"]++;
 
      $tmp = explode( ":",$lines[1]);
@@ -189,8 +348,9 @@ if(sizeof($lines)<2)
      $player[$tmp[0]]["hash"]   = $tmp[0];
      $player[$tmp[0]]["name"]   = $tmp[1];
      $player[$tmp[0]]["email"]  = $tmp[2];
-     $player[$tmp[0]]["option"] = $tmp[3]; 
-     $player[$tmp[0]]["cards"]  = $tmp[4];
+     $player[$tmp[0]]["option"] = $tmp[3];
+     $player[$tmp[0]]["points"] = $tmp[4]; 
+     $player[$tmp[0]]["cards"]  = $tmp[5];
      if(ereg("s",$tmp[3])) $game["init"]++;
      
      $tmp = explode( ":",$lines[2]);
@@ -200,7 +360,8 @@ if(sizeof($lines)<2)
      $player[$tmp[0]]["name"]   = $tmp[1];
      $player[$tmp[0]]["email"]  = $tmp[2];
      $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["cards"]  = $tmp[4];
+     $player[$tmp[0]]["points"] = $tmp[4];
+     $player[$tmp[0]]["cards"]  = $tmp[5];
      if(ereg("s",$tmp[3])) $game["init"]++;
      
      $tmp = explode( ":",$lines[3]);
@@ -210,7 +371,8 @@ if(sizeof($lines)<2)
      $player[$tmp[0]]["name"]   = $tmp[1];
      $player[$tmp[0]]["email"]  = $tmp[2];
      $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["cards"]  = $tmp[4];
+     $player[$tmp[0]]["points"] = $tmp[4];
+     $player[$tmp[0]]["cards"]  = $tmp[5];
      if(ereg("s",$tmp[3])) $game["init"]++;
 
      /* save the game history */
@@ -282,23 +444,39 @@ if(sizeof($lines)<2)
 	   }
 	 else
 	   { /* show the hand */
-	     if($_REQUEST["update"]=="card") $player[$b]["option"].="c";
-	     if($_REQUEST["update"]=="turn") $player[$b]["option"].="t";
-	     
-	     $player[$b]["option"].="i";
-	     
-	     save_status();
-	     
-	     $allcards = $player[$b]["cards"];
-	     $mycards = explode(";",$allcards);
-	     
-	     sort($mycards);
-	     echo "your cards are <br>";
-	     foreach($mycards as $card) 
+	     if($_REQUEST["in"]=="no")
 	       {
-		 display_card($card);
+		 for($i=0;$i<4;$i++)
+		   {
+		     echo "Hello ".$player[$hash[$i]]["name"].",\n";
+		     echo "\n";
+		     echo "the game has been cancled due to the request of one of the players.\n";
+		   }
+		   $output = fopen("status.txt","w");
+		   if($output)
+		     fclose($output);
+		   else
+		     echo "problem opening file";
 	       }
-	     echo "<br />\n";   
+	     else
+	       {
+		 if($_REQUEST["update"]=="card") $player[$b]["option"].="c";
+		 if($_REQUEST["update"]=="turn") $player[$b]["option"].="t";
+		 
+		 $player[$b]["option"].="i";
+		 
+		 save_status();
+		 
+		 $allcards = $player[$b]["cards"];
+		 $mycards = explode(";",$allcards);
+		 
+		 sort($mycards);
+		 echo "your cards are <br>";
+		 foreach($mycards as $card) 
+		   {
+		     display_card($card);
+		   }
+		 echo "<br />\n";   
  ?>
  <form action="index.php" method="post">
    
@@ -315,10 +493,11 @@ if(sizeof($lines)<2)
    no<input type="radio" name="poverty" value="no" /> <br />
    
 <?php   
-             echo "<input type=\"hidden\" name=\"c\" value=\"$b\" />\n";
-	     echo "<input type=\"submit\" value=\"count me in\" />\n";
-
-	     echo "</form>\n";
+                 echo "<input type=\"hidden\" name=\"c\" value=\"$b\" />\n";
+		 echo "<input type=\"submit\" value=\"count me in\" />\n";
+		 
+		 echo "</form>\n";
+	       }
 	   }
        }
      if(isset($_REQUEST["c"]))
@@ -390,28 +569,19 @@ if(sizeof($lines)<2)
 		 if($hash[$next]==$me)
 		   {
 		     $card=$_REQUEST["card"];
-		     echo "EMAIL: you played $card ";
 		     $mycards = explode(";",$player[$me]["cards"]);
 		     if(in_array($card,$mycards))
 		       {
 			 $tmp=array();
-			 echo "<br>";
 			 foreach($mycards as $m)
-			   {
-			     if($m!=$card)
-			       {
-				 $tmp[]=$m;
-				 echo "adding card $m <br>";
-			       }
-			   }
+			   if($m!=$card)
+			     $tmp[]=$m;
 			 $tmp2="";
 			 for($i=0;$i<sizeof($tmp)-1;$i++)
 			   {
 			     $tmp2.=$tmp[$i].";";
-			     echo "adding card $tmp2 at $i <br>";
 			   }
 			 $tmp2.=$tmp[$i];
-			 echo "adding card $tmp2 at $i *<br>";
 			 $player[$me]["cards"]=$tmp2;
 			 
 			 if($last<0)
@@ -425,8 +595,28 @@ if(sizeof($lines)<2)
 			     $history[sizeof($history)-1]=join(":",$tmp);
 			   }
 			 save_status();
-			 
+
+			 echo " you played ";
 			 display_card($card);
+			 /* send out email to players who want/need to get informed */
+			 for($i=0;$i<4;$i++)
+			   {
+			     $mynext=$next+1; if($mynext>3)$mynext-=4;
+			     if((ereg("c",$player[$hash[$i]]["option"]) || $i==$mynext) && $hash[$i]!=$me)
+			       {
+				 echo " <br> ** $next** \n Hello ".$player[$hash[$i]]["name"].",\n";
+				 echo "\n";
+				 if($i==$mynext)
+				   echo "it's your turn  now.\n";
+				 echo $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
+				 
+				 echo "<a href=\"index.php?me=hash1\"> player 1</a> <br />";
+				 echo "<a href=\"index.php?me=hash2\"> player 2</a> <br />";
+				 echo "<a href=\"index.php?me=hash3\"> player 3</a> <br />";
+				 echo "<a href=\"index.php?me=hash4\"> player 4</a> <br />";
+				 
+			       }
+			   }
 		       }
 		     else
 		       echo "seems like you don't have that card<br>";
@@ -438,7 +628,19 @@ if(sizeof($lines)<2)
 	       {
 		 $win=$_REQUEST["win"];
 		 $history[]=$win.":\n";
-		 echo "juhu someone won:$win <br>";
+		 /* count points of the last trick */
+		 $points=0;
+		 echo "<br>".$history[sizeof($history)-2]."is the last trick played<br>";
+		 $tmp = explode(":",$history[sizeof($history)-2]);
+		 for($i=0;$i<4;$i++)
+		   {
+		     $tmp2 = explode("->",$tmp[$i]);
+		     $c = $tmp2[1];
+		     $points += card_value($c);
+		     echo "adding card value ".card_value($c)."<br>";
+		   }
+		 $player[$hash[$win]]["points"]+=$points;
+		 echo "<br> ".$player[$hash[$win]]["name"]." won: $points Points <br>";
 
 		 save_status();
 	       }
@@ -446,19 +648,16 @@ if(sizeof($lines)<2)
 
 	     $tmp = explode(":",$history[sizeof($history)-1]);
 
-	     echo sizeof($tmp)." tmp ;;".strlen($tmp[0])." len tmp0  <br>";
-
 	     if(sizeof($tmp)==5)
 	       {
 		 ?>
 <form action="index.php" method="post">
 			  
- 
-   player1<input type="radio" name="win" value="0" />
-   player2<input type="radio" name="win" value="1" />
-   player3<input type="radio" name="win" value="2" />
-   player4<input type="radio" name="win" value="3" />
-<input type="hidden" name="me" value="hash1" />
+<?php 
+   for($i=0;$i<4;$i++)
+     echo $player[$hash[$i]]["name"]." <input type=\"radio\" name=\"win\" value=\"$i\" />";
+   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />";
+?>
 <input type="submit" value="who will win?" />
 
 </form>
@@ -470,12 +669,20 @@ if(sizeof($lines)<2)
 		   {
 		     $next=$tmp[0];
 		     echo "found the start of a new trick at $next<br>";
+		     if(strlen(trim($player[$me]["cards"]))==0)
+		       {
+			 echo "<br> game over, count points <br>";
+			 for($i=0;$i>4;$i++)
+			   {
+			     echo $player[$hash[$i]]["name"]." got ".$player[$hash[$i]]["points"]."<br>";
+			   }
+		       }
 		   }
-		 if($hash[$next]==$me)
+		 if($hash[$next]==$me && strlen(trim($player[$me]["cards"]))>0 )
 		   {
 		     
 		     echo "ITS YOUR TURN<br>";
-		     $allcards = $player[$me]["cards"];
+		     $allcards = trim($player[$me]["cards"]);
 		     $mycards = explode(";",$allcards);
 		     
 		     sort($mycards);
@@ -492,17 +699,8 @@ if(sizeof($lines)<2)
 	   }
        }
 
- }      /* is this the last player that needs to accept? */
-         /* yes, figure out who starts, send out email to first player */
-   /* no, email the rest to cancel game */
+ } 
 
-/* player wants to make a move? */
-  /* check if it is this players turn it is (if it's the players turn, convert cards into links) */
-  /* if it is the last card played*/
-     /* add checkbox for who one the trick */
-     /* email next player */
-     /* last card played? */
-        /* count score for each player */
 ?>
 
 </body>
