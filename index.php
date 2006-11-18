@@ -15,7 +15,7 @@ function mymail($To,$Subject,$message)
 {
   $debug = 1;
   if($debug)
-    echo "<br>To: $To<br>Subject: $subject <br>$message<br>";
+    echo "<br>To: $To<br>Subject: $Subject <br>$message<br>";
   else
     mail($To,$Subject,$message);
   return;
@@ -651,14 +651,13 @@ if(sizeof($lines)<2)
 		 $history[]=$win.":\n";
 		 /* count points of the last trick */
 		 $points=0;
-		 echo "<br>".$history[sizeof($history)-2]."is the last trick played<br>";
+
 		 $tmp = explode(":",$history[sizeof($history)-2]);
 		 for($i=0;$i<4;$i++)
 		   {
 		     $tmp2 = explode("->",$tmp[$i]);
 		     $c = $tmp2[1];
 		     $points += card_value($c);
-		     echo "adding card value ".card_value($c)."<br>";
 		   }
 		 $player[$hash[$win]]["points"]+=$points;
 		 echo "<br> ".$player[$hash[$win]]["name"]." won: $points Points <br>";
@@ -689,7 +688,7 @@ if(sizeof($lines)<2)
 		 if(sizeof($tmp)==2 && strlen($tmp[0])==1)
 		   {
 		     $next=$tmp[0];
-		     echo "found the start of a new trick at $next<br>";
+		     echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next].">the next player</a><br>";
 		     if(strlen(trim($player[$me]["cards"]))==0)
 		       {
 			 echo "<br> game over, count points <br>";
