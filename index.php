@@ -12,7 +12,7 @@
 <?php
 /* helper function */
 function mymail($To,$Subject,$message)
-{
+{  
   $debug = 1;
   if($debug)
     echo "<br>To: $To<br>Subject: $Subject <br>$message<br>";
@@ -471,9 +471,9 @@ if(sizeof($lines)<2)
 	       {
 		 for($i=0;$i<4;$i++)
 		   {
-		     echo "Hello ".$player[$hash[$i]]["name"].",\n";
-		     echo "\n";
-		     echo "the game has been cancled due to the request of one of the players.\n";
+		     $message = "Hello ".$player[$hash[$i]]["name"].",\n\n".
+		       "the game has been cancled due to the request of one of the players.\n";
+		     mymail($player[$hash[$i]]["email"],"[DoKo] the game has been cancled",$message); 
 		   }
 		   $output = fopen("status.txt","w");
 		   if($output)
@@ -501,6 +501,7 @@ if(sizeof($lines)<2)
 		   }
 		 echo "<br />\n";   
  ?>
+ <p>aehm... at the moment please just answer everything with no, still need to implement this</p>	 	  
  <form action="index.php" method="post">
    
    do you want to play solo?
@@ -688,11 +689,14 @@ if(sizeof($lines)<2)
 		 if(sizeof($tmp)==2 && strlen($tmp[0])==1)
 		   {
 		     $next=$tmp[0];
-		     echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next].">the next player</a><br>";
+
+		     /*
+		      * echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next]."\">the next player</a><br>";
+		      */
 		     if(strlen(trim($player[$me]["cards"]))==0)
 		       {
 			 echo "<br> game over, count points <br>";
-			 for($i=0;$i>4;$i++)
+			 for($i=0;$i<4;$i++)
 			   {
 			     echo $player[$hash[$i]]["name"]." got ".$player[$hash[$i]]["points"]."<br>";
 			   }
