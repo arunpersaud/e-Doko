@@ -256,12 +256,21 @@ if( isset($_REQUEST["PlayerA"]) &&
     $EmailD  = $_REQUEST["EmailD"] ;
     
     /* send out email, check for error with email */
-    echo "send out emails to everyone, asking if they want to join";
-    echo "use link <br>";
-    echo "<a href=\"index.php?a=hash1\"> player 1</a> <br />";
-    echo "<a href=\"index.php?a=hash2\"> player 2</a> <br />";
-    echo "<a href=\"index.php?a=hash3\"> player 3</a> <br />";
-    echo "<a href=\"index.php?a=hash4\"> player 4</a> <br />";
+
+    $message = "\n".
+      "you are invited to play a game of DoKo.\n".
+      "The whole round would consist of the following players:\n".
+      "$PlayerA\n".
+      "$PlayerB\n".
+      "$PlayerC\n".
+      "$PlayerD\n\n".
+      "If you want to join this game, please follow this link:\n\n".
+      " http://doko.nubati.net/index.php?a=hash";
+    
+    mail($EmailA,"Invite for a game of DoKo","Hello $PlayerA,\n".$message."1");
+    mail($EmailB,"Invite for a game of DoKo","Hello $PlayerB,\n".$message."2");
+    mail($EmailC,"Invite for a game of DoKo","Hello $PlayerC,\n".$message."3");
+    mail($EmailD,"Invite for a game of DoKo","Hello $PlayerD,\n".$message."4");
     
     /* read in random.txt */
     if(file_exists("random.txt"))
@@ -309,7 +318,7 @@ if( isset($_REQUEST["PlayerA"]) &&
 if(sizeof($lines)<2)
   {
 ?>
- <p> no game in progress, please input 4 names and email addresses </p>
+    <p> no game in progress, please input 4 names and email addresses, please make sure that the addresses are correct! </p>
  <form action="index.php" method="post">
    Name:  <input name="PlayerA" type="text" size="10" maxlength="20" /> 
    Email: <input name="EmailA"  type="text" size="10" maxlength="20" /> <br />
