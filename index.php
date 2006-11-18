@@ -204,6 +204,7 @@ function save_status()
     {
       foreach($hash as $key)
 	{
+	  /* sorting the options, not sure why I do that actually */
 	  $tmp="";
 	  if( ereg("i",$player[$key]["option"]) )
 	    $tmp.="i";
@@ -213,8 +214,29 @@ function save_status()
 	    $tmp.="t";
 	  if( ereg("c",$player[$key]["option"]) )
 	    $tmp.="c";
+	  if( ereg("N",$player[$key]["option"]) )
+	    $tmp.="N";
+	  if( ereg("W",$player[$key]["option"]) )
+	    $tmp.="W";
+	  if( ereg("P",$player[$key]["option"]) )
+	    $tmp.="P";
+	  if( ereg("O",$player[$key]["option"]) )
+	    $tmp.="O";
+	  if( ereg("S",$player[$key]["option"]) )
+	    $tmp.="S";
+	  if( ereg("Q",$player[$key]["option"]) )
+	    $tmp.="Q";
+	  if( ereg("J",$player[$key]["option"]) )
+	    $tmp.="J";
+	  if( ereg("C",$player[$key]["option"]) )
+	    $tmp.="C";
+	  if( ereg("A",$player[$key]["option"]) )
+	    $tmp.="A";
+	  if( ereg("H",$player[$key]["option"]) )
+	    $tmp.="H";
 	  $player[$key]["option"]=$tmp;
 
+	  /* saving the player stats */
 	  fwrite($output,"".$player[$key]["hash"].":" );
 	  fwrite($output,"".$player[$key]["name"].":" );
 	  fwrite($output,"".$player[$key]["email"].":" );
@@ -353,6 +375,11 @@ if(sizeof($lines)<2)
  else
    { /* load game status */
      $game["init"]=0;
+     $game["solo-who"]=-1;
+     $game["solo-what"]="";
+     $game["wedding"]=0;
+     $game["poverty"]=0;
+     $game["nines"]=0;
      
      $tmp = explode( ":",$lines[0]);
      $hash[0]   = $tmp[0];
@@ -504,9 +531,18 @@ if(sizeof($lines)<2)
  <p>aehm... at the moment please just answer everything with no, still need to implement this</p>	 	  
  <form action="index.php" method="post">
    
-   do you want to play solo?
-   yes<input type="radio" name="solo" value="yes" />
-   no<input type="radio" name="solo" value="no" /> <br />
+   do you want to play solo? 
+   <select name="solo" size="1">
+     <option>No</option>
+     <option>No trump</option>
+     <option>Normal solo</option>
+     <option>Queen solo</option>
+     <option>Jack solo</option>
+     <option>Club solo</option>
+     <option>Spade solo</option>
+     <option>Heart solo</option>
+   </select>     
+   <br />
 
    do you have a wedding?
    yes<input type="radio" name="wedding" value="yes" />
@@ -515,6 +551,10 @@ if(sizeof($lines)<2)
    do you have poverty?
    yes<input type="radio" name="poverty" value="yes" />
    no<input type="radio" name="poverty" value="no" /> <br />
+
+   do too many nines?
+   yes<input type="radio" name="nines" value="yes" />
+   no<input type="radio" name="nines" value="no" /> <br />
    
 <?php   
                  echo "<input type=\"hidden\" name=\"c\" value=\"$b\" />\n";
@@ -528,7 +568,7 @@ if(sizeof($lines)<2)
        {
 	 $c=$_REQUEST["c"];
 	 
-	 if(!isset($_REQUEST["solo"])|| !isset($_REQUEST["wedding"])|| !isset($_REQUEST["poverty"]) )
+	 if(!isset($_REQUEST["solo"])|| !isset($_REQUEST["wedding"])|| !isset($_REQUEST["poverty"]) || !isset($_REQUEST["nines"]) )
 	   {
 	     echo "go back to ";
 	     echo "<a href=\"index.php?b=$c\"> here and fill out the form </a> <br />";
@@ -540,7 +580,48 @@ if(sizeof($lines)<2)
 	 else if($game["init"]<4)
 	   { 
 	     echo "handle krankheit <br />";
-
+	     if( $_REQUEST["solo"]!="No")
+	       {
+		 switch($_REQUEST["solo"])
+		   {
+		   case "No trump":
+		     $player[$c]["option"].="O";
+		     break;
+		   case "Normal solo":
+		     $player[$c]["option"].="S";
+		     break;
+		   case "Queen solo":
+		     $player[$c]["option"].="Q";
+		     break;
+		   case "Jack solo":
+		     $player[$c]["option"].="J";
+		     break;
+		   case "Club solo":
+		     $player[$c]["option"].="C";
+		     break;
+		   case "Spade solo":
+		     $player[$c]["option"].="A";
+		     break;
+		   case "Hear solo":
+		     $player[$c]["option"].="H";
+		     break;
+		   }
+	       }
+	     else if($_REQUEST["wedding"] == "yes")
+	       {
+		 echo "wedding was chosen<br>";
+		 $player[$c]["option"].="W";
+	       }
+	     else if($_REQUEST["poverty"] == "yes")
+	       {
+		 echo "poverty was chosen<br>";
+		 $player[$c]["option"].="P"; 
+	       }
+	     else if($_REQUEST["nines"] == "yes")
+	       {
+		 echo "nines was chosen<br>";
+		 $player[$c]["option"].="N";
+	       }
 	     $message = "you're in. once everyone has filled out the form,".
 	       "the game will start and you'll get an eamil on your turn\n";
 	     mymail($player[$c]["email"],"[DoKo] the game will start soon",$message); 
