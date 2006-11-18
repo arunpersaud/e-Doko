@@ -11,6 +11,15 @@
 
 <?php
 /* helper function */
+function mymail($To,$Subject,$message)
+{
+  $debug = 1;
+  if($debug)
+    echo "<br>To: $To<br>Subject: $subject <br>$message<br>";
+  else
+    mail($To,$Subject,$message);
+  return;
+}
 
 function card_to_name($card)
 {
@@ -244,7 +253,7 @@ if( isset($_REQUEST["PlayerA"]) &&
     isset($_REQUEST["EmailA"]) && 
     isset($_REQUEST["EmailB"]) && 
     isset($_REQUEST["EmailC"]) && 
-    isset($_REQUEST["EmailD"]) )
+    isset($_REQUEST["EmailD"]) && sizeof($lines<2))
   {
     $PlayerA = $_REQUEST["PlayerA"];
     $PlayerB = $_REQUEST["PlayerB"];
@@ -255,6 +264,11 @@ if( isset($_REQUEST["PlayerA"]) &&
     $EmailC  = $_REQUEST["EmailC"] ;
     $EmailD  = $_REQUEST["EmailD"] ;
     
+    $hashA = md5("AGameOfDoko".$PlayerA.$EmailA);
+    $hashB = md5("AGameOfDoko".$PlayerB.$EmailB);
+    $hashC = md5("AGameOfDoko".$PlayerC.$EmailC);
+    $hashD = md5("AGameOfDoko".$PlayerD.$EmailD);
+
     /* send out email, check for error with email */
 
     $message = "\n".
@@ -265,12 +279,12 @@ if( isset($_REQUEST["PlayerA"]) &&
       "$PlayerC\n".
       "$PlayerD\n\n".
       "If you want to join this game, please follow this link:\n\n".
-      " http://doko.nubati.net/index.php?a=hash";
+      " http://doko.nubati.net/index.php?a=";
     
-    mail($EmailA,"Invite for a game of DoKo","Hello $PlayerA,\n".$message."1");
-    mail($EmailB,"Invite for a game of DoKo","Hello $PlayerB,\n".$message."2");
-    mail($EmailC,"Invite for a game of DoKo","Hello $PlayerC,\n".$message."3");
-    mail($EmailD,"Invite for a game of DoKo","Hello $PlayerD,\n".$message."4");
+    mymail($EmailA,"Invite for a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
+    mymail($EmailB,"Invite for a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
+    mymail($EmailC,"Invite for a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
+    mymail($EmailD,"Invite for a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
     
     /* read in random.txt */
     if(file_exists("random.txt"))
@@ -284,25 +298,25 @@ if( isset($_REQUEST["PlayerA"]) &&
     $output = fopen("status.txt","w");
     if ($output)
       {
-	fwrite($output, "hash1:$PlayerA:$EmailA:::" );
+	fwrite($output, "$hashA:$PlayerA:$EmailA:::" );
 	for($i=0;$i<11;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[11]:" ); $i++;
 	fwrite($output,"\n");
 	
-	fwrite($output, "hash2:$PlayerB:$EmailB:::" );
+	fwrite($output, "$hashB:$PlayerB:$EmailB:::" );
 	for(;$i<23;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[23]:" ); $i++;
 	fwrite($output,"\n");
 	
-	fwrite($output, "hash3:$PlayerC:$EmailC:::" );
+	fwrite($output, "$hashC:$PlayerC:$EmailC:::" );
 	for(;$i<35;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[35]:" ); $i++;
 	fwrite($output,"\n");
 	
-	fwrite($output, "hash4:$PlayerD:$EmailD:::");
+	fwrite($output, "$hashD:$PlayerD:$EmailD:::");
 	for(;$i<47;$i++)
 	  fwrite($output,"$randomNR[$i];" );
 	fwrite($output,"$randomNR[47]:" );
@@ -526,8 +540,9 @@ if(sizeof($lines)<2)
 	   { 
 	     echo "handle krankheit <br />";
 
-	     echo "email this out: you're in. once everyone has filled out the form,";
-	     echo "the game will start and you'll get an eamil about it";
+	     $message = "you're in. once everyone has filled out the form,".
+	       "the game will start and you'll get an eamil on your turn\n";
+	     mymail($player[$c]["email"],"[DoKo] the game will start soon",$message); 
 	     
 	     $player[$c]["option"].="s";
 
@@ -613,17 +628,14 @@ if(sizeof($lines)<2)
 			     $mynext=$next+1; if($mynext>3)$mynext-=4;
 			     if((ereg("c",$player[$hash[$i]]["option"]) || $i==$mynext) && $hash[$i]!=$me)
 			       {
-				 echo " <br> ** $next** \n Hello ".$player[$hash[$i]]["name"].",\n";
-				 echo "\n";
+				 $message = " Hello ".$player[$hash[$i]]["name"].",\n\n";
+				   
 				 if($i==$mynext)
-				   echo "it's your turn  now.\n";
-				 echo $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
+				   $message .= "it's your turn  now.\n";
+				 $message .= $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
 				 
-				 echo "<a href=\"index.php?me=hash1\"> player 1</a> <br />";
-				 echo "<a href=\"index.php?me=hash2\"> player 2</a> <br />";
-				 echo "<a href=\"index.php?me=hash3\"> player 3</a> <br />";
-				 echo "<a href=\"index.php?me=hash4\"> player 4</a> <br />";
-				 
+				 mymail($player[$hash[$i]]["email"],"[DoKo] a card has been played",$message);
+				 echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />";
 			       }
 			   }
 		       }
