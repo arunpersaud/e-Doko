@@ -3,23 +3,138 @@
     "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
-     <title>Doko via email</title>
+     <title>e-Doko</title>
      <link rel="stylesheet" type="text/css" href="standard.css"/>	
   </head>
 <body>
 <h1> Welcome to E-Doko </h1>
 
 <?php
+/*
+ * config 
+ */
+
+$host  = "http://doko.nubati.net/index.php";
+$debug = 1;
+
+/*
+ * end config
+ */	
+					
+
 /* helper function */
 function mymail($To,$Subject,$message)
 {  
-  $debug = 1;
+  global $debug;
+
   if($debug)
-    echo "<br>To: $To<br>Subject: $Subject <br>$message<br>";
+    {
+      str_replace("\n","<br />",$message);
+      echo "<br>To: $To<br>Subject: $Subject <br>$message<br>";
+    }
   else
     mail($To,$Subject,$message);
   return;
 }
+
+function parse_status()
+{
+  global $game,$history,$player,$hash,$lines;
+  
+  $game["init"]        = 0;
+  $game["solo-who"]    = -1;
+  $game["solo-what"]   = "todo";
+  $game["wedding"]     = -1;
+  $game["poverty"]     = -1;
+  $game["nines"]       = -1;
+  $game["startplayer"] = 0;
+
+  for($i=0;$i<4;$i++)
+    {
+      $tmp = explode( ":",$lines[$i]);
+      $hash[$i]   = $tmp[0];
+      $player[$tmp[0]]["number"] = $i;
+      $player[$tmp[0]]["hash"]   = $tmp[0];
+      $player[$tmp[0]]["name"]   = $tmp[1];
+      $player[$tmp[0]]["email"]  = $tmp[2];
+      $player[$tmp[0]]["option"] = $tmp[3];
+      $player[$tmp[0]]["points"] = $tmp[4]; 
+      $player[$tmp[0]]["cards"]  = $tmp[5];
+      if(ereg("s",$tmp[3])) $game["init"]++;
+      if(ereg("P",$tmp[3])) $game["poverty"] = $i;
+      if(ereg("N",$tmp[3])) $game["nines"]   = $i;
+      if(ereg("W",$tmp[3])) $game["wedding"] = $i;
+      if(ereg("[OSQJCAH]",$tmp[3]) && ($game["solo-who"]<0) )
+	{
+	  $game["solo-who"]    = $i;     
+	  $game["startplayer"] = $i;
+	}
+  
+    }  
+  /* save the game history */
+  for($i=4;$i<sizeof($lines);$i++)
+    {
+      if(!ereg("^[[:space:]]*$",trim($lines[$i])))
+	{
+	  $history[] = $lines[$i];
+	}
+    }
+  
+  if(sizeof($history)==0 || (sizeof($history)==1 && strlen($history[0])==3 ))
+    $history[0] = $game["startplayer"].":";
+  
+  return;
+}
+
+function count_nines($cards)
+{
+  $card = explode(";",$cards);
+  
+  $nines =0;
+
+  foreach($card as $c)
+    {
+      if($c == "25" || $c == "26") $nines++;
+      else if($c == "33" || $c == "34") $nines++;
+      else if($c == "41" || $c == "42") $nines++;
+      else if($c == "47" || $c == "48") $nines++;
+    }
+  
+  return $nines;
+}
+
+function check_wedding($cards)
+{
+  $card = explode(";",$cards);
+  
+  $count =0;
+
+  if( in_array("3",$card) && in_array("2",$card) )
+    $count=1;
+
+  return $count;
+}
+
+function count_trump($cards)
+{
+  $card = explode(";",$cards);
+  
+  $trump =0;
+
+  /* count each trump */
+  foreach($card as $c)
+    {
+      if( (int)($c) <27) $trump++;
+    }
+
+  /* subtract one, in case player has both foxes */
+  if( in_array("19",$card) && in_array("20",$card) )
+    $trump--;
+
+  return $trump;
+}
+
+
 
 function card_to_name($card)
 {
@@ -220,7 +335,7 @@ function save_status()
 	    $tmp.="W";
 	  if( ereg("P",$player[$key]["option"]) )
 	    $tmp.="P";
-	  if( ereg("O",$player[$key]["option"]) )
+	  if( ereg("O",$player[$key]["option"]) ) 
 	    $tmp.="O";
 	  if( ereg("S",$player[$key]["option"]) )
 	    $tmp.="S";
@@ -301,7 +416,7 @@ if( isset($_REQUEST["PlayerA"]) &&
       "$PlayerC\n".
       "$PlayerD\n\n".
       "If you want to join this game, please follow this link:\n\n".
-      " http://doko.nubati.net/index.php?a=";
+      " ".$host."?a=";
     
     mymail($EmailA,"Invite for a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
     mymail($EmailB,"Invite for a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
@@ -374,68 +489,7 @@ if(sizeof($lines)<2)
    }
  else
    { /* load game status */
-     $game["init"]=0;
-     $game["solo-who"]=-1;
-     $game["solo-what"]="";
-     $game["wedding"]=0;
-     $game["poverty"]=0;
-     $game["nines"]=0;
-     
-     $tmp = explode( ":",$lines[0]);
-     $hash[0]   = $tmp[0];
-     $player[$tmp[0]]["number"] = 0;
-     $player[$tmp[0]]["hash"]   = $tmp[0];
-     $player[$tmp[0]]["name"]   = $tmp[1];
-     $player[$tmp[0]]["email"]  = $tmp[2];
-     $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["points"] = $tmp[4];
-     $player[$tmp[0]]["cards"]  = $tmp[5];
-     if(ereg("s",$tmp[3])) $game["init"]++;
-
-     $tmp = explode( ":",$lines[1]);
-     $hash[1]   = $tmp[0];
-     $player[$tmp[0]]["number"] = 1;
-     $player[$tmp[0]]["hash"]   = $tmp[0];
-     $player[$tmp[0]]["name"]   = $tmp[1];
-     $player[$tmp[0]]["email"]  = $tmp[2];
-     $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["points"] = $tmp[4]; 
-     $player[$tmp[0]]["cards"]  = $tmp[5];
-     if(ereg("s",$tmp[3])) $game["init"]++;
-     
-     $tmp = explode( ":",$lines[2]);
-     $hash[2]   = $tmp[0];
-     $player[$tmp[0]]["number"] = 2;
-     $player[$tmp[0]]["hash"]   = $tmp[0];
-     $player[$tmp[0]]["name"]   = $tmp[1];
-     $player[$tmp[0]]["email"]  = $tmp[2];
-     $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["points"] = $tmp[4];
-     $player[$tmp[0]]["cards"]  = $tmp[5];
-     if(ereg("s",$tmp[3])) $game["init"]++;
-     
-     $tmp = explode( ":",$lines[3]);
-     $hash[3]   = $tmp[0];
-     $player[$tmp[0]]["number"] = 3;
-     $player[$tmp[0]]["hash"]   = $tmp[0];
-     $player[$tmp[0]]["name"]   = $tmp[1];
-     $player[$tmp[0]]["email"]  = $tmp[2];
-     $player[$tmp[0]]["option"] = $tmp[3];
-     $player[$tmp[0]]["points"] = $tmp[4];
-     $player[$tmp[0]]["cards"]  = $tmp[5];
-     if(ereg("s",$tmp[3])) $game["init"]++;
-
-     /* save the game history */
-     for($i=4;$i<sizeof($lines);$i++)
-       {
-	 if(!ereg("^[[:space:]]*$",trim($lines[$i])))
-	   {
-	     $history[] = $lines[$i];
-	   }
-       }
-     if(sizeof($history)== 0)
-       $history[] = "0:";
-
+     parse_status();
 /*     **
  *    *  *
  *    ****
@@ -487,7 +541,7 @@ if(sizeof($lines)<2)
 	   {
 	     echo "just wait for the game to start";
 	   }
-	 else if(!isset($_REQUEST["in"])|| !isset($_REQUEST["update"]) )
+	 else if( (!isset($_REQUEST["in"])|| !isset($_REQUEST["update"])) && !ereg("i",$player[$b]["option"]))
 	   {
 	     echo "go back to ";
 	     echo "<a href=\"index.php?a=$b\"> here and fill out the form </a> <br />";
@@ -544,19 +598,41 @@ if(sizeof($lines)<2)
    </select>     
    <br />
 
-   do you have a wedding?
-   yes<input type="radio" name="wedding" value="yes" />
-   no<input type="radio" name="wedding" value="no" /> <br />
-
-   do you have poverty?
-   yes<input type="radio" name="poverty" value="yes" />
-   no<input type="radio" name="poverty" value="no" /> <br />
-
-   do too many nines?
-   yes<input type="radio" name="nines" value="yes" />
-   no<input type="radio" name="nines" value="no" /> <br />
-   
 <?php   
+     
+                 echo "wedding?";
+		 if(check_wedding($player[$b]["cards"]))
+		   {
+		     echo " yes<input type=\"radio\" name=\"wedding\" value=\"yes\" />";
+		     echo " no <input type=\"radio\" name=\"wedding\" value=\"no\" /> <br />";
+		   }
+		 else
+		   {
+		     echo " no <input type=\"hidden\" name=\"wedding\" value=\"no\" /> <br />";
+		   };
+
+                 echo "do you have poverty?";
+		 if(count_trump($player[$b]["cards"])<4)
+		   {
+		     echo " yes<input type=\"radio\" name=\"poverty\" value=\"yes\" />";
+		     echo " no <input type=\"radio\" name=\"poverty\" value=\"no\" /> <br />";
+		   }
+		 else
+		   {
+		     echo " no <input type=\"hidden\" name=\"poverty\" value=\"no\" /> <br />";
+		   };
+
+                 echo "do you have too many nines?";
+		 if(count_nines($player[$b]["cards"])>4)
+		   {
+		     echo " yes<input type=\"radio\" name=\"nines\" value=\"yes\" />";
+		     echo " no <input type=\"radio\" name=\"nines\" value=\"no\" /> <br />";
+		   }
+		 else
+		   {
+		     echo " no <input type=\"hidden\" name=\"nines\" value=\"no\" /> <br />";
+		   };
+
                  echo "<input type=\"hidden\" name=\"c\" value=\"$b\" />\n";
 		 echo "<input type=\"submit\" value=\"count me in\" />\n";
 		 
@@ -579,7 +655,6 @@ if(sizeof($lines)<2)
 	   }
 	 else if($game["init"]<4)
 	   { 
-	     echo "handle krankheit <br />";
 	     if( $_REQUEST["solo"]!="No")
 	       {
 		 switch($_REQUEST["solo"])
@@ -622,25 +697,60 @@ if(sizeof($lines)<2)
 		 echo "nines was chosen<br>";
 		 $player[$c]["option"].="N";
 	       }
+	     
 	     $message = "you're in. once everyone has filled out the form,".
 	       "the game will start and you'll get an eamil on your turn\n";
 	     mymail($player[$c]["email"],"[DoKo] the game will start soon",$message); 
-	     
-	     $player[$c]["option"].="s";
 
+	     $player[$c]["option"].="s";
 	     save_status();
+	     if(file_exists("status.txt"))
+	       $lines = file("status.txt");
+	     else
+	       die("no file");
+	     parse_status();
+
+	     if($game["init"]==4)
+3	       {
+		 $message = "The game can start now, it's your turn, please use this link to play a card:\n".
+		   $host."?me=".$hash[$game["startplayer"]]."\n";
+		 mymail($player[$hash[$game["startplayer"]]]["email"],"[DoKo] let's go",$message);
+	       }
+	     
 	   }
        }
      if($game["init"]==4)
        {
+	 /* check for sickness*/
+	 /***** someone has 5 nines and no one is playing solo=> cancel game */
+	 if($game["nines"]>=0 && $game["solo-who"]<0)
+	   {
+	     $message = $player[$hash[$game["poverty"]]]["nines"]." has more than 4 nines. Game aborted!\n";
+	     for($i=0;$i<4;$i++)
+	       {
+		 mymail($player[$hash[$i]]["email"],"[DoKo] the game has been canceled",$message); 
+	       }
+	     $output = fopen("status.txt","w");
+	     if($output)
+	       fclose($output);
+	     else
+	       echo "problem opening file";
+	   }
+
+	 /* who is requesting this*/
 	 if(!isset($_REQUEST["me"]))
 	   echo "a game is in progress, but you are not playing";
 	 else
 	   {
 	     $me = $_REQUEST["me"];
 
-	     echo "game in progress and you are in it<br>";
-	     foreach($history as $play)
+	     echo "game in progress and you are in it<br />";
+	     if($game["solo-who"]>=0)
+	       echo $player[$hash[$game["solo-who"]]]["name"]." is playing a ".$game["solo-what"]." solo!<br />";
+	     else if($game["wedding"]>=0)
+	       echo $player[$hash[$game["wedding"]]]["name"]." is playing a wedding!<br />";
+	     
+	     foreach($history as $play) 
 	       {
 		 echo "<br />";
 
@@ -716,6 +826,9 @@ if(sizeof($lines)<2)
 				   $message .= "it's your turn  now.\n";
 				 $message .= $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
 				 
+				 if($game["solo-who"]<=0)
+				   $message.= $player[$hash[$game["solo-who"]]]." is playing a ".$game["solo-what"]." solo!\n";
+
 				 mymail($player[$hash[$i]]["email"],"[DoKo] a card has been played",$message);
 				 echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />";
 			       }
@@ -754,13 +867,13 @@ if(sizeof($lines)<2)
 	       {
 		 ?>
 <form action="index.php" method="post">
-			  
+who won?
 <?php 
    for($i=0;$i<4;$i++)
      echo $player[$hash[$i]]["name"]." <input type=\"radio\" name=\"win\" value=\"$i\" />";
    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />";
 ?>
-<input type="submit" value="who will win?" />
+<input type="submit" value="submit" />
 
 </form>
 <?php
@@ -771,9 +884,9 @@ if(sizeof($lines)<2)
 		   {
 		     $next=$tmp[0];
 
-		     /*
-		      * echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next]."\">the next player</a><br>";
-		      */
+		     if($debug)
+		       echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next]."\">the next player</a><br>";
+		      
 		     if(strlen(trim($player[$me]["cards"]))==0)
 		       {
 			 echo "<br> game over, count points <br>";
