@@ -4,18 +4,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
      <title>e-Doko</title>
-     <link rel="stylesheet" type="text/css" href="standard.css"/>	
+     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
+     <link rel="stylesheet" type="text/css" href="standard.css" />	
   </head>
 <body>
 <h1> Welcome to E-Doko </h1>
-
+<p>
 <?php
 /*
  * config 
  */
 
 $host  = "http://doko.nubati.net/index.php";
-$debug = 1;
+$debug = 0;
 
 /*
  * end config
@@ -208,10 +209,10 @@ function card_to_name($card)
       return "ace of hearts";
       case 45:
       case 46:
-      return "ace of diamonds";
+      return "king of hearts";
       case 47:
       case 48:
-      return "nine of diamonds";
+      return "nine of hearts";
       default:
       return "something went wrong, please contact the admin";
     }
@@ -296,17 +297,18 @@ function card_value($card)
 function display_card($card)
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<img src=\"cards/".$card.".png\" height=\"100\">";
+    echo "<img src=\"cards/".$card.".png\" height=\"100\" alt=\"".card_to_name($card)."\" />";
   else
-    echo "<img src=\"cards/".($card-1).".png\" height=\"100\">";
+    echo "<img src=\"cards/".($card-1).".png\" height=\"100\" alt=\"".card_to_name($card-1)."\" />";
   return;
 }
-   function display_link_card($card,$me)
+
+function display_link_card($card,$me)
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<a href=\"index.php?me=$me&card=$card\"><img src=\"cards/".$card.".png\" height=\"100\"></a>";
+    echo "<a href=\"index.php?me=$me&card=$card\"><img src=\"cards/".$card.".png\" height=\"100\" alt=\"".card_to_name($card)."\" /></a>";
   else
-    echo "<a href=\"index.php?me=$me&card=$card\"><img src=\"cards/".($card-1).".png\" height=\"100\"></a>";
+    echo "<a href=\"index.php?me=$me&card=$card\"><img src=\"cards/".($card-1).".png\" height=\"100\" alt=\"".card_to_name($card-1)."\" /></a>";
   return;
 }
 
@@ -409,7 +411,9 @@ if( isset($_REQUEST["PlayerA"]) &&
     /* send out email, check for error with email */
 
     $message = "\n".
-      "you are invited to play a game of DoKo.\n".
+      "you are invited to play a game of DoKo (that is to debug the program ;).\n".
+      "Place comments and bug reports here:\n".
+      "http://wiki.nubati.net/index.php?title=EmailDoko\n\n".
       "The whole round would consist of the following players:\n".
       "$PlayerA\n".
       "$PlayerB\n".
@@ -472,16 +476,16 @@ if(sizeof($lines)<2)
     <p> no game in progress, please input 4 names and email addresses, please make sure that the addresses are correct! </p>
  <form action="index.php" method="post">
    Name:  <input name="PlayerA" type="text" size="10" maxlength="20" /> 
-   Email: <input name="EmailA"  type="text" size="10" maxlength="20" /> <br />
+   Email: <input name="EmailA"  type="text" size="20" maxlength="30" /> <br />
 
    Name:  <input name="PlayerB" type="text" size="10" maxlength="20" /> 
-   Email: <input name="EmailB"  type="text" size="10" maxlength="20" /> <br />
+   Email: <input name="EmailB"  type="text" size="20" maxlength="30" /> <br />
 
    Name:  <input name="PlayerC" type="text" size="10" maxlength="20" /> 
-   Email: <input name="EmailC"  type="text" size="10" maxlength="20" /> <br />
+   Email: <input name="EmailC"  type="text" size="20" maxlength="30" /> <br />
 
    Name:  <input name="PlayerD" type="text" size="10" maxlength="20" /> 
-   Email: <input name="EmailD"  type="text" size="10" maxlength="20" /> <br />
+   Email: <input name="EmailD"  type="text" size="20" maxlength="30" /> <br />
 
    <input type="submit" value="start game" />
  </form>
@@ -553,8 +557,8 @@ if(sizeof($lines)<2)
 		 for($i=0;$i<4;$i++)
 		   {
 		     $message = "Hello ".$player[$hash[$i]]["name"].",\n\n".
-		       "the game has been cancled due to the request of one of the players.\n";
-		     mymail($player[$hash[$i]]["email"],"[DoKo] the game has been cancled",$message); 
+		       "the game has been canceled due to the request of one of the players.\n";
+		     mymail($player[$hash[$i]]["email"],"[DoKo-Debug] the game has been canceled",$message); 
 		   }
 		   $output = fopen("status.txt","w");
 		   if($output)
@@ -700,7 +704,7 @@ if(sizeof($lines)<2)
 	     
 	     $message = "you're in. once everyone has filled out the form,".
 	       "the game will start and you'll get an eamil on your turn\n";
-	     mymail($player[$c]["email"],"[DoKo] the game will start soon",$message); 
+	     mymail($player[$c]["email"],"[DoKo-debug] the game will start soon",$message); 
 
 	     $player[$c]["option"].="s";
 	     save_status();
@@ -711,10 +715,10 @@ if(sizeof($lines)<2)
 	     parse_status();
 
 	     if($game["init"]==4)
-3	       {
+	       {
 		 $message = "The game can start now, it's your turn, please use this link to play a card:\n".
 		   $host."?me=".$hash[$game["startplayer"]]."\n";
-		 mymail($player[$hash[$game["startplayer"]]]["email"],"[DoKo] let's go",$message);
+		 mymail($player[$hash[$game["startplayer"]]]["email"],"[DoKo-debug] let's go",$message);
 	       }
 	     
 	   }
@@ -722,13 +726,13 @@ if(sizeof($lines)<2)
      if($game["init"]==4)
        {
 	 /* check for sickness*/
-	 /***** someone has 5 nines and no one is playing solo=> cancel game */
+	 /***** someone has 5 nines and no one is playing solo=> cance5Al game */
 	 if($game["nines"]>=0 && $game["solo-who"]<0)
 	   {
 	     $message = $player[$hash[$game["poverty"]]]["nines"]." has more than 4 nines. Game aborted!\n";
 	     for($i=0;$i<4;$i++)
 	       {
-		 mymail($player[$hash[$i]]["email"],"[DoKo] the game has been canceled",$message); 
+		 mymail($player[$hash[$i]]["email"],"[DoKo-debug] the game has been canceled",$message); 
 	       }
 	     $output = fopen("status.txt","w");
 	     if($output)
@@ -739,7 +743,38 @@ if(sizeof($lines)<2)
 
 	 /* who is requesting this*/
 	 if(!isset($_REQUEST["me"]))
-	   echo "a game is in progress, but you are not playing";
+	  {	
+	   if(!isset($_REQUEST["recovery"]))
+           {
+	     echo "a game is in progress, but you are not playing.<br />";
+	     echo "In case you are playing, but lost your email or can't access the game anymore, please input your email here:<br />";
+?>
+ <form action="index.php" method="post">
+   recorvery: <input name="recovery"  type="text" size="20" maxlength="30" /> <br />
+   <input type="submit" value="get me back into the game" />
+ </form>
+<?php
+           }
+	   else
+	  {
+	    $recovery=$_REQUEST["recovery"];
+	    $ok=-1;
+	    for($i=0;$i<4;$i++)
+		if(trim($recovery)==trim($player[$hash[$i]]["email"]))
+	          $ok=$i;
+	    if($ok>=0)
+	     {
+ 	       $message = "Please try this link: ".$host."?me=".$hash[$ok]."\n".
+		          "\n if this doesn't work, contact the admin.\n";
+		mymail($recovery,"[DoKo-Debug] recovery ",$message);
+	       echo "email has been sent.";
+	     }
+	   else
+             {
+	       echo "can't find this email address, sorry.";
+             }; 
+          }	
+          }
 	 else
 	   {
 	     $me = $_REQUEST["me"];
@@ -823,14 +858,19 @@ if(sizeof($lines)<2)
 				 $message = " Hello ".$player[$hash[$i]]["name"].",\n\n";
 				   
 				 if($i==$mynext)
-				   $message .= "it's your turn  now.\n";
+		                 {
+				   $message .= "it's your turn  now.\n".
+	                                    "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
+                                 }
 				 $message .= $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
 				 
-				 if($game["solo-who"]<=0)
+				 if($game["solo-who"]>=0)
 				   $message.= $player[$hash[$game["solo-who"]]]." is playing a ".$game["solo-what"]." solo!\n";
 
-				 mymail($player[$hash[$i]]["email"],"[DoKo] a card has been played",$message);
-				 echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />";
+				 mymail($player[$hash[$i]]["email"],"[DoKo-debug] a card has been played",$message);
+
+				 if($debug)
+	                           echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />";
 			       }
 			   }
 		       }
@@ -920,6 +960,6 @@ who won?
  } 
 
 ?>
-
+</p>
 </body>
 </html>
