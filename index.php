@@ -872,7 +872,7 @@ if(sizeof($lines)<2)
 				     $message .= "it's your turn  now.\n".
 				       "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
 				   }
-				 $message .= $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
+				 $message .= $player[$me]["name"]." has played the following card ".card_to_name($card)."\n";
 				 
 				 if($game["solo-who"]>=0)
 				   $message.= $player[$hash[$game["solo-who"]]]." is playing a ".$game["solo-what"]." solo!\n";
