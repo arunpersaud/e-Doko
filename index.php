@@ -743,52 +743,53 @@ if(sizeof($lines)<2)
 
 	 /* who is requesting this*/
 	 if(!isset($_REQUEST["me"]))
-	  {	
-	   if(!isset($_REQUEST["recovery"]))
-           {
-	     echo "a game is in progress, but you are not playing.<br />";
-	     echo "In case you are playing, but lost your email or can't access the game anymore, please input your email here:<br />";
-?>
+	   {	
+	     if(!isset($_REQUEST["recovery"]))
+	       {
+		 echo "a game is in progress, but you are not playing.<br />";
+		 echo "In case you are playing, but lost your email or can't access the game anymore, please input your email here:<br />";
+		 ?>
  <form action="index.php" method="post">
    recorvery: <input name="recovery"  type="text" size="20" maxlength="30" /> <br />
    <input type="submit" value="get me back into the game" />
  </form>
 <?php
-           }
-	   else
-	  {
-	    $recovery=$_REQUEST["recovery"];
-	    $ok=-1;
-	    for($i=0;$i<4;$i++)
-		if(trim($recovery)==trim($player[$hash[$i]]["email"]))
-	          $ok=$i;
-	    if($ok>=0)
-	     {
- 	       $message = "Please try this link: ".$host."?me=".$hash[$ok]."\n".
-		          "\n if this doesn't work, contact the admin.\n";
-		mymail($recovery,"[DoKo-Debug] recovery ",$message);
-	       echo "email has been sent.";
-	     }
-	   else
-             {
-	       echo "can't find this email address, sorry.";
-             }; 
-          }	
-          }
+               }
+	     else
+	       {
+		 $recovery=$_REQUEST["recovery"];
+		 $ok=-1;
+		 for($i=0;$i<4;$i++)
+		   if(trim($recovery)==trim($player[$hash[$i]]["email"]))
+		     $ok=$i;
+		 if($ok>=0)
+		   {
+		     $message = "Please try this link: ".$host."?me=".$hash[$ok]."\n".
+		       "\n if this doesn't work, contact the admin.\n";
+		     mymail($recovery,"[DoKo-Debug] recovery ",$message);
+		     echo "email has been sent.";
+		   }
+		 else
+		   {
+		     echo "can't find this email address, sorry.";
+		   }; 
+	       } /* end recovery */
+	   }
 	 else
-	   {
+	   { /* $me is set */ 
 	     $me = $_REQUEST["me"];
-
+	     
 	     echo "game in progress and you are in it<br />";
 	     if($game["solo-who"]>=0)
 	       echo $player[$hash[$game["solo-who"]]]["name"]." is playing a ".$game["solo-what"]." solo!<br />";
 	     else if($game["wedding"]>=0)
 	       echo $player[$hash[$game["wedding"]]]["name"]." is playing a wedding!<br />";
 	     
+	     /* show history */
 	     foreach($history as $play) 
 	       {
 		 echo "<br />";
-
+		 
 		 $trick = explode(":",$play);
 		 
 		 $last=-2;
@@ -806,6 +807,7 @@ if(sizeof($lines)<2)
 		   }
 	       }
 	     
+	     /* figure out who needs to play next */
 	     $next = $last + 1;
 	     if ($next>=4) 
 	       $next -= 4 ;
@@ -813,20 +815,24 @@ if(sizeof($lines)<2)
 	       {
 		 $next=$history[sizeof($history)-1][0];
 	       }
-
-
+	     
+	     /* are we trying to play a card? */
 	     if(isset($_REQUEST["card"]))
 	       {
 		 if($hash[$next]==$me)
 		   {
-		     $card=$_REQUEST["card"];
+		     $card    = $_REQUEST["card"];
 		     $mycards = explode(";",$player[$me]["cards"]);
+		     
+		     /* do we have that card */
 		     if(in_array($card,$mycards))
 		       {
-			 $tmp=array();
+			 /* delete card from array */
+			 $tmp = array();
 			 foreach($mycards as $m)
-			   if($m!=$card)
+			   if($m != $card)
 			     $tmp[]=$m;
+			 
 			 $tmp2="";
 			 for($i=0;$i<sizeof($tmp)-1;$i++)
 			   {
@@ -835,6 +841,7 @@ if(sizeof($lines)<2)
 			 $tmp2.=$tmp[$i];
 			 $player[$me]["cards"]=$tmp2;
 			 
+			 /* add card to history, special case if this is the first card */
 			 if($last<0)
 			   {
 			     $history[sizeof($history)-1]="".$player[$me]["number"]."->".$card.":\n";
@@ -846,9 +853,10 @@ if(sizeof($lines)<2)
 			     $history[sizeof($history)-1]=join(":",$tmp);
 			   }
 			 save_status();
-
+			 
 			 echo " you played ";
 			 display_card($card);
+			 
 			 /* send out email to players who want/need to get informed */
 			 for($i=0;$i<4;$i++)
 			   {
@@ -856,19 +864,19 @@ if(sizeof($lines)<2)
 			     if((ereg("c",$player[$hash[$i]]["option"]) || $i==$mynext) && $hash[$i]!=$me)
 			       {
 				 $message = " Hello ".$player[$hash[$i]]["name"].",\n\n";
-				   
+				 
 				 if($i==$mynext)
-		                 {
-				   $message .= "it's your turn  now.\n".
-	                                    "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
-                                 }
+				   {
+				     $message .= "it's your turn  now.\n".
+				       "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
+				   }
 				 $message .= $player[$me]["name"]. "has played the following card ".card_to_name($card)."\n";
 				 
 				 if($game["solo-who"]>=0)
 				   $message.= $player[$hash[$game["solo-who"]]]." is playing a ".$game["solo-what"]." solo!\n";
-
+				 
 				 mymail($player[$hash[$i]]["email"],"[DoKo-debug] a card has been played",$message);
-
+				 
 				 if($debug)
 	                           echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />";
 			       }
@@ -876,10 +884,10 @@ if(sizeof($lines)<2)
 		       }
 		     else
 		       echo "seems like you don't have that card<br>";
-			  
+		     
 		   }
 		 
-	       }
+	       } /* end if card is set */
 	     else if(isset($_REQUEST["win"]) && strlen($history[sizeof($history)-1])>3)
 	       {
 		 $win=$_REQUEST["win"];
@@ -896,13 +904,14 @@ if(sizeof($lines)<2)
 		   }
 		 $player[$hash[$win]]["points"]+=$points;
 		 echo "<br> ".$player[$hash[$win]]["name"]." won: $points Points <br>";
-
+		 
 		 save_status();
-	       }
+	       }; /* end if win is set */
 	     echo "<br />";
 
 	     $tmp = explode(":",$history[sizeof($history)-1]);
 
+	     /* check last history entry: end of a trick? ask who won it */
 	     if(sizeof($tmp)==5)
 	       {
 		 ?>
@@ -917,16 +926,16 @@ who won?
 
 </form>
 <?php
-	       }
+               }
 	     else if(sizeof($tmp)<5 && 1<sizeof($tmp) && !isset($_REQUEST["card"]))
-	       {		 
+	       { 		 
 		 if(sizeof($tmp)==2 && strlen($tmp[0])==1)
 		   {
 		     $next=$tmp[0];
-
+		     
 		     if($debug)
 		       echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next]."\">the next player</a><br>";
-		      
+		     
 		     if(strlen(trim($player[$me]["cards"]))==0)
 		       {
 			 echo "<br> game over, count points <br>";
@@ -936,23 +945,36 @@ who won?
 			   }
 		       }
 		   }
-		 if($hash[$next]==$me && strlen(trim($player[$me]["cards"]))>0 )
+		 echo "<br />";
+	       } /* end check for winner */
+	     
+	     /* do we still have cards? display them */
+	     if(strlen(trim($player[$me]["cards"]))>0 )
+	       {
+		 $allcards = trim($player[$me]["cards"]);
+		 $mycards = explode(";",$allcards);
+		 
+		 sort($mycards);
+		 
+		 /* is it our turn? */
+		 if($hash[$next]==$me) 
 		   {
-		     
-		     echo "ITS YOUR TURN<br>";
-		     $allcards = trim($player[$me]["cards"]);
-		     $mycards = explode(";",$allcards);
-		     
-		     sort($mycards);
-		     echo "your cards are <br>";
+		     echo "ITS YOUR TURN   <br />";
+		     echo "your cards are: <br />";
 		     foreach($mycards as $card) 
 		       {
 			 display_link_card($card,$me);
 		       }
-		     echo "<br />\n";   
 		   }
-		 echo "<br />";
-		 
+		 else 
+		   { /* not our turn, just show the hand */
+		     echo "your cards are: <br />";
+		     foreach($mycards as $card) 
+		       {
+			 display_card($card);
+		       }
+		   }
+		 echo "<br />\n";   
 	       }
 	   }
        }
