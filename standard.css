@@ -1,0 +1,29 @@
+.trick 
+{
+  //border: 1px solid green;
+  clear:both;
+}
+
+.trick div div
+{
+  position: absolute;
+  width:    65px;
+  background-color: red;
+  display:  none;
+}
+
+.trick div
+{
+  float:left;
+  margin-bottom:10px;
+}
+
+.trick div:hover div
+{
+ display:block;
+}
+
+.comment
+{
+  background-color:green;
+}
