@@ -16,7 +16,7 @@
 
 $host  = "http://doko.nubati.net/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
-$debug = 0;
+$debug = 1;
 
 /*
  * end config
@@ -30,7 +30,7 @@ function mymail($To,$Subject,$message)
 
   if($debug)
     {
-      str_replace("\n","<br />",$message);
+      $message = str_replace("\n","<br />",$message);
       echo "<br />To: $To<br />Subject: $Subject <br />$message<br />\n";
     }
   else
@@ -489,6 +489,11 @@ if( isset($_REQUEST["PlayerA"]) &&
     else
       echo "can't open file for writing";
   };
+/* reread file */
+if(file_exists("status.txt"))
+  $lines = file("status.txt");
+ else
+   die("no file");
 
 /* test if a game is running, else output everything for a new game */
 if(sizeof($lines)<2)
@@ -847,7 +852,7 @@ if(sizeof($lines)<2)
 	       $next -= 4 ;
 	     if($last<0)
 	       {
-		 $next=$history[sizeof($history)-1][0];
+		 $next = $history[sizeof($history)-1][0];
 	       }
 	     
 	     /* are we trying to play a card? */
@@ -902,29 +907,36 @@ if(sizeof($lines)<2)
 </form>
 <?php
 			 /* send out email to players who want/need to get informed */
-			 for($i=0;$i<4;$i++)
-			   {
-			     $mynext=$next+1; if($mynext>3)$mynext-=4;
-			     if((ereg("c",$player[$hash[$i]]["option"]) || $i==$mynext) && $hash[$i]!=$me)
-			       {
-				 $message = " Hello ".$player[$hash[$i]]["name"].",\n\n";
-				 
-				 if($i==$mynext)
-				   {
-				     $message .= "it's your turn  now.\n".
-				       "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
-				   }
-				 $message .= $player[$me]["name"]." has played the following card ".card_to_name($card)."\n";
-				 
-				 if($game["solo-who"]>=0)
-				   $message.= $player[$hash[$game["solo-who"]]]["name"]." is playing a ".$game["solo-what"]." solo!\n";
-				 
-				 mymail($player[$hash[$i]]["email"],"[DoKo-debug] a card has been played",$message);
-				 
-				 if($debug)
-	                           echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />\n";
-			       }
-			   }
+                         /* check if we are in a trick, if trick is done, this needs to be handelt in the
+			  * who-won-the-trick section further down */
+                         $tmp = explode(":",$history[sizeof($history)-1]);
+			 if(sizeof($tmp)<5)
+			   for($i=0;$i<4;$i++)
+			     {
+			       $mynext = $next+1; if($mynext>3)$mynext-=4;
+			       
+			       if((ereg("c",$player[$hash[$i]]["option"]) || $i==$mynext) && $hash[$i]!=$me)
+				 {
+				   $message = " Hello ".$player[$hash[$i]]["name"].",\n\n";
+				   
+				   if($i==$mynext)
+				     {
+				       $message .= "it's your turn  now.\n".
+					 "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
+				     }
+				   $message .= $player[$me]["name"]." has played the following card ".
+				     card_to_name($card)."\n";
+				   
+				   if($game["solo-who"]>=0)
+				     $message .= $player[$hash[$game["solo-who"]]]["name"]." is playing a ".
+				       $game["solo-what"]." solo!\n";
+				   
+				   mymail($player[$hash[$i]]["email"],"[DoKo-debug] a card has been played",$message);
+				   
+				   if($debug)
+				     echo "<a href=\"index.php?me=".$hash[$mynext]."\"> next player </a> <br />\n";
+				 }
+			     }
 		       }
 		     else
 		       echo "seems like you don't have that card<br />\n";
@@ -948,10 +960,41 @@ if(sizeof($lines)<2)
 	       }
 	     else if(isset($_REQUEST["win"]) && strlen($history[sizeof($history)-1])>3)
 	       {
-		 $win=$_REQUEST["win"];
-		 $history[]=$win.":\n";
+		 $win       = $_REQUEST["win"];
+		 
+		 if(strlen($player[$hash[0]]["cards"]))
+		    $history[] = $win.":\n";
+
+		 /* email the player who needs to move next*/
+		 for($i=0;$i<4;$i++)
+		   {
+		     if((ereg("c",$player[$hash[$i]]["option"]) || $i==$win) )
+		       {
+			 $message = " Hello ".$player[$hash[$i]]["name"].",\n\n";
+			 
+			 if($i == $win)
+			   {
+			     $message .= "You won the last trick,it's your turn  now.\n".
+			       "Use this link to play a card: ".$host."?me=".$hash[$i]."\n\n" ;
+			   }
+			 else
+			   $message .= $player[$hash[$win]]["name"]." has won the last trick\n".
+			     "Use this link to look at the game: ".$host."?me=".$hash[$i]."\n\n" ;
+			 
+			 if($game["solo-who"]>=0)
+			   $message.= $player[$hash[$game["solo-who"]]]["name"]." is playing a ".
+			     $game["solo-what"]." solo!\n";
+			 
+			 mymail($player[$hash[$i]]["email"],"[DoKo-debug] a card has been played",$message);
+			 
+			 if($debug)
+			   echo "<a href=\"index.php?me=".$hash[$win]."\"> next player </a> <br />\n";
+		       }
+		   }
+		 
+		 
 		 /* count points of the last trick */
-		 $points=0;
+		 $points = 0;
 
 		 $tmp = explode(":",$history[sizeof($history)-2]);
 		 for($i=0;$i<4;$i++)
@@ -960,7 +1003,7 @@ if(sizeof($lines)<2)
 		     $c = $tmp2[1];
 		     $points += card_value($c);
 		   }
-		 $player[$hash[$win]]["points"]+=$points;
+		 $player[$hash[$win]]["points"] += $points;
 		 echo "<br />\n ".$player[$hash[$win]]["name"]." won: $points Points <br />\n";
 		 
 		 save_status();
@@ -969,8 +1012,8 @@ if(sizeof($lines)<2)
 
 	     $tmp = explode(":",$history[sizeof($history)-1]);
 
-	     /* check last history entry: end of a trick? ask who won it */
-	     if(sizeof($tmp)==5)
+	     /* check last history entry: end of a trick? ask who won it, unless it was the last trick */
+	     if(sizeof($tmp)==5 && strlen($player[$hash[0]]["cards"]))
 	       {
 		 ?>
 <form action="index.php" method="post">
