@@ -16,7 +16,7 @@
 
 $host  = "http://doko.nubati.net/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
-$debug = 1;
+$debug = 0;
 
 /*
  * end config
@@ -443,10 +443,10 @@ if( isset($_REQUEST["PlayerA"]) &&
       "If you want to join this game, please follow this link:\n\n".
       " ".$host."?a=";
     
-    mymail($EmailA,"Invite for a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
-    mymail($EmailB,"Invite for a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
-    mymail($EmailC,"Invite for a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
-    mymail($EmailD,"Invite for a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
+    mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
+    mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
+    mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
+    mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
     
     /* read in random.txt */
     if(file_exists("random.txt"))
@@ -607,7 +607,7 @@ if(sizeof($lines)<2)
 		   }
 		 echo "<br />\n";   
  ?>
- <p>aehm... at the moment please just answer everything with no, still need to implement this</p>	 	  
+ <p>aehm... at the moment poverty is not implented. so I guess you need to play a normal game, even if you have less than 3 turmp :(...sorry</p>	 	  
  <form action="index.php" method="post">
    
    do you want to play solo? 
@@ -723,8 +723,8 @@ if(sizeof($lines)<2)
 		 $player[$c]["option"].="N";
 	       }
 	     
-	     $message = "you're in. once everyone has filled out the form,".
-	       "the game will start and you'll get an eamil on your turn\n";
+	     $message = "You're in. Once everyone has filled out the form, ".
+	       "the game will start and you'll get an eamil on your turn.\n";
 	     mymail($player[$c]["email"],"[DoKo-debug] the game will start soon",$message); 
 
 	     $player[$c]["option"].="s";
