@@ -16,7 +16,7 @@
 
 $host  = "http://doko.nubati.net/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
-$debug = 1;
+$debug = 0;
 
 /*
  * end config
@@ -392,9 +392,9 @@ function save_status()
   return;
 }
 
-echo "<p>If you find bugs, please list them in the <a href=\"".$wiki."\">wiki</a></p>\n";
+echo "<p>If you find bugs, please list them in the <a href=\"".$wiki."\">wiki</a>.</p>\n";
 	
-echo "<p> Cards that have a <span class=\"comment\"> green </span> background have a comment, which you can access by hovering over the card with your mouse ;)</p>\n";
+echo "<p> Names that are underlined have a comment, which you can access by hovering over the name with your mouse ;)</p>\n";
 
 $history=array();
 
@@ -830,15 +830,20 @@ if(sizeof($lines)<2)
 		       {
 			 $tmp = explode("->",$card);
 
+		         echo "<div class=\"card".$tmp[0]."\">";
+
 			 if(strlen($tmp[2])>0)
-			   echo "<div class=\"card".$tmp[0]." comment\">";
+			   echo "<span class=\"comment\">";
 			 else
-			   echo "<div class=\"card".$tmp[0]."\">";
-			 echo $player[$hash[$tmp[0]]]["name"]."  <br />";
-			 display_card($tmp[1]);
+			   echo " <span>";
+		         echo $player[$hash[$tmp[0]]]["name"];
 			 /* check for comment */
 			 if(strlen($tmp[2])>0)
-			   echo "<div class=\"comment\">".$tmp[2]."</div>\n";
+			   echo " <span>".$tmp[2]."</span>";
+			 echo " </span>\n  ";
+	
+			 display_card($tmp[1]);
+
 			 $last = $tmp[0];
 			 echo "</div>\n";
 		       }
@@ -1049,7 +1054,6 @@ who won?
 		 echo "<br />\n";
 	       } /* end check for winner */
 	     
-	     echo "<br clear=\"both\" />";
 	     /* do we still have cards? display them */
 	     if(strlen(trim($player[$me]["cards"]))>0 )
 	       {

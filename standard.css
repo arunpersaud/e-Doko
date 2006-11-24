@@ -131,6 +131,18 @@ div.card3
   left:140px;
 }
 
+.card2 span span
+{
+   position:relative;
+   left:-80px;
+}
+
+.card3 span span
+{ 
+  position:relative;
+  top:-40px;
+}
+
 span.comment
 {
   text-decoration:underline;
@@ -141,6 +153,7 @@ span.comment
   text-decoration:none;
 }
 
+/* hide comments */
 .table div span span
 {
   position: absolute;
@@ -161,18 +174,8 @@ span.comment
  display:block;
 }
 
-.card2 span span
-{
-   position:relative;
-   left:-80px;
-}
 
-.card3 span span
-{ 
-  position:relative;
-  top:-40px;
-}
-
+/* background image for the table */
 .background0
 {
    background:url(pics/stable0.png) no-repeat 60px 60px;
@@ -189,6 +192,7 @@ span.comment
 {
    background:url(pics/stable3.png) no-repeat 60px 60px;
 }
+
 div.back0
 {
    background:url(pics/table0.png) no-repeat 100px 100px;
