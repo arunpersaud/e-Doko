@@ -1,10 +1,109 @@
-.trick 
+
+
+.trick
 {
-  //border: 1px solid green;
-  clear:both;
+  position:relative;
+//  border: 1px solid green;
+  height:500px;
+  width:500px;
+  clear:both;  
 }
 
-.trick div div
+img
+{
+  height:80px;
+}
+
+.oldtrick
+{
+  position:relative;
+// border: 1px solid green;
+  height:280px;
+  width: 280px;
+  float:left;
+}
+
+.oldtrick img
+{ 
+  height:50px;
+}
+
+.oldtrick div.table
+{
+  position:absolute;
+  height:180px;;
+  width:180px;
+  left:50px;
+  top:50px;
+ // border:1px solid black;
+}
+.trick div.table
+{
+  position:absolute;
+  
+  height:340px;;
+  width:340px;
+  left:80px;
+  top:80px;
+ // border:1px solid black;
+}
+
+div.card0
+{
+  position:absolute;
+  top:50px;
+  left: 0px;
+}
+div.card1
+{
+  position:absolute;
+  top:0px;
+  left:70px
+}
+div.card2
+{
+  position:absolute;
+  top:50px;
+  right:0px;
+  text-align:right;
+}
+div.card3
+{
+  position:absolute;
+
+  bottom:0px;
+  left:70px;
+}
+
+.trick div.card0
+{
+  position:absolute;
+  top:110px;
+  left: 0px;
+}
+.trick div.card1
+{
+  position:absolute;
+  top:0px;
+  left:140px
+}
+.trick div.card2
+{
+  position:absolute;
+  top:110px;
+  right:0px;
+  text-align:right;
+}
+.trick div.card3
+{
+  position:absolute;
+
+  bottom:0px;
+  left:140px;
+}
+
+
+.table div div
 {
   position: absolute;
   width:    65px;
@@ -12,13 +111,13 @@
   display:  none;
 }
 
-.trick div
+.table div
 {
   float:left;
   margin-bottom:10px;
 }
 
-.trick div:hover div
+.table div:hover div
 {
  display:block;
 }
@@ -27,3 +126,38 @@
 {
   background-color:green;
 }
+
+.background0
+{
+   background:url(pics/stable0.png) no-repeat 60px 60px;
+}
+.background1
+{
+   background:url(pics/stable1.png) no-repeat 60px 60px;
+}
+.background2
+{
+   background:url(pics/stable2.png) no-repeat 60px 60px;
+}
+.background3
+{
+   background:url(pics/stable3.png) no-repeat 60px 60px;
+}
+div.back0
+{
+   background:url(pics/table0.png) no-repeat 100px 100px;
+}
+div.back1
+{
+   background:url(pics/table1.png) no-repeat 100px 100px;
+}
+div.back2
+{
+   background:url(pics/table2.png) no-repeat 100px 100px;
+}
+div.back3
+{
+   background:url(pics/table3.png) no-repeat 100px 100px;
+}
+
+

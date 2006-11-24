@@ -314,18 +314,18 @@ function card_value($card)
 function display_card($card)
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<img src=\"cards/".$card.".png\" height=\"100\" alt=\"".card_to_name($card)."\" />\n";
+    echo "<img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
   else
-    echo "<img src=\"cards/".($card-1).".png\" height=\"100\" alt=\"".card_to_name($card-1)."\" />\n";
+    echo "<img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
   return;
 }
 
 function display_link_card($card,$me)
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".$card.".png\" height=\"100\" alt=\"".card_to_name($card)."\" /></a>\n";
+    echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" /></a>\n";
   else
-    echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".($card-1).".png\" height=\"100\" alt=\"".card_to_name($card-1)."\" /></a>\n";
+    echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" /></a>\n";
   return;
 }
 
@@ -810,13 +810,14 @@ if(sizeof($lines)<2)
 	     /* show history */
 	     foreach($history as $play) 
 	       {
-		 echo "<br />\n";
-		 
 		 $trick = explode(":",$play);
 		 
 		 $last=-2;
 		 /* found old trick, display it */
-		 echo "<div class=\"trick\">\n";
+		 if(sizeof($trick)==5)
+		   echo "<div class=\"oldtrick background".$play[0]."\"><div class=\"table\">\n";
+		 else
+		   echo "<div class=\"trick back".$play[0]."\"><div class=\"table\">\n";
 		 for($i=0;$i<sizeof($trick)-1;$i++)
 		   {
 		     $card = $trick[$i];
@@ -825,10 +826,10 @@ if(sizeof($lines)<2)
 			 $tmp = explode("->",$card);
 
 			 if(strlen($tmp[2])>0)
-			   echo "<div class=\"card comment\">";
+			   echo "<div class=\"card".$tmp[0]." comment\">";
 			 else
-			   echo "<div class=\"card\">";
-			 echo $player[$hash[$tmp[0]]]["name"]." played <br />";
+			   echo "<div class=\"card".$tmp[0]."\">";
+			 echo $player[$hash[$tmp[0]]]["name"]."  <br />";
 			 display_card($tmp[1]);
 			 /* check for comment */
 			 if(strlen($tmp[2])>0)
@@ -837,7 +838,7 @@ if(sizeof($lines)<2)
 			 echo "</div>\n";
 		       }
 		   }
-		 echo "</div>\n";
+		 echo "</div></div>\n";
 	       }
 	     
 	     /* figure out who needs to play next */
@@ -888,7 +889,7 @@ if(sizeof($lines)<2)
 			 save_status();
 			 
 			 echo "<div class=\"card\">";
-			 echo " you played <br />";
+			 echo " you played  <br />";
 			 display_card($card);
 			 echo "</div>\n";
 
@@ -1005,7 +1006,7 @@ who won?
 		 echo "<br />\n";
 	       } /* end check for winner */
 	     
-	     echo "<br clear=\"both\">";
+	     echo "<br clear=\"both\" />";
 	     /* do we still have cards? display them */
 	     if(strlen(trim($player[$me]["cards"]))>0 )
 	       {
@@ -1016,7 +1017,7 @@ who won?
 		 
 		 echo "<p class=\"mycards\">\n";
 		 /* is it our turn? */
-		 if($hash[$next]==$me && !isset($_REQUEST["card"])) 
+		 if($hash[$next]==$me && !isset($_REQUEST["card"]) && !isset($_REQUEST["win"])) 
 		   {
 		     echo "ITS YOUR TURN   <br />\n";
 		     echo "your cards are: <br />\n";
