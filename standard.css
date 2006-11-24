@@ -1,12 +1,10 @@
 
-
 .trick
 {
   position:relative;
 //  border: 1px solid green;
   height:500px;
   width:500px;
-  clear:both;  
 }
 
 img
@@ -17,10 +15,11 @@ img
 .oldtrick
 {
   position:relative;
-// border: 1px solid green;
+  //border: 1px solid green;
   height:280px;
   width: 280px;
-  float:left;
+  float:right;
+  clear:right;
 }
 
 .oldtrick img
@@ -35,7 +34,7 @@ img
   width:180px;
   left:50px;
   top:50px;
- // border:1px solid black;
+  //border:1px solid black;
 }
 .trick div.table
 {
@@ -48,11 +47,41 @@ img
  // border:1px solid black;
 }
 
+div.card0>span
+{ 
+  position:absolute;
+  left:-70px;
+  //border:1px solid black;
+}
+
+div.card1>span
+{ 
+  position:absolute;
+  top:-30px;
+  //border:1px solid black;
+}
+
+
+div.card2>span
+{ 
+  position:absolute;
+  left:40px;
+ // border:1px solid black;
+}
+
+div.card3>span
+{ 
+  position:absolute;
+  bottom:-40px;
+  //border:1px solid black;
+}
+
 div.card0
 {
   position:absolute;
   top:50px;
   left: 0px;
+  //border:2px solid;
 }
 div.card1
 {
@@ -102,12 +131,22 @@ div.card3
   left:140px;
 }
 
+span.comment
+{
+  text-decoration:underline;
+}
 
-.table div div
+.comment span span
+{
+  text-decoration:none;
+}
+
+.table div span span
 {
   position: absolute;
-  width:    65px;
-  background-color: red;
+  width:    100px;
+  background-color: white;
+  border:1px solid black;
   display:  none;
 }
 
@@ -117,14 +156,21 @@ div.card3
   margin-bottom:10px;
 }
 
-.table div:hover div
+.table div:hover span span
 {
  display:block;
 }
 
-.comment
+.card2 span span
 {
-  background-color:green;
+   position:relative;
+   left:-80px;
+}
+
+.card3 span span
+{ 
+  position:relative;
+  top:-40px;
 }
 
 .background0
