@@ -8,8 +8,10 @@
      <link rel="stylesheet" type="text/css" href="standard.css" />	
   </head>
 <body>
+<div class="header">
 <h1> Welcome to E-Doko </h1>
 <?php
+
 /*
  * config 
  */
@@ -22,7 +24,6 @@ $debug = 0;
  * end config
  */	
 					
-
 /* helper function */
 function mymail($To,$Subject,$message)
 {  
@@ -141,18 +142,20 @@ function count_trump($cards)
 
   /* count each trump */
   foreach($card as $c)
-    {
-      if( (int)($c) <27) $trump++;
-    }
+    if( (int)($c) <27) 
+      $trump++;
 
-  /* subtract one, in case player has both foxes */
-  if( in_array("19",$card) && in_array("20",$card) )
+  /* subtract foxes */
+  if( in_array("19",$card))
     $trump--;
+  if( in_array("20",$card) )
+    $trump--;
+  /* add one, in case the player has both foxes (schweinchen) */
+  if( in_array("19",$card) && in_array("20",$card) )
+    $trump++;
 
   return $trump;
 }
-
-
 
 function card_to_name($card)
 {
@@ -392,9 +395,15 @@ function save_status()
   return;
 }
 
+/*****************  M A I N **************************/
+
 echo "<p>If you find bugs, please list them in the <a href=\"".$wiki."\">wiki</a>.</p>\n";
 	
 echo "<p> Names that are underlined have a comment, which you can access by hovering over the name with your mouse ;)</p>\n";
+echo "</div>\n";
+
+/* end header */
+
 
 $history=array();
 
@@ -402,8 +411,8 @@ $history=array();
 
 if(file_exists("status.txt"))
   $lines = file("status.txt");
- else
-   die("no file");
+else
+  die("no file");
 
 /* check if we want to start a new game */
 if( isset($_REQUEST["PlayerA"]) && 
@@ -517,9 +526,9 @@ if(sizeof($lines)<2)
  </form>
 <?php
    }
- else
-   { /* load game status */
-     parse_status();
+else
+  { /* load game status */
+    parse_status();
 /*     **
  *    *  *
  *    ****
@@ -527,18 +536,16 @@ if(sizeof($lines)<2)
  *
  * check if a player wants to accept a game 
  */
-     
-     if(isset($_REQUEST["a"]))
-       {
-	 $a=$_REQUEST["a"];
-	 
-	 if( ereg("[is]",$player[$a]["option"]) &&  $game["init"]<4)
-	   {
-	     echo "just wait for the game to start";
-	   }
-	 else  if( !ereg("[is]",$player[$a]["option"]) )
-	   {
-
+    if(isset($_REQUEST["a"]))
+      {
+	$a = $_REQUEST["a"];
+	
+	if( ereg("[is]",$player[$a]["option"]) &&  $game["init"]<4)
+	  {
+	    echo "just wait for the game to start";
+	  }
+	else if( !ereg("[is]",$player[$a]["option"]) )
+	  {
  ?>
  <form action="index.php" method="post">
    Do you want to play a game of DoKo?
@@ -555,7 +562,6 @@ if(sizeof($lines)<2)
 	     echo " </form>\n";
 	   }
        }
-
 /*   ***
  *   *  *
  *   ***
@@ -565,56 +571,59 @@ if(sizeof($lines)<2)
  */
      if(isset($_REQUEST["b"]))
        {
-	 $b=$_REQUEST["b"];
+	 $b = $_REQUEST["b"];
 	 
 	 if( ereg("s",$player[$b]["option"])  && $game["init"]<4)
-	   {
+	   { /* the player already filled out everything */
 	     echo "just wait for the game to start";
 	   }
 	 else if( (!isset($_REQUEST["in"])|| !isset($_REQUEST["update"])) && !ereg("i",$player[$b]["option"]))
-	   {
+	   { /* the player didn't fill out the form at "a" correctly */
 	     echo "go back to ";
 	     echo "<a href=\"index.php?a=$b\"> here and fill out the form </a> <br />\n";
 	   }
 	 else
-	   { /* show the hand */
+	   { /* show the hand and check if the player is sick*/
 	     if($_REQUEST["in"]=="no")
-	       {
+	       { /* player doesn't want to play, cancel the game */
 		 for($i=0;$i<4;$i++)
 		   {
 		     $message = "Hello ".$player[$hash[$i]]["name"].",\n\n".
 		       "the game has been canceled due to the request of one of the players.\n";
 		     mymail($player[$hash[$i]]["email"],"[DoKo-Debug] the game has been canceled",$message); 
 		   }
-		   $output = fopen("status.txt","w");
-		   if($output)
-		     fclose($output);
-		   else
-		     echo "problem opening file";
+		 /* canceling the game is as easy as removing the contents of the status file*/
+		 $output = fopen("status.txt","w");
+		 if($output)
+		   fclose($output);
+		 else
+		   echo "problem opening file";
 	       }
 	     else
 	       {
-		 if($_REQUEST["update"]=="card") $player[$b]["option"].="c";
-		 if($_REQUEST["update"]=="turn") $player[$b]["option"].="t";
+		 /* player wants to play, save information from "a"*/
+		 if($_REQUEST["update"]=="card") 
+		   $player[$b]["option"] .= "c";
+		 else
+		   $player[$b]["option"] .= "t";
 		 
-		 $player[$b]["option"].="i";
+		 $player[$b]["option"] .= "i"; /* player finished stage "a" */
 		 
 		 save_status();
 		 
 		 $allcards = $player[$b]["cards"];
-		 $mycards = explode(";",$allcards);
+		 $mycards  = explode(";",$allcards);
 		 
 		 sort($mycards);
-		 echo "your cards are <br />\n";
+		 echo "<p class=\"mycards\">your cards are: <br />\n";
 		 foreach($mycards as $card) 
-		   {
-		     display_card($card);
-		   }
-		 echo "<br />\n";   
+		   display_card($card);
+		 echo "</p>\n";   
  ?>
- <p>aehm... at the moment poverty is not implented. so I guess you need to play a normal game, even if you have less than 3 turmp :(...sorry</p>	 	  
+ <p> aehm... at the moment poverty is not implented. so I guess you need to play a normal game, even if you have less than 3 trump :(...sorry </p>	 	  
+
  <form action="index.php" method="post">
-   
+
    do you want to play solo? 
    <select name="solo" size="1">
      <option>No</option>
@@ -670,21 +679,26 @@ if(sizeof($lines)<2)
 	       }
 	   }
        }
+
      if(isset($_REQUEST["c"]))
        {
-	 $c=$_REQUEST["c"];
+	 $c = $_REQUEST["c"];
 	 
-	 if(!isset($_REQUEST["solo"])|| !isset($_REQUEST["wedding"])|| !isset($_REQUEST["poverty"]) || !isset($_REQUEST["nines"]) )
-	   {
+
+	 if( ereg("s",$player[$c]["option"]) && $game["init"]<4 )
+	   { /* the player already filled out everything */
+	     echo "<p>just wait for the game to start</p>\n";
+	   }
+	 else if(!isset($_REQUEST["solo"])    || 
+		 !isset($_REQUEST["wedding"]) ||
+		 !isset($_REQUEST["poverty"]) ||
+		 !isset($_REQUEST["nines"]) )
+	   {/* player still needs to fill out the form */
 	     echo "go back to ";
 	     echo "<a href=\"index.php?b=$c\"> here and fill out the form </a> <br />\n";
 	   }
-	 else if(  ereg("s",$player[$c]["option"]) && $game["init"]<4 )
-	   {
-	     echo "just wait for the game to start";
-	   }
 	 else if($game["init"]<4)
-	   { 
+	   { /* save information */
 	     if( $_REQUEST["solo"]!="No")
 	       {
 		 switch($_REQUEST["solo"])
@@ -728,46 +742,56 @@ if(sizeof($lines)<2)
 		 $player[$c]["option"].="N";
 	       }
 	     
-	     $message = "You're in. Once everyone has filled out the form, ".
-	       "the game will start and you'll get an eamil on your turn.\n";
-	     mymail($player[$c]["email"],"[DoKo-debug] the game will start soon",$message); 
-
+	     /* player finished setup */
 	     $player[$c]["option"].="s";
+
 	     save_status();
+	     /* reread status file, to get the correct startplayer, etc */
 	     if(file_exists("status.txt"))
 	       $lines = file("status.txt");
 	     else
 	       die("no file");
 	     parse_status();
 
-	     if($game["init"]==4)
+	     if($game["init"]==4 && $player[$c]["number"]==$game["startplayer"])
+	       {
+		 echo "<p> The game can start now, it's your turn, please use this <a href=\"".
+		   $host."?me=".$hash[$c]."\">link</a> to play a card.</p>\n";
+	       }
+	     else if($game["init"]==4)
 	       {
 		 $message = "The game can start now, it's your turn, please use this link to play a card:\n".
 		   $host."?me=".$hash[$game["startplayer"]]."\n";
 		 mymail($player[$hash[$game["startplayer"]]]["email"],"[DoKo-debug] let's go",$message);
+		 echo "<p> The game has started. An email has been sent out to the first player.</p>\n";
 	       }
-	     
+	     else
+	       {
+		 echo "<p>You're in. Once everyone has filled out the form, ".
+		   "the game will start and you'll get an eamil on your turn.</p>\n";
+	       }
 	   }
        }
+     /* END SETUP */
+
+     /* the game */
      if($game["init"]==4)
        {
-	 /* check for sickness*/
-	 /***** someone has 5 nines and no one is playing solo=> cancel game */
+	 /* check for sickness, only would need to do this on the first trick really...*/
+	 /***** someone has 5 nines and no one is playing solo => cancel game */
 	 if($game["nines"]>=0 && $game["solo-who"]<0)
 	   {
 	     $message = $player[$hash[$game["poverty"]]]["nines"]." has more than 4 nines. Game aborted!\n";
 	     for($i=0;$i<4;$i++)
-	       {
-		 mymail($player[$hash[$i]]["email"],"[DoKo-debug] the game has been canceled",$message); 
-	       };
-
+	       mymail($player[$hash[$i]]["email"],"[DoKo-debug] the game has been canceled",$message); 
+	     
 	     $output = fopen("status.txt","w");
 	     if($output)
 	       fclose($output);
 	     else
 	       echo "problem opening file";
-	   }
-
+	   };
+	 
 	 /* who is requesting this*/
 	 if(!isset($_REQUEST["me"]))
 	   {	
@@ -784,21 +808,21 @@ if(sizeof($lines)<2)
                }
 	     else
 	       {
-		 $recovery=$_REQUEST["recovery"];
-		 $ok=-1;
+		 $recovery = $_REQUEST["recovery"];
+		 $ok = -1;
 		 for($i=0;$i<4;$i++)
 		   if(trim($recovery)==trim($player[$hash[$i]]["email"]))
-		     $ok=$i;
+		     $ok = $i;
 		 if($ok>=0)
 		   {
 		     $message = "Please try this link: ".$host."?me=".$hash[$ok]."\n".
 		       "\n if this doesn't work, contact the admin.\n";
 		     mymail($recovery,"[DoKo-Debug] recovery ",$message);
-		     echo "email has been sent.";
+		     echo "<p> An email with the game information has been sent.</p>\n";
 		   }
 		 else
 		   {
-		     echo "can't find this email address, sorry.";
+		     echo "<p> can't find this email address, sorry.</p>\n";
 		   }; 
 	       } /* end recovery */
 	   }
@@ -856,9 +880,7 @@ if(sizeof($lines)<2)
 	     if ($next>=4) 
 	       $next -= 4 ;
 	     if($last<0)
-	       {
-		 $next = $history[sizeof($history)-1][0];
-	       }
+	       $next = $history[sizeof($history)-1][0];
 	     
 	     /* are we trying to play a card? */
 	     if(isset($_REQUEST["card"]))
@@ -950,12 +972,12 @@ if(sizeof($lines)<2)
 		 
 	       } /* end if card is set */
 	     else if(isset($_REQUEST["comment"]))
-	       {
+	       { /*save comment */
 		 $comment = $_REQUEST["comment"];
-		 $tmp = explode(":",$history[sizeof($history)-1]);
-		 $tmp2 = explode("->",$tmp[sizeof($tmp)-2]);
+		 $tmp  = explode(":",$history[sizeof($history)-1]); /*last played trick */
+		 $tmp2 = explode("->",$tmp[sizeof($tmp)-2]);        /*last played card */
 		 
-		 $comment = str_replace(":","",$comment);
+		 $comment = str_replace(":","",$comment);           /*can't have ":" in comments */
 
 		 if(sizeof($tmp2)<=2)
 		   $tmp[sizeof($tmp)-2] .= "->".$comment;
@@ -964,8 +986,8 @@ if(sizeof($lines)<2)
 		 save_status();
 	       }
 	     else if(isset($_REQUEST["win"]) && strlen($history[sizeof($history)-1])>3)
-	       {
-		 $win       = $_REQUEST["win"];
+	       { /* count points, email winner */
+		 $win = $_REQUEST["win"];
 		 
 		 if(strlen($player[$hash[0]]["cards"]))
 		    $history[] = $win.":\n";
@@ -997,7 +1019,6 @@ if(sizeof($lines)<2)
 		       }
 		   }
 		 
-		 
 		 /* count points of the last trick */
 		 $points = 0;
 
@@ -1015,9 +1036,8 @@ if(sizeof($lines)<2)
 	       }; /* end if win is set */
 	     echo "<br />\n";
 
-	     $tmp = explode(":",$history[sizeof($history)-1]);
-
 	     /* check last history entry: end of a trick? ask who won it, unless it was the last trick */
+	     $tmp = explode(":",$history[sizeof($history)-1]);
 	     if(sizeof($tmp)==5 && strlen($player[$hash[0]]["cards"]))
 	       {
 		 ?>
@@ -1034,14 +1054,13 @@ who won?
 <?php
                }
 	     else if(sizeof($tmp)<5 && 1<sizeof($tmp) && !isset($_REQUEST["card"]))
-	       { 		 
+	       { 
 		 if(sizeof($tmp)==2 && strlen($tmp[0])==1)
 		   {
 		     $next=$tmp[0];
 		     
 		     if($debug)
 		       echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next]."\">the next player</a><br />\n";
-		     
 		     if(strlen(trim($player[$me]["cards"]))==0)
 		       {
 			 echo "<br /> game over, count points <br />\n";
@@ -1058,7 +1077,7 @@ who won?
 	     if(strlen(trim($player[$me]["cards"]))>0 )
 	       {
 		 $allcards = trim($player[$me]["cards"]);
-		 $mycards = explode(";",$allcards);
+		 $mycards  = explode(";",$allcards);
 		 
 		 sort($mycards);
 		 
@@ -1066,20 +1085,16 @@ who won?
 		 /* is it our turn? */
 		 if($hash[$next]==$me && !isset($_REQUEST["card"]) && !isset($_REQUEST["win"])) 
 		   {
-		     echo "ITS YOUR TURN   <br />\n";
-		     echo "your cards are: <br />\n";
+		     echo "ITS YOUR TURN!  <br />\n";
+		     echo "Your cards are: <br />\n";
 		     foreach($mycards as $card) 
-		       {
-			 display_link_card($card,$me);
-		       }
+		       display_link_card($card,$me);
 		   }
 		 else 
 		   { /* not our turn, just show the hand */
-		     echo "your cards are: <br />\n";
+		     echo "Your cards are: <br />\n";
 		     foreach($mycards as $card) 
-		       {
-			 display_card($card);
-		       }
+		       display_card($card);
 		   }
 		 echo "</p>\n";   
 	       }
@@ -1091,3 +1106,12 @@ who won?
 ?>
 </body>
 </html>
+
+<?php
+/*
+ *Local Variables: 
+ *mode: php
+ *mode: hs-minor
+ *End:
+ */
+?>
