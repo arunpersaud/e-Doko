@@ -879,14 +879,14 @@ else
 		   }
 		 echo "</div></div>\n";
 	       }
-	     
+
 	     /* figure out who needs to play next */
 	     $next = $last + 1;
 	     if ($next>=4) 
 	       $next -= 4 ;
 
 	     /* if no one has played yet or we are at the start of a new trick */
-	     if(strlen($history[sizeof($history)-1])==3)
+	     if($last<0)
 	       $next = $history[sizeof($history)-1][0];
 	     
 	     /* are we trying to play a card? */
@@ -991,7 +991,7 @@ else
 
 		 save_status();
 	       }
-	     else if(isset($_REQUEST["win"]) && strlen($history[sizeof($history)-1])>3)
+	     else if(isset($_REQUEST["win"]) && substr_count($history[sizeof($history)-1],":")==4)
 	       { /* count points, email winner */
 		 $win = $_REQUEST["win"];
 		 
