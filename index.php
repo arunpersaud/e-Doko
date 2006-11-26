@@ -10,6 +10,7 @@
 <body>
 <div class="header">
 <h1> Welcome to E-Doko </h1>
+<p>(please hit shift-reload:))</p>
 <?php
 
 /*
@@ -19,6 +20,8 @@
 $host  = "http://doko.nubati.net/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
 $debug = 0;
+
+$last=-2;
 
 /*
  * end config
@@ -234,7 +237,7 @@ function card_to_name($card)
       case 48:
       return "nine of hearts";
       default:
-      return "something went wrong, please contact the admin";
+      return "something went wrong, please contact the admin. Error: code1.";
     }
 }
 
@@ -309,7 +312,7 @@ function card_value($card)
       case 47:
       return 0;
       default:
-      echo "something went wrong, please contact the admin <br>";
+      echo "something went wrong, please contact the admin. ErrorCode 2<br>";
       return 0;
     }
 }
@@ -390,7 +393,7 @@ function save_status()
       fclose($output);
     }
   else
-    echo "can't open file for writing, please inform the admin.";
+    echo "can't open file for writing, please inform the admin.errorcode3";
   
   return;
 }
@@ -816,7 +819,7 @@ else
 		 if($ok>=0)
 		   {
 		     $message = "Please try this link: ".$host."?me=".$hash[$ok]."\n".
-		       "\n if this doesn't work, contact the admin.\n";
+		       "\n if this doesn't work, contact the admin.error4\n";
 		     mymail($recovery,"[DoKo-Debug] recovery ",$message);
 		     echo "<p> An email with the game information has been sent.</p>\n";
 		   }
@@ -841,7 +844,6 @@ else
 	       {
 		 $trick = explode(":",$play);
 		 
-		 $last=-2;
 		 /* found old trick, display it */
 		 if(sizeof($trick)==5)
 		   echo "<div class=\"oldtrick background".$play[0]."\"><div class=\"table\">\n";
@@ -850,6 +852,9 @@ else
 		 for($i=0;$i<sizeof($trick)-1;$i++)
 		   {
 		     $card = $trick[$i];
+
+	             $last=-2;
+	             /* has a card been played? */
 		     if(ereg("->",$card))
 		       {
 			 $tmp = explode("->",$card);
@@ -879,7 +884,9 @@ else
 	     $next = $last + 1;
 	     if ($next>=4) 
 	       $next -= 4 ;
-	     if($last<0)
+
+	     /* if no one has played yet or we are at the start of a new trick */
+	     if(strlen($history[sizeof($history)-1])==3)
 	       $next = $history[sizeof($history)-1][0];
 	     
 	     /* are we trying to play a card? */
@@ -926,7 +933,6 @@ else
 			 echo "</div>\n";
 
 			 ?>
-<br clear="both" />
 <form action="index.php" method="post">
    A short comment:<input name="comment" type="text" size="30" maxlength="50" /> 
    <input type="hidden" name="me" value="<?php echo $me; ?>" />
