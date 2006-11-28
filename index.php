@@ -6,8 +6,32 @@
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="stylesheet" type="text/css" href="standard.css" />	
+     <script type="text/javascript">
+       function hl(num) {
+         if(document.getElementById){
+	   var i;
+	   for(i=1;i<13;i++){
+	     if(document.getElementById("trick"+i))
+	       document.getElementById("trick"+i).style.display = 'none';
+	   }
+	   document.getElementById("trick"+num).style.display = 'block';
+	 }
+       }
+       function high_last(){
+	 if(document.getElementById){
+	   var i;
+	   for(i=12;i>0;i--) {
+	     if(document.getElementById("trick"+i))
+	       {
+		 hl(i);
+		 break;
+	       }
+	   }
+	 }
+       }
+     </script>
   </head>
-<body>
+<body onload="high_last();">
 <div class="header">
 <h1> Welcome to E-Doko </h1>
 <p>(please hit shift-reload:))</p>
@@ -19,7 +43,7 @@
 
 $host  = "http://doko.nubati.net/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
-$debug = 0;
+$debug = 1;
 
 $last=-2;
 
@@ -401,8 +425,6 @@ function save_status()
 /*****************  M A I N **************************/
 
 echo "<p>If you find bugs, please list them in the <a href=\"".$wiki."\">wiki</a>.</p>\n";
-	
-echo "<p> Names that are underlined have a comment, which you can access by hovering over the name with your mouse ;)</p>\n";
 echo "</div>\n";
 
 /* end header */
@@ -840,15 +862,23 @@ else
 	       echo $player[$hash[$game["wedding"]]]["name"]." is playing a wedding!<br />\n";
 	     
 	     /* show history */
+	     /* old tricks as list */
+	     echo "<ul class=\"oldtrick\">\n";
+	     echo "  <li> History: </li>\n";
+	     $j=0;
 	     foreach($history as $play) 
 	       {
+		 $j++;
 		 $trick = explode(":",$play);
 		 
 		 /* found old trick, display it */
 		 if(sizeof($trick)==5)
-		   echo "<div class=\"oldtrick background".$play[0]."\"><div class=\"table\">\n";
+		   echo "  <li onclick=\"hl('$j');\">Trick $j\n    <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />\n";
 		 else
-		   echo "<div class=\"trick back".$play[0]."\"><div class=\"table\">\n";
+		   {
+		     /* display current trick */
+		     echo "<li onclick=\"hl('$j');\">Current Trick\n  <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />";
+		   }
 		 for($i=0;$i<sizeof($trick)-1;$i++)
 		   {
 		     $card = $trick[$i];
@@ -859,26 +889,28 @@ else
 		       {
 			 $tmp = explode("->",$card);
 
-		         echo "<div class=\"card".$tmp[0]."\">";
+		         echo "      <div class=\"card".$tmp[0]."\">\n";
 
 			 if(strlen($tmp[2])>0)
-			   echo "<span class=\"comment\">";
+			   echo "        <span class=\"comment\">";
 			 else
-			   echo " <span>";
+			   echo "        <span>";
 		         echo $player[$hash[$tmp[0]]]["name"];
 			 /* check for comment */
 			 if(strlen($tmp[2])>0)
-			   echo " <span>".$tmp[2]."</span>";
-			 echo " </span>\n  ";
+			   echo "<span>".$tmp[2]."</span>";
+			 echo "</span>\n        ";
 	
 			 display_card($tmp[1]);
 
 			 $last = $tmp[0];
-			 echo "</div>\n";
+			 echo "      </div>\n";
 		       }
 		   }
-		 echo "</div></div>\n";
+		 
+		 echo "    </div>\n  </li>\n";
 	       }
+	     echo "</ul>\n";
 
 	     /* figure out who needs to play next */
 	     $next = $last + 1;
@@ -1051,7 +1083,7 @@ else
 who won?
 <?php 
    for($i=0;$i<4;$i++)
-     echo $player[$hash[$i]]["name"]." <input type=\"radio\" name=\"win\" value=\"$i\" />";
+     echo $player[$hash[$i]]["name"]." <input type=\"radio\" name=\"win\" value=\"$i\" /><br />";
    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />";
 ?>
 <input type="submit" value="submit" />
