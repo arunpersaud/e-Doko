@@ -4,17 +4,32 @@
   border-bottom:3px solid gray;
 }
 
+.card { 
+  position:absolute;
+  z-index:20;
+  top:18em;
+  left:28em;
+  text-aling:center;
+  background-color:white;
+  border:2px solid gray;
+}
+.card img { width:8em; }
+
+
 ul.oldtrick {
   list-style:none;
-  margin:0;
+  margin:3px;
   padding:0;
-  background-color:yellow;
+  /*background-color:yellow;*/
+  text-align:center;
 }
+
+ul.oldtrick a { text-decoration:none; color:#000;}
 
 ul.oldtrick li {
   /*background-color:blue;*/
   margin:0 0.5em;  
-  float:left;
+  display:inline;
 }
 ul.oldtrick li:hover {
   background-color: yellow;
@@ -35,8 +50,8 @@ ul.oldtrick li div.table {
   margin:0;
   padding:0;
   /*border: 5px solid green;*/
-  top: 14em;
-  left: 8em;
+  top: 10em;
+  left: 18em;
   height:28em;
   width:28em;
   z-index:9;
@@ -77,7 +92,7 @@ ul.oldtrick li div div.card3 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 28em;
+  top: 29em;
   left:0;
   width:28em;
   text-align:center;
@@ -129,23 +144,60 @@ ul.oldtrick li div div span span {
   background-color:white;
   margin:0;
   padding:0;
+  width:10em;
   border: 1px solid yellow;
-  top:1em;
   z-index:11;
+}
+ul.oldtrick li div div.card0 span span{
+  top:1em;
+  left:-14em;
+  border: 3px solid green;
+}
+ul.oldtrick li div div.card1 span span{
+  top:-1em;
+  left:3em;
+  border: 3px solid green;
+}
+ul.oldtrick li div div.card2 span span{
+  top:-2em;
+  left:3em;
+  border: 3px solid green;
+}
+ul.oldtrick li div div.card3 span span{
+  top:-1em;
+  left:3em;
+  border: 3px solid green;
 }
 
 .mycards {
-  position:absolute;
+  clear:both;
   margin:0;
+  margin-top:33em;
   padding:0;
-  right:0;
-  top:15em;
-  width:12em;
-  float:right;
   border:1px solid red;
   background-color:yellow;
 }
 
-.mycards img{
+.mycards img {
   height:6em;
+}
+
+.line{
+  clear:both;
+  border-top:2px solid gray;
+  margin:0;
+  padding:0;
+}
+
+.info {
+  float:right;
+  border:2px solid gray;
+  border-top:0;
+}
+
+.bug {
+  float:left;
+  width:10em;
+  border:2px solid gray;
+  border-top:0;
 }

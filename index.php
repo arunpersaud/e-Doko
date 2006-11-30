@@ -34,7 +34,6 @@
 <body onload="high_last();">
 <div class="header">
 <h1> Welcome to E-Doko </h1>
-<p>(please hit shift-reload:))</p>
 <?php
 
 /*
@@ -46,10 +45,16 @@ $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
 $debug = 1;
 
 $last=-2;
+$number_of_trick;
 
 /*
  * end config
  */	
+
+echo "</div>\n";
+
+/* end header */
+
 					
 /* helper function */
 function mymail($To,$Subject,$message)
@@ -64,6 +69,71 @@ function mymail($To,$Subject,$message)
   else
     mail($To,$Subject,$message);
   return;
+}
+
+function is_trump($c) { return (($c<27) ? 1:0);}
+function is_club($c)  { return (in_array($c,array('27','28','29','30','31','32','33','34')));}
+function is_space($c) { return (in_array($c,array('35','36','37','38','39','40','41','42')));}
+function is_heart($c) { return (in_array($c,array('43','44','45','46','47','48')));}
+
+function compare_cards($a,$b)
+{
+  /* if a is higher than b return 1, else 0, a being the card first played */
+  
+  /* first map all cards to the odd number */
+  if( $a/2 - (int)($a/2) != 0.5)
+    $a--;
+  if( $b/2 - (int)($b/2) != 0.5)
+    $b--;
+  
+  if(is_trump($a) && $a<=$b)
+    return 1;
+  else if(is_trump($a) && $a>$b)
+    return 0;
+  else 
+    { /*$a is not a trump */
+      if(is_trump($b))
+	return 0;
+      else
+	{
+	  /* both clubs? */
+	  if( is_club($a) && is_club($b))
+	    if($a<=$b)
+	      return 1;
+	    else
+	      return 0;
+	  /* both spade? */
+	  if( is_spade($a) && is_spade($b))
+	    if($a<=$b)
+	      return 1;
+	    else
+	      return 0;
+	  /* both heart? */
+	  if( is_heart($a) && is_heart($b))
+	    if($a<=$b)
+	      return 1;
+	    else
+	      return 0;
+      return 1;
+	}	  
+    }
+      
+} 
+
+function get_winner($p)
+{
+  $c1 = $p[0];
+  $c2 = $p[1];
+  $c3 = $p[2];
+  $c4 = $p[3];
+
+  if( compare_cards($c1,$c2) && compare_cards($c1,$c3) && compare_cards($c1,$c4) )
+    return 0;
+  if( compare_cards($c2,$c3) && compare_cards($c2,$c4) )
+    return 1;
+  if( compare_cards($c3,$c4) )
+    return 2;
+  return 3;
 }
 
 function parse_status()
@@ -352,10 +422,15 @@ function display_card($card)
 
 function display_link_card($card,$me)
 {
-  if( $card/2 - (int)($card/2) == 0.5)
+  /*  if( $card/2 - (int)($card/2) == 0.5)
     echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" /></a>\n";
   else
     echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" /></a>\n";
+  */
+  if( $card/2 - (int)($card/2) == 0.5)
+    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$card.".png\" alt=\"\" />\n";
+  else
+    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".($card-1).".png\" alt=\"\" />\n";
   return;
 }
 
@@ -423,11 +498,6 @@ function save_status()
 }
 
 /*****************  M A I N **************************/
-
-echo "<p>If you find bugs, please list them in the <a href=\"".$wiki."\">wiki</a>.</p>\n";
-echo "</div>\n";
-
-/* end header */
 
 
 $history=array();
@@ -855,12 +925,6 @@ else
 	   { /* $me is set */ 
 	     $me = $_REQUEST["me"];
 	     
-	     /* output if we are playing a solo or a wedding */
-	     if($game["solo-who"]>=0)
-	       echo $player[$hash[$game["solo-who"]]]["name"]." is playing a ".$game["solo-what"]." solo!<br />\n";
-	     else if($game["wedding"]>=0)
-	       echo $player[$hash[$game["wedding"]]]["name"]." is playing a wedding!<br />\n";
-	     
 	     /* show history */
 	     /* old tricks as list */
 	     echo "<ul class=\"oldtrick\">\n";
@@ -873,11 +937,11 @@ else
 		 
 		 /* found old trick, display it */
 		 if(sizeof($trick)==5)
-		   echo "  <li onclick=\"hl('$j');\">Trick $j\n    <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />\n";
+		   echo "  <li onclick=\"hl('$j');\"><a href=\"#\">Trick $j</a>\n    <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />\n";
 		 else
 		   {
 		     /* display current trick */
-		     echo "<li onclick=\"hl('$j');\">Current Trick\n  <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />";
+		     echo "<li onclick=\"hl('$j');\"><a href=\"#\">Current Trick</a>\n  <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />";
 		   }
 		 for($i=0;$i<sizeof($trick)-1;$i++)
 		   {
@@ -912,6 +976,22 @@ else
 	       }
 	     echo "</ul>\n";
 
+	     echo "<div class=\"line\"></div>";
+
+	     /* output if we are playing a solo or a wedding */
+	     echo "<div class=\"info\">";
+	     if($game["solo-who"]>=0)
+	       echo $player[$hash[$game["solo-who"]]]["name"]." is playing a ".$game["solo-what"]." solo!<br />\n";
+	     else if($game["wedding"]>=0)
+	       echo $player[$hash[$game["wedding"]]]["name"]." is playing a wedding!<br />\n";
+	     echo "</div>";
+	     echo "<div class=\"bug\"> Poverty not working yet! <br />".
+	       " Schweinchen not working yet <br />".
+	       "Bug: at the end of the game the winner of the last trick can add more points to his score by reloading the page <br />".
+	       "If you find more bugs, please list them in the <a href=\"".$wiki.
+	       "\">wiki</a>.Hit shift reload every now and then too.</div>\n";
+
+
 	     /* figure out who needs to play next */
 	     $next = $last + 1;
 	     if ($next>=4) 
@@ -928,6 +1008,8 @@ else
 		   {
 		     $card    = $_REQUEST["card"];
 		     $mycards = explode(";",$player[$me]["cards"]);
+		     $comment = $_REQUEST["comment"];
+		     $comment = str_replace(":","",$comment);           /*can't have ":" in comments */
 		     
 		     /* do we have that card */
 		     if(in_array($card,$mycards))
@@ -949,12 +1031,12 @@ else
 			 /* add card to history, special case if this is the first card */
 			 if($last<0)
 			   {
-			     $history[sizeof($history)-1]="".$player[$me]["number"]."->".$card.":\n";
+			     $history[sizeof($history)-1]="".$player[$me]["number"]."->".$card."->$comment:\n";
 			   }
 			 else
 			   {
 			     $tmp = explode(":",$history[sizeof($history)-1]);
-			     $tmp[sizeof($tmp)-1] = "".$player[$me]["number"]."->".$card.":";
+			     $tmp[sizeof($tmp)-1] = "".$player[$me]["number"]."->".$card."->$comment:";
 			     $history[sizeof($history)-1]=join(":",$tmp);
 			   }
 			 save_status();
@@ -964,13 +1046,6 @@ else
 			 display_card($card);
 			 echo "</div>\n";
 
-			 ?>
-<form action="index.php" method="post">
-   A short comment:<input name="comment" type="text" size="30" maxlength="50" /> 
-   <input type="hidden" name="me" value="<?php echo $me; ?>" />
-   <input type="submit" value="submit comment" />
-</form>
-<?php
 			 /* send out email to players who want/need to get informed */
                          /* check if we are in a trick, if trick is done, this needs to be handelt in the
 			  * who-won-the-trick section further down */
@@ -1005,30 +1080,27 @@ else
 		       }
 		     else
 		       echo "seems like you don't have that card<br />\n";
-		     
 		   }
-		 
 	       } /* end if card is set */
-	     else if(isset($_REQUEST["comment"]))
-	       { /*save comment */
-		 $comment = $_REQUEST["comment"];
-		 $tmp  = explode(":",$history[sizeof($history)-1]); /*last played trick */
-		 $tmp2 = explode("->",$tmp[sizeof($tmp)-2]);        /*last played card */
-		 
-		 $comment = str_replace(":","",$comment);           /*can't have ":" in comments */
-
-		 if(sizeof($tmp2)<=2)
-		   $tmp[sizeof($tmp)-2] .= "->".$comment;
-		 $history[sizeof($history)-1]=join(":",$tmp);
-
-		 save_status();
-	       }
-	     else if(isset($_REQUEST["win"]) && substr_count($history[sizeof($history)-1],":")==4)
+	    if(substr_count($history[sizeof($history)-1],":")==4)
 	       { /* count points, email winner */
-		 $win = $_REQUEST["win"];
+		 $p = array();
+		 $c = array();
+
+		 $tmp  = explode(":",$history[sizeof($history)-1]); /*last played trick */
+
+		 /* get player and cards of last trick */
+		 for($i=0;$i<4;$i++)
+		   {
+		     $tmp2 = explode("->",$tmp[$i]);
+		     $p[] = $tmp2[0];
+		     $c[] = $tmp2[1];
+		   };
 		 
+		 $win = $p[get_winner($c)];
+		   		 
 		 if(strlen($player[$hash[0]]["cards"]))
-		    $history[] = $win.":\n";
+		   $history[] = "\n".$win.":\n"; /* not sure why I need the first \n here */
 
 		 /* email the player who needs to move next*/
 		 for($i=0;$i<4;$i++)
@@ -1074,43 +1146,22 @@ else
 	       }; /* end if win is set */
 	     echo "<br />\n";
 
-	     /* check last history entry: end of a trick? ask who won it, unless it was the last trick */
-	     $tmp = explode(":",$history[sizeof($history)-1]);
-	     if(sizeof($tmp)==5 && strlen($player[$hash[0]]["cards"]))
-	       {
-		 ?>
-<form action="index.php" method="post">
-who won?
-<?php 
-   for($i=0;$i<4;$i++)
-     echo $player[$hash[$i]]["name"]." <input type=\"radio\" name=\"win\" value=\"$i\" /><br />";
-   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />";
-?>
-<input type="submit" value="submit" />
-
-</form>
-<?php
-               }
-	     else if(sizeof($tmp)<5 && 1<sizeof($tmp) && !isset($_REQUEST["card"]))
-	       { 
-		 if(sizeof($tmp)==2 && strlen($tmp[0])==1)
-		   {
-		     $next=$tmp[0];
-		     
-		     if($debug)
-		       echo "DEBUG: the next move is for <a href=\"index.php?me=".$hash[$next]."\">the next player</a><br />\n";
-		     if(strlen(trim($player[$me]["cards"]))==0)
-		       {
-			 echo "<br /> game over, count points <br />\n";
-			 for($i=0;$i<4;$i++)
-			   {
-			     echo $player[$hash[$i]]["name"]." got ".$player[$hash[$i]]["points"]."<br />\n";
-			   }
-		       }
-		   }
-		 echo "<br />\n";
-	       } /* end check for winner */
+	     /* check if game is done */
+	     $end = 1;
+	     for($i=0;$i<4;$i++)
+	       if(strlen(trim($player[$hash[$i]]["cards"]))!=0)
+		 $end = 0;
 	     
+	     if($end)
+	       { 
+		 echo "<br /> game over, count points <br />\n";
+		 for($i=0;$i<4;$i++)
+		   {
+		     echo $player[$hash[$i]]["name"]." got ".$player[$hash[$i]]["points"]."<br />\n";
+		   }
+	       }
+	     /* check end of game */
+  
 	     /* do we still have cards? display them */
 	     if(strlen(trim($player[$me]["cards"]))>0 )
 	       {
@@ -1119,14 +1170,21 @@ who won?
 		 
 		 sort($mycards);
 		 
-		 echo "<p class=\"mycards\">\n";
+		 echo "<div class=\"mycards\">\n";
 		 /* is it our turn? */
-		 if($hash[$next]==$me && !isset($_REQUEST["card"]) && !isset($_REQUEST["win"])) 
+		 if($hash[$next]==$me && !isset($_REQUEST["card"])) 
 		   {
-		     echo "ITS YOUR TURN!  <br />\n";
+		     echo "Hello ".$player[$me]["name"].", it's your turn!  <br />\n";
 		     echo "Your cards are: <br />\n";
+		     echo "<form action=\"index.php\" method=\"post\">\n";
 		     foreach($mycards as $card) 
 		       display_link_card($card,$me);
+?>
+   <br />A short comment:<input name="comment" type="text" size="30" maxlength="50" /> 
+   <input type="hidden" name="me" value="<?php echo $me; ?>" />
+   <input type="submit" value="move" />
+</form>
+<?php
 		   }
 		 else 
 		   { /* not our turn, just show the hand */
@@ -1134,7 +1192,7 @@ who won?
 		     foreach($mycards as $card) 
 		       display_card($card);
 		   }
-		 echo "</p>\n";   
+		 echo "</div>\n";   
 	       }
 	   }
        }
