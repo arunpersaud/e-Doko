@@ -5,7 +5,7 @@
   <head>
      <title>e-DoKo</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
-     <link rel="stylesheet" type="text/css" href="standard.css" />	
+     <link rel="stylesheet" type="text/css" href="http://doko.nubati.net/css/standard.css" />	
      <script type="text/javascript">
        function hl(num) {
          if(document.getElementById){
@@ -40,7 +40,8 @@
  * config 
  */
 
-$host  = "http://doko.nubati.net/index.php";
+$base  = "http://doko.nubati.net/";
+$host  = $base."index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
 $debug = 0;
 
@@ -398,9 +399,9 @@ function display_card($card)
    * convert even cards to the matching odd value */
 
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
+    echo "<img src=\"".$base."cards/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
   else
-    echo "<img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
+    echo "<img src=\"".$base."cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
 
   return;
 }
@@ -408,9 +409,9 @@ function display_card($card)
 function display_link_card($card,$me)
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$card.".png\" alt=\"\" />\n";
+    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"".$base."cards/".$card.".png\" alt=\"\" />\n";
   else
-    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".($card-1).".png\" alt=\"\" />\n";
+    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"".$base."cards/".($card-1).".png\" alt=\"\" />\n";
   return;
 }
 
@@ -916,11 +917,11 @@ else
 		 
 		 /* found old trick, display it */
 		 if(sizeof($trick)==5)
-		   echo "  <li onclick=\"hl('$j');\"><a href=\"#\">Trick $j</a>\n    <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />\n";
+		   echo "  <li onclick=\"hl('$j');\"><a href=\"#\">Trick $j</a>\n    <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"".$base."pics/table".$play[0].".png\" alt=\"table\" />\n";
 		 else
 		   {
 		     /* display current trick */
-		     echo "<li onclick=\"hl('$j');\"><a href=\"#\">Current Trick</a>\n  <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"pics/table".$play[0].".png\" alt=\"table\" />";
+		     echo "<li onclick=\"hl('$j');\"><a href=\"#\">Current Trick</a>\n  <div class=\"table\" id=\"trick".$j."\">\n      <img class=\"table\" src=\"".$base."pics/table".$play[0].".png\" alt=\"table\" />";
 		   }
 		 for($i=0;$i<sizeof($trick)-1;$i++)
 		   {
