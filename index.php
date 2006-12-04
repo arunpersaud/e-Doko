@@ -45,7 +45,6 @@ $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
 $debug = 1;
 
 $last=-2;
-$number_of_trick;
 
 /*
  * end config
@@ -73,7 +72,7 @@ function mymail($To,$Subject,$message)
 
 function is_trump($c) { return (($c<27) ? 1:0);}
 function is_club($c)  { return (in_array($c,array('27','28','29','30','31','32','33','34')));}
-function is_space($c) { return (in_array($c,array('35','36','37','38','39','40','41','42')));}
+function is_spade($c) { return (in_array($c,array('35','36','37','38','39','40','41','42')));}
 function is_heart($c) { return (in_array($c,array('43','44','45','46','47','48')));}
 
 function compare_cards($a,$b)
@@ -122,11 +121,13 @@ function compare_cards($a,$b)
 
 function get_winner($p)
 {
+  /* get all 4 cards played in a trick */
   $c1 = $p[0];
   $c2 = $p[1];
   $c3 = $p[2];
   $c4 = $p[3];
 
+  /* find out who won */
   if( compare_cards($c1,$c2) && compare_cards($c1,$c3) && compare_cards($c1,$c4) )
     return 0;
   if( compare_cards($c2,$c3) && compare_cards($c2,$c4) )
@@ -189,12 +190,8 @@ function parse_status()
     }  
   /* save the game history */
   for($i=4;$i<sizeof($lines);$i++)
-    {
-      if(!ereg("^[[:space:]]*$",trim($lines[$i])))
-	{
-	  $history[] = $lines[$i];
-	}
-    }
+    if(!ereg("^[[:space:]]*$",trim($lines[$i])))
+      $history[] = $lines[$i];
   
   if(sizeof($history)==0 || (sizeof($history)==1 && strlen($history[0])==3 ))
     $history[0] = $game["startplayer"].":";
@@ -204,9 +201,8 @@ function parse_status()
 
 function count_nines($cards)
 {
-  $card = explode(";",$cards);
-  
-  $nines =0;
+  $card  = explode(";",$cards);
+  $nines = 0;
 
   foreach($card as $c)
     {
@@ -221,21 +217,18 @@ function count_nines($cards)
 
 function check_wedding($cards)
 {
-  $card = explode(";",$cards);
-  
-  $count =0;
+  $card  = explode(";",$cards);
 
   if( in_array("3",$card) && in_array("2",$card) )
-    $count=1;
+    return 1;
 
-  return $count;
+  return 0;
 }
 
 function count_trump($cards)
 {
-  $card = explode(";",$cards);
-  
-  $trump =0;
+  $card  = explode(";",$cards);
+  $trump = 0;
 
   /* count each trump */
   foreach($card as $c)
@@ -337,96 +330,84 @@ function card_to_name($card)
 
 function card_value($card)
 {
-  switch($card-1)
+  switch($card)
     {
-      case 0:
-      case 1:
-        return 10;
-      case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-      case 9:
-        return 3;
-      case 10:
-      case 11:
-      case 12:
-      case 13:
-      case 14:
-      case 15:
-      case 16:
-      case 17:
-        return 2;
-      case 18:
-      case 19:
-        return 11;
-      case 20:
-      case 21:
-        return 10;
-      case 22:
-      case 23:
-        return 4;
-      case 24:
-      case 25:
-      return 0;
-      case 26:
-      case 27:
-      return 11;
-      case 28:
-      case 29:
+    case 1:      /* heart */
+    case 2:
       return 10;
-      case 30:
-      case 31:
-      return 4;
-      case 32:
-      case 33:
-      return 0;
-      case 34:
-      case 35:
+    case 3:     /* clubes */	 
+    case 4:	                 
+    case 5:     /* spades */	 
+    case 6:	                 
+    case 7:     /* hearts */	 
+    case 8:	                 
+    case 9:     /* diamonds */	 
+    case 10:                     
+      return 3;
+    case 11:    /* clubes */	 
+    case 12:	                 
+    case 13:	/* spades */	 
+    case 14:	                 
+    case 15:	/* hearts */	 
+    case 16:	                 
+    case 17:	/* diamonds */	 
+    case 18:
+      return 2;	                 
+    case 19:    /* diamonds */ 
+    case 20:	               
+    case 27:    /* clubs */    
+    case 28:	               
+    case 35:    /* spades */   
+    case 36:	               
+    case 43:    /* hearts */   
+    case 44:                   
       return 11;
-      case 36:
-      case 37:
+    case 21:    /* diamonds */    
+    case 22:
+    case 29:    /* clubs */
+    case 30:
+    case 37:    /* spades */
+    case 38:
       return 10;
-      case 38:
-      case 39:
+    case 23:    /* diamonds */ 
+    case 24:	               
+    case 31:	/* clubs */    
+    case 32:	               
+    case 39:	/* spades */   
+    case 40:	               
+    case 45:	/* hearts */   
+    case 46:	               
       return 4;
-      case 40:
-      case 41:
+    case 25:    /* diamonds */   
+    case 26:	               
+    case 33:	/* clubs */    
+    case 34:	               
+    case 41:	/* spades */   
+    case 42:	               
+    case 47:	/* hearts */   
+    case 48:	               
       return 0;
-      case 42:
-      case 43:
-      return 11;
-      case 44:
-      case 45:
-      return 4;
-      case 46:
-      case 47:
-      return 0;
-      default:
-      echo "something went wrong, please contact the admin. ErrorCode 2<br>";
+    default:
+      echo "something went wrong, please contact the admin. ErrorCode: 2<br>";
       return 0;
     }
 }
 
 function display_card($card)
 {
+  /* cards are only availabl for the odd values, e.g. 1.png, 3.png, ... 
+   * convert even cards to the matching odd value */
+
   if( $card/2 - (int)($card/2) == 0.5)
     echo "<img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
   else
     echo "<img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
+
   return;
 }
 
 function display_link_card($card,$me)
 {
-  /*  if( $card/2 - (int)($card/2) == 0.5)
-    echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" /></a>\n";
-  else
-    echo "<a href=\"index.php?me=$me&amp;card=$card\"><img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" /></a>\n";
-  */
   if( $card/2 - (int)($card/2) == 0.5)
     echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$card.".png\" alt=\"\" />\n";
   else
