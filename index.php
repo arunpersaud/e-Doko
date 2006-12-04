@@ -3,7 +3,7 @@
     "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
-     <title>e-Doko</title>
+     <title>e-DoKo</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="stylesheet" type="text/css" href="standard.css" />	
      <script type="text/javascript">
@@ -33,7 +33,7 @@
   </head>
 <body onload="high_last();">
 <div class="header">
-<h1> Welcome to E-Doko </h1>
+<h1> Welcome to E-DoKo </h1>
 <?php
 
 /*
@@ -42,7 +42,7 @@
 
 $host  = "http://doko.nubati.net/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
-$debug = 1;
+$debug = 0;
 
 $last=-2;
 
@@ -53,7 +53,6 @@ $last=-2;
 echo "</div>\n";
 
 /* end header */
-
 					
 /* helper function */
 function mymail($To,$Subject,$message)
@@ -480,7 +479,6 @@ function save_status()
 
 /*****************  M A I N **************************/
 
-
 $history=array();
 
 /* check for status file and read it, if possible */
@@ -539,7 +537,7 @@ if( isset($_REQUEST["PlayerA"]) &&
     else
       die("no random file");
  
-    $randomNR = explode( ":", $random[2] );
+    $randomNR = explode( ":", $random[4] );
     
     /* write initial status into file */
     $output = fopen("status.txt","w");
@@ -955,7 +953,7 @@ else
 		 
 		 echo "    </div>\n  </li>\n";
 	       }
-	     echo "</ul>\n";
+	     echo "</ul> <hr />\n";
 
 	     echo "<div class=\"line\"></div>";
 
@@ -1083,7 +1081,14 @@ else
 		 if(strlen($player[$hash[0]]["cards"]))
 		   $history[] = "\n".$win.":\n"; /* not sure why I need the first \n here */
 
+	         /* check if game is done */
+	         $end = 1;
+	         for($i=0;$i<4;$i++)
+	           if(strlen(trim($player[$hash[$i]]["cards"]))!=0)
+		     $end = 0;
+
 		 /* email the player who needs to move next*/
+	         if(!$end)
 		 for($i=0;$i<4;$i++)
 		   {
 		     if((ereg("c",$player[$hash[$i]]["option"]) || $i==$win) )
