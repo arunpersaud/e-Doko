@@ -17,20 +17,18 @@
 
 
 ul.oldtrick {
-  position:relative;
   list-style:none;
   margin:3px;
   padding:0;
   /*background-color:yellow;*/
   text-align:center;
-
 }
 
 ul.oldtrick a { text-decoration:none; color:#000;}
 
 ul.oldtrick li {
   /*background-color:blue;*/
-  margin:0.2em 0.5em;  
+  margin:0 0.5em;  
   display:inline;
 }
 ul.oldtrick li:hover {
@@ -41,9 +39,9 @@ ul.oldtrick li div.table img.table {
   position:absolute;
   margin:0;
   padding:0;
-  top: 4em;
-  left: 3em;
-  height:22em;
+  top: 3em;
+  left: 4em;
+  height:24em;
   z-index:-2;
 }
 
@@ -60,9 +58,8 @@ ul.oldtrick li div.table {
   display:none;
 }
 
-hr {clear:both;}
-
-/*ul.oldtrick li:hover div.table{ display:block; }*/
+/*ul.oldtrick li:hover div.table{ display:block; }
+*/
 
 ul.oldtrick li div div.card0 {
   position:absolute;
@@ -70,7 +67,7 @@ ul.oldtrick li div div.card0 {
   padding:0;
   /*border: 1px solid red;*/
   top: 14em;
-  right:25em;
+  right:26em;
 }
 ul.oldtrick li div div.card1 {
   position:absolute;
@@ -88,7 +85,7 @@ ul.oldtrick li div div.card2 {
   padding:0;
   /*border: 1px solid red;*/
   top: 14em;
-  right:0em;
+  left:26em;
 }
 ul.oldtrick li div div.card3 {
   position:absolute;
@@ -175,7 +172,7 @@ ul.oldtrick li div div.card3 span span{
 .mycards {
   clear:both;
   margin:0;
-  margin-top:38em;
+  margin-top:33em;
   padding:0;
   border:1px solid red;
   background-color:yellow;
