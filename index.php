@@ -96,7 +96,7 @@ else if( isset($_REQUEST["PlayerA"]) &&
     $randomNRstring = join(":",$randomNR);
     
     /* create game */
-    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL, NULL)");
+    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre', NULL)");
     $game_id = mysql_insert_id();
     
     
@@ -288,11 +288,11 @@ else if(isset($_REQUEST["me"]))
 			      "       play.sequence as sequence, ".
 			      "       hand.hash     as hash,     ".
 			      "       trick.id ".
-			      "FROM trick ".
-			      "LEFT JOIN play ON trick.id=play.trick_id ".
-			      "LEFT JOIN hand_card ON play.hand_card_id=hand_card.id ".
-			      "LEFT JOIN hand ON hand_card.hand_id=hand.id ".
-			      "LEFT JOIN user ON user.id=hand.user_id ".
+			      "FROM Trick ".
+			      "LEFT JOIN Play ON trick.id=play.trick_id ".
+			      "LEFT JOIN Hand_Card ON play.hand_card_id=hand_card.id ".
+			      "LEFT JOIN Hand ON hand_card.hand_id=hand.id ".
+			      "LEFT JOIN User ON user.id=hand.user_id ".
 			      "WHERE trick.game_id='".$gameid."' ".
 			      "ORDER BY trick.id,sequence ASC");
 	
@@ -390,13 +390,13 @@ else if(isset($_REQUEST["me"]))
 	    
 	    /* check if we have card */
 	    /* set played in hand_card to true where hand_id and card_id*/
-	    $result = mysql_query("SELECT id from hand_card WHERE hand_id='$handid' AND card_id=".DB_quote_smart($card));
+	    $result = mysql_query("SELECT id FROM Hand_Card WHERE hand_id='$handid' AND card_id=".DB_quote_smart($card));
 	    $r = mysql_fetch_array($result,MYSQL_NUM);
 	    $handcardid = $r[0];
 	    
 	    if($handcardid)
 	      {
-		mysql_query("UPDATE hand_card SET played='true' WHERE hand_id='$handid' AND card_id=".DB_quote_smart($card));
+		mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".DB_quote_smart($card));
 		
 		/* get trick id or start new trick */
 		$a = DB_get_current_trickid($gameid);
@@ -527,7 +527,7 @@ else if(isset($_REQUEST["Rfullname"]) &&
 	  }
 	if($ok)
 	  {
-	    $r=mysql_query("INSERT INTO user VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
+	    $r=mysql_query("INSERT INTO User VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
 		      ",".DB_quote_smart($_REQUEST["Remail"]).
      		      ",".DB_quote_smart(md5($_REQUEST["Rpassword"])).
 		      ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL)"); 

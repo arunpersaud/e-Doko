@@ -4,7 +4,7 @@
  * config 
  */
 
-$host  = "http://doko.nubati.net/index.php";
+$host  = "http://doko.nubati.net/database/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
 $debug = 1;
 
