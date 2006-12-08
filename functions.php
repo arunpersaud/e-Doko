@@ -6,7 +6,7 @@
 
 $host  = "http://doko.nubati.net/database/index.php";
 $wiki  = "http://wiki.nubati.net/index.php?title=EmailDoko";
-$debug = 0;
+$debug = 1;
 
 $last=-2;
 

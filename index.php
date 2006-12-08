@@ -98,8 +98,13 @@ else if( isset($_REQUEST["PlayerA"]) &&
     
     /* create game */
     $followup = NULL;
-    if(isset($_REQUEST["followup"])) $followup= $_REQUEST["followup"];
-    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre',$followup ,NULL)");
+    if(isset($_REQUEST["followup"])) 
+      {
+	$followup= $_REQUEST["followup"];
+	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre','$followup' ,NULL)");
+      }
+    else
+      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre', NULL ,NULL)");
     $game_id = mysql_insert_id();
     
     
@@ -289,7 +294,13 @@ else if(isset($_REQUEST["me"]))
       case 'gameover': /* gameover and play, so that the tricks are visible for both */
 	display_news();
 	display_status();
-		
+
+	$gamestatus =DB_get_game_status_by_gameid($gameid);
+	if($gamestatus == 'pre')
+	  {
+	    echo "you need to wait for the others... <br />";
+	    break;
+	  }
 	/* get trick ids */
 	$result = mysql_query("SELECT Hand_Card.card_id as card,".
 			      "       User.fullname as name,".
@@ -553,6 +564,12 @@ else if(isset($_REQUEST["me"]))
 	echo date("r",$unixtime)."<br />";
 
 	DB_update_user_timestamp($uid);
+
+	echo "<p>these are the games you are playing in:<br />\n";
+	$result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status<>'gameover'" );
+	while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	  echo "<a href=\"http://doko.nubati.net/database/index.php?me=".$r[0]."\">game #".$r[1]." </a><br />";
+	echo "</p>\n";
 
 	$names = DB_get_all_names();
 	echo "<p>registered players:<br />\n";
