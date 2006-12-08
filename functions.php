@@ -431,4 +431,18 @@ function display_cards($me,$myturn)
   return;
 }
 
+function return_timezone($offset)
+{
+  switch($offset)
+    {
+    case '1':
+      $zone = "Europe/Berlin";
+      break;
+    default:
+      $zone = "Europe/London";
+    }
+  
+  return $zone;
+}
+
 ?>

@@ -349,4 +349,31 @@ function DB_get_all_names()
 
   return $names;
 }
+
+function DB_update_user_timestamp($userid)
+{
+  mysql_query("UPDATE User SET last_login = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($userid));
+  return;
+}
+
+function DB_get_user_timestamp($userid)
+{
+  $result = mysql_query("SELECT last_login FROM User WHERE id=".DB_quote_smart($userid));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+function DB_get_user_timezone($userid)
+{
+  $result = mysql_query("SELECT timezone FROM User WHERE id=".DB_quote_smart($userid));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
 ?>

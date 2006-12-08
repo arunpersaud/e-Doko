@@ -171,6 +171,7 @@ else if(isset($_REQUEST["me"]))
 	 exit();
       }
     
+    DB_update_user_timestamp($myid);
     $myname   = DB_get_name_by_hash($me);
     $mystatus = DB_get_status_by_hash($me);
 
@@ -541,7 +542,18 @@ else if(isset($_REQUEST["me"]))
 
     if($ok)
       {
-	echo "ok. your logged in, now what? :)<br />";
+	$time = DB_get_user_timestamp($uid);
+	$unixtime =strtotime($time);
+	
+	$offset = DB_get_user_timezone($uid);
+	$zone = return_timezone($offset);
+	date_default_timezone_set($zone);
+
+	echo "ok. your logged in, now what? :) <br />last login: ";
+	echo date("r",$unixtime)."<br />";
+
+	DB_update_user_timestamp($uid);
+
 	$names = DB_get_all_names();
 	echo "<p>registered players:<br />\n";
 	foreach ($names as $name)
@@ -576,7 +588,9 @@ else if(isset($_REQUEST["register"]) )
                <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxsize="30" /></td>
               </tr><tr>
 	       <td><label for="Rtimezone">Timezone:</label></td>
-               <td><input type="text" id="Rtimezone" name="Rtimezone" size="4" maxsize="4" value="+1"/></td>
+               <td>
+                  <input type="text" id="Rtimezone" name="Rtimezone" size="4" maxsize="4" value="+1" />
+	       </td>
               </tr><tr>
                <td colspan="2"> <input type="submit" value="register" /></td>
              </table>
