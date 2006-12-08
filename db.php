@@ -7,8 +7,8 @@
 function DB_open()
 {
   global $DB;
-  if ( $DB = mysql_connect('mysql.nubati.net','doko', '$DoKo#.') )
-    mysql_select_db('dokodb') or die('Could not select database'); 
+  if ( $DB = mysql_connect('localhost','dokodb', 'doko') )
+    mysql_select_db('doko') or die('Could not select database'); 
   else
     die (mysql_error());
   
@@ -50,7 +50,6 @@ function DB_test()
 
 function DB_get_email_by_name($name)
 {
-  echo "*looking for $name*";
   $result = mysql_query("SELECT email FROM User WHERE fullname=".DB_quote_smart($name)."");
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
@@ -126,7 +125,7 @@ function DB_get_pos_by_hash($hash)
 
 function DB_get_name_by_hash($hash)
 {
-  $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON hand.user_id=user.id WHERE hash=".DB_quote_smart($hash));
+  $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($hash));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
   if($r)
@@ -146,10 +145,38 @@ function DB_get_status_by_hash($hash)
     return 0;
 }
 
+function DB_set_game_status_by_gameid($id,$status)
+{
+  mysql_query("UPDATE Game SET status='".$status."' WHERE id=".DB_quote_smart($id));
+  return;
+}
+
+function DB_get_game_status_by_gameid($id)
+{
+  $result = mysql_query("SELECT status FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+
 function DB_set_hand_status_by_hash($hash,$status)
 {
   mysql_query("UPDATE Hand SET status='".$status."' WHERE hash=".DB_quote_smart($hash));
   return;
+}
+
+function DB_get_hand_status_by_userid($id)
+{
+  $result = mysql_query("SELECT status FROM Hand WHERE user_id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
 }
 
 function DB_get_gameid_by_hash($hash)
@@ -207,6 +234,22 @@ function DB_get_hand($me)
   return $cards;
 }
 
+function DB_get_cards_by_trick($id)
+{
+  $cards = array();
+  $cards[0]=0; /* need to return index 1-4 */
+
+  $result = mysql_query("SELECT card_id FROM Play LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id ".
+			"LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
+			"WHERE trick_id=".
+			DB_quote_smart($id)." ORDER BY position ASC");
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $cards[]=$r[0];
+
+  return $cards;
+}
+
+
 function DB_set_solo_by_hash($me,$solo)
 {
   mysql_query("UPDATE Hand SET solo=".DB_quote_smart($solo)." WHERE hash=".DB_quote_smart($hash));
@@ -221,10 +264,10 @@ function DB_set_sickness_by_hash($me,$sickness)
 
 function DB_get_current_trickid($gameid)
 {
-  $result = mysql_query("SELECT trick.id,MAX(play.sequence) FROM Play ".
-			"LEFT JOIN Trick ON play.trick_id=trick.id ".
-			"WHERE trick.game_id=".DB_quote_smart($gameid)." ".
-			"GROUP BY trick.id");
+  $result = mysql_query("SELECT Trick.id,MAX(Play.sequence) FROM Play ".
+			"LEFT JOIN Trick ON Play.trick_id=Trick.id ".
+			"WHERE Trick.game_id=".DB_quote_smart($gameid)." ".
+			"GROUP BY Trick.id");
   while(  $r = mysql_fetch_array($result,MYSQL_NUM) )
     {
       $trickid  = $r[0];
@@ -259,6 +302,41 @@ function DB_play_card($trickid,$handcardid,$sequence)
   mysql_query("INSERT INTO Play VALUES(NULL,NULL,NULL,".DB_quote_smart($trickid).
 	      ",".DB_quote_smart($handcardid).",".DB_quote_smart($sequence).")");
   return;
+}
+
+function DB_get_all_names_by_gameid($id)
+{
+  $names = array();
+  
+  $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE game_id=".
+			DB_quote_smart($id)." ORDER BY position ASC");
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $names[] = $r[0];
+
+  return $names;
+}
+
+function DB_get_all_userid_by_gameid($id)
+{
+  $names = array();
+  
+  $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
+			DB_quote_smart($id));
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $names[] = $r[0];
+
+  return $names;
+}
+
+function DB_get_hash_from_game_and_pos($id,$pos)
+{
+  $result = mysql_query("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and position=".DB_quote_smart($pos));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
 }
 
 ?>

@@ -37,6 +37,7 @@
 </div>
 
 <?php
+error_reporting(E_ALL);
      
 include_once("functions.php");
 include_once("db.php");
@@ -96,7 +97,9 @@ else if( isset($_REQUEST["PlayerA"]) &&
     $randomNRstring = join(":",$randomNR);
     
     /* create game */
-    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre', NULL)");
+    $followup = NULL;
+    if(isset($_REQUEST["followup"])) $followup= $_REQUEST["followup"];
+    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre',$followup ,NULL)");
     $game_id = mysql_insert_id();
     
     
@@ -146,21 +149,14 @@ else if( isset($_REQUEST["PlayerA"]) &&
     mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
     mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
     mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
-    
-    /*
-
-   do things like:
-     select fullname,strength,suite,game_id from hand_card left join hand on hand_id=hand.id left join user on user.id=user_id left join card on card_id=card.id where game_id='4'
-
-    */
-    
+        
   }    
 /* end set up a new game */
 
 else if(isset($_REQUEST["me"]))
   {
      /* handle request from one specifig player,
-      * the hash is set on a  per game base, so first just handle this game
+      * the hash is set on a per game base, so first just handle this game
       * perhaps also show links to other games in a sidebar
       */
     
@@ -177,6 +173,9 @@ else if(isset($_REQUEST["me"]))
     
     $myname   = DB_get_name_by_hash($me);
     $mystatus = DB_get_status_by_hash($me);
+
+    /* get game id */
+    $gameid = DB_get_gameid_by_hash($me);
     
     switch($mystatus)
       {
@@ -273,28 +272,37 @@ else if(isset($_REQUEST["me"]))
 	
 	/* only set this after all poverty, etc. are handeled*/
 	DB_set_hand_status_by_hash($me,'play');
+
+	/* check if the game can start  */
+	$userids = DB_get_all_userid_by_gameid($gameid);
+	$done=1;
+	foreach($userids as $user)
+	  if(DB_get_hand_status_by_userid($user)!='play')
+	    $done=0;
+
+	if($done)
+	  DB_set_game_status_by_gameid($gameid,'play');
+
 	break;
       case 'play':
+      case 'gameover': /* gameover and play, so that the tricks are visible for both */
 	display_news();
 	display_status();
-	
-	 /* get game id */
-	$gameid = DB_get_gameid_by_hash($me);
-	
+		
 	/* get trick ids */
-	$result = mysql_query("SELECT hand_card.card_id as card,".
-			      "       user.fullname as name,".
-			      "       hand.position as position,".
-			      "       play.sequence as sequence, ".
-			      "       hand.hash     as hash,     ".
-			      "       trick.id ".
+	$result = mysql_query("SELECT Hand_Card.card_id as card,".
+			      "       User.fullname as name,".
+			      "       Hand.position as position,".
+			      "       Play.sequence as sequence, ".
+			      "       Hand.hash     as hash,     ".
+			      "       Trick.id ".
 			      "FROM Trick ".
-			      "LEFT JOIN Play ON trick.id=play.trick_id ".
-			      "LEFT JOIN Hand_Card ON play.hand_card_id=hand_card.id ".
-			      "LEFT JOIN Hand ON hand_card.hand_id=hand.id ".
-			      "LEFT JOIN User ON user.id=hand.user_id ".
-			      "WHERE trick.game_id='".$gameid."' ".
-			      "ORDER BY trick.id,sequence ASC");
+			      "LEFT JOIN Play ON Trick.id=Play.trick_id ".
+			      "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
+			      "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
+			      "LEFT JOIN User ON User.id=Hand.user_id ".
+			      "WHERE Trick.game_id='".$gameid."' ".
+			      "ORDER BY Trick.id,sequence ASC");
 	
 	
 	$trickNR = 1;
@@ -388,9 +396,10 @@ else if(isset($_REQUEST["me"]))
 	    $card   = $_REQUEST["card"];
 	    $handid = DB_get_handid_by_hash($me); 
 	    
-	    /* check if we have card */
+	    /* check if we have card and that we haven't played it yet*/
 	    /* set played in hand_card to true where hand_id and card_id*/
-	    $result = mysql_query("SELECT id FROM Hand_Card WHERE hand_id='$handid' AND card_id=".DB_quote_smart($card));
+	    $result = mysql_query("SELECT id FROM Hand_Card WHERE played='false' and ".
+				  "hand_id='$handid' AND card_id=".DB_quote_smart($card));
 	    $r = mysql_fetch_array($result,MYSQL_NUM);
 	    $handcardid = $r[0];
 	    
@@ -409,10 +418,45 @@ else if(isset($_REQUEST["me"]))
 		display_card($card);
 		echo "</div>\n";
 		
+
+		/*check if we still have cards left, else set status to gameover */
 		if(sizeof(DB_get_hand($me))==0)
-		  DB_set_hand_status_by_hash($me,'gameover');
+		  {
+		    DB_set_hand_status_by_hash($me,'gameover');
+		    $mystatus='gameover';
+		  }
 		
-		echo "TODO: email next player<br />";
+		/* if all players are done, set game status also to game over */
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		$done=1;
+		foreach($userids as $user)
+		  if(DB_get_hand_status_by_userid($user)!='gameover')
+		    $done=0;
+
+		if($done)
+		  DB_set_game_status_by_gameid($gameid,"gameover");
+		
+		/* email next player */
+		if(DB_get_game_status_by_gameid($gameid)=='play')
+		  {
+		    if($sequence==4)
+		      {
+			$play   = DB_get_cards_by_trick($trickid);
+			$winner = get_winner($play); /* returns the position */
+			$next = $winner;
+		      }
+		    else
+		      {
+			$next = DB_get_pos_by_hash($me)+1;
+		      }
+		    if($next==5) $next=1;
+
+		    echo "TODO: email next player at pos $next <br />";
+		    if($debug)
+		      echo "DEBUG:<a href=\"index.php?me=".DB_get_hash_from_game_and_pos($gameid,$next).
+			"\"> next player </a> <br />\n";
+
+		  }
 	      }
 	    else
 	      {
@@ -430,7 +474,7 @@ else if(isset($_REQUEST["me"]))
 	
 	if($myturn && !isset($_REQUEST["card"]))
 	  {
-	    echo "Hello ".DB_get_name_by_hash($me).", it's your turn!  <br />\n";
+	    echo "Hello ".$myname.", it's your turn!  <br />\n";
 	    echo "Your cards are: <br />\n";
 	    echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
 	    foreach($mycards as $card) 
@@ -442,19 +486,40 @@ else if(isset($_REQUEST["me"]))
  </form>
  <?php
          }
-	else
+	else if($mystatus=='play')
 	  {
 	    echo "Your cards are: <br />\n";
 	    foreach($mycards as $card) 
 	      display_card($card);
 	  }
 	echo "</div>\n";
-	/*check if we still have cards left, else set status to gameover */
-	
-	break;
-      case 'gameover':
-	echo "the game is over... guess the final score should be displayed here...<br />\n";
-	echo "TODO: suggest a new game with the next person as dealer <br />\n";
+
+	/* check if we need to set status to 'gameover' is done during playing of the card */
+	if($mystatus=='play')
+	  break;
+   /* the following happens only when the gamestatus is 'gameover' */
+	/* check if game is over, display results */
+	if(DB_get_game_status_by_gameid($gameid)=='play')
+	  {
+	    echo "the game is over for you.. other people still need to play though";
+	  }
+	else
+	  {
+	    echo "the game is over now... guess the final score should be displayed here...<br />\n";
+	    
+	    /* suggest a new game with the same people in it, just rotated once */
+	    $names = DB_get_all_names_by_gameid($gameid);
+	    
+	    echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
+	    echo "<form action=\"index.php\" methog=\"post\">\n";
+	    echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"".($names[1])."\" />\n";
+	    echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"".($names[2])."\" />\n";
+	    echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"".($names[3])."\" />\n";
+	    echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"".($names[0])."\" />\n";
+	    echo "  <input type=\"hidden\" name=\"followup\" value=\"".($gameid)."\" />\n";
+	    echo "  <input type=\"submit\" value=\"keep playing\" />\n";
+	    echo "</form>\n";
+	  }
 	break;
       default:
 	echo "error in testing the status";
