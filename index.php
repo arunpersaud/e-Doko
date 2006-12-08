@@ -52,8 +52,8 @@ DB_open();
 if(isset($_REQUEST["new"]))
   {
 ?>
-    <p> no game in progress, please input 4 names and email addresses, please make sure that the addresses are correct! </p>
- <form action="index.php" method="post">
+    <p>Please add 4 names, please make sure that the names are correct! </p>
+       <form action="index.php" method="post">
    Name:  <input name="PlayerA" type="text" size="10" maxlength="20" /> 
    Name:  <input name="PlayerB" type="text" size="10" maxlength="20" /> 
    Name:  <input name="PlayerC" type="text" size="10" maxlength="20" /> 
@@ -389,7 +389,11 @@ else if(isset($_REQUEST["me"]))
 	  $myturn = 1;
 	else
 	  $myturn = 0;
+
+	if(isset($_REQUEST["comment"]))
+	  {
 	
+	  }  
 	/* do we want to play a card? */
 	if(isset($_REQUEST["card"]) && $myturn)
 	  {
@@ -480,7 +484,7 @@ else if(isset($_REQUEST["me"]))
 	    foreach($mycards as $card) 
 	      display_link_card($card);
 ?>
-    <br />A short comment:<input name="comment" type="text" size="30" maxlength="50" /> 
+    <br />A short comments:<input name="comment" type="text" size="30" maxlength="50" /> 
     <input type="hidden" name="me" value="<?php echo $me; ?>" />
     <input type="submit" value="move" />
  </form>
@@ -538,7 +542,13 @@ else if(isset($_REQUEST["me"]))
     if($ok)
       {
 	echo "ok. your logged in, now what? :)<br />";
-	
+	$names = DB_get_all_names();
+	echo "<p>registered players:<br />\n";
+	foreach ($names as $name)
+	  echo "$name <br />\n";
+	echo "</p>\n";
+	echo "<p>Want to start a new game? remember 4 names from the list above and visit ".
+	  "<a href=\"http://doko.nubati.net/database/index.php?new\">this page.</a></p>";
       }
     else
       {

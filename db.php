@@ -7,8 +7,8 @@
 function DB_open()
 {
   global $DB;
-  if ( $DB = mysql_connect('localhost','dokodb', 'doko') )
-    mysql_select_db('doko') or die('Could not select database'); 
+  if ( $DB = mysql_connect('mysql.nubati.net','doko', '$DoKo#.') )
+    mysql_select_db('dokodb') or die('Could not select database'); 
   else
     die (mysql_error());
   
@@ -339,4 +339,14 @@ function DB_get_hash_from_game_and_pos($id,$pos)
     return "";
 }
 
+function DB_get_all_names()
+{
+  $names  = array();
+
+  $result = mysql_query("SELECT fullname FROM User");
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $names[] = $r[0];
+
+  return $names;
+}
 ?>
