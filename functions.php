@@ -441,6 +441,9 @@ function return_timezone($offset)
     case '-8':
       $zone = "America/Vancouver";
       break;
+    case '13':
+      $zone = "Pacific/Auckland";
+      break;
     default:
       $zone = "Europe/London";
     }
