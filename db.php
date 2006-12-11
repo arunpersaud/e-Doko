@@ -301,7 +301,9 @@ function DB_play_card($trickid,$handcardid,$sequence)
 {
   mysql_query("INSERT INTO Play VALUES(NULL,NULL,NULL,".DB_quote_smart($trickid).
 	      ",".DB_quote_smart($handcardid).",".DB_quote_smart($sequence).")");
-  return;
+      
+  $playid = mysql_insert_id();
+  return $playid;
 }
 
 function DB_get_all_names_by_gameid($id)
@@ -375,5 +377,11 @@ function DB_get_user_timezone($userid)
     return $r[0];
   else
     return 0;
+}
+
+function DB_insert_comment($comment,$playid,$userid)
+{
+  mysql_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid, ".DB_quote_smart($comment).")");
+  return;
 }
 ?>

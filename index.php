@@ -313,6 +313,7 @@ else if(isset($_REQUEST["me"]))
 			      "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
 			      "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
 			      "LEFT JOIN User ON User.id=Hand.user_id ".
+			      "LEFT JOIN Comment ON Play.id=Comment.play_id ".
 			      "WHERE Trick.game_id='".$gameid."' ".
 			      "ORDER BY Trick.id,sequence ASC");
 	
@@ -333,6 +334,7 @@ else if(isset($_REQUEST["me"]))
 	    $seq   = $r[3];
 	    $pos   = $r[2];
 	    $trick = $r[5];
+	    $comment = $r[6];
 	    
 	    if($trick!=$lasttrick && $seq==1)
 	      {
@@ -354,8 +356,7 @@ else if(isset($_REQUEST["me"]))
 	    
 	    $play[$pos]=$r[0];
 	    
-	    $comment=0;
-	    if($comment)
+	    if($comment!="")
 	      echo "        <span class=\"comment\">";
 	    else
 	      echo "        <span>";
@@ -364,7 +365,7 @@ else if(isset($_REQUEST["me"]))
 	    echo $r[1];
 	    
 	    /* check for comment */
-	    if($comment)
+	    if($comment!="")
 	      echo "<span>".$comment."</span>";
 	    echo "</span>\n        ";
 	    
@@ -402,10 +403,6 @@ else if(isset($_REQUEST["me"]))
 	else
 	  $myturn = 0;
 
-	if(isset($_REQUEST["comment"]))
-	  {
-	
-	  }  
 	/* do we want to play a card? */
 	if(isset($_REQUEST["card"]) && $myturn)
 	  {
@@ -428,7 +425,14 @@ else if(isset($_REQUEST["me"]))
 		$trickid  = $a[0];
 		$sequence = $a[1];
 		
-		DB_play_card($trickid,$handcardid,$sequence);
+		$playid = DB_play_card($trickid,$handcardid,$sequence);
+
+		/*check for coment */
+		if(isset($_REQUEST["comment"]))
+		  {
+		    DB_insert_comment($_REQUEST["comment"],$playid,$myid);
+		  };  
+
 		echo "<div class=\"card\">";
 		echo " you played  <br />";
 		display_card($card);
