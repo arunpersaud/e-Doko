@@ -6,9 +6,9 @@
 
 function DB_open()
 {
-  global $DB;
-  if ( $DB = mysql_connect('mysql.nubati.net','doko', '$DoKo#.') )
-    mysql_select_db('dokodb') or die('Could not select database'); 
+  global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
+  if ( $DB = mysql_connect($DB_host,$DB_user, $DB_password) )
+    mysql_select_db($DB_database) or die('Could not select database'); 
   else
     die (mysql_error());
   
