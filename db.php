@@ -264,11 +264,14 @@ function DB_set_sickness_by_hash($me,$sickness)
 
 function DB_get_current_trickid($gameid)
 {
+  $trickid  = NULL;
+  $sequence = NULL;
+
   $result = mysql_query("SELECT Trick.id,MAX(Play.sequence) FROM Play ".
 			"LEFT JOIN Trick ON Play.trick_id=Trick.id ".
 			"WHERE Trick.game_id=".DB_quote_smart($gameid)." ".
 			"GROUP BY Trick.id");
-  while(  $r = mysql_fetch_array($result,MYSQL_NUM) )
+  while( $r = mysql_fetch_array($result,MYSQL_NUM) )
     {
       $trickid  = $r[0];
       $sequence = $r[1];

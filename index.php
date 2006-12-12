@@ -232,7 +232,7 @@ else if(isset($_REQUEST["me"]))
 	break;
 	
       case 'check':
-	echo "no checking at the moment... you need to play a normal game";
+	echo "no checking at the moment... you need to play a normal game. At the moment you need to reload this page to finish the setup.";
 	if(!isset($_REQUEST["solo"])    || 
 	   !isset($_REQUEST["wedding"]) ||
 	   !isset($_REQUEST["poverty"]) ||
@@ -307,7 +307,8 @@ else if(isset($_REQUEST["me"]))
 			      "       Hand.position as position,".
 			      "       Play.sequence as sequence, ".
 			      "       Hand.hash     as hash,     ".
-			      "       Trick.id ".
+			      "       Trick.id, ".
+			      "       Comment.comment ".
 			      "FROM Trick ".
 			      "LEFT JOIN Play ON Trick.id=Play.trick_id ".
 			      "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
