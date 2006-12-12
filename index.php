@@ -52,17 +52,7 @@ DB_open();
 /* check if we want to start a new game */
 if(isset($_REQUEST["new"]))
   {
-?>
-    <p>Please add 4 names, please make sure that the names are correct! </p>
-       <form action="index.php" method="post">
-   Name:  <input name="PlayerA" type="text" size="10" maxlength="20" /> 
-   Name:  <input name="PlayerB" type="text" size="10" maxlength="20" /> 
-   Name:  <input name="PlayerC" type="text" size="10" maxlength="20" /> 
-   Name:  <input name="PlayerD" type="text" size="10" maxlength="20" /> 
-
-   <input type="submit" value="start game" />
- </form>
-<?php
+    output_form_for_new_game();
   } 
 /* end start a new game */
 
@@ -108,7 +98,7 @@ else if( isset($_REQUEST["PlayerA"]) &&
       mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre', NULL ,NULL)");
     $game_id = mysql_insert_id();
     
-    
+    /* create hash */
     $hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA);
     $hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB);
     $hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC);
@@ -138,7 +128,7 @@ else if( isset($_REQUEST["PlayerA"]) &&
     for($i=36;$i<48;$i++)
       mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
 
-    /* send out email, check for error with email */
+    /* send out email, TODO: check for error with email */
     $message = "\n".
       "you are invited to play a game of DoKo (that is to debug the program ;).\n".
       "Place comments and bug reports here:\n".
@@ -169,20 +159,19 @@ else if(isset($_REQUEST["me"]))
     $me = $_REQUEST["me"];
     
     $myid = DB_get_userid_by_hash($me);
-    
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
 	echo "perhaps the game has been cancled.";
-	 exit();
+	exit();
       }
     
     DB_update_user_timestamp($myid);
+
+    /* get some information from the DB */
+    $gameid   = DB_get_gameid_by_hash($me);
     $myname   = DB_get_name_by_hash($me);
     $mystatus = DB_get_status_by_hash($me);
-
-    /* get game id */
-    $gameid = DB_get_gameid_by_hash($me);
     
     switch($mystatus)
       {
@@ -190,7 +179,6 @@ else if(isset($_REQUEST["me"]))
 	check_want_to_play($me);
 	DB_set_hand_status_by_hash($me,'init');
 	break;
-	
       case 'init':
 	if( !isset($_REQUEST["in"]) || !isset($_REQUEST["update"]))
 	  {
@@ -201,7 +189,7 @@ else if(isset($_REQUEST["me"]))
 	  {
 	    if($_REQUEST["in"] == "no")
 	      {
-		echo "TODO: email everyone that the game has been canceld<br />";
+		echo "TODO: email everyone that the game has been canceled.<br />";
 		 /*something like
 		 for($i=0;$i<4;$i++)
  		   {
@@ -296,7 +284,7 @@ else if(isset($_REQUEST["me"]))
 	display_news();
 	display_status();
 
-	$gamestatus =DB_get_game_status_by_gameid($gameid);
+	$gamestatus = DB_get_game_status_by_gameid($gameid);
 	if($gamestatus == 'pre')
 	  {
 	    echo "you need to wait for the others... <br />";
@@ -325,17 +313,17 @@ else if(isset($_REQUEST["me"]))
 	$lasttrick = DB_get_max_trickid($gameid);
 	
 	$play = array(); /* needed to calculate winner later  */
-	$seq=1;          
-	$pos=0;
+	$seq  = 1;          
+	$pos  = 0;
 	
 	echo "\n<ul class=\"oldtrick\">\n";
 	echo "  <li> Hello $myname!   History: </li>\n";
 	
 	while($r = mysql_fetch_array($result,MYSQL_NUM))
 	  {
-	    $seq   = $r[3];
-	    $pos   = $r[2];
-	    $trick = $r[5];
+	    $seq     = $r[3];
+	    $pos     = $r[2];
+	    $trick   = $r[5];
 	    $comment = $r[6];
 	    
 	    if($trick!=$lasttrick && $seq==1)
@@ -473,7 +461,14 @@ else if(isset($_REQUEST["me"]))
 		      }
 		    if($next==5) $next=1;
 
-		    echo "TODO: email next player at pos $next <br />";
+		    /* email next player */
+		    $next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
+		    $email     = DB_get_email_by_hash($next_hash);
+
+		    $message .= "It's your turn  now.\n".
+		      "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
+		    mymail($email,"[DoKo-debug] a card has been played",$message);
+
 		    if($debug)
 		      echo "DEBUG:<a href=\"index.php?me=".DB_get_hash_from_game_and_pos($gameid,$next).
 			"\"> next player </a> <br />\n";

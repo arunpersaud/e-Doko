@@ -59,6 +59,17 @@ function DB_get_email_by_name($name)
     return "";
 }
 
+function DB_get_email_by_hash($hash)
+{
+  $result = mysql_query("SELECT User.email FROM User LEFT JOIN Hand ON Hand.user_id=User.id WHERE Hand.hash=".DB_quote_smart($hash)."");
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
 function DB_get_userid_by_name($name)
 {
   $result = mysql_query("SELECT id FROM User WHERE fullname=".DB_quote_smart($name));

@@ -435,4 +435,19 @@ function return_timezone($offset)
   return $zone;
 }
 
+function output_form_for_new_game()
+{
+?>
+    <p>Please add 4 names, please make sure that the names are correct! </p>
+       <form action="index.php" method="post">
+   Name:  <input name="PlayerA" type="text" size="10" maxlength="20" /> 
+   Name:  <input name="PlayerB" type="text" size="10" maxlength="20" /> 
+   Name:  <input name="PlayerC" type="text" size="10" maxlength="20" /> 
+   Name:  <input name="PlayerD" type="text" size="10" maxlength="20" /> 
+
+   <input type="submit" value="start game" />
+ </form>
+<?php
+}
+
 ?>
