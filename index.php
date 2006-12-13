@@ -37,6 +37,8 @@
 </div>
 
 <?php
+/* end header */
+
 error_reporting(E_ALL);
 
 include_once("config.php");     
@@ -45,16 +47,11 @@ include_once("db.php");
 
 DB_open();
 
-/* end header */
-
 /*****************  M A I N **************************/
 
 /* check if we want to start a new game */
 if(isset($_REQUEST["new"]))
-  {
-    output_form_for_new_game();
-  } 
-/* end start a new game */
+     output_form_for_new_game();
 
 /*check if everything is ready to set up a new game */
 else if( isset($_REQUEST["PlayerA"]) && 
@@ -157,7 +154,8 @@ else if(isset($_REQUEST["me"]))
       */
     
     $me = $_REQUEST["me"];
-    
+
+    /* test for valid ID */
     $myid = DB_get_userid_by_hash($me);
     if(!$myid)
       {
@@ -190,7 +188,7 @@ else if(isset($_REQUEST["me"]))
 	    if($_REQUEST["in"] == "no")
 	      {
 		echo "TODO: email everyone that the game has been canceled.<br />";
-		 /*something like
+		 /*something like need to modify for DB backend
 		 for($i=0;$i<4;$i++)
  		   {
  		     $message = "Hello ".$player[$hash[$i]]["name"].",\n\n".
@@ -198,6 +196,7 @@ else if(isset($_REQUEST["me"]))
  		     mymail($player[$hash[$i]]["email"],"[DoKo-Debug] the game has been canceled",$message); 
  		   }
 		 */
+		/* delete everything from the dB */
 		DB_cancel_game($me);
 	      }
 	    else
@@ -280,7 +279,7 @@ else if(isset($_REQUEST["me"]))
 
 	break;
       case 'play':
-      case 'gameover': /* gameover and play, so that the tricks are visible for both */
+      case 'gameover': /*both entries here,  so that the tricks are visible for both in case of 'play' there is a break later that skips the last part*/
 	display_news();
 	display_status();
 
@@ -290,7 +289,7 @@ else if(isset($_REQUEST["me"]))
 	    echo "you need to wait for the others... <br />";
 	    break;
 	  }
-	/* get trick ids */
+	/* get everythin relevant to display the tricks */
 	$result = mysql_query("SELECT Hand_Card.card_id as card,".
 			      "       User.fullname as name,".
 			      "       Hand.position as position,".
@@ -338,7 +337,7 @@ else if(isset($_REQUEST["me"]))
 		/* start of a last trick? */
 		echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Current Trick</a>\n".
 		  "    <div class=\"table\" id=\"trick".$trickNR."\">\n".
-		  "      <img class=\"table\" src=\"pics/table".($pos-1).".png\" alt=\"table\" />";
+		  "      <img class=\"table\" src=\"pics/table".($pos-1).".png\" alt=\"table\" />\n";
 	      }
 	    
 	    /* display card */
@@ -370,7 +369,8 @@ else if(isset($_REQUEST["me"]))
 		echo "    </div>\n  </li>\n";  /* end div table, end li table */
 	      }
 	  }
-	if($seq!=4) 
+
+	if($seq!=4 && $trickNR>1) 
 	  echo "    </div>\n  </li>\n";  /* end div table, end li table */
 	
 	echo "</ul>\n";
@@ -543,8 +543,10 @@ else if(isset($_REQUEST["me"]))
       }
     exit();
   } 
+/* user status page */ 
  else if(isset($_REQUEST["email"]) && isset($_REQUEST["password"]))
   {
+    /* test id and password, should really be done in one step */
     $ok=1;
     $uid = DB_get_userid_by_email($_REQUEST["email"]);
     if(!$uid)
@@ -586,6 +588,7 @@ else if(isset($_REQUEST["me"]))
       }
     exit();
   }
+/* page for registration */
 else if(isset($_REQUEST["register"]) )
   {
     echo "TODO: convert timezone into a menu<br />\n";
@@ -616,6 +619,7 @@ else if(isset($_REQUEST["register"]) )
         </form>
 <?php
   }
+/* new user wants to register */
 else if(isset($_REQUEST["Rfullname"]) && 
 	isset($_REQUEST["Remail"]   ) && 
 	isset($_REQUEST["Rpassword"]) && 
@@ -645,27 +649,28 @@ else if(isset($_REQUEST["Rfullname"]) &&
 	      echo " something went wrong";
 	  }
   }
+/* default login page */
 else
   { /* no new game, not in a game */
 ?>
     <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
     <p> Please <a href="index.php?register">register</a>, in case you haven't done yet  <br />
         or login with you email-address or name and password here:
+    </p>
         <form action="index.php" method="post">
           <fieldset>
             <legend>Login</legend>
              <table>
               <tr>
-               <td><label for="email">Email:</label></td><td><input type="text" id="email" name="email" size="20" maxsize="30" /> </td>
+               <td><label for="email">Email:</label></td><td><input type="text" id="email" name="email" size="20" maxlength="30" /> </td>
               </tr><tr>
-               <td><label for="password">Password:</label></td><td><input type="password" id="password" name="password" size="20" maxsize="30" /></td>
+               <td><label for="password">Password:</label></td><td><input type="password" id="password" name="password" size="20" maxlength="30" /></td>
               </tr><tr>
                <td> <input type="submit" value="login" /></td>
              </table>
           </fieldset>
         </form>
- 
-    </p>
+
 
 
 <?php
