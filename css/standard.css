@@ -198,15 +198,23 @@ ul.oldtrick li div div.card3 span span{
   border-top:0;
 }
 
-.time,.over { 
+.time { 
+  float:left;
+  border:2px solid gray;
+  border-top:0;
+}
+
+.over { 
   float:right;
   border:2px solid black;
   clear:right;
- }
+}
 
 .bug {
   float:left;
   width:10em;
   border:2px solid gray;
   border-top:0;
+  padding-top:0.5em;
+  clear:left;
 }

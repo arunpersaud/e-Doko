@@ -280,9 +280,6 @@ else if(isset($_REQUEST["me"]))
 	break;
       case 'play':
       case 'gameover': /*both entries here,  so that the tricks are visible for both in case of 'play' there is a break later that skips the last part*/
-	display_news();
-	display_status();
-
 	/* display local time */
 	echo "<div class=\"time\">\n Local times:<table>";
 	$users = array();
@@ -297,6 +294,7 @@ else if(isset($_REQUEST["me"]))
 	    echo "<tr> <td>$name</td> <td>".date("Y-m-d H:i:s")."</td></tr>\n";
 	  };
 	echo "</table>\n</div>\n";
+	display_status();
 
 	/* display links to other games */
 	echo "<div class=\"over\">\n";
@@ -308,6 +306,8 @@ else if(isset($_REQUEST["me"]))
 	echo "  <input type=\"submit\" value=\"go to my user page\" />\n";
 	echo "</form>\n";
 	echo "</div>\n";
+
+	display_news();
 
 	$gamestatus = DB_get_game_status_by_gameid($gameid);
 	if($gamestatus == 'pre')

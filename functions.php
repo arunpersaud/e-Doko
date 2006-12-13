@@ -394,7 +394,7 @@ function display_status()
 {
   echo "<div class=\"info\">";
   echo " is someone playing solo, etc?";
-  echo "</div>";
+  echo "</div>\n";
   
   return;
 }
@@ -402,11 +402,11 @@ function display_status()
 function display_news()
 {
   global $wiki;
-  echo "<div class=\"bug\"> ".
-    "Please hit shift+reload.<br /><hr />".
-    "added local time display, let me know what you think<br /><hr />".
-    "If you find more bugs, please list them in the <a href=\"".$wiki.
-    "\">wiki</a>.</div>\n";
+  echo "<div class=\"bug\">\n".
+    "  Please hit <strong>shift+reload</strong>.<br /><hr />\n".
+    "  added local time display, let me know what you think<br /><hr />\n".
+    "  If you find more bugs, please list them in the <a href=\"".$wiki.
+    "\">wiki</a>.\n</div>\n";
   return;
 }
 
