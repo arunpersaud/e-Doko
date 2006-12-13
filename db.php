@@ -100,6 +100,16 @@ function DB_get_userid_by_email($email)
   else
     return 0;
 }
+function DB_get_userid_by_email_and_password($email,$password)
+{
+  $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($email)." AND password=".DB_quote_smart($password));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
 
 function DB_get_handid_by_hash($hash)
 {
@@ -137,6 +147,17 @@ function DB_get_pos_by_hash($hash)
 function DB_get_name_by_hash($hash)
 {
   $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($hash));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
+function DB_get_name_by_userid($id)
+{
+  $result = mysql_query("SELECT fullname FROM User  WHERE id=".DB_quote_smart($id));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
   if($r)

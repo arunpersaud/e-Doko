@@ -5,7 +5,7 @@
   <head>
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
-     <link rel="stylesheet" type="text/css" href="standard.css" />	
+     <link rel="stylesheet" type="text/css" href="css/standard.css" />	
      <script type="text/javascript">
        function hl(num) {
          if(document.getElementById){
@@ -283,6 +283,32 @@ else if(isset($_REQUEST["me"]))
 	display_news();
 	display_status();
 
+	/* display local time */
+	echo "<div class=\"time\">\n Local times:<table>";
+	$users = array();
+	$users = DB_get_all_userid_by_gameid($gameid);
+	foreach($users as $user)
+	  {
+	    $offset = DB_get_user_timezone($user);
+	    $zone = return_timezone($offset);
+	    date_default_timezone_set($zone);
+	    $name = DB_get_name_by_userid($user);
+	    
+	    echo "<tr> <td>$name</td> <td>".date("Y-m-d H:i:s")."</td></tr>\n";
+	  };
+	echo "</table>\n</div>\n";
+
+	/* display links to other games */
+	echo "<div class=\"over\">\n";
+	$result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
+	$r = mysql_fetch_array($result,MYSQL_NUM);
+	echo "<form action=\"index.php\" method=\"post\">\n";
+	echo "  <input type=\"hidden\" name=\"email\" value=\"".$r[0]."\" />\n";
+	echo "  <input type=\"hidden\" name=\"password\" value=\"".$r[1]."\" />\n";
+	echo "  <input type=\"submit\" value=\"go to my user page\" />\n";
+	echo "</form>\n";
+	echo "</div>\n";
+
 	$gamestatus = DB_get_game_status_by_gameid($gameid);
 	if($gamestatus == 'pre')
 	  {
@@ -528,7 +554,7 @@ else if(isset($_REQUEST["me"]))
 	    $names = DB_get_all_names_by_gameid($gameid);
 	    
 	    echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
-	    echo "<form action=\"index.php\" methog=\"post\">\n";
+	    echo "<form action=\"index.php\" method=\"post\">\n";
 	    echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"".($names[1])."\" />\n";
 	    echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"".($names[2])."\" />\n";
 	    echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"".($names[3])."\" />\n";
@@ -547,11 +573,15 @@ else if(isset($_REQUEST["me"]))
  else if(isset($_REQUEST["email"]) && isset($_REQUEST["password"]))
   {
     /* test id and password, should really be done in one step */
+    $email     = $_REQUEST["email"];
+    $password  = $_REQUEST["password"];
+
+    if(strlen($password)!=32)
+      $password = md5($password);
+
     $ok=1;
-    $uid = DB_get_userid_by_email($_REQUEST["email"]);
+    $uid = DB_get_userid_by_email_and_password($email,$password);
     if(!$uid)
-      $ok=0;
-    if(!DB_get_userid_by_passwd(md5($_REQUEST["password"])))
       $ok=0;
 
     if($ok)
@@ -591,6 +621,7 @@ else if(isset($_REQUEST["me"]))
 /* page for registration */
 else if(isset($_REQUEST["register"]) )
   {
+    echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
     echo "TODO: convert timezone into a menu<br />\n";
     echo "TODO: figure out a way to handle passwrods <br />\n";
 ?>

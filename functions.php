@@ -404,7 +404,7 @@ function display_news()
   global $wiki;
   echo "<div class=\"bug\"> ".
     "Please hit shift+reload.<br /><hr />".
-    "Fixed a few bugs, comments might be working again <br /><hr />".
+    "added local time display, let me know what you think<br /><hr />".
     "If you find more bugs, please list them in the <a href=\"".$wiki.
     "\">wiki</a>.</div>\n";
   return;

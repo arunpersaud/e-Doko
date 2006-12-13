@@ -198,6 +198,12 @@ ul.oldtrick li div div.card3 span span{
   border-top:0;
 }
 
+.time,.over { 
+  float:right;
+  border:2px solid black;
+  clear:right;
+ }
+
 .bug {
   float:left;
   width:10em;
