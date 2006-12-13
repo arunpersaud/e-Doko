@@ -267,7 +267,7 @@ function DB_set_solo_by_hash($me,$solo)
   return;
 }
 
-function DB_set_sickness_by_hash($me,$sickness)
+function DB_set_sickness_by_hash($hash,$sickness)
 {
   mysql_query("UPDATE Hand SET sickness=".DB_quote_smart($sickness)." WHERE hash=".DB_quote_smart($hash));
   return;
