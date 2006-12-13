@@ -465,10 +465,10 @@ else if(isset($_REQUEST["me"]))
 		    $next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
 		    $email     = DB_get_email_by_hash($next_hash);
 
-		    $message .= "It's your turn  now.\n".
+		    $message = "It's your turn  now.\n".
 		      "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
 		    mymail($email,"[DoKo-debug] a card has been played",$message);
-
+		    
 		    if($debug)
 		      echo "DEBUG:<a href=\"index.php?me=".DB_get_hash_from_game_and_pos($gameid,$next).
 			"\"> next player </a> <br />\n";
