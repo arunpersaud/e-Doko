@@ -593,8 +593,7 @@ else if(isset($_REQUEST["me"]))
 	$zone = return_timezone($offset);
 	date_default_timezone_set($zone);
 
-	echo "ok. your logged in, now what? :) <br />last login: ";
-	echo date("r",$unixtime)."<br />";
+	echo "last login: ".date("r",$unixtime)."<br />";
 
 	DB_update_user_timestamp($uid);
 
