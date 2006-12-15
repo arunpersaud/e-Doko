@@ -42,8 +42,9 @@
 error_reporting(E_ALL);
 
 include_once("config.php");     
-include_once("functions.php");
-include_once("db.php");
+include_once("output.php");      /* html output only */
+include_once("db.php");          /* database only */
+include_once("functions.php");   /* the rest */
 
 DB_open();
 
@@ -682,28 +683,7 @@ else if(isset($_REQUEST["Rfullname"]) &&
 /* default login page */
 else
   { /* no new game, not in a game */
-?>
-    <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
-    <p> Please <a href="index.php?register">register</a>, in case you haven't done yet  <br />
-        or login with you email-address or name and password here:
-    </p>
-        <form action="index.php" method="post">
-          <fieldset>
-            <legend>Login</legend>
-             <table>
-              <tr>
-               <td><label for="email">Email:</label></td><td><input type="text" id="email" name="email" size="20" maxlength="30" /> </td>
-              </tr><tr>
-               <td><label for="password">Password:</label></td><td><input type="password" id="password" name="password" size="20" maxlength="30" /></td>
-              </tr><tr>
-               <td> <input type="submit" value="login" /></td>
-             </table>
-          </fieldset>
-        </form>
-
-
-
-<?php
+    home_page();
   }
 ?>
 </body>
