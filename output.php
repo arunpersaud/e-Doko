@@ -168,4 +168,56 @@ function home_page()
  return;
 }
 
+function output_header()
+{
+?>
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
+    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+     <title>e-Doko</title>
+     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
+     <link rel="stylesheet" type="text/css" href="css/standard.css" />	
+     <script type="text/javascript">
+       function hl(num) {
+         if(document.getElementById){
+	   var i;
+	   for(i=1;i<13;i++){
+	     if(document.getElementById("trick"+i))
+	       document.getElementById("trick"+i).style.display = 'none';
+	   }
+	   document.getElementById("trick"+num).style.display = 'block';
+	 }
+       }
+       function high_last(){
+	 if(document.getElementById){
+	   var i;
+	   for(i=12;i>0;i--) {
+	     if(document.getElementById("trick"+i))
+	       {
+		 hl(i);
+		 break;
+	       }
+	   }
+	 }
+       }
+     </script>
+  </head>
+<body onload="high_last();">
+<div class="header">
+<h1> Welcome to E-Doko </h1>
+</div>
+
+<?php
+  return;
+}
+
+function output_footer()
+{
+  echo "</body>\n";
+  echo "</html>\n";
+
+  return;
+}
 ?>
