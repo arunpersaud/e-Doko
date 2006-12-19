@@ -19,51 +19,69 @@ function is_club($c)  { return (in_array($c,array('27','28','29','30','31','32',
 function is_spade($c) { return (in_array($c,array('35','36','37','38','39','40','41','42')));}
 function is_heart($c) { return (in_array($c,array('43','44','45','46','47','48')));}
 
-function compare_cards($a,$b)
+function compare_cards($a,$b,$mode)
 {
-  /* if a is higher than b return 1, else 0, a being the card first played */
-  
-  /* first map all cards to the odd number */
+  /* if "a" is higher than "b" return 1, else 0, "a" being the card first played */
+
+  /* don't think we need this */
   if( $a/2 - (int)($a/2) != 0.5)
     $a--;
   if( $b/2 - (int)($b/2) != 0.5)
     $b--;
   
-  if(is_trump($a) && $a<=$b)
-    return 1;
-  else if(is_trump($a) && $a>$b)
-    return 0;
-  else 
-    { /*$a is not a trump */
-      if(is_trump($b))
+  switch($mode)
+    {
+    case "trumpless":
+      break;
+    case "jack":
+      break;
+    case "queen":
+      break;
+    case "trump":
+      break;
+    case "club":
+      break;
+    case "spade":
+      break;
+    case "heart":
+      break;
+    case "normal":
+      /* first map all cards to the odd number */
+      if(is_trump($a) && $a<=$b)
+	return 1;
+      else if(is_trump($a) && $a>$b)
 	return 0;
-      else
-	{
-	  /* both clubs? */
-	  if( is_club($a) && is_club($b))
-	    if($a<=$b)
+      else 
+	{ /*$a is not a trump */
+	  if(is_trump($b))
+	    return 0;
+	  else
+	    {
+	      /* both clubs? */
+	      if( is_club($a) && is_club($b))
+		if($a<=$b)
+		  return 1;
+		else
+		  return 0;
+	      /* both spade? */
+	      if( is_spade($a) && is_spade($b))
+		if($a<=$b)
+		  return 1;
+		else
+		  return 0;
+	      /* both heart? */
+	      if( is_heart($a) && is_heart($b))
+		if($a<=$b)
+		  return 1;
+		else
+		  return 0;
 	      return 1;
-	    else
-	      return 0;
-	  /* both spade? */
-	  if( is_spade($a) && is_spade($b))
-	    if($a<=$b)
-	      return 1;
-	    else
-	      return 0;
-	  /* both heart? */
-	  if( is_heart($a) && is_heart($b))
-	    if($a<=$b)
-	      return 1;
-	    else
-	      return 0;
-      return 1;
-	}	  
+	    }	  
+	}
     }
-      
 } 
 
-function get_winner($p)
+function get_winner($p,$mode)
 {
   /* get all 4 cards played in a trick */
   $c1 = $p[1];
@@ -72,11 +90,11 @@ function get_winner($p)
   $c4 = $p[4];
 
   /* find out who won */
-  if( compare_cards($c1,$c2) && compare_cards($c1,$c3) && compare_cards($c1,$c4) )
+  if( compare_cards($c1,$c2,$mode) && compare_cards($c1,$c3,$mode) && compare_cards($c1,$c4,$mode) )
     return 1;
-  if( compare_cards($c2,$c3) && compare_cards($c2,$c4) )
+  if( compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
     return 2;
-  if( compare_cards($c3,$c4) )
+  if( compare_cards($c3,$c4,$mode) )
     return 3;
   return 4;
 }

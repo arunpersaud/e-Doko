@@ -225,6 +225,11 @@ else if(isset($_REQUEST["me"]))
 	/* reset solo, etc from players who did say something, but it didn't matter? */
 	break;
       case 'poverty':
+	/* here we need to check if there is a solo or some other form o sickness.
+	 * If so, which one counts
+	 * set that one in the Game table, delete other ones form Hand table 
+	 * tell people about it.
+	 */
 	echo "<br />poverty not handeled at the moment... you need to play a normal game<br />";
 	
 	/* only set this after all poverty, etc. are handeled*/
@@ -367,7 +372,7 @@ else if(isset($_REQUEST["me"]))
 	/* whos turn is it? */
 	if($seq==4)
 	  {
-	     $winner = get_winner($play); /* returns the position */
+	     $winner = get_winner($play,"normal"); /* returns the position */
 	     $next = $winner;
 	  }
 	else
@@ -441,7 +446,7 @@ else if(isset($_REQUEST["me"]))
 		    if($sequence==4)
 		      {
 			$play   = DB_get_cards_by_trick($trickid);
-			$winner = get_winner($play); /* returns the position */
+			$winner = get_winner($play,"normal"); /* returns the position */
 			$next = $winner;
 		      }
 		    else
