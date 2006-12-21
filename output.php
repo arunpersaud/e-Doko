@@ -22,6 +22,66 @@ function display_news()
   return;
 }
 
+function output_link_to_user_page($email,$password)
+{
+  echo "<div class=\"over\">\n";
+  echo "<form action=\"index.php\" method=\"post\">\n";
+  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
+  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
+  echo "  <input type=\"submit\" value=\"go to my user page\" />\n";
+  echo "</form>\n";
+  echo "</div>\n";
+  
+  return;
+}
+
+function output_register()
+{
+  echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
+  echo "TODO: convert timezone into a menu<br />\n";
+  echo "TODO: figure out a way to handle passwrods <br />\n";
+  ?>
+        <form action="index.php" method="post">
+          <fieldset>
+            <legend>Register</legend>
+             <table>
+              <tr>
+               <td><label for="Rfullname">Full name:</label></td>
+	       <td><input type="text" id="Rfullname" name="Rfullname" size="20" maxsize="30" /> </td>
+              </tr><tr>
+               <td><label for="Remail">Email:</label></td>
+	       <td><input type="text" id="Remail" name="Remail" size="20" maxsize="30" /></td>
+              </tr><tr>
+	       <td><label for="Rpassword">Password(will be displayed in cleartext on the next page):</label></td>
+               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxsize="30" /></td>
+              </tr><tr>
+	       <td><label for="Rtimezone">Timezone:</label></td>
+               <td>
+                  <input type="text" id="Rtimezone" name="Rtimezone" size="4" maxsize="4" value="+1" />
+	       </td>
+              </tr><tr>
+               <td colspan="2"> <input type="submit" value="register" /></td>
+             </table>
+          </fieldset>
+        </form>
+<?php
+  return;
+}					   
+
+function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
+{
+  echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
+  echo "<form action=\"index.php\" method=\"post\">\n";
+  echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"$playerA\" />\n";
+  echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
+  echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"$playerC\" />\n";
+  echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"$playerD\" />\n";
+  echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
+  echo "  <input type=\"submit\" value=\"keep playing\" />\n";
+  echo "</form>\n";
+
+  return;
+}
 
 function output_form_for_new_game()
 {
@@ -69,7 +129,7 @@ function check_for_sickness($me,$mycards)
 
     do you want to play solo? 
     <select name="solo" size="1">
-      <option>No</option>
+      <option selected="selected">No</option>
       <option>trumpless</option>
       <option>trump</option>
       <option>queen</option>
@@ -85,7 +145,7 @@ function check_for_sickness($me,$mycards)
    echo "wedding?";
   if(check_wedding($mycards))
      {
-       echo " yes<input type=\"radio\" name=\"wedding\" value=\"yes\" />";
+       echo " yes<input type=\"radio\" name=\"wedding\" value=\"yes\" checked=\"checked\" />";
        echo " no <input type=\"radio\" name=\"wedding\" value=\"no\" /> <br />\n";
      }
    else
@@ -96,7 +156,7 @@ function check_for_sickness($me,$mycards)
   echo "do you have poverty?";
   if(count_trump($mycards)<4)
     {
-      echo " yes<input type=\"radio\" name=\"poverty\" value=\"yes\" />";
+      echo " yes<input type=\"radio\" name=\"poverty\" value=\"yes\" checked=\"checked\" />";
       echo " no <input type=\"radio\" name=\"poverty\" value=\"no\" /> <br />\n";
     }
   else
@@ -107,7 +167,7 @@ function check_for_sickness($me,$mycards)
    echo "do you have too many nines?";
   if(count_nines($mycards)>4)
      {
-       echo " yes<input type=\"radio\" name=\"nines\" value=\"yes\" />";
+       echo " yes<input type=\"radio\" name=\"nines\" value=\"yes\" checked=\"checked\" />";
        echo " no <input type=\"radio\" name=\"nines\" value=\"no\" /> <br />\n";
      }
    else
@@ -143,7 +203,7 @@ function check_want_to_play($me)
   return;
 }
 
-function home_page()
+function output_home_page()
 {
 ?>
     <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
@@ -212,6 +272,8 @@ function output_header()
 <?php
   return;
 }
+
+
 
 function output_footer()
 {

@@ -200,9 +200,10 @@ function DB_set_hand_status_by_hash($hash,$status)
   return;
 }
 
-function DB_get_hand_status_by_userid($id)
+function DB_get_hand_status_by_userid_and_gameid($uid,$gid)
 {
-  $result = mysql_query("SELECT status FROM Hand WHERE user_id=".DB_quote_smart($id));
+  $result = mysql_query("SELECT status FROM Hand WHERE user_id=".DB_quote_smart($uid).
+			" AND game_id=".DB_quote_smart($gid));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
   if($r)

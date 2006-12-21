@@ -14,28 +14,123 @@ function mymail($To,$Subject,$message)
   return;
 }
 
-function is_trump($c) { return (($c<27) ? 1:0);}
-function is_club($c)  { return (in_array($c,array('27','28','29','30','31','32','33','34')));}
-function is_spade($c) { return (in_array($c,array('35','36','37','38','39','40','41','42')));}
-function is_heart($c) { return (in_array($c,array('43','44','45','46','47','48')));}
+function myisset()
+{
+  /* returns 1 if all names passed as args are defined by a GET or POST statement,
+   * else it returns 0
+   */
 
-function compare_cards($a,$b,$mode)
+  $ok   = 1;
+  $args = func_get_args();
+  
+  foreach($args as $arg)
+    {
+      $ok = $ok * isset($_REQUEST[$arg]);
+      /* echo "$arg: ok = $ok <br />";
+       */
+    }
+  return $ok;
+}
+
+function is_trump($c,$game) 
+{ 
+  switch($game)
+    {
+    case "queen":
+      if(in_array($c,array('3','4','5','6','7','8','9','10')))
+	return 1;
+      else 
+	return 0;
+      break;
+    case "normal":
+      return (($c<27) ? 1:0);
+      break;
+    }
+}
+
+function is_same_suite($c1,$c2,$game) 
+{
+  switch($game)
+    {
+    case "queen":
+      /* clubs */
+      if(in_array($c1,array('11','12','27','28','29','30','31','32','33','34')) &&
+	 in_array($c2,array('11','12','27','28','29','30','31','32','33','34')) )
+	return 1;
+      /* spade */
+      if(in_array($c1,array('13','14','35','36','37','38','39','40','41','42')) &&
+	 in_array($c2,array('13','14','35','36','37','38','39','40','41','42')) )
+	return 1;
+      /* heart */
+      if(in_array($c1,array( '1', '2','15','16','43','44','45','46','47','48')) &&
+	 in_array($c2,array( '1', '2','15','16','43','44','45','46','47','48')) )
+	return 1;
+      /* diamonds */
+      if(in_array($c1,array('17','18','19','20','21','22','23','24','25','26')) &&
+	 in_array($c2,array('17','18','19','20','21','22','23','24','25','26')) )
+	return 1;
+      
+      return 0;
+      break;
+    case "normal":
+      /* clubs */
+      if(in_array($c1,array('27','28','29','30','31','32','33','34')) &&
+	 in_array($c2,array('27','28','29','30','31','32','33','34')) )
+	return 1;
+      /* spade */
+      if(in_array($c1,array('35','36','37','38','39','40','41','42')) &&
+	 in_array($c2,array('35','36','37','38','39','40','41','42')) )
+	return 1;
+      /* heart */
+      if(in_array($c1,array('43','44','45','46','47','48')) &&
+	 in_array($c2,array('43','44','45','46','47','48')) )
+	return 1;
+      
+      return 0;
+      break;
+    }
+}
+
+function compare_cards($a,$b,$game)
 {
   /* if "a" is higher than "b" return 1, else 0, "a" being the card first played */
 
-  /* don't think we need this */
+  /* first map all cards to the odd number, 
+   * this insure that the first card wins the trick 
+   * if they are the same card
+   */
   if( $a/2 - (int)($a/2) != 0.5)
     $a--;
   if( $b/2 - (int)($b/2) != 0.5)
     $b--;
   
-  switch($mode)
+  switch($game)
     {
     case "trumpless":
       break;
     case "jack":
       break;
     case "queen":
+      if(is_trump($a,$game) && $a<=$b)
+	return 1;
+      else if(is_trump($a,$game))
+	return 0;
+      else 
+	{ /*$a is not a trump */
+	  if(is_trump($b,$game))
+	    return 0;
+	  else
+	    {
+	      if(is_same_suite($a,$b,$game))
+		if($a<=$b)
+		  return 1;
+		else
+		  return 0;
+	      
+	      /* not the same suit and no trump: a wins */
+	      return 1;
+	    }	  
+	}
       break;
     case "trump":
       break;
@@ -46,35 +141,25 @@ function compare_cards($a,$b,$mode)
     case "heart":
       break;
     case "normal":
-      /* first map all cards to the odd number */
-      if(is_trump($a) && $a<=$b)
+      if($a==1 && $b==1) /* both 10 of hearts */
+	return 0;        /* second one wins. TODO should be able to set this at the start of a new game */
+      if(is_trump($a,$game) && $a<=$b)
 	return 1;
-      else if(is_trump($a) && $a>$b)
+      else if(is_trump($a,$game))
 	return 0;
       else 
 	{ /*$a is not a trump */
-	  if(is_trump($b))
+	  if(is_trump($b,$game))
 	    return 0;
 	  else
 	    {
-	      /* both clubs? */
-	      if( is_club($a) && is_club($b))
+	      if(is_same_suite($a,$b,$game))
 		if($a<=$b)
 		  return 1;
 		else
 		  return 0;
-	      /* both spade? */
-	      if( is_spade($a) && is_spade($b))
-		if($a<=$b)
-		  return 1;
-		else
-		  return 0;
-	      /* both heart? */
-	      if( is_heart($a) && is_heart($b))
-		if($a<=$b)
-		  return 1;
-		else
-		  return 0;
+	      
+	      /* not the same suit and no trump: a wins */
 	      return 1;
 	    }	  
 	}
@@ -92,9 +177,9 @@ function get_winner($p,$mode)
   /* find out who won */
   if( compare_cards($c1,$c2,$mode) && compare_cards($c1,$c3,$mode) && compare_cards($c1,$c4,$mode) )
     return 1;
-  if( compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
+  if( !compare_cards($c1,$c2,$mode) && compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
     return 2;
-  if( compare_cards($c3,$c4,$mode) )
+  if( !compare_cards($c1,$c3,$mode) && !compare_cards($c2,$c3,$mode) && compare_cards($c3,$c4,$mode) )
     return 3;
   return 4;
 }

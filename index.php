@@ -1,26 +1,21 @@
 <?php
 error_reporting(E_ALL);
 
-include_once("config.php");     
+include_once("config.php");      
 include_once("output.php");      /* html output only */
 include_once("db.php");          /* database only */
 include_once("functions.php");   /* the rest */
 
 DB_open();
 
-/*****************  M A I N **************************/
 output_header();
 
-
 /* check if we want to start a new game */
-if(isset($_REQUEST["new"]))
-     output_form_for_new_game();
+if(myisset("new"))
+  output_form_for_new_game();
 
 /*check if everything is ready to set up a new game */
-else if( isset($_REQUEST["PlayerA"]) && 
-    isset($_REQUEST["PlayerB"]) && 
-    isset($_REQUEST["PlayerC"]) && 
-    isset($_REQUEST["PlayerD"]) )
+else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD" ))
   {
     $PlayerA = $_REQUEST["PlayerA"];
     $PlayerB = $_REQUEST["PlayerB"];
@@ -49,7 +44,7 @@ else if( isset($_REQUEST["PlayerA"]) &&
     
     /* create game */
     $followup = NULL;
-    if(isset($_REQUEST["followup"])) 
+    if(myisset("followup") )
       {
 	$followup= $_REQUEST["followup"];
 	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre','$followup' ,NULL)");
@@ -109,12 +104,11 @@ else if( isset($_REQUEST["PlayerA"]) &&
   }    
 /* end set up a new game */
 
-else if(isset($_REQUEST["me"]))
+else if(myisset("me"))
   {
-     /* handle request from one specifig player,
-      * the hash is set on a per game base, so first just handle this game
-      * perhaps also show links to other games in a sidebar
-      */
+    /* handle request from one specific player,
+     * the hash is set on a per game base
+     */
     
     $me = $_REQUEST["me"];
 
@@ -123,7 +117,7 @@ else if(isset($_REQUEST["me"]))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled.";
+	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
 	exit();
       }
     
@@ -141,7 +135,7 @@ else if(isset($_REQUEST["me"]))
 	DB_set_hand_status_by_hash($me,'init');
 	break;
       case 'init':
-	if( !isset($_REQUEST["in"]) || !isset($_REQUEST["update"]))
+	if( !myisset("in","update") )
 	  {
 	    DB_set_hand_status_by_hash($me,'start');
 	    echo "you need to answer both question";
@@ -183,17 +177,14 @@ else if(isset($_REQUEST["me"]))
 	break;
 	
       case 'check':
-	echo "no checking at the moment... you need to play a normal game. At the moment you need to reload this page to finish the setup.";
-	if(!isset($_REQUEST["solo"])    || 
-	   !isset($_REQUEST["wedding"]) ||
-	   !isset($_REQUEST["poverty"]) ||
-	   !isset($_REQUEST["nines"]) )
+	echo "no checking at the moment... you need to play a normal game.".
+	  " At the moment you need to reload this page to finish the setup.";
+	if(!myisset("solo","wedding","poverty","nines") )
 	  {
-	    DB_set_hand_status_by_hash($me,'init');
-	    /* problem: by setting it back to init, variables "in" and "update" are 
-	     * not set, so the player will be send back to the start, after seeing his hand
-	     */
-	    echo "you need to fill out the form";
+	    /* all these variables have a pre-selected default,
+	     * so we should never get here,
+	     * unless a user tries to cheat ;) */
+	    echo "something went wrong...please contact the admin.";
 	  }
 	else
 	  {
@@ -237,17 +228,23 @@ else if(isset($_REQUEST["me"]))
 
 	/* check if the game can start  */
 	$userids = DB_get_all_userid_by_gameid($gameid);
-	$done=1;
+	$ok=1;
 	foreach($userids as $user)
-	  if(DB_get_hand_status_by_userid($user)!='play')
-	    $done=0;
+	  if(DB_get_hand_status_by_userid_and_gameid($user,$gameid)!='play')
+	    $ok=0;
 
-	if($done)
+	if($ok)
 	  DB_set_game_status_by_gameid($gameid,'play');
 
 	break;
       case 'play':
-      case 'gameover': /*both entries here,  so that the tricks are visible for both in case of 'play' there is a break later that skips the last part*/
+      case 'gameover': 
+	/* both entries here,  so that the tricks are visible for both.
+	 * in case of 'play' there is a break later that skips the last part
+	 */
+
+	/* display useful things in divs */
+	
 	/* display local time */
 	echo "<div class=\"time\">\n Local times:<table>";
 	$users = array();
@@ -255,35 +252,35 @@ else if(isset($_REQUEST["me"]))
 	foreach($users as $user)
 	  {
 	    $offset = DB_get_user_timezone($user);
-	    $zone = return_timezone($offset);
+	    $zone   = return_timezone($offset);
 	    date_default_timezone_set($zone);
-	    $name = DB_get_name_by_userid($user);
+	    $name   = DB_get_name_by_userid($user);
 	    
 	    echo "<tr> <td>$name</td> <td>".date("Y-m-d H:i:s")."</td></tr>\n";
 	  };
 	echo "</table>\n</div>\n";
+
 	display_status();
 
-	/* display links to other games */
-	echo "<div class=\"over\">\n";
+	/* display links to the users status page */
 	$result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
-	$r = mysql_fetch_array($result,MYSQL_NUM);
-	echo "<form action=\"index.php\" method=\"post\">\n";
-	echo "  <input type=\"hidden\" name=\"email\" value=\"".$r[0]."\" />\n";
-	echo "  <input type=\"hidden\" name=\"password\" value=\"".$r[1]."\" />\n";
-	echo "  <input type=\"submit\" value=\"go to my user page\" />\n";
-	echo "</form>\n";
-	echo "</div>\n";
-
+	$r      = mysql_fetch_array($result,MYSQL_NUM);
+	output_link_to_user_page($r[0],$r[1]);
+	  
 	display_news();
 
+	/* end display useful things*/
+
+	/* has the game started? No, then just wait here...*/
 	$gamestatus = DB_get_game_status_by_gameid($gameid);
 	if($gamestatus == 'pre')
 	  {
 	    echo "you need to wait for the others... <br />";
-	    break;
+	    break; /* not sure this works... the idea is that you can 
+		    * only  play a card after everyone is ready to play */
 	  }
-	/* get everythin relevant to display the tricks */
+	
+	/* get everything relevant to display the tricks */
 	$result = mysql_query("SELECT Hand_Card.card_id as card,".
 			      "       User.fullname as name,".
 			      "       Hand.position as position,".
@@ -388,7 +385,7 @@ else if(isset($_REQUEST["me"]))
 	  $myturn = 0;
 
 	/* do we want to play a card? */
-	if(isset($_REQUEST["card"]) && $myturn)
+	if(myisset("card") && $myturn)
 	  {
 	    $card   = $_REQUEST["card"];
 	    $handid = DB_get_handid_by_hash($me); 
@@ -412,7 +409,7 @@ else if(isset($_REQUEST["me"]))
 		$playid = DB_play_card($trickid,$handcardid,$sequence);
 
 		/*check for coment */
-		if(isset($_REQUEST["comment"]))
+		if(myisset("comment"))
 		  {
 		    DB_insert_comment($_REQUEST["comment"],$playid,$myid);
 		  };  
@@ -430,11 +427,11 @@ else if(isset($_REQUEST["me"]))
 		    $mystatus='gameover';
 		  }
 		
-		/* if all players are done, set game status also to game over */
+		/* if all players are done, set game status to game over */
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		$done=1;
 		foreach($userids as $user)
-		  if(DB_get_hand_status_by_userid($user)!='gameover')
+		  if(DB_get_hand_status_by_userid_and_gameid($user,$gameid)!='gameover')
 		    $done=0;
 
 		if($done)
@@ -474,7 +471,7 @@ else if(isset($_REQUEST["me"]))
 		echo "couldn't find card <br />\n";
 	      }
 	  }
-	else if(isset($_REQUEST["card"]) && !$myturn )
+	else if(myisset("card") && !$myturn )
 	  {
 	    echo "please wait until it is your turn! <br />\n";
 	  }
@@ -483,19 +480,18 @@ else if(isset($_REQUEST["me"]))
 	sort($mycards);
 	echo "<div class=\"mycards\">\n";
 	
-	if($myturn && !isset($_REQUEST["card"]))
+	if($myturn && !myisset("card"))
 	  {
 	    echo "Hello ".$myname.", it's your turn!  <br />\n";
 	    echo "Your cards are: <br />\n";
 	    echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
 	    foreach($mycards as $card) 
 	      display_link_card($card);
-?>
-    <br />A short comments:<input name="comment" type="text" size="30" maxlength="50" /> 
-    <input type="hidden" name="me" value="<?php echo $me; ?>" />
-    <input type="submit" value="move" />
- </form>
- <?php
+
+	    echo "<br />\nA short comments:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"50\" />\n";
+	    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
+	    echo "<input type=\"submit\" value=\"move\" />\n";
+	    echo "</form>\n";
          }
 	else if($mystatus=='play')
 	  {
@@ -508,7 +504,7 @@ else if(isset($_REQUEST["me"]))
 	/* check if we need to set status to 'gameover' is done during playing of the card */
 	if($mystatus=='play')
 	  break;
-   /* the following happens only when the gamestatus is 'gameover' */
+	/* the following happens only when the gamestatus is 'gameover' */
 	/* check if game is over, display results */
 	if(DB_get_game_status_by_gameid($gameid)=='play')
 	  {
@@ -520,16 +516,7 @@ else if(isset($_REQUEST["me"]))
 	    
 	    /* suggest a new game with the same people in it, just rotated once */
 	    $names = DB_get_all_names_by_gameid($gameid);
-	    
-	    echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
-	    echo "<form action=\"index.php\" method=\"post\">\n";
-	    echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"".($names[1])."\" />\n";
-	    echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"".($names[2])."\" />\n";
-	    echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"".($names[3])."\" />\n";
-	    echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"".($names[0])."\" />\n";
-	    echo "  <input type=\"hidden\" name=\"followup\" value=\"".($gameid)."\" />\n";
-	    echo "  <input type=\"submit\" value=\"keep playing\" />\n";
-	    echo "</form>\n";
+	    output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	  }
 	break;
       default:
@@ -538,7 +525,7 @@ else if(isset($_REQUEST["me"]))
     exit();
   } 
 /* user status page */ 
- else if(isset($_REQUEST["email"]) && isset($_REQUEST["password"]))
+    else if(myisset("email","password"))
   {
     /* test id and password, should really be done in one step */
     $email     = $_REQUEST["email"];
@@ -576,6 +563,7 @@ else if(isset($_REQUEST["me"]))
 	foreach ($names as $name)
 	  echo "$name <br />\n";
 	echo "</p>\n";
+
 	echo "<p>Want to start a new game? remember 4 names from the list above and visit ".
 	  "<a href=\"".$host."?new\">this page.</a></p>";
       }
@@ -586,42 +574,12 @@ else if(isset($_REQUEST["me"]))
     exit();
   }
 /* page for registration */
-else if(isset($_REQUEST["register"]) )
+else if(myisset("register") )
   {
-    echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
-    echo "TODO: convert timezone into a menu<br />\n";
-    echo "TODO: figure out a way to handle passwrods <br />\n";
-?>
-        <form action="index.php" method="post">
-          <fieldset>
-            <legend>Register</legend>
-             <table>
-              <tr>
-               <td><label for="Rfullname">Full name:</label></td>
-	       <td><input type="text" id="Rfullname" name="Rfullname" size="20" maxsize="30" /> </td>
-              </tr><tr>
-               <td><label for="Remail">Email:</label></td>
-	       <td><input type="text" id="Remail" name="Remail" size="20" maxsize="30" /></td>
-              </tr><tr>
-	       <td><label for="Rpassword">Password(will be displayed in cleartext on the next page):</label></td>
-               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxsize="30" /></td>
-              </tr><tr>
-	       <td><label for="Rtimezone">Timezone:</label></td>
-               <td>
-                  <input type="text" id="Rtimezone" name="Rtimezone" size="4" maxsize="4" value="+1" />
-	       </td>
-              </tr><tr>
-               <td colspan="2"> <input type="submit" value="register" /></td>
-             </table>
-          </fieldset>
-        </form>
-<?php
+    output_register();
   }
 /* new user wants to register */
-else if(isset($_REQUEST["Rfullname"]) && 
-	isset($_REQUEST["Remail"]   ) && 
-	isset($_REQUEST["Rpassword"]) && 
-	isset($_REQUEST["Rtimezone"]) )
+ else if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
   {
 	$ok=1;
 	if(DB_get_userid_by_name($_REQUEST["Rfullname"]))
@@ -642,15 +600,15 @@ else if(isset($_REQUEST["Rfullname"]) &&
 		      ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL)"); 
 	    
 	    if($r)
-	      echo "  added you to the database";
+	      echo " added you to the database";
 	    else
 	      echo " something went wrong";
 	  }
   }
 /* default login page */
 else
-  { /* no new game, not in a game */
-    home_page();
+  { 
+    output_home_page();
   }
 
 output_footer();
