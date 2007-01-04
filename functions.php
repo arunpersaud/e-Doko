@@ -17,7 +17,7 @@ function mymail($To,$Subject,$message)
 function myisset()
 {
   /* returns 1 if all names passed as args are defined by a GET or POST statement,
-   * else it returns 0
+   * else return 0
    */
 
   $ok   = 1;
@@ -30,6 +30,23 @@ function myisset()
        */
     }
   return $ok;
+}
+
+function pos_array($c,$arr)
+{
+  $ret = 0;
+
+  $i   = 0;
+  foreach($arr as $a)
+    {
+      $i++;
+      if($a == $c)
+	{
+	  $ret = $i;
+	  break;
+	}
+    }
+  return $ret;
 }
 
 function is_trump($c,$game) 
@@ -111,22 +128,49 @@ function compare_cards($a,$b,$game)
     case "jack":
       break;
     case "queen":
-      if(is_trump($a,$game) && $a<=$b)
+      if(is_trump($a,$game) && is_trump($b,$game) && $a<=$b)
 	return 1;
-      else if(is_trump($a,$game))
+      else if(is_trump($a,$game) && is_trump($b,$game) )
 	return 0;
       else 
 	{ /*$a is not a trump */
 	  if(is_trump($b,$game))
 	    return 0;
 	  else
-	    {
-	      if(is_same_suite($a,$b,$game))
-		if($a<=$b)
+	    { /* both no trump */
+	      /* both clubs? */
+	      $posA = pos_array($a,array('27','28','29','30','31','32','11','12','33','34'));
+	      $posB = pos_array($b,array('27','28','29','30','31','32','11','12','33','34'));
+	      if($posA && $posB)
+		if($posA <= $posB)
 		  return 1;
 		else
 		  return 0;
-	      
+	      /* both spades? */
+	      $posA = pos_array($a,array('35','36','37','38','39','40','13','14','41','42'));
+	      $posB = pos_array($b,array('35','36','37','38','39','40','13','14','41','42'));
+	      if($posA && $posB)
+		if($posA <= $posB)
+		  return 1;
+		else
+		  return 0;
+	      /* both hearts? */
+	      $posA = pos_array($a,array('43','44','15','16','45','46', '1', '2','47','48'));
+	      $posB = pos_array($b,array('43','44','15','16','45','46', '1', '2','47','48'));
+	      if($posA && $posB)
+		if($posA <= $posB)
+		  return 1;
+		else
+		  return 0;
+	      /* both diamonds? */
+	      $posA = pos_array($a,array('19','20','21','22','23','24','17','18','25','26'));
+	      $posB = pos_array($b,array('19','20','21','22','23','24','17','18','25','26'));
+	      if($posA && $posB)
+		if($posA <= $posB)
+		  return 1;
+		else
+		  return 0;
+
 	      /* not the same suit and no trump: a wins */
 	      return 1;
 	    }	  

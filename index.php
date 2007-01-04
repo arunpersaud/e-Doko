@@ -234,8 +234,11 @@ else if(myisset("me"))
 	    $ok=0;
 
 	if($ok)
-	  DB_set_game_status_by_gameid($gameid,'play');
-
+	  {
+	    /* TODO: check what kind of game we are playing */
+	    DB_set_game_status_by_gameid($gameid,'play');
+	  }
+	
 	break;
       case 'play':
       case 'gameover': 
@@ -280,19 +283,35 @@ else if(myisset("me"))
 		    * only  play a card after everyone is ready to play */
 	  }
 	
+	/* display the table and the names */
+	$result = mysql_query("SELECT  User.fullname as name,".
+			      "        Hand.position as position ".
+			      "FROM Hand ".
+			      "LEFT JOIN User ON User.id=Hand.user_id ".
+			      "WHERE Hand.game_id='".$gameid."' ".
+			      "ORDER BY position ASC");
+	
+	echo "<div class=\"table\">\n".
+	  "  <img src=\"pics/table.png\" alt=\"table\" />\n";
+	while($r = mysql_fetch_array($result,MYSQL_NUM))
+	  {
+	    $name = $r[0];
+	    $pos  = $r[1];
+	    
+	    echo " <span class=\"table".($pos-1)."\">$name</span>\n";
+	  }
+	echo  "</div>\n";
+	
 	/* get everything relevant to display the tricks */
 	$result = mysql_query("SELECT Hand_Card.card_id as card,".
-			      "       User.fullname as name,".
 			      "       Hand.position as position,".
 			      "       Play.sequence as sequence, ".
-			      "       Hand.hash     as hash,     ".
 			      "       Trick.id, ".
 			      "       Comment.comment ".
 			      "FROM Trick ".
 			      "LEFT JOIN Play ON Trick.id=Play.trick_id ".
 			      "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
 			      "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
-			      "LEFT JOIN User ON User.id=Hand.user_id ".
 			      "LEFT JOIN Comment ON Play.id=Comment.play_id ".
 			      "WHERE Trick.game_id='".$gameid."' ".
 			      "ORDER BY Trick.id,sequence ASC");
@@ -306,49 +325,42 @@ else if(myisset("me"))
 	$seq  = 1;          
 	$pos  = 0;
 	
-	echo "\n<ul class=\"oldtrick\">\n";
+	echo "\n<ul class=\"tricks\">\n";
 	echo "  <li> Hello $myname!   History: </li>\n";
 	
 	while($r = mysql_fetch_array($result,MYSQL_NUM))
 	  {
-	    $seq     = $r[3];
-	    $pos     = $r[2];
-	    $trick   = $r[5];
-	    $comment = $r[6];
+	    $pos     = $r[1];
+	    $seq     = $r[2];
+	    $trick   = $r[3];
+	    $comment = $r[4];
+
+	    /* save card to be able to find the winner of the trick later */
+	    $play[$pos] = $r[0]; 
 	    
 	    if($trick!=$lasttrick && $seq==1)
 	      {
 		/* start of an old trick? */
 		echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Trick $trickNR</a>\n".
-		  "    <div class=\"table\" id=\"trick".$trickNR."\">\n".
-		  "      <img class=\"table\" src=\"pics/table".($pos-1).".png\" alt=\"table\" />\n";
+		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
+		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      }
 	    else if($trick==$lasttrick && $seq==1)
 	      {
 		/* start of a last trick? */
 		echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Current Trick</a>\n".
-		  "    <div class=\"table\" id=\"trick".$trickNR."\">\n".
-		  "      <img class=\"table\" src=\"pics/table".($pos-1).".png\" alt=\"table\" />\n";
+		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
+		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      }
 	    
 	    /* display card */
 	    echo "      <div class=\"card".($pos-1)."\">\n";
 	    
-	    $play[$pos]=$r[0];
-	    
+	    /* display comments */
 	    if($comment!="")
-	      echo "        <span class=\"comment\">";
-	    else
-	      echo "        <span>";
+	      echo "        <span class=\"comment\">".$comment."</span>\n";
 	    
-	    /* print name */
-	    echo $r[1];
-	    
-	    /* check for comment */
-	    if($comment!="")
-	      echo "<span>".$comment."</span>";
-	    echo "</span>\n        ";
-	    
+	    echo "        ";
 	    display_card($r[0]);
 	    
 	    echo "      </div>\n"; /* end div card */
@@ -375,8 +387,8 @@ else if(myisset("me"))
 	else
 	  {
 	    $next = $pos+1;
+	    if($next==5) $next=1;
 	  }
-	if($next==5) $next=1;
 	
 	/* my turn?, display cards as links, ask for comments*/
 	if(DB_get_pos_by_hash($me) == $next)
@@ -468,12 +480,12 @@ else if(myisset("me"))
 	      }
 	    else
 	      {
-		echo "couldn't find card <br />\n";
+		echo "can't find that card?! <br />\n";
 	      }
 	  }
 	else if(myisset("card") && !$myturn )
 	  {
-	    echo "please wait until it is your turn! <br />\n";
+	    echo "please wait until it's your turn! <br />\n";
 	  }
 	
 	$mycards = DB_get_hand($me);
