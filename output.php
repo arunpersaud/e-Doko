@@ -2,10 +2,10 @@
 
 /* functions which only ouput html  */
 
-function display_status()
+function display_status($gametype)
 {
   echo "<div class=\"info\">";
-  echo " is someone playing solo, etc?";
+  echo " Gametype: $gametype";
   echo "</div>\n";
   
   return;
@@ -142,7 +142,7 @@ function check_for_sickness($me,$mycards)
 
  <?php   
       
-   echo "wedding?";
+  echo "wedding?";
   if(check_wedding($mycards))
      {
        echo " yes<input type=\"radio\" name=\"wedding\" value=\"yes\" checked=\"checked\" />";

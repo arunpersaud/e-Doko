@@ -283,9 +283,15 @@ function DB_get_cards_by_trick($id)
 }
 
 
-function DB_set_solo_by_hash($me,$solo)
+function DB_set_solo_by_hash($hash,$solo)
 {
   mysql_query("UPDATE Hand SET solo=".DB_quote_smart($solo)." WHERE hash=".DB_quote_smart($hash));
+  return;
+}
+
+function DB_set_solo_by_gameid($id,$solo)
+{
+  mysql_query("UPDATE Game SET solo=".DB_quote_smart($solo)." WHERE id=".DB_quote_smart($id));
   return;
 }
 
@@ -420,4 +426,51 @@ function DB_insert_comment($comment,$playid,$userid)
   mysql_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid, ".DB_quote_smart($comment).")");
   return;
 }
+
+function DB_get_gametype_by_gameid($id)
+{
+  $result = mysql_query("SELECT type FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0]."";
+  else
+    return "";
+}
+
+function DB_set_gametype_by_gameid($id,$p)
+{
+  mysql_query("UPDATE Game SET type='".$p."' WHERE id=".DB_quote_smart($id));
+  return;
+}
+
+function DB_get_solo_by_gameid($id)
+{
+  $result = mysql_query("SELECT solo FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0]."";
+  else
+    return "";
+}
+
+
+function DB_get_startplayer_by_gameid($id)
+{
+  $result = mysql_query("SELECT startplayer FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
+function DB_set_startplayer_by_gameid($id,$p)
+{
+  mysql_query("UPDATE Game SET startplayer='".$p."' WHERE id=".DB_quote_smart($id));
+  return;
+}
+
 ?>

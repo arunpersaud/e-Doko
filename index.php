@@ -7,7 +7,6 @@ include_once("db.php");          /* database only */
 include_once("functions.php");   /* the rest */
 
 DB_open();
-
 output_header();
 
 /* check if we want to start a new game */
@@ -47,10 +46,10 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD" ))
     if(myisset("followup") )
       {
 	$followup= $_REQUEST["followup"];
-	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre','$followup' ,NULL)");
+	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre','$followup' ,NULL)");
       }
     else
-      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', NULL, NULL,'pre', NULL ,NULL)");
+      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre', NULL ,NULL)");
     $game_id = mysql_insert_id();
     
     /* create hash */
@@ -127,6 +126,7 @@ else if(myisset("me"))
     $gameid   = DB_get_gameid_by_hash($me);
     $myname   = DB_get_name_by_hash($me);
     $mystatus = DB_get_status_by_hash($me);
+    $mypos    = DB_get_pos_by_hash($me);
     
     switch($mystatus)
       {
@@ -177,8 +177,8 @@ else if(myisset("me"))
 	break;
 	
       case 'check':
-	echo "no checking at the moment... you need to play a normal game.".
-	  " At the moment you need to reload this page to finish the setup.";
+	echo "checking for solo...<br /> if you have a wedding or poverty you need to play a normal game,sorry...<br />".
+	  " At the moment you need to reload this page to finish the setup.<br />";
 	if(!myisset("solo","wedding","poverty","nines") )
 	  {
 	    /* all these variables have a pre-selected default,
@@ -188,13 +188,28 @@ else if(myisset("me"))
 	  }
 	else
 	  {
+	    /* check if this sickness needs to be handled first */
+	    $gametype    = DB_get_gametype_by_gameid($gameid);
+	    $startplayer = DB_get_startplayer_by_gameid($gameid);
+
 	    if( $_REQUEST["solo"]!="No")
 	      {
 		DB_set_solo_by_hash($me,$_REQUEST["solo"]);
 		DB_set_sickness_by_hash($me,"solo");
+		echo "Seems like you want to play a ".$_REQUEST["solo"]." solo. Got it.\n";
+		
+		if($gametype == "solo" && $startplayer<$mypos)
+		  {}/* do nothing */
+		else
+		  {
+		    DB_set_gametype_by_gameid($gameid,"solo");
+		    DB_set_startplayer_by_gameid($gameid,$mypos);
+		    DB_set_solo_by_gameid($gameid,$_REQUEST["solo"]);
+		  };
 	      }
 	    else if($_REQUEST["wedding"] == "yes")
 	      {
+		/* TODO: add silent solo somewhere*/
 		echo "wedding was chosen<br />\n";
 		DB_set_sickness_by_hash($me,"wedding");
 	      }
@@ -209,14 +224,14 @@ else if(myisset("me"))
  		 DB_set_sickness_by_hash($me,"nines");
 	      }
 	  }
+
 	DB_set_hand_status_by_hash($me,'poverty');
-	
+
 	/* check all players and set game to final result, e.g. solo, wedding, povert, redeal */
-	
-	/* reset solo, etc from players who did say something, but it didn't matter? */
+
 	break;
       case 'poverty':
-	/* here we need to check if there is a solo or some other form o sickness.
+	/* here we need to check if there is a solo or some other form of sickness.
 	 * If so, which one counts
 	 * set that one in the Game table, delete other ones form Hand table 
 	 * tell people about it.
@@ -246,6 +261,24 @@ else if(myisset("me"))
 	 * in case of 'play' there is a break later that skips the last part
 	 */
 
+	/* figure out what kind of game we are playing, 
+	 * set the global variables $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES
+	 * accordingly
+	 */
+	
+	$gametype = DB_get_gametype_by_gameid($gameid);
+	$GT = $gametype;
+	if($gametype=="solo")
+	  {
+	    $gametype = DB_get_solo_by_gameid($gameid);
+	    $GT = $gametype." ".$GT;
+	  }
+	else
+	  $gametype="normal";
+	
+	set_gametype($gametype);
+
+	
 	/* display useful things in divs */
 	
 	/* display local time */
@@ -263,7 +296,7 @@ else if(myisset("me"))
 	  };
 	echo "</table>\n</div>\n";
 
-	display_status();
+	display_status($GT);
 
 	/* display links to the users status page */
 	$result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
@@ -324,6 +357,7 @@ else if(myisset("me"))
 	$play = array(); /* needed to calculate winner later  */
 	$seq  = 1;          
 	$pos  = 0;
+	$firstcard = ""; /* first card in a trick */
 	
 	echo "\n<ul class=\"tricks\">\n";
 	echo "  <li> Hello $myname!   History: </li>\n";
@@ -338,20 +372,27 @@ else if(myisset("me"))
 	    /* save card to be able to find the winner of the trick later */
 	    $play[$pos] = $r[0]; 
 	    
-	    if($trick!=$lasttrick && $seq==1)
+	    if($seq==1)
 	      {
-		/* start of an old trick? */
-		echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Trick $trickNR</a>\n".
-		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
-		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
-	      }
-	    else if($trick==$lasttrick && $seq==1)
-	      {
-		/* start of a last trick? */
-		echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Current Trick</a>\n".
-		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
-		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
-	      }
+		/* first card in a trick, output some html */
+		if($trick!=$lasttrick)
+		  {
+		    /* start of an old trick? */
+		    echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Trick $trickNR</a>\n".
+		      "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
+		      "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
+		  }
+		else if($trick==$lasttrick)
+		  {
+		    /* start of a last trick? */
+		    echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Current Trick</a>\n".
+		      "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
+		      "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
+		  };
+		
+		/* remember first card, so that we are able to check, what cards can be played */
+		$firstcard = $r[0];
+	      };
 	    
 	    /* display card */
 	    echo "      <div class=\"card".($pos-1)."\">\n";
@@ -381,8 +422,9 @@ else if(myisset("me"))
 	/* whos turn is it? */
 	if($seq==4)
 	  {
-	     $winner = get_winner($play,"normal"); /* returns the position */
+	     $winner = get_winner($play,$gametype); /* returns the position */
 	     $next = $winner;
+	     $firstcard = ""; /* new trick, no first card */
 	  }
 	else
 	  {
@@ -455,7 +497,7 @@ else if(myisset("me"))
 		    if($sequence==4)
 		      {
 			$play   = DB_get_cards_by_trick($trickid);
-			$winner = get_winner($play,"normal"); /* returns the position */
+			$winner = get_winner($play,$gametype); /* returns the position */
 			$next = $winner;
 		      }
 		    else
@@ -497,8 +539,19 @@ else if(myisset("me"))
 	    echo "Hello ".$myname.", it's your turn!  <br />\n";
 	    echo "Your cards are: <br />\n";
 	    echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
+
+	    /* do we have to follow suit? */
+	    $followsuit = 0;
+	    if(have_suit($mycards,$firstcard))
+	      $followsuit = 1;
+
 	    foreach($mycards as $card) 
-	      display_link_card($card);
+	      {
+		if($followsuit && !same_type($card,$firstcard))
+		  display_card($card);
+		else
+		  display_link_card($card);
+	      }
 
 	    echo "<br />\nA short comments:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"50\" />\n";
 	    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
