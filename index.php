@@ -6,6 +6,14 @@ include_once("output.php");      /* html output only */
 include_once("db.php");          /* database only */
 include_once("functions.php");   /* the rest */
 
+if(0)
+{
+  output_header();
+  echo "Working on the database...please check back in a few mintues";
+  output_footer();
+  exit();
+}
+
 DB_open();
 output_header();
 
