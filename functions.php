@@ -156,14 +156,13 @@ function get_winner($p,$mode)
   $c3 = $p[3];
   $c4 = $p[4];
 
-  /* find out who won */
 
   /* first card is better than all the rest */
   if( compare_cards($c1,$c2,$mode) && compare_cards($c1,$c3,$mode) && compare_cards($c1,$c4,$mode) )
     return 1; 
 
   /* second card is better than first and better than the rest */
-  if( !compare_cards($c1,$c2,$mode) && compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
+  if( !compare_cards($c1,$c2,$mode) &&  compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
     return 2;
 
   /* third card is better than first card and better than last */

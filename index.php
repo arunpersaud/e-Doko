@@ -631,6 +631,12 @@ else if(myisset("me"))
 	  echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a><br />";
 	echo "</p>\n";
 
+	echo "<p>and these are your games that are already done:<br />\n";
+	$result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
+	while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	  echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a><br />";
+	echo "</p>\n";
+
 	$names = DB_get_all_names();
 	echo "<p>registered players:<br />\n";
 	foreach ($names as $name)
