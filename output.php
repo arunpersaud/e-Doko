@@ -123,7 +123,7 @@ function display_link_card($card)
 function check_for_sickness($me,$mycards)
 {
  ?>
-  <p> nothing implemented so far, but give it a try anyway ;) </p>	 	  
+  <p> Solo will work, but the first player will not change. Nothing else implemented. </p>	 	  
 
   <form action="index.php" method="post">
 

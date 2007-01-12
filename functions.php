@@ -364,7 +364,7 @@ function card_value($card)
     case 48:	               
       return 0;
     default:
-      echo "something went wrong, please contact the admin. ErrorCode: 2<br>";
+      echo "something went wrong, please contact the admin. ErrorCode: 2 - $card<br>";
       return 0;
     }
 }

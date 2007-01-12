@@ -185,7 +185,9 @@ else if(myisset("me"))
 	break;
 	
       case 'check':
-	echo "checking for solo...<br /> if you have a wedding or poverty you need to play a normal game,sorry...<br />".
+	echo "checking for solo...<br />".
+	  " if you have a wedding, please send an email to the other players. <br />".
+	  " if you have  poverty you need to play a normal game,sorry...<br />".
 	  " At the moment you need to reload this page to finish the setup.<br />";
 	if(!myisset("solo","wedding","poverty","nines") )
 	  {
@@ -204,7 +206,7 @@ else if(myisset("me"))
 	      {
 		DB_set_solo_by_hash($me,$_REQUEST["solo"]);
 		DB_set_sickness_by_hash($me,"solo");
-		echo "Seems like you want to play a ".$_REQUEST["solo"]." solo. Got it.\n";
+		echo "<br />Seems like you want to play a ".$_REQUEST["solo"]." solo. Got it.<br />\n";
 		
 		if($gametype == "solo" && $startplayer<$mypos)
 		  {}/* do nothing */
@@ -244,7 +246,8 @@ else if(myisset("me"))
 	 * set that one in the Game table, delete other ones form Hand table 
 	 * tell people about it.
 	 */
-	echo "<br />poverty not handeled at the moment... you need to play a normal game<br />";
+	echo "<br />poverty not handeled at the moment... you need to play a normal game<br />".
+	   "reload this page to finish the setup <br />";
 	
 	/* only set this after all poverty, etc. are handeled*/
 	DB_set_hand_status_by_hash($me,'play');
@@ -461,7 +464,9 @@ else if(myisset("me"))
 	    
 	    if($handcardid)
 	      {
-		mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".DB_quote_smart($card));
+		/* mark card as played */
+		mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
+			    DB_quote_smart($card));
 		
 		/* get trick id or start new trick */
 		$a = DB_get_current_trickid($gameid);
@@ -470,17 +475,17 @@ else if(myisset("me"))
 		
 		$playid = DB_play_card($trickid,$handcardid,$sequence);
 
-		/*check for coment */
+		/* check for coment */
 		if(myisset("comment"))
 		  {
 		    DB_insert_comment($_REQUEST["comment"],$playid,$myid);
 		  };  
 
+		/* display played card */
 		echo "<div class=\"card\">";
 		echo " you played  <br />";
 		display_card($card);
 		echo "</div>\n";
-		
 
 		/*check if we still have cards left, else set status to gameover */
 		if(sizeof(DB_get_hand($me))==0)
@@ -489,16 +494,51 @@ else if(myisset("me"))
 		    $mystatus='gameover';
 		  }
 		
-		/* if all players are done, set game status to game over */
+		/* if all players are done, set game status to game over, 
+		 * get the points of the last trick and send out an email 
+		 * to all players
+		 */
 		$userids = DB_get_all_userid_by_gameid($gameid);
+
 		$done=1;
 		foreach($userids as $user)
 		  if(DB_get_hand_status_by_userid_and_gameid($user,$gameid)!='gameover')
 		    $done=0;
 
 		if($done)
-		  DB_set_game_status_by_gameid($gameid,"gameover");
+		  {
+		    DB_set_game_status_by_gameid($gameid,"gameover");
+		    /* get score for last trick 
+		     * all other tricks are handled a few lines further down*/
+		    $play   = DB_get_cards_by_trick($trickid);
+		    $winner = get_winner($play,$gametype); /* returns the position */
+		    /* get points of last trick and save it */
+		    $points = 0;
+		    foreach($play as $card)
+		      $points = $points + card_value($card);
+		    $winnerid = DB_get_handid_by_gameid_and_position($gameid,$winner);
+		    if($winnerid>0)
+		      mysql_query("INSERT INTO Score VALUES (NULL, '$gameid', '$winnerid', '$points')");
+		    else
+		      echo "ERROR during scoring";
+
+		    /* email all players */
+		    $result = mysql_query("SELECT fullname, SUM(score) FROM Score".
+					  " LEFT JOIN Hand ON Hand.id=hand_id".
+					  " LEFT JOIN User ON Hand.user_id=User.id".
+					  " GROUP BY fullname" );
+		    $message = "The game is over. Thanks for playing :)\n";
+		    while( $r = mysql_fetch_array($result,MYSQL_NUM))
+		      $message .= " FINAL SCORE: ".$r[0]." ".$r[1]."\n";
+		    $message .= "\nIf your not in the list above your score is zero...\n";
+		    foreach($userids as $user)
+		      {
+			$To = DB_get_email_by_userid($user);
+			mymail($To,"[DoKo] game over",$message);
+		      }
+		  }
 		
+
 		/* email next player */
 		if(DB_get_game_status_by_gameid($gameid)=='play')
 		  {
@@ -506,6 +546,23 @@ else if(myisset("me"))
 		      {
 			$play   = DB_get_cards_by_trick($trickid);
 			$winner = get_winner($play,$gametype); /* returns the position */
+
+			/* get points of last trick and save it, last trick is handled 
+			 * a few lines further up  */
+			$points = 0;
+			foreach($play as $card)
+			  $points = $points + card_value($card);
+
+			$winnerid = DB_get_handid_by_gameid_and_position($gameid,$winner);
+			if($winnerid>0)
+			  mysql_query("INSERT INTO Score VALUES (NULL, '$gameid', '$winnerid', '$points')");
+			else
+			  echo "ERROR during scoring";
+			
+			if($debug)
+			  echo "DEBUG: $winner got $points <br />";
+			
+			/* who is the next player? */
 			$next = $winner;
 		      }
 		    else
@@ -585,8 +642,15 @@ else if(myisset("me"))
 	  }
 	else
 	  {
-	    echo "the game is over now... guess the final score should be displayed here...<br />\n";
+	    echo "the game is over now...<br />\n";
 	    
+	    $result = mysql_query("SELECT fullname, SUM(score) FROM Score".
+				  " LEFT JOIN Hand ON Hand.id=hand_id".
+				  " LEFT JOIN User ON Hand.user_id=User.id".
+				  " GROUP BY fullname" );
+	    while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	      echo " FINAL SCORE: ".$r[0]." ".$r[1]."<br />";
+
 	    /* suggest a new game with the same people in it, just rotated once */
 	    $names = DB_get_all_names_by_gameid($gameid);
 	    output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);

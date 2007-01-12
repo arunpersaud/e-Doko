@@ -59,6 +59,17 @@ function DB_get_email_by_name($name)
     return "";
 }
 
+function DB_get_email_by_userid($id)
+{
+  $result = mysql_query("SELECT email FROM User WHERE id=".DB_quote_smart($id)."");
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
 function DB_get_email_by_hash($hash)
 {
   $result = mysql_query("SELECT User.email FROM User LEFT JOIN Hand ON Hand.user_id=User.id WHERE Hand.hash=".DB_quote_smart($hash)."");
@@ -120,6 +131,19 @@ function DB_get_handid_by_hash($hash)
     return $r[0];
   else
     return 0;
+}
+
+function DB_get_handid_by_gameid_and_position($gameid,$pos)
+{
+  $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
+			DB_quote_smart($gameid)." AND position=".
+			DB_quote_smart($pos));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return -1;
 }
 
 function DB_get_userid_by_hash($hash)
@@ -270,14 +294,17 @@ function DB_get_hand($me)
 function DB_get_cards_by_trick($id)
 {
   $cards = array();
-  $cards[0]=0; /* need to return index 1-4 */
-
+  $i     = 1;
+  
   $result = mysql_query("SELECT card_id FROM Play LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id ".
 			"LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
 			"WHERE trick_id=".
 			DB_quote_smart($id)." ORDER BY position ASC");
   while($r = mysql_fetch_array($result,MYSQL_NUM))
-    $cards[]=$r[0];
+    {
+      $cards[$i]=$r[0];
+      $i++;
+    }
 
   return $cards;
 }
