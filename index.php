@@ -526,6 +526,7 @@ else if(myisset("me"))
 		    $result = mysql_query("SELECT fullname, SUM(score) FROM Score".
 					  " LEFT JOIN Hand ON Hand.id=hand_id".
 					  " LEFT JOIN User ON Hand.user_id=User.id".
+					  " WHERE Hand.game_id=$gameid".
 					  " GROUP BY fullname" );
 		    $message = "The game is over. Thanks for playing :)\n";
 		    while( $r = mysql_fetch_array($result,MYSQL_NUM))
@@ -647,6 +648,7 @@ else if(myisset("me"))
 	    $result = mysql_query("SELECT fullname, SUM(score) FROM Score".
 				  " LEFT JOIN Hand ON Hand.id=hand_id".
 				  " LEFT JOIN User ON Hand.user_id=User.id".
+				  " WHERE Hand.game_id=$gameid".
 				  " GROUP BY fullname" );
 	    while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	      echo " FINAL SCORE: ".$r[0]." ".$r[1]."<br />";
