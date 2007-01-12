@@ -236,6 +236,18 @@ function DB_get_hand_status_by_userid_and_gameid($uid,$gid)
     return 0;
 }
 
+function DB_get_sickness_by_userid_and_gameid($uid,$gid)
+{
+  $result = mysql_query("SELECT sickness FROM Hand WHERE user_id=".DB_quote_smart($uid).
+			" AND game_id=".DB_quote_smart($gid));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
 function DB_get_gameid_by_hash($hash)
 {
   $result = mysql_query("SELECT game_id FROM Hand WHERE hash=".DB_quote_smart($hash));

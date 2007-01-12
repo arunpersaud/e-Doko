@@ -159,7 +159,7 @@ else if(myisset("me"))
 		foreach($userids as $user)
 		  {
 		    $To = DB_get_email_by_userid($user);
-		    mymail($To,"[DoKo] game over",$message);
+		    mymail($To,"[DoKo] game cancled",$message);
 		  }
 		
 		/* delete everything from the dB */
@@ -186,9 +186,9 @@ else if(myisset("me"))
 	break;
 	
       case 'check':
-	echo "checking for solo...<br />".
+	echo "checking if you selected solo or nines...<br />".
 	  " if you have a wedding, please send an email to the other players. <br />".
-	  " if you have  poverty you need to play a normal game,sorry...<br />".
+	  " if you have poverty you need to play a normal game,sorry...<br />".
 	  " At the moment you need to reload this page to finish the setup.<br />";
 	if(!myisset("solo","wedding","poverty","nines") )
 	  {
@@ -213,6 +213,7 @@ else if(myisset("me"))
 		  {}/* do nothing */
 		else
 		  {
+		    /* this solo comes first */
 		    DB_set_gametype_by_gameid($gameid,"solo");
 		    DB_set_startplayer_by_gameid($gameid,$mypos);
 		    DB_set_solo_by_gameid($gameid,$_REQUEST["solo"]);
@@ -247,7 +248,7 @@ else if(myisset("me"))
 	 * set that one in the Game table, delete other ones form Hand table 
 	 * tell people about it.
 	 */
-	echo "<br />poverty not handeled at the moment... you need to play a normal game<br />".
+	echo "<br />checking if someone else selected solo or nines... wedding and poverty not handled at the moment<br />".
 	   "reload this page to finish the setup <br />";
 	
 	/* only set this after all poverty, etc. are handeled*/
@@ -262,8 +263,71 @@ else if(myisset("me"))
 
 	if($ok)
 	  {
-	    /* TODO: check what kind of game we are playing */
 	    DB_set_game_status_by_gameid($gameid,'play');
+
+	    /* check what kind of game we are playing */
+	    $gametype    = DB_get_gametype_by_gameid($gameid);
+	    $startplayer = DB_get_startplayer_by_gameid($gameid);
+
+	    /* nines? */
+	    $nines = 0;
+	    /* check for nines */
+	    foreach($userids as $user)
+	      {
+		if(DB_get_sickness_by_userid_and_gameid($user,$gameid) == 'nines')
+		  $nines = 1;
+	      }
+	    
+	    /* gamestatus == normal, => cancel game */
+	    if($nines && $gamestatus == "normal")
+	      {
+		/* TODO: set game type to nines to be able to keep statistics */
+		
+		$message = "Hello, \n\n".
+		  "the game has been cancled becausee someone has five or more nines.\n";
+		
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		foreach($userids as $user)
+		  {
+		    $To = DB_get_email_by_userid($user);
+		    mymail($To,"[DoKo] game cancled",$message);
+		  }
+		
+		/* delete everything from the dB */
+		DB_cancel_game($me);
+
+	      }
+
+	    /* poverty? */
+	    $poverty = 0;
+
+	    /* check players for poverty */
+	    foreach($userids as $user)
+	      {
+		if(DB_get_sickness_by_userid_and_gameid($user,$gameid) == 'poverty')
+		  {
+		    $poverty++;
+		    $name = DB_get_name_by_userid($user);
+		    echo "$name has a Vorbehalt. <br />";
+		  }
+	      }
+	    /* if gamestatus == normal, set poverty or dpovert (in case two people have poverty) */
+
+	    /* wedding? */
+	    $wedding = 0;
+	    /* check players for wedding */
+	    foreach($userids as $user)
+	      {
+		if(DB_get_sickness_by_userid_and_gameid($user,$gameid) == 'wedding')
+		  {
+		    $wedding++;
+		    $name = DB_get_name_by_userid($user);
+		    echo "$name has a Vorbehalt. <br />"  ;
+		  }
+	      }
+
+	    /* if gamestatus == normal, set wedding  */
+	    
 	  }
 	
 	break;
@@ -290,7 +354,9 @@ else if(myisset("me"))
 	
 	set_gametype($gametype);
 
-	
+	/* get some infos about the game */
+	$gamestatus = DB_get_game_status_by_gameid($gameid);
+
 	/* display useful things in divs */
 	
 	/* display local time */
@@ -308,7 +374,8 @@ else if(myisset("me"))
 	  };
 	echo "</table>\n</div>\n";
 
-	display_status($GT);
+	if($gamestatus != 'pre')
+	  display_status($GT);
 
 	/* display links to the users status page */
 	$result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
@@ -320,7 +387,6 @@ else if(myisset("me"))
 	/* end display useful things*/
 
 	/* has the game started? No, then just wait here...*/
-	$gamestatus = DB_get_game_status_by_gameid($gameid);
 	if($gamestatus == 'pre')
 	  {
 	    echo "you need to wait for the others... <br />";
@@ -360,8 +426,6 @@ else if(myisset("me"))
 			      "LEFT JOIN Comment ON Play.id=Comment.play_id ".
 			      "WHERE Trick.game_id='".$gameid."' ".
 			      "ORDER BY Trick.id,sequence ASC");
-	
-	
 	$trickNR = 1;
 	
 	$lasttrick = DB_get_max_trickid($gameid);
@@ -607,7 +671,7 @@ else if(myisset("me"))
 	    echo "Your cards are: <br />\n";
 	    echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
 
-	    /* do we have to follow suit? */
+	    /* do we have to follow suite? */
 	    $followsuit = 0;
 	    if(have_suit($mycards,$firstcard))
 	      $followsuit = 1;
