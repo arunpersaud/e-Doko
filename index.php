@@ -107,7 +107,9 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD" ))
     mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
     mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
     mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
-        
+
+    
+    echo "You started a new game. The emails have been sent out!";    
   }    
 /* end set up a new game */
 

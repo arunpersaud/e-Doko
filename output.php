@@ -16,9 +16,9 @@ function display_news()
   global $wiki;
   echo "<div class=\"bug\">\n".
     "  Please hit <strong>shift+reload</strong>.<br /><hr />\n".
-    "  the table and the names are now always shown. <br /><hr />".
-    "  If you find more bugs, please list them in the <a href=\"".$wiki.
-    "\">wiki</a>.\n</div>\n";
+    "  The server now keeps score... (only from now on) <br /><hr />".
+    "  If you find more bugs, please list them in the <a href=\"".
+    $wiki."\">wiki</a>.\n</div>\n";
   return;
 }
 

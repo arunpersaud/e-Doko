@@ -26,8 +26,8 @@ function myisset()
   foreach($args as $arg)
     {
       $ok = $ok * isset($_REQUEST[$arg]);
-      /* echo "$arg: ok = $ok <br />";
-       */
+      /*echo "$arg: ok = $ok <br />";
+       */ 
     }
   return $ok;
 }
