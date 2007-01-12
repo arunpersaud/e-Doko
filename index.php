@@ -152,15 +152,16 @@ else if(myisset("me"))
 	  {
 	    if($_REQUEST["in"] == "no")
 	      {
-		echo "TODO: email everyone that the game has been canceled.<br />";
-		 /*something like need to modify for DB backend
-		 for($i=0;$i<4;$i++)
- 		   {
- 		     $message = "Hello ".$player[$hash[$i]]["name"].",\n\n".
- 		       "the game has been canceled due to the request of one of the players.\n";
- 		     mymail($player[$hash[$i]]["email"],"[DoKo-Debug] the game has been canceled",$message); 
- 		   }
-		 */
+		$message = "Hello, \n\n".
+		  "the game has been canceled due to the request of one of the players.\n";
+		
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		foreach($userids as $user)
+		  {
+		    $To = DB_get_email_by_userid($user);
+		    mymail($To,"[DoKo] game over",$message);
+		  }
+		
 		/* delete everything from the dB */
 		DB_cancel_game($me);
 	      }

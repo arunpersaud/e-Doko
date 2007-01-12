@@ -156,7 +156,6 @@ function get_winner($p,$mode)
   $c3 = $p[3];
   $c4 = $p[4];
 
-
   /* first card is better than all the rest */
   if( compare_cards($c1,$c2,$mode) && compare_cards($c1,$c3,$mode) && compare_cards($c1,$c4,$mode) )
     return 1; 
