@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 
 global $REV;
-$REV  ="$Rev$";
+$REV  ="\$Rev$";
 
 include_once("config.php");      
 include_once("output.php");      /* html output only */

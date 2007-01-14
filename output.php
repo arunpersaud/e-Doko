@@ -268,7 +268,7 @@ function output_header()
 <body onload="high_last();">
 <div class="header">
 <h1> Welcome to E-Doko </h1>
-<p> Revision: $REV</p>
+<p> Revision: <?php echo "$REV"; ?></p>
 </div>
 
 <?php
