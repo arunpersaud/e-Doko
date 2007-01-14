@@ -230,6 +230,7 @@ function output_home_page()
 
 function output_header()
 {
+   global $REV;
 ?>
 <!DOCTYPE html PUBLIC
     "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
@@ -267,6 +268,7 @@ function output_header()
 <body onload="high_last();">
 <div class="header">
 <h1> Welcome to E-Doko </h1>
+<p> Revision: $REV</p>
 </div>
 
 <?php

@@ -1,6 +1,9 @@
 <?php
 error_reporting(E_ALL);
 
+global $REV;
+$REV  ="$Rev$";
+
 include_once("config.php");      
 include_once("output.php");      /* html output only */
 include_once("db.php");          /* database only */

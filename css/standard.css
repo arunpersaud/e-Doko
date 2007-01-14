@@ -3,6 +3,11 @@
   text-align:center;
   border-bottom:3px solid gray;
 }
+.header p { 
+  position:absolute;
+  right:0;
+  top:0;
+}
 
 .card { 
   position:absolute;
