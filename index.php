@@ -191,7 +191,7 @@ else if(myisset("me"))
 	echo "checking if you selected solo or nines...<br />".
 	  " if you have a wedding, please send an email to the other players. <br />".
 	  " if you have poverty you need to play a normal game,sorry...<br />".
-	  " At the moment you need to reload this page to finish the setup.<br />";
+	  " Please click <a href=\"$host?me=$me\">here</a> to finish the setup.<br />";
 	if(!myisset("solo","wedding","poverty","nines") )
 	  {
 	    /* all these variables have a pre-selected default,
@@ -251,7 +251,7 @@ else if(myisset("me"))
 	 * tell people about it.
 	 */
 	echo "<br />checking if someone else selected solo or nines... wedding and poverty not handled at the moment<br />".
-	   "reload this page to finish the setup <br />";
+	  " Please click <a href=\"$host?me=$me\">here</a> to finish the setup.<br />";	 
 	
 	/* only set this after all poverty, etc. are handeled*/
 	DB_set_hand_status_by_hash($me,'play');
