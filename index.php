@@ -434,7 +434,7 @@ else if(myisset("me"))
 	
 	$play = array(); /* needed to calculate winner later  */
 	$seq  = 1;          
-	$pos  = 0;
+	$pos  = DB_get_startplayer_by_gameid($gameid)-1; 
 	$firstcard = ""; /* first card in a trick */
 	
 	echo "\n<ul class=\"tricks\">\n";
