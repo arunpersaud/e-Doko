@@ -525,22 +525,18 @@ function set_gametype($gametype)
 
 function mysort($cards,$gametype)
 {
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
-    
-  switch($gametype) {
-  case normal:
-  case trump:
-  default:
-    $ALL = array_merge($TRUMP,$DIAMONDS,$CLUBS,$HEARTS,$SPADES,$DIAMONDS);
-    break;
-  }
-
-  $compare = create_function("$a, $b", "return pos_array($a,$ALL)-pos_array($b,$ALL);");
-
-  usort ( $cards, $compare );
-
-  return;
+  usort ( $cards, "sort_comp" );
+  return $cards;
 }
 
+function sort_comp($a,$b)
+{
+  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+
+  $ALL = array();
+  $ALL = array_merge($TRUMP,$DIAMONDS,$CLUBS,$HEARTS,$SPADES,$DIAMONDS);
+
+  return pos_array($a,$ALL)-pos_array($b,$ALL);
+}
 
 ?>
