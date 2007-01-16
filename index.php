@@ -667,7 +667,7 @@ else if(myisset("me"))
 	  }
 	
 	$mycards = DB_get_hand($me);
-	sort($mycards);
+	mysort($mycards,$gametype);
 	echo "<div class=\"mycards\">\n";
 	
 	if($myturn && !myisset("card"))
