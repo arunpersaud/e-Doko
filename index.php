@@ -141,6 +141,9 @@ else if(myisset("me"))
     $mystatus = DB_get_status_by_hash($me);
     $mypos    = DB_get_pos_by_hash($me);
     
+    if(myisset("cancle"))
+      echo "<p style=\"background-color:red\";>canceling a game is not implemented at the moment, but will be soon...<br /><br /></p>";
+
     switch($mystatus)
       {
       case 'start':
@@ -762,10 +765,18 @@ else if(myisset("me"))
 	DB_update_user_timestamp($uid);
 
 	echo "<p>these are the games you are playing in:<br />\n";
-	$result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status<>'gameover'" );
+	$result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date from Hand".
+			      " LEFT JOIN Game On Hand.game_id=Game.id".
+			      " WHERE Hand.user_id='$uid' AND Game.status<>'gameover'" );
 	while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	  echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a><br />";
+	  {
+	    echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
+	    if(time()-strtotime($r[2]) > 60*60*24*30)
+	       echo " The game has been running for over a month. Do you want to cancel it? <a href=\"$host?cancle=1&me=".$r[0]."\">yes</a>";
+	    echo "<br />";
+	  }
 	echo "</p>\n";
+
 
 	echo "<p>and these are your games that are already done:<br />\n";
 	$result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
