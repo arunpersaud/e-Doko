@@ -140,6 +140,10 @@ else if(myisset("me"))
     $myname   = DB_get_name_by_hash($me);
     $mystatus = DB_get_status_by_hash($me);
     $mypos    = DB_get_pos_by_hash($me);
+
+    echo "<p class=\"gamenumber\"> Game $gameid </p>\n";
+    
+
     
     if(myisset("cancle"))
       echo "<p style=\"background-color:red\";>canceling a game is not implemented at the moment, but will be soon...<br /><br /></p>";

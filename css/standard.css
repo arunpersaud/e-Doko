@@ -9,6 +9,12 @@
   top:0;
 }
 
+p.gamenumber { 
+  position:absolute;
+  top:0;
+  text-align:center;
+}
+
 .card { 
   position:absolute;
   z-index:20;
