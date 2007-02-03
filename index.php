@@ -9,6 +9,10 @@ include_once("output.php");      /* html output only */
 include_once("db.php");          /* database only */
 include_once("functions.php");   /* the rest */
 
+/* check if some variables are set in the config file, else set defaults */
+if(!isset($EmailName))
+     $EmailName="[DoKo] ";
+
 if(0)
 {
   output_header();
@@ -173,7 +177,7 @@ else if(myisset("me"))
 		foreach($userids as $user)
 		  {
 		    $To = DB_get_email_by_userid($user);
-		    mymail($To,"[DoKo] game cancled",$message);
+		    mymail($To,$EmailName."game cancled",$message);
 		  }
 		
 		/* delete everything from the dB */
@@ -304,7 +308,7 @@ else if(myisset("me"))
 		foreach($userids as $user)
 		  {
 		    $To = DB_get_email_by_userid($user);
-		    mymail($To,"[DoKo] game cancled",$message);
+		    mymail($To,$EmailName."game cancled",$message);
 		  }
 		
 		/* delete everything from the dB */
@@ -614,7 +618,7 @@ else if(myisset("me"))
 		    foreach($userids as $user)
 		      {
 			$To = DB_get_email_by_userid($user);
-			mymail($To,"[DoKo] game over",$message);
+			mymail($To,$EmailName."game over",$message);
 		      }
 		  }
 		
@@ -657,7 +661,7 @@ else if(myisset("me"))
 
 		    $message = "It's your turn  now.\n".
 		      "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
-		    mymail($email,"[DoKo-debug] a card has been played",$message);
+		    mymail($email,$EmailName."a card has been played",$message);
 		    
 		    if($debug)
 		      echo "DEBUG:<a href=\"index.php?me=".DB_get_hash_from_game_and_pos($gameid,$next).
