@@ -146,7 +146,7 @@ else if(myisset("cancle","me"))
   if(time()-strtotime($r[0]) > 60*60*24*30)
     {
       $message = "Hello, \n\n".
-	"Game $gameid has been cancled because, since nothing happend for a while and $myname requested it.\n";
+	"Game $gameid has been cancled since nothing happend for a while and $myname requested it.\n";
       
       $userids = DB_get_all_userid_by_gameid($gameid);
       foreach($userids as $user)
