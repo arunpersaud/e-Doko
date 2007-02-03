@@ -261,7 +261,7 @@ function DB_get_gameid_by_hash($hash)
 
 function DB_cancel_game($hash)
 {
-  $gameid = DB_get_gameid_by_hash($me);
+  $gameid = DB_get_gameid_by_hash($hash);
 
   if(!$gameid)
     return;

@@ -32,128 +32,164 @@ if(myisset("new"))
 }
 /*check if everything is ready to set up a new game */
 else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD" ))
-  {
-    $PlayerA = $_REQUEST["PlayerA"];
-    $PlayerB = $_REQUEST["PlayerB"];
-    $PlayerC = $_REQUEST["PlayerC"];
-    $PlayerD = $_REQUEST["PlayerD"];
-    
-    $EmailA  = DB_get_email_by_name($PlayerA);
-    $EmailB  = DB_get_email_by_name($PlayerB);
-    $EmailC  = DB_get_email_by_name($PlayerC);
-    $EmailD  = DB_get_email_by_name($PlayerD);
-    
-    if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
-      {
-	echo "couldn't find one of the names, please start a new game";
-	exit();
-      }
-    
-    $useridA  = DB_get_userid_by_name($PlayerA);
-    $useridB  = DB_get_userid_by_name($PlayerB);
-    $useridC  = DB_get_userid_by_name($PlayerC);
-    $useridD  = DB_get_userid_by_name($PlayerD);
-    
-    /* create random numbers */
-    $randomNR       = create_array_of_random_numbers();
-    $randomNRstring = join(":",$randomNR);
-    
-    /* create game */
-    $followup = NULL;
-    if(myisset("followup") )
-      {
-	$followup= $_REQUEST["followup"];
-	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre','$followup' ,NULL)");
-      }
-    else
-      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre', NULL ,NULL)");
-    $game_id = mysql_insert_id();
-    
-    /* create hash */
-    $hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA);
-    $hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB);
-    $hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC);
-    $hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD);
-    
-    /* create hands */
-    mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
-		", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,'false','false',NULL)");
-    $hand_idA = mysql_insert_id();							       
-    mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridB).
-		", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,'false','false',NULL)");
-    $hand_idB = mysql_insert_id();							       
-    mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridC).
-		", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,'false','false',NULL)");
-    $hand_idC = mysql_insert_id();							       
-    mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
-		", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,'false','false',NULL)");
-    $hand_idD = mysql_insert_id();
-    
-    /* save cards */
-    for($i=0;$i<12;$i++)
-      mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idA', '".$randomNR[$i]."', 'false')");
-    for($i=12;$i<24;$i++)
-      mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idB', '".$randomNR[$i]."', 'false')");
-    for($i=24;$i<36;$i++)
-      mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idC', '".$randomNR[$i]."', 'false')");
-    for($i=36;$i<48;$i++)
-      mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
-
-    /* send out email, TODO: check for error with email */
-    $message = "\n".
-      "you are invited to play a game of DoKo (that is to debug the program ;).\n".
-      "Place comments and bug reports here:\n".
-      "http://wiki.nubati.net/index.php?title=EmailDoko\n\n".
-      "The whole round would consist of the following players:\n".
-      "$PlayerA\n".
-      "$PlayerB\n".
-      "$PlayerC\n".
-      "$PlayerD\n\n".
-      "If you want to join this game, please follow this link:\n\n".
-      " ".$host."?me=";
-    
-    mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
-    mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
-    mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
-    mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
-
-    
-    echo "You started a new game. The emails have been sent out!";    
-  }    
-/* end set up a new game */
-
+{
+  $PlayerA = $_REQUEST["PlayerA"];
+  $PlayerB = $_REQUEST["PlayerB"];
+  $PlayerC = $_REQUEST["PlayerC"];
+  $PlayerD = $_REQUEST["PlayerD"];
+  
+  $EmailA  = DB_get_email_by_name($PlayerA);
+  $EmailB  = DB_get_email_by_name($PlayerB);
+  $EmailC  = DB_get_email_by_name($PlayerC);
+  $EmailD  = DB_get_email_by_name($PlayerD);
+  
+  if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
+    {
+      echo "couldn't find one of the names, please start a new game";
+      exit();
+    }
+  
+  $useridA  = DB_get_userid_by_name($PlayerA);
+  $useridB  = DB_get_userid_by_name($PlayerB);
+  $useridC  = DB_get_userid_by_name($PlayerC);
+  $useridD  = DB_get_userid_by_name($PlayerD);
+  
+  /* create random numbers */
+  $randomNR       = create_array_of_random_numbers();
+  $randomNRstring = join(":",$randomNR);
+  
+  /* create game */
+  $followup = NULL;
+  if(myisset("followup") )
+    {
+      $followup= $_REQUEST["followup"];
+      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre','$followup' ,NULL)");
+    }
+  else
+    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre', NULL ,NULL)");
+  $game_id = mysql_insert_id();
+  
+  /* create hash */
+  $hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA);
+  $hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB);
+  $hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC);
+  $hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD);
+  
+  /* create hands */
+  mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
+	      ", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,'false','false',NULL)");
+  $hand_idA = mysql_insert_id();							       
+  mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridB).
+	      ", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,'false','false',NULL)");
+  $hand_idB = mysql_insert_id();							       
+  mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridC).
+	      ", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,'false','false',NULL)");
+  $hand_idC = mysql_insert_id();							       
+  mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
+	      ", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,'false','false',NULL)");
+  $hand_idD = mysql_insert_id();
+  
+  /* save cards */
+  for($i=0;$i<12;$i++)
+    mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idA', '".$randomNR[$i]."', 'false')");
+  for($i=12;$i<24;$i++)
+    mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idB', '".$randomNR[$i]."', 'false')");
+  for($i=24;$i<36;$i++)
+    mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idC', '".$randomNR[$i]."', 'false')");
+  for($i=36;$i<48;$i++)
+    mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
+  
+  /* send out email, TODO: check for error with email */
+  $message = "\n".
+    "you are invited to play a game of DoKo (that is to debug the program ;).\n".
+    "Place comments and bug reports here:\n".
+    "http://wiki.nubati.net/index.php?title=EmailDoko\n\n".
+    "The whole round would consist of the following players:\n".
+    "$PlayerA\n".
+    "$PlayerB\n".
+    "$PlayerC\n".
+    "$PlayerD\n\n".
+    "If you want to join this game, please follow this link:\n\n".
+    " ".$host."?me=";
+  
+  mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
+  mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
+  mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
+  mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
+  
+  echo "You started a new game. The emails have been sent out!";    
+}    /* end set up a new game */
+else if(myisset("cancle","me"))
+{
+  $me = $_REQUEST["me"];
+  
+  /* test for valid ID */
+  $myid = DB_get_userid_by_hash($me);
+  if(!$myid)
+    {
+      echo "Can't find you in the database, please check the url.<br />\n";
+      echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+      exit();
+    }
+  
+  DB_update_user_timestamp($myid);
+  
+  /* get some information from the DB */
+  $gameid   = DB_get_gameid_by_hash($me);
+  $myname   = DB_get_name_by_hash($me);
+  $mystatus = DB_get_status_by_hash($me);
+  $mypos    = DB_get_pos_by_hash($me);
+  
+  /* check if game really is old enough */
+  $result = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+  if(time()-strtotime($r[0]) > 60*60*24*30)
+    {
+      $message = "Hello, \n\n".
+	"Game $gameid has been cancled because, since nothing happend for a while and $myname requested it.\n";
+      
+      $userids = DB_get_all_userid_by_gameid($gameid);
+      foreach($userids as $user)
+	{
+	  $To = DB_get_email_by_userid($user);
+	  mymail($To,$EmailName."game cancled (timed out)",$message);
+	}
+      
+      /* delete everything from the dB */
+      DB_cancel_game($me);
+      
+      echo "<p style=\"background-color:red\";>Game $gameid has been cancled.<br /><br /></p>";
+    }
+  else
+    echo "<p>You need to wait longer before you can cancle a game...</p>\n";
+}
 else if(myisset("me"))
-  {
-    /* handle request from one specific player,
-     * the hash is set on a per game base
-     */
-    
-    $me = $_REQUEST["me"];
-
-    /* test for valid ID */
-    $myid = DB_get_userid_by_hash($me);
-    if(!$myid)
-      {
-	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
-	exit();
-      }
-    
-    DB_update_user_timestamp($myid);
-
-    /* get some information from the DB */
-    $gameid   = DB_get_gameid_by_hash($me);
-    $myname   = DB_get_name_by_hash($me);
-    $mystatus = DB_get_status_by_hash($me);
-    $mypos    = DB_get_pos_by_hash($me);
-
-    echo "<p class=\"gamenumber\"> Game $gameid </p>\n";
-    
-
-    
-    if(myisset("cancle"))
-      echo "<p style=\"background-color:red\";>canceling a game is not implemented at the moment, but will be soon...<br /><br /></p>";
-
+{
+  /* handle request from one specific player,
+`  * the hash is set on a per game base
+   */
+  
+  $me = $_REQUEST["me"];
+  
+  /* test for valid ID */
+  $myid = DB_get_userid_by_hash($me);
+  if(!$myid)
+    {
+      echo "Can't find you in the database, please check the url.<br />\n";
+      echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+      exit();
+    }
+  
+  DB_update_user_timestamp($myid);
+  
+  /* get some information from the DB */
+  $gameid   = DB_get_gameid_by_hash($me);
+  $myname   = DB_get_name_by_hash($me);
+  $mystatus = DB_get_status_by_hash($me);
+  $mypos    = DB_get_pos_by_hash($me);
+  
+  echo "<p class=\"gamenumber\"> Game $gameid </p>\n";
+       
     switch($mystatus)
       {
       case 'start':
@@ -782,7 +818,7 @@ else if(myisset("me"))
 	  {
 	    echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
 	    if(time()-strtotime($r[2]) > 60*60*24*30)
-	       echo " The game has been running for over a month. Do you want to cancel it? <a href=\"$host?cancle=1&me=".$r[0]."\">yes</a>";
+	       echo " The game has been running for over a month. Do you want to cancel it? <a href=\"$host?cancle=1&me=".$r[0]."\">yes</a> (clicking here is final and can't be restored)";
 	    echo "<br />";
 	  }
 	echo "</p>\n";
