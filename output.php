@@ -83,15 +83,20 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   return;
 }
 
-function output_form_for_new_game()
+function output_form_for_new_game($names)
 {
 ?>
-    <p>Please add 4 names, please make sure that the names are correct! </p>
+    <p>Please select four players </p>
        <form action="index.php" method="post">
-   Name:  <input name="PlayerA" type="text" size="10" maxlength="20" /> 
-   Name:  <input name="PlayerB" type="text" size="10" maxlength="20" /> 
-   Name:  <input name="PlayerC" type="text" size="10" maxlength="20" /> 
-   Name:  <input name="PlayerD" type="text" size="10" maxlength="20" /> 
+<?php
+  foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
+  {
+    echo "    Name:  <select name=\"$player\" size=\"1\" />  \n";
+     foreach($names as $name)
+      echo "     <option>$name</option>\n";
+    echo "  </select>\n";
+   }
+?>   
 
    <input type="submit" value="start game" />
  </form>

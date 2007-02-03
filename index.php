@@ -22,8 +22,10 @@ output_header();
 
 /* check if we want to start a new game */
 if(myisset("new"))
-  output_form_for_new_game();
-
+{
+  $names = DB_get_all_names();
+  output_form_for_new_game($names);
+}
 /*check if everything is ready to set up a new game */
 else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD" ))
   {
