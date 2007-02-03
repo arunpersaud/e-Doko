@@ -74,7 +74,7 @@ CREATE TABLE `Game` (
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `startplayer` tinyint(4) default '1', 
   `status` enum('pre','play','gameover') default NULL,
-  `followup_of` int(11) default NULL,
+  `session` int(11) default NULL,
   `id` int(11) NOT NULL auto_increment,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

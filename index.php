@@ -63,7 +63,17 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD" ))
   if(myisset("followup") )
     {
       $followup= $_REQUEST["followup"];
-      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre','$followup' ,NULL)");
+      $session = DB_get_session_by_gameid($followup);
+      if($session)
+	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre','$session' ,NULL)");
+      else
+	{
+	  /* get max session */
+	  $max = DB_get_max_session();
+	  $max++;
+	  mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre','$max' ,NULL)");
+	  mysql_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
+	}
     }
   else
     mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,'1','pre', NULL ,NULL)");

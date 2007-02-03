@@ -512,4 +512,27 @@ function DB_set_startplayer_by_gameid($id,$p)
   return;
 }
 
+function DB_get_session_by_gameid($id)
+{
+  $result = mysql_query("SELECT session FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+
+function DB_get_max_session()
+{
+  $result = mysql_query("SELECT MAX(session) FROM Game");
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
+
 ?>
