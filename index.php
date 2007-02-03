@@ -782,9 +782,22 @@ else if(myisset("me"))
 	    while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	      echo " FINAL SCORE: ".$r[0]." ".$r[1]."<br />";
 
-	    /* suggest a new game with the same people in it, just rotated once */
-	    $names = DB_get_all_names_by_gameid($gameid);
-	    output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+
+	    $session = DB_get_session_by_gameid($gameid);
+	    $result  = mysql_query("SELECT id,create_date FROM Game".
+				   " WHERE session=$session".
+				   " ORDER BY create_date DESC".
+				   " LIMIT 1");
+	    $r=-1;
+	    if($result)
+	      $r = mysql_fetch_array($result,MYSQL_NUM);
+
+	    if(!$session || $gameid==$r)
+	      {
+		/* suggest a new game with the same people in it, just rotated once */
+		$names = DB_get_all_names_by_gameid($gameid);
+		output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+	      }
 	  }
 	break;
       default:
