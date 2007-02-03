@@ -824,20 +824,19 @@ else if(myisset("me"))
 	echo "</p>\n";
 
 
-	echo "<p>and these are your games that are already done:<br />\n";
+	echo "<p>and these are your games that are already done:<br />Game: \n";
 	$result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
 	while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	  echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a><br />";
+	  echo "<a href=\"".$host."?me=".$r[0]."\">#".$r[1]." </a>, ";
 	echo "</p>\n";
 
 	$names = DB_get_all_names();
 	echo "<p>registered players:<br />\n";
 	foreach ($names as $name)
-	  echo "$name <br />\n";
+	  echo "$name, \n";
 	echo "</p>\n";
 
-	echo "<p>Want to start a new game? remember 4 names from the list above and visit ".
-	  "<a href=\"".$host."?new\">this page.</a></p>";
+	echo "<p>Want to start a new game? Visit <a href=\"".$host."?new\">this page.</a></p>";
       }
     else
       {
