@@ -86,15 +86,26 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 function output_form_for_new_game($names)
 {
 ?>
-    <p>Please select four players </p>
+    <p>Please select four players (or use the randomly pre-selected names)</p>
        <form action="index.php" method="post">
 <?php
   foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
   {
+    srand((float) microtime() * 10000000);
+    $randkey = array_rand($names);
+    $rand = $names[$randkey];
     echo "    Name:  <select name=\"$player\" size=\"1\" />  \n";
-     foreach($names as $name)
-      echo "     <option>$name</option>\n";
+    foreach($names as $name)
+    {
+      if($name==$rand)
+	{
+	  echo "     <option selected=\"selected\">$name</option>\n";
+	}
+      else
+	echo "     <option>$name</option>\n";
+    }
     echo "  </select>\n";
+    unset($names[$randkey]);
    }
 ?>   
 
