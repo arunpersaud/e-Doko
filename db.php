@@ -303,6 +303,19 @@ function DB_get_hand($me)
   return $cards;
 }
 
+function DB_get_all_hand($me)
+{
+  $cards = array();
+
+  $handid = DB_get_handid_by_hash($me);
+
+  $result = mysql_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid));
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $cards[]=$r[0];
+
+  return $cards;
+}
+
 function DB_get_cards_by_trick($id)
 {
   $cards = array();

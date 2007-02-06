@@ -769,6 +769,14 @@ else if(myisset("me"))
 	  foreach($mycards as $card) 
 	    display_card($card);
 	}
+      else if($mystatus=='gameover')
+	{
+	  $oldcards = DB_get_all_hand($me);
+	  $oldcards = mysort($oldcards,$gametype);
+	  echo "Your cards were: <br />\n";
+	  foreach($oldcards as $card) 
+	    display_card($card);
+	}
       echo "</div>\n";
       
       /* check if we need to set status to 'gameover' is done during playing of the card */
