@@ -321,13 +321,13 @@ function DB_get_cards_by_trick($id)
   $cards = array();
   $i     = 1;
   
-  $result = mysql_query("SELECT card_id FROM Play LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id ".
+  $result = mysql_query("SELECT card_id,position FROM Play LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id ".
 			"LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
 			"WHERE trick_id=".
-			DB_quote_smart($id)." ORDER BY position ASC");
+			DB_quote_smart($id)." ORDER BY sequence ASC");
   while($r = mysql_fetch_array($result,MYSQL_NUM))
     {
-      $cards[$i]=$r[0];
+      $cards[$i]=array("card"=>$r[0],"pos"=>$r[1]);
       $i++;
     }
 
@@ -525,6 +525,17 @@ function DB_set_startplayer_by_gameid($id,$p)
   return;
 }
 
+function DB_get_ruleset_by_gameid($id)
+{
+  $result = mysql_query("SELECT ruleset FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+
 function DB_get_session_by_gameid($id)
 {
   $result = mysql_query("SELECT session FROM Game WHERE id=".DB_quote_smart($id));
@@ -547,5 +558,30 @@ function DB_get_max_session()
     return 0;
 }
 
+function DB_get_ruleset($dullen,$schweinchen)
+{
+  $r = array();
+  
+  $result = mysql_query("SELECT id FROM Rulesets WHERE".
+			" dullen=".DB_quote_smart($dullen)." AND ".
+			" schweinchen=".DB_quote_smart($schweinchen));
+  if($result)
+    $r    = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0]; /* found ruleset */
+  else
+    {
+      /* create new one */
+      $result = mysql_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
+			    DB_quote_smart($dullen).",".
+			    DB_quote_smart($schweinchen).
+			    ", NULL)");
+      if($result)
+	return mysql_insert_id();
+    };
+
+  return -1; /* something went wrong */
+}
 
 ?>

@@ -77,6 +77,7 @@ function compare_cards($a,$b,$game)
   /* if "a" is higher than "b" return 1, else 0, "a" being the card first played */
 
   global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+  global $RULES;
 
   /* first map all cards to the odd number, 
    * this insure that the first card wins the trick 
@@ -91,8 +92,14 @@ function compare_cards($a,$b,$game)
   switch($game)
     {
     case "normal":
-      if($a==1 && $b==1) /* both 10 of hearts */
-	return 0;        /* second one wins. TODO should be able to set this at the start of a new game */
+    case "silent":
+    case "trump":
+    case "heart":
+    case "spade":
+    case "club":
+      if($RULES["dullen"]=="secondwins")
+	if($a==1 && $b==1) /* both 10 of hearts */
+	  return 0;        /* second one wins.*/
     }
   
   if(is_trump($a) && is_trump($b) && $a<=$b)
@@ -150,31 +157,42 @@ function compare_cards($a,$b,$game)
 
 function get_winner($p,$mode)
 {
-  /* get all 4 cards played in a trick */
-  $c1 = $p[1];
-  $c2 = $p[2];
-  $c3 = $p[3];
-  $c4 = $p[4];
+  /* get all 4 cards played in a trick, in the order they are played */
+  $tmp = $p[1];
+  $c1    = $tmp["card"];
+  $c1pos = $tmp["pos"]; 
+
+  $tmp = $p[2];
+  $c2    = $tmp["card"];
+  $c2pos = $tmp["pos"]; 
+
+  $tmp = $p[3];
+  $c3    = $tmp["card"];
+  $c3pos = $tmp["pos"]; 
+
+  $tmp = $p[4];
+  $c4    = $tmp["card"];
+  $c4pos = $tmp["pos"]; 
 
   /* first card is better than all the rest */
   if( compare_cards($c1,$c2,$mode) && compare_cards($c1,$c3,$mode) && compare_cards($c1,$c4,$mode) )
-    return 1; 
+    return $c1pos; 
 
   /* second card is better than first and better than the rest */
   if( !compare_cards($c1,$c2,$mode) &&  compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
-    return 2;
+    return $c2pos;
 
   /* third card is better than first card and better than last */
   if( !compare_cards($c1,$c3,$mode) &&  compare_cards($c3,$c4,$mode) )
     /* if second card is better than first, third card needs to be even better */
     if( !compare_cards($c1,$c2,$mode) && !compare_cards($c2,$c3,$mode) )
-      return 3;
+      return $c3pos;
     /* second is worse than first, e.g. not following suite */
     else if (compare_cards($c1,$c2,$mode) )
-      return 3;
+      return $c3pos;
 
   /* non of the above */
-  return 4;
+  return $c4pos;
 }
 
 function count_nines($cards)
@@ -307,9 +325,6 @@ function card_value($card)
 {
   switch($card)
     {
-    case 1:      /* heart */
-    case 2:
-      return 10;
     case 3:     /* clubes */	 
     case 4:	                 
     case 5:     /* spades */	 
@@ -337,6 +352,8 @@ function card_value($card)
     case 43:    /* hearts */   
     case 44:                   
       return 11;
+    case 1:      /* heart */
+    case 2:
     case 21:    /* diamonds */    
     case 22:
     case 29:    /* clubs */
@@ -462,6 +479,7 @@ function same_type($card,$c)
 function set_gametype($gametype)
 {
   global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+  global $RULES;
 
   switch($gametype)
     {
@@ -474,6 +492,12 @@ function set_gametype($gametype)
       $CLUBS    = array('27','28','29','30','31','32','33','34');
       $SPADES   = array('35','36','37','38','39','40','41','42');
       $HEARTS   = array('43','44','45','46','47','48');
+      if($RULES["dullen"]=='none')
+	{
+	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+                        '17','18','19','20','21','22','23','24','25','26');
+	  $HEARTS   = array('43','44','1','2','45','46','47','48');
+	}
       break;
     case "queen":
       $TRUMP    = array('3','4','5','6','7','8','9','10');
@@ -503,6 +527,12 @@ function set_gametype($gametype)
       $SPADES   = array('35','36','37','38','39','40','41','42');
       $HEARTS   = array('43','44','45','46','47','48');
       $DIAMONDS = array('19','20','21','22','23','24','25','26');
+      if($RULES["dullen"]=='none')
+	{
+	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+			    '17','18','27','28','29','30','31','32','33','34');
+	  $HEARTS   = array('43','44','1','2','45','46','47','48');
+	}
       break;
     case "spade":
       $TRUMP    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
@@ -511,6 +541,12 @@ function set_gametype($gametype)
       $SPADES   = array();
       $HEARTS   = array('43','44','45','46','47','48');
       $DIAMONDS = array('19','20','21','22','23','24','25','26');
+      if($RULES["dullen"]=='none')
+	{
+	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+			    '17','18','35','36','37','38','39','40','41','42');
+	  $HEARTS   = array('43','44','1','2','45','46','47','48');
+	}
       break;
     case "heart":
       $TRUMP    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
@@ -519,6 +555,11 @@ function set_gametype($gametype)
       $SPADES   = array('35','36','37','38','39','40','41','42');
       $HEARTS   = array();
       $DIAMONDS = array('19','20','21','22','23','24','25','26');
+      if($RULES["dullen"]=='none')
+	{
+	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+			    '17','18','43','44','1','2','45','46','47','48');
+	}
       break;
     }
 }

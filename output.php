@@ -70,12 +70,16 @@ function output_register()
 
 function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 {
+  global $RULES;
+
   echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
   echo "<form action=\"index.php\" method=\"post\">\n";
   echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"$playerA\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"$playerC\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"$playerD\" />\n";
+  echo "  <input type=\"hidden\" name=\"dullen\"  value=\"".$RULES["dullen"]."\" />\n";
+  echo "  <input type=\"hidden\" name=\"schweinchen\" value=\"".$RULES["schweinchen"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
   echo "  <input type=\"submit\" value=\"keep playing\" />\n";
   echo "</form>\n";
@@ -86,9 +90,11 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 function output_form_for_new_game($names)
 {
 ?>
+    <h2> Players </h2>
     <p>Please select four players (or use the randomly pre-selected names)</p>
        <form action="index.php" method="post">
 <?php
+    /* ask for player names */
   foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
   {
     srand((float) microtime() * 10000000);
@@ -108,7 +114,24 @@ function output_form_for_new_game($names)
     unset($names[$randkey]);
    }
 ?>   
-
+   <h2> Rules </h2> 
+      
+      <p> ten of hearts: 
+         <ul>
+         <li> <input type="radio" name="dullen" value="none" /> just normal non-trump  </li>
+         <li> <input type="radio" name="dullen" value="firstwins" /> first ten of hearts wins the trick </li>
+         <li> <input type="radio" name="dullen" value="secondwins" checked="checked" /> second ten of hearts wins the trick </li>
+         </ul>
+      </p>
+      <p> schweinchen (both foxes): 
+        <ul>
+        <li> <input type="radio" name="schweinchen" value="none" /> none </li>
+      <li> <input type="radio" name="schweinchen" value="both" /> both become highest trump (call at beginning of the game)(doesn't work yet) </li>
+        <li> <input type="radio" name="schweinchen" value="second" checked="checked" /> first one normal, second one becomes highest (call during the game) (doesn't work yet) </li>
+      <li> <input type="radio" name="schweinchen" value="secondaftercall"  /> second one become highest only in case re/contra was announced (doesn't work yet)</li>
+      </ul>
+      </p>
+   
    <input type="submit" value="start game" />
  </form>
 <?php
@@ -207,10 +230,12 @@ function check_want_to_play($me)
    yes<input type="radio" name="in" value="yes" />
    no<input type="radio" name="in" value="no" /> <br />
 
+<?php   
+/*
    Do you want to get an email for every card played or only if it your move?
    every card<input type="radio" name="update" value="card" />
    only on my turn<input type="radio" name="update" value="turn" /> <br />
-<?php   
+*/
   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
   echo "\n";
   echo "<input type=\"submit\" value=\"count me in\" />\n";

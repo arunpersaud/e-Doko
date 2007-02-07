@@ -238,6 +238,12 @@ ul.tricks li div div.card3 span{
   border-top:0;
 }
 
+.ruleset {
+  float:right;
+  border:2px solid gray;
+  border-top:0;
+}
+
 .time { 
   float:left;
   border:2px solid gray;

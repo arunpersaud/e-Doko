@@ -74,6 +74,7 @@ CREATE TABLE `Game` (
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `startplayer` tinyint(4) default '1', 
   `status` enum('pre','play','gameover') default NULL,
+  `ruleset` int(11) default NULL,
   `session` int(11) default NULL,
   `id` int(11) NOT NULL auto_increment,
   UNIQUE KEY `id` (`id`)
@@ -88,6 +89,33 @@ CREATE TABLE `Game` (
 LOCK TABLES `Game` WRITE;
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `Game` ENABLE KEYS */;
+
+
+--
+-- Table structure for table `Ruleset`
+--
+
+DROP TABLE IF EXISTS `Rulesets`;
+CREATE TABLE `Rulesets` (
+  `mod_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `dullen` enum('none','firstwins','secondwins') default 'secondwins',
+  `schweinchen` enum ('none','both','second','secondaftercall') default 'second',
+  `id` int(11) NOT NULL auto_increment,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  
+--
+-- Dumping data for table `Rulesets`
+--
+
+
+/*!40000 ALTER TABLE `Rulesets` DISABLE KEYS */;
+LOCK TABLES `Rulesets` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Rulesets` ENABLE KEYS */;
+
+
 
 --
 -- Table structure for table `Hand`
