@@ -51,9 +51,9 @@ function pos_array($c,$arr)
 
 function is_trump($c) 
 { 
-  global $TRUMP;
+  global $CARDS;
 
-  if(in_array($c,$TRUMP))
+  if(in_array($c,$CARDS["trump"]))
     return 1;
   else 
     return 0;
@@ -61,13 +61,13 @@ function is_trump($c)
 
 function is_same_suite($c1,$c2) 
 {
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+  global $CARDS;
   
-  if(in_array($c1,$TRUMP   ) && in_array($c2,$TRUMP   ) ) return 1;
-  if(in_array($c1,$CLUBS   ) && in_array($c2,$CLUBS   ) ) return 1;
-  if(in_array($c1,$HEARTS  ) && in_array($c2,$HEARTS  ) ) return 1;
-  if(in_array($c1,$SPADES  ) && in_array($c2,$SPADES  ) ) return 1;
-  if(in_array($c1,$DIAMONDS) && in_array($c2,$DIAMONDS) ) return 1;
+  if(in_array($c1,$CARDS["trump"]   ) && in_array($c2,$CARDS["trump"]   ) ) return 1;
+  if(in_array($c1,$CARDS["clubs"]   ) && in_array($c2,$CARDS["clubs"]   ) ) return 1;
+  if(in_array($c1,$CARDS["hearts"]  ) && in_array($c2,$CARDS["hearts"]  ) ) return 1;
+  if(in_array($c1,$CARDS["spades"]  ) && in_array($c2,$CARDS["spades"]  ) ) return 1;
+  if(in_array($c1,$CARDS["diamonds"]) && in_array($c2,$CARDS["diamonds"]) ) return 1;
   
   return 0;
 }
@@ -76,7 +76,7 @@ function compare_cards($a,$b,$game)
 {
   /* if "a" is higher than "b" return 1, else 0, "a" being the card first played */
 
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+  global $CARDS;
   global $RULES;
 
   /* first map all cards to the odd number, 
@@ -114,8 +114,8 @@ function compare_cards($a,$b,$game)
 	{ /* both no trump */
 
 	  /* both clubs? */
-	  $posA = pos_array($a,$CLUBS);
-	  $posB = pos_array($b,$CLUBS);
+	  $posA = pos_array($a,$CARDS["clubs"]);
+	  $posB = pos_array($b,$CARDS["clubs"]);
 	  if($posA && $posB)
 	    if($posA <= $posB)
 	      return 1;
@@ -123,8 +123,8 @@ function compare_cards($a,$b,$game)
 	      return 0;
 
 	  /* both spades? */
-	  $posA = pos_array($a,$SPADES);
-	  $posB = pos_array($b,$SPADES);
+	  $posA = pos_array($a,$CARDS["spades"]);
+	  $posB = pos_array($b,$CARDS["spades"]);
 	  if($posA && $posB)
 	    if($posA <= $posB)
 	      return 1;
@@ -132,8 +132,8 @@ function compare_cards($a,$b,$game)
 	      return 0;
 
 	  /* both hearts? */
-	  $posA = pos_array($a,$HEARTS);
-	  $posB = pos_array($b,$HEARTS);
+	  $posA = pos_array($a,$CARDS["hearts"]);
+	  $posB = pos_array($b,$CARDS["hearts"]);
 	  if($posA && $posB)
 	    if($posA <= $posB)
 	      return 1;
@@ -141,8 +141,8 @@ function compare_cards($a,$b,$game)
 	      return 0;
 
 	  /* both diamonds? */
-	  $posA = pos_array($a,$DIAMONDS);
-	  $posB = pos_array($b,$DIAMONDS);
+	  $posA = pos_array($a,$CARDS["diamonds"]);
+	  $posB = pos_array($b,$CARDS["diamonds"]);
 	  if($posA && $posB)
 	    if($posA <= $posB)
 	      return 1;
@@ -317,7 +317,7 @@ function card_to_name($card)
       case 48:
       return "nine of hearts";
       default:
-      return "something went wrong, please contact the admin. Error: code1.";
+      return "something went wrong, please contact the admin. Error: code1. $card <br />";
     }
 }
 
@@ -395,7 +395,7 @@ function  create_array_of_random_numbers()
     $a[$i]=$i;
   
   $r = array_rand($a,48);
-   
+  
   return $r;
 }
 
@@ -429,23 +429,23 @@ function return_timezone($offset)
 
 function have_suit($cards,$c)
 {
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
-  $suit = array();
+  global $CARDS;
+  $suite = array();
 
-  if(in_array($c,$TRUMP))
-    $suit = $TRUMP;
-  else if(in_array($c,$CLUBS))
-    $suit = $CLUBS;
-  else if(in_array($c,$SPADES))
-    $suit = $SPADES;
-  else if(in_array($c,$HEARTS))
-    $suit = $HEARTS;
-  else if(in_array($c,$DIAMONDS))
-    $suit = $DIAMONDS;
+  if(in_array($c,$CARDS["trump"]))
+    $suite = $CARDS["trump"];
+  else if(in_array($c,$CARDS["clubs"]))
+    $suite = $CARDS["clubs"];
+  else if(in_array($c,$CARDS["spades"]))
+    $suite = $CARDS["spades"];
+  else if(in_array($c,$CARDS["hearts"]))
+    $suite = $CARDS["hearts"];
+  else if(in_array($c,$CARDS["diamonds"]))
+    $suite = $CARDS["diamonds"];
 
   foreach($cards as $card)
     {
-      if(in_array($card,$suit))
+      if(in_array($card,$suite))
 	return 1;
     }
 
@@ -454,23 +454,23 @@ function have_suit($cards,$c)
 
 function same_type($card,$c)
 {
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
-  $suit = "";
+  global $CARDS;
+  $suite = "";
 
   /* figure out what kind of card c is */
-  if(in_array($c,$TRUMP))
-    $suit = $TRUMP;
-  else if(in_array($c,$CLUBS))
-    $suit = $CLUBS;
-  else if(in_array($c,$SPADES))
-    $suit = $SPADES;
-  else if(in_array($c,$HEARTS))
-    $suit = $HEARTS;
-  else if(in_array($c,$DIAMONDS))
-    $suit = $DIAMONDS;
+  if(in_array($c,$CARDS["trump"]))
+    $suite = $CARDS["trump"];
+  else if(in_array($c,$CARDS["clubs"]))
+    $suite = $CARDS["clubs"];
+  else if(in_array($c,$CARDS["spades"]))
+    $suite = $CARDS["spades"];
+  else if(in_array($c,$CARDS["hearts"]))
+    $suite = $CARDS["hearts"];
+  else if(in_array($c,$CARDS["diamonds"]))
+    $suite = $CARDS["diamonds"];
 
   /* card is the same suid return 1 */ 
-  if(in_array($card,$suit))
+  if(in_array($card,$suite))
     return 1;
   
   return 0;
@@ -478,7 +478,7 @@ function same_type($card,$c)
 
 function set_gametype($gametype)
 {
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+  global $CARDS;
   global $RULES;
 
   switch($gametype)
@@ -486,78 +486,85 @@ function set_gametype($gametype)
     case "normal":
     case "trump":
     case "silent":
-      $TRUMP    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-                        '17','18','19','20','21','22','23','24','25','26');
-      $DIAMONDS = array();
-      $CLUBS    = array('27','28','29','30','31','32','33','34');
-      $SPADES   = array('35','36','37','38','39','40','41','42');
-      $HEARTS   = array('43','44','45','46','47','48');
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				 '17','18','19','20','21','22','23','24','25','26');
+      $CARDS["diamonds"] = array();
+      $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
+      $CARDS["spades"]   = array('35','36','37','38','39','40','41','42');
+      $CARDS["hearts"]   = array('43','44','45','46','47','48');
+      $CARDS["foxes"]    = array('21','22');
       if($RULES["dullen"]=='none')
 	{
-	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-                        '17','18','19','20','21','22','23','24','25','26');
-	  $HEARTS   = array('43','44','1','2','45','46','47','48');
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				     '17','18','19','20','21','22','23','24','25','26');
+	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
 	}
       break;
     case "queen":
-      $TRUMP    = array('3','4','5','6','7','8','9','10');
-      $CLUBS    = array('27','28','29','30','31','32','11','12','33','34');
-      $SPADES   = array('35','36','37','38','39','40','13','14','41','42');
-      $HEARTS   = array('43','44', '1', '2','45','46','15','16','47','48');
-      $DIAMONDS = array('19','20','21','22','23','24','17','18','25','26');
+      $CARDS["trump"]    = array('3','4','5','6','7','8','9','10');
+      $CARDS["clubs"]    = array('27','28','29','30','31','32','11','12','33','34');
+      $CARDS["spades"]   = array('35','36','37','38','39','40','13','14','41','42');
+      $CARDS["hearts"]   = array('43','44', '1', '2','45','46','15','16','47','48');
+      $CARDS["diamonds"] = array('19','20','21','22','23','24','17','18','25','26');
+      $CARDS["foxes"]    = array();
       break;
     case "jack":
-      $TRUMP    = array('11','12','13','14','15','16','17','18');
-      $CLUBS    = array('27','28','29','30','31','32','3', '4','33','34');
-      $SPADES   = array('35','36','37','38','39','40','5', '6','41','42');
-      $HEARTS   = array('43','44', '1', '2','45','46','7', '8','47','48');
-      $DIAMONDS = array('19','20','21','22','23','24','9','10','25','26');
+      $CARDS["trump"]    = array('11','12','13','14','15','16','17','18');
+      $CARDS["clubs"]    = array('27','28','29','30','31','32','3', '4','33','34');
+      $CARDS["spades"]   = array('35','36','37','38','39','40','5', '6','41','42');
+      $CARDS["hearts"]   = array('43','44', '1', '2','45','46','7', '8','47','48');
+      $CARDS["diamonds"] = array('19','20','21','22','23','24','9','10','25','26');
+      $CARDS["foxes"]    = array();
       break;
     case "trumpless":
-      $TRUMP    = array();
-      $CLUBS    = array('27','28','29','30','31','32','3', '4','11','12','33','34');
-      $SPADES   = array('35','36','37','38','39','40','5', '6','13','14','41','42');
-      $HEARTS   = array('43','44', '1', '2','45','46','7', '8','15','16','47','48');
-      $DIAMONDS = array('19','20','21','22','23','24','9','10','17','18','25','26');
+      $CARDS["trump"]    = array();
+      $CARDS["clubs"]    = array('27','28','29','30','31','32','3', '4','11','12','33','34');
+      $CARDS["spades"]   = array('35','36','37','38','39','40','5', '6','13','14','41','42');
+      $CARDS["hearts"]   = array('43','44', '1', '2','45','46','7', '8','15','16','47','48');
+      $CARDS["diamonds"] = array('19','20','21','22','23','24','9','10','17','18','25','26');
+      $CARDS["foxes"]    = array();
       break;
     case "club":
-      $TRUMP    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-                        '17','18','27','28','29','30','31','32','33','34');
-      $CLUBS    = array();
-      $SPADES   = array('35','36','37','38','39','40','41','42');
-      $HEARTS   = array('43','44','45','46','47','48');
-      $DIAMONDS = array('19','20','21','22','23','24','25','26');
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				 '17','18','27','28','29','30','31','32','33','34');
+      $CARDS["clubs"]    = array();
+      $CARDS["spades"]   = array('35','36','37','38','39','40','41','42');
+      $CARDS["hearts"]   = array('43','44','45','46','47','48');
+      $CARDS["diamonds"] = array('19','20','21','22','23','24','25','26');
+      $CARDS["foxes"]    = array();
       if($RULES["dullen"]=='none')
 	{
-	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-			    '17','18','27','28','29','30','31','32','33','34');
-	  $HEARTS   = array('43','44','1','2','45','46','47','48');
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				     '17','18','27','28','29','30','31','32','33','34');
+	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
 	}
       break;
     case "spade":
-      $TRUMP    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-                        '17','18','35','36','37','38','39','40','41','42');
-      $CLUBS    = array('27','28','29','30','31','32','33','34');
-      $SPADES   = array();
-      $HEARTS   = array('43','44','45','46','47','48');
-      $DIAMONDS = array('19','20','21','22','23','24','25','26');
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				 '17','18','35','36','37','38','39','40','41','42');
+      $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
+      $CARDS["spades"]   = array();
+      $CARDS["hearts"]   = array('43','44','45','46','47','48');
+      $CARDS["diamonds"] = array('19','20','21','22','23','24','25','26');
+      $CARDS["foxes"]    = array();
       if($RULES["dullen"]=='none')
 	{
-	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-			    '17','18','35','36','37','38','39','40','41','42');
-	  $HEARTS   = array('43','44','1','2','45','46','47','48');
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				     '17','18','35','36','37','38','39','40','41','42');
+	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
 	}
       break;
     case "heart":
-      $TRUMP    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
-                        '17','18','43','44','45','46','47','48');
-      $CLUBS    = array('27','28','29','30','31','32','33','34');
-      $SPADES   = array('35','36','37','38','39','40','41','42');
-      $HEARTS   = array();
-      $DIAMONDS = array('19','20','21','22','23','24','25','26');
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+				 '17','18','43','44','45','46','47','48');
+      $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
+      $CARDS["spades"]   = array('35','36','37','38','39','40','41','42');
+      $CARDS["hearts"]   = array();
+      $CARDS["diamonds"] = array('19','20','21','22','23','24','25','26');
+      $CARDS["foxes"]    = array();
       if($RULES["dullen"]=='none')
 	{
-	  $TRUMP    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
 			    '17','18','43','44','1','2','45','46','47','48');
 	}
       break;
@@ -572,10 +579,11 @@ function mysort($cards,$gametype)
 
 function sort_comp($a,$b)
 {
-  global $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES;
+  global $CARDS;
 
   $ALL = array();
-  $ALL = array_merge($TRUMP,$DIAMONDS,$CLUBS,$HEARTS,$SPADES,$DIAMONDS);
+  $ALL = array_merge($CARDS["trump"],$CARDS["diamonds"],$CARDS["clubs"],
+		     $CARDS["hearts"],$CARDS["spades"],$CARDS["diamonds"]);
 
   return pos_array($a,$ALL)-pos_array($b,$ALL);
 }

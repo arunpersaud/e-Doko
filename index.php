@@ -328,19 +328,20 @@ else if(myisset("me"))
 	  else if($_REQUEST["wedding"] == "yes")
 	    {
 	      /* TODO: add silent solo somewhere*/
-	      echo "wedding was chosen, can't handle it at the moment, you need to send out".
-		" an email by hand to the other players<br />\n";
+	      echo "Ok, you don't want to play a silent solo...wedding was chosen.<br />\n";
 	      DB_set_sickness_by_hash($me,"wedding");
 	    }
 	  else if($_REQUEST["poverty"] == "yes")
 	    {
-	      echo "poverty was chosen. Unfortunately this is not implemented yet,".
-		" so you need to play a normal game... sorry<br />\n";
+	      echo "So you got poverty. You might as well have said nothing, since this is not implemented yet,".
+		" so you need to play a normal game...to make it a bit harder, I'll tell the other people that".
+		" you only have a few trump... should make the game more interesting (although perhaps not for you:))<br />\n";
 	      DB_set_sickness_by_hash($me,"poverty");
 	    }
 	  else if($_REQUEST["nines"] == "yes")
 	    {
-	      echo "Nines was chosen. If no is playing solo, this game will be canceled.<br />\n";
+	      echo "What you just don't want to play a game because you have a few nines? Well, if no one".
+		" is playing solo, this game will be canceled.<br />\n";
 	      DB_set_sickness_by_hash($me,"nines");
 	    }
 	}
@@ -356,7 +357,7 @@ else if(myisset("me"))
        * set that one in the Game table
        * tell people about it.
        */
-      echo "<br />checking if someone else selected solo or nines... wedding and poverty not handled at the moment<br />".
+      echo "<br />checking if someone else selected solo or nines... poverty not handled at the moment<br />".
 	" Please click <a href=\"$host?me=$me\">here</a> to finish the setup.<br />";	 
       
       /* check if everyone has reached this stage */
@@ -371,7 +372,7 @@ else if(myisset("me"))
 
       if($ok)
 	{
-	  echo "Everyone has finished checking their cards, the game can now start...<br />";
+	  echo "Everyone has finished checking their cards, let's see what they said...<br />";
 	  /* check what kind of game we are playing */
 	  $gametype    = DB_get_gametype_by_gameid($gameid);
 	  $startplayer = DB_get_startplayer_by_gameid($gameid);
@@ -384,9 +385,9 @@ else if(myisset("me"))
 	      $nines = $user;
 	  
 	  /* gamestatus == normal, => cancel game */
-	  if($nines && $gamestatus == "normal")
+	  if($nines && $gametype != "solo")
 	    {
-	      /* TODO: set game type to nines to be able to keep statistics? */
+	      /* TODO: should we keep statistics of this? */
 	      $message = "Hello, \n\n".
 		"the game has been canceled because ".DB_get_name_by_userid($nines)." has five or more nines.\n";
 	      
@@ -399,7 +400,10 @@ else if(myisset("me"))
 	      
 	      /* delete everything from the dB */
 	      DB_cancel_game($me);
+	      exit();
 	    }
+
+	  /* check for different sickness and just output a general info */
 	  
 	  /* check players for poverty */
 	  $poverty = 0;
@@ -412,21 +416,19 @@ else if(myisset("me"))
 		  echo "$name has a Vorbehalt. <br />";
 		}
 	    }
-	  /* if gamestatus == normal, set poverty or dpovert (in case two people have poverty) */
-	  
+
 	  /* check players for wedding */
 	  $wedding = 0;
 	  foreach($userids as $user)
 	    {
 	      if(DB_get_sickness_by_userid_and_gameid($user,$gameid) == 'wedding')
 		{
-		  $wedding++;
+		  $wedding=$user;
 		  $name = DB_get_name_by_userid($user);
 		  echo "$name has a Vorbehalt. <br />"  ;
 		}
-	    }
-	  /* if gamestatus == normal, set wedding  */
-	  
+	    };
+
 	  /* check for solo, output vorbehalt */
 	  $solo = 0;
 	  foreach($userids as $user)
@@ -439,8 +441,91 @@ else if(myisset("me"))
 		}
 	    }
 
-	  /* finished the setup, go to next stage */
-	  DB_set_hand_status_by_hash($me,'play');
+	  /* now check which sickness comes first and set the gametype to it */
+
+	  /* if gamestatus == normal, set poverty or dpovert (in case two people have poverty) */
+	  if($poverty>0 && $gametype == "normal")
+	    {
+	      if($poverty==1)
+		{
+		  DB_set_gametype_by_gameid($gameid,"poverty");
+		  $gametype = "poverty";
+		}
+	      else if($poverty==2)
+		{
+		  DB_set_gametype_by_gameid($gameid,"dpoverty");
+		  $gametype = "dpoverty";
+		};
+	    };
+	  /* if gamestatus == normal, set wedding  */
+	  if($wedding> 0 && $gametype == "normal")
+	    {
+	      DB_set_gametype_by_gameid($gameid,"wedding");
+	      $gametype = "wedding";
+	    };
+	  
+	  /* now the gametype is set correctly (shouldn't matter that this is calculated for every user)
+	   * output what kind of game we have */
+	  
+	  echo "<br />\n";
+
+	  $poverty=0;
+	  foreach($userids as $user)
+	    {
+	      $name = DB_get_name_by_userid($user);
+	      $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
+	      if($usersick=="poverty")
+		$poverty++;
+	      if($usersick)
+		echo "$name has $usersick <br />";
+	      if($usersick == "wedding" && $gametype =="wedding")
+		break;
+	      if($usersick == "poverty" && $gametype =="poverty")
+		break;
+	      if($usersick == "poverty" && $gametype =="dpoverty" && $poverty==2)
+		break;
+	      if($usersick == "solo" && $gametype =="solo")
+		break;
+	    };	  
+	  echo "<br />\n";
+	  
+	  /* check for Schweinchen (cards 21,22) */
+	  if($RULES["schweinchen"]=="both")
+	    {
+	      set_gametype($gametype);
+	      echo "TODO: check if one user has both foxes and output here ";
+	    }    
+
+	  /* finished the setup, go to next stage unless there is a case of poverty*/
+	  switch($gametype)
+	    {
+	    case "solo":
+	      /* are we the solo player? set us to re, else set us to contra */
+	      $pos = DB_get_pos_by_hash($me);
+	      if($pos == $startplayer)
+		DB_set_party_by_hash($me,"re");
+	      else
+		DB_set_party_by_hash($me,"contra");
+	      DB_set_hand_status_by_hash($me,'play');
+	      break;
+	    case "wedding":
+	      echo "Don't know who will be Re and Contra, you need to figure that out at the end of the game yourself <br />\n";
+	      DB_set_hand_status_by_hash($me,'play');
+	      break;
+	    case "normal":
+	      $hand = DB_get_all_hand($me);
+	      
+	      if(in_array('3',$hand)||in_array('4',$hand))
+		DB_set_party_by_hash($me,"re");
+	      else
+		DB_set_party_by_hash($me,"contra");
+	      DB_set_hand_status_by_hash($me,'play');
+	      break;
+	    case "poverty":
+	    case "dpoverty":
+	      echo "TODO: handle poverty here";
+	      DB_set_hand_status_by_hash($me,'play');
+	    };
 	}
       else
 	{
@@ -467,7 +552,8 @@ else if(myisset("me"))
        */
       
       /* figure out what kind of game we are playing, 
-       * set the global variables $TRUMP,$DIAMONDS,$HEARTS,$CLUBS,$SPADES
+       * set the global variables $CARDS["trump"],$CARDS["diamonds"],$CARDS["hearts"],
+       * $CARDS["clubs"],$CARDS["spades"],$CARDS["foxes"]
        * accordingly
        */
       
@@ -717,15 +803,26 @@ else if(myisset("me"))
 		    echo "ERROR during scoring";
 		  
 		  /* email all players */
-		  $result = mysql_query("SELECT fullname, SUM(score) FROM Score".
+		  /* individual score */
+		  $result = mysql_query("SELECT fullname, SUM(score), Hand.party FROM Score".
 					" LEFT JOIN Hand ON Hand.id=hand_id".
 					" LEFT JOIN User ON Hand.user_id=User.id".
 					" WHERE Hand.game_id=$gameid".
 					" GROUP BY fullname" );
 		  $message = "The game is over. Thanks for playing :)\n";
 		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+		    $message .= " FINAL SCORE: ".$r[0]."(".$r[2].") ".$r[1]."\n";
+		  $message .= "\nIf your not in the list above your score is zero...\n\n";
+
+		  $result = mysql_query("SELECT Hand.party, SUM(score) FROM Score".
+					" LEFT JOIN Hand ON Hand.id=hand_id".
+					" LEFT JOIN User ON Hand.user_id=User.id".
+					" WHERE Hand.game_id=$gameid".
+					" GROUP BY Hand.party" );
+		  $message .= "\n";
+		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		    $message .= " FINAL SCORE: ".$r[0]." ".$r[1]."\n";
-		  $message .= "\nIf your not in the list above your score is zero...\n";
+
 		  foreach($userids as $user)
 		    {
 		      $To = DB_get_email_by_userid($user);
@@ -847,14 +944,22 @@ else if(myisset("me"))
 	{
 	  echo "the game is over now...<br />\n";
 	  
-	  $result = mysql_query("SELECT fullname, SUM(score) FROM Score".
+	  $result = mysql_query("SELECT fullname, SUM(score), Hand.party FROM Score".
 				" LEFT JOIN Hand ON Hand.id=hand_id".
 				" LEFT JOIN User ON Hand.user_id=User.id".
 				" WHERE Hand.game_id=$gameid".
 				" GROUP BY fullname" );
 	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	    echo " FINAL SCORE: ".$r[0]." ".$r[1]."<br />";
+	    echo " FINAL SCORE: ".$r[0]."(".$r[2].") ".$r[1]."<br />";
 	  
+	  $result = mysql_query("SELECT Hand.party, SUM(score) FROM Score".
+				" LEFT JOIN Hand ON Hand.id=hand_id".
+				" LEFT JOIN User ON Hand.user_id=User.id".
+				" WHERE Hand.game_id=$gameid".
+				" GROUP BY Hand.party" );
+	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	    echo " FINAL SCORE: ".$r[0]." ".$r[1]."<br />\n";
+
 	  
 	  $session = DB_get_session_by_gameid($gameid);
 	  $result  = mysql_query("SELECT id,create_date FROM Game".

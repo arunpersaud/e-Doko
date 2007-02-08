@@ -417,7 +417,7 @@ function DB_get_all_userid_by_gameid($id)
   $names = array();
   
   $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
-			DB_quote_smart($id));
+			DB_quote_smart($id)." ORDER BY position ");
   while($r = mysql_fetch_array($result,MYSQL_NUM))
     $names[] = $r[0];
 
@@ -583,5 +583,22 @@ function DB_get_ruleset($dullen,$schweinchen)
 
   return -1; /* something went wrong */
 }
+
+function DB_get_party_by_hash($hash)
+{
+  $result = mysql_query("SELECT party FROM Hand WHERE hash=".DB_quote_smart($hash));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+function DB_set_party_by_hash($hash,$party)
+{
+  mysql_query("UPDATE Hand SET party=".DB_quote_smart($party)." WHERE hash=".DB_quote_smart($hash));
+  return;
+}
+
 
 ?>

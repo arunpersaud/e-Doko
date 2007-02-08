@@ -39,7 +39,7 @@ function output_register()
 {
   echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
   echo "TODO: convert timezone into a menu<br />\n";
-  echo "TODO: figure out a way to handle passwrods <br />\n";
+  echo "TODO: figure out a way to handle passwords <br />\n";
   ?>
         <form action="index.php" method="post">
           <fieldset>
@@ -126,9 +126,14 @@ function output_form_for_new_game($names)
       <p> schweinchen (both foxes): 
         <ul>
         <li> <input type="radio" name="schweinchen" value="none" /> none </li>
-      <li> <input type="radio" name="schweinchen" value="both" /> both become highest trump (call at beginning of the game)(doesn't work yet) </li>
-        <li> <input type="radio" name="schweinchen" value="second" checked="checked" /> first one normal, second one becomes highest (call during the game) (doesn't work yet) </li>
-      <li> <input type="radio" name="schweinchen" value="secondaftercall"  /> second one become highest only in case re/contra was announced (doesn't work yet)</li>
+        <li> <input type="radio" name="schweinchen" value="both" /> 
+              both become highest trump (automatic call at beginning of the game)
+              (does not work yet) </li>
+        <li> <input type="radio" name="schweinchen" value="second" checked="checked" /> 
+              first one normal, second one becomes highest (call during the game) (does not work yet) </li>
+        <li> <input type="radio" name="schweinchen" value="secondaftercall"  /> 
+             second one become highest only in case re/contra was announced 
+            (does not work yet)</li>
       </ul>
       </p>
    
