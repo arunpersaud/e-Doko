@@ -78,6 +78,7 @@ function compare_cards($a,$b,$game)
 
   global $CARDS;
   global $RULES;
+  global $GAME;
 
   /* first map all cards to the odd number, 
    * this insure that the first card wins the trick 
@@ -93,6 +94,20 @@ function compare_cards($a,$b,$game)
     {
     case "normal":
     case "silent":
+      if($RULES["schweinchen"]=="both" && $GAME["schweinchen"])
+	{
+	  if($a == 19 || $a == 20 )
+	    return 1;
+	  if($b == 19 || $b == 20 )
+	    return 0;
+	};
+      if($RULES["schweinchen"]=="second" && $GAME["schweinchen"]==3)
+	{
+	  if($a == 19 || $a == 20 )
+	    return 1;
+	  if($b == 19 || $b == 20 )
+	    return 0;
+	};
     case "trump":
     case "heart":
     case "spade":
@@ -102,6 +117,7 @@ function compare_cards($a,$b,$game)
 	  return 0;        /* second one wins.*/
     }
   
+  /* normal case */
   if(is_trump($a) && is_trump($b) && $a<=$b)
     return 1;
   else if(is_trump($a) && is_trump($b) )
@@ -221,6 +237,8 @@ function check_wedding($cards)
 
 function count_trump($cards)
 {
+  global $RULES;
+
   $trump = 0;
 
   /* count each trump */
@@ -228,14 +246,23 @@ function count_trump($cards)
     if( (int)($c) <27) 
       $trump++;
 
-  /* subtract foxes */
-  if( in_array("19",$cards))
-    $trump--;
-  if( in_array("20",$cards) )
-    $trump--;
-  /* add one, in case the player has both foxes (schweinchen) */
-  if( in_array("19",$cards) && in_array("20",$cards) )
-    $trump++;
+  switch($RULES["schweinchen"])
+    {
+    case "none":
+      break;
+    case "second":
+    case "secondaftercall":
+      /* add one, in case the player has both foxes (schweinchen) */
+      if( in_array("19",$cards) && in_array("20",$cards) )
+	$trump++;
+    case "both":
+      /* subtract foxes */
+      if( in_array("19",$cards))
+	$trump--;
+      if( in_array("20",$cards) )
+	$trump--;
+      break;
+    }
 
   return $trump;
 }
@@ -391,11 +418,12 @@ function  create_array_of_random_numbers()
   $r = array();
   $a = array();
   
-  for($i=1;$i<49;$i++)
-    $a[$i]=$i;
+  for($i=0;$i<48;$i++)
+    $a[$i]=$i+1;
   
-  $r = array_rand($a,48);
-  
+#  $r = array_rand($a,48);
+  $r =$a; 
+ 
   return $r;
 }
 
@@ -492,7 +520,7 @@ function set_gametype($gametype)
       $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
       $CARDS["spades"]   = array('35','36','37','38','39','40','41','42');
       $CARDS["hearts"]   = array('43','44','45','46','47','48');
-      $CARDS["foxes"]    = array('21','22');
+      $CARDS["foxes"]    = array('19','20');
       if($RULES["dullen"]=='none')
 	{
 	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 

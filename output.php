@@ -111,11 +111,10 @@ function output_form_for_new_game($names)
 	echo "     <option>$name</option>\n";
     }
     echo "  </select>\n";
-    unset($names[$randkey]);
    }
 ?>   
    <h2> Rules </h2> 
-      
+      <p> Some areas are grayed out which means that the rule is not implemented yet and therefore cannot be selected </p>
       <p> ten of hearts: 
          <ul>
          <li> <input type="radio" name="dullen" value="none" /> just normal non-trump  </li>
@@ -123,20 +122,20 @@ function output_form_for_new_game($names)
          <li> <input type="radio" name="dullen" value="secondwins" checked="checked" /> second ten of hearts wins the trick </li>
          </ul>
       </p>
-      <p> schweinchen (both foxes): 
+      <p> schweinchen (both foxes), only in normal games or silent solos: 
         <ul>
-        <li> <input type="radio" name="schweinchen" value="none" /> none </li>
+        <li> <input type="radio" name="schweinchen" value="none" checked="checked" /> none </li>
         <li> <input type="radio" name="schweinchen" value="both" /> 
               both become highest trump (automatic call at beginning of the game)
-              (does not work yet) </li>
-        <li> <input type="radio" name="schweinchen" value="second" checked="checked" /> 
-              first one normal, second one becomes highest (call during the game) (does not work yet) </li>
-        <li> <input type="radio" name="schweinchen" value="secondaftercall"  /> 
-             second one become highest only in case re/contra was announced 
-            (does not work yet)</li>
-      </ul>
+        </li>
+        <li> <input type="radio" name="schweinchen" value="second" /> 
+              first one normal, second one becomes highest (call during the game) </li>
+        <li> <input type="radio" name="schweinchen" value="secondaftercall"  disabled="disabled" /> 
+      second one become highest only in case re/contra was announced (not working yet)
+        </li>
+        </ul>
       </p>
-   
+      
    <input type="submit" value="start game" />
  </form>
 <?php

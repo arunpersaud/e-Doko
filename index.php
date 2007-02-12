@@ -229,6 +229,19 @@ else if(myisset("me"))
     echo "schweinchen: ".$r[3]."<br />";
     echo "</div>\n";
     
+    /* does anyone have both foxes */
+    $GAME["schweinchen"]=0; 
+    for($i=1;$i<5;$i++)
+      {
+	$hash  = DB_get_hash_from_game_and_pos($gameid,$i);
+	$cards = DB_get_all_hand($hash);
+	if( in_array("19",$cards) && in_array("20",$cards) )
+	  {
+	    $GAME["schweinchen"]=1;
+	    $GAME["schweinchen-who"]=$hash;
+	  }
+      };
+        
 
     /* mystatus gets the player through the different stages of a game.
      * start:    yes/no
@@ -486,17 +499,16 @@ else if(myisset("me"))
 		break;
 	      if($usersick == "solo" && $gametype =="solo")
 		break;
-	    };	  
+	      		  
+	    };
+
+	  if( $gametype != "solo")
+	    if($GAME["schweinchen"] && $RULES["schweinchen"]=="both" )
+	      echo DB_get_name_by_hash($GAME["schweinchen-who"])." has Schweinchen. <br />";
+	  
 	  echo "<br />\n";
 	  
-	  /* check for Schweinchen (cards 21,22) */
-	  if($RULES["schweinchen"]=="both")
-	    {
-	      set_gametype($gametype);
-	      echo "TODO: check if one user has both foxes and output here ";
-	    }    
-
-	  /* finished the setup, go to next stage unless there is a case of poverty*/
+	  /* finished the setup, set re/contra parties if possible, go to next stage unless there is a case of poverty*/
 	  switch($gametype)
 	    {
 	    case "solo":
@@ -509,7 +521,8 @@ else if(myisset("me"))
 	      DB_set_hand_status_by_hash($me,'play');
 	      break;
 	    case "wedding":
-	      echo "Don't know who will be Re and Contra, you need to figure that out at the end of the game yourself <br />\n";
+	      echo "Don't know who will be Re and Contra, you need to ".
+		"figure that out at the end of the game yourself <br />\n";
 	      DB_set_hand_status_by_hash($me,'play');
 	      break;
 	    case "normal":
@@ -567,7 +580,7 @@ else if(myisset("me"))
       else
 	$gametype="normal";
       
-      set_gametype($gametype);
+      set_gametype($gametype); /* this sets the $CARDS variable */
       
       /* get some infos about the game */
       $gamestatus = DB_get_game_status_by_gameid($gameid);
@@ -660,6 +673,10 @@ else if(myisset("me"))
 	  $trick   = $r[3];
 	  $comment = $r[4];
 	  
+	  /* check if first schweinchen has been played */
+	  if($r[0] == 19 || $r[0] == 20 )
+	    $GAME["schweinchen"]++;
+	  
 	  /* save card to be able to find the winner of the trick later */
 	  $play[$seq] = array("card"=>$r[0],"pos"=>$pos); 
 	  
@@ -744,10 +761,24 @@ else if(myisset("me"))
 	  
 	  if($handcardid)
 	    {
+	      $comment = "";
+
 	      /* mark card as played */
 	      mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
 			  DB_quote_smart($card));
 	      
+	      /* check for schweinchen */
+	      echo "schweinchen = ".$GAME["schweinchen"]." --$card-<br />";
+	      if($card == 19 || $card == 20 )
+		{
+		  $GAME["schweinchen"]++;
+		  if($GAME["schweinchen"]==3 && $RULES["schweinchen"]=="second" )
+		    $comment="Schweinchen! ";
+		  if($RULES["schweinchen"]=="both" )
+		    $comment="Schweinchen! ";
+		  echo "schweinchen = ".$GAME["schweinchen"]." ---<br />";
+		}
+
 	      /* get trick id or start new trick */
 	      $a = DB_get_current_trickid($gameid);
 	      $trickid  = $a[0];
@@ -758,9 +789,11 @@ else if(myisset("me"))
 	      /* check for coment */
 	      if(myisset("comment"))
 		{
-		  DB_insert_comment($_REQUEST["comment"],$playid,$myid);
+		  $comment.=$_REQUEST["comment"];
 		};  
-	      
+	      if($comment != "")
+		DB_insert_comment($comment,$playid,$myid);
+
 	      /* display played card */
 	      echo "<div class=\"card\">";
 	      echo " you played  <br />";
