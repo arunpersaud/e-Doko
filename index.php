@@ -535,8 +535,23 @@ else if(myisset("me"))
 	      DB_set_hand_status_by_hash($me,'play');
 	      break;
 	    case "poverty":
+	      /* figure out who has poverty */
+	      /* check who was asked already 
+	       *   everyone or trump was taken? 
+	       *      trump was taken, start game 
+	       *      trump was not taken, cancle game
+	       *
+	       *   not everyone, figure out who is next in the list
+	       *   is the next person this one?
+	       *      no, display wait message, e.g. player X is asked at the moment
+	       *      yes, display trump, ask if he wants to take it
+	       *        no, set player asked to true, email next player
+	       *        yes, display all cards, ask for N return cards
+	       *          set re/contra 
+	       *        
+	       */
 	    case "dpoverty":
-	      echo "TODO: handle poverty here";
+	      echo "TODO: handle double poverty here";
 	      DB_set_hand_status_by_hash($me,'play');
 	    };
 	}
