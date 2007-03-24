@@ -141,25 +141,25 @@ function output_form_for_new_game($names)
 <?php
 }
 
-function display_card($card)
+function display_card($card,$dir="english")
 {
   /* cards are only availabl for the odd values, e.g. 1.png, 3.png, ... 
    * convert even cards to the matching odd value */
 
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<img src=\"cards/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
+    echo "<img src=\"cards/".$dir."/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
   else
-    echo "<img src=\"cards/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
+    echo "<img src=\"cards/".$dir."/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
 
   return;
 }
 
-function display_link_card($card)
+function display_link_card($card,$dir="english")
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$card.".png\" alt=\"\" />\n";
+    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"\" />\n";
   else
-    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".($card-1).".png\" alt=\"\" />\n";
+    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"\" />\n";
   return;
 }
 
