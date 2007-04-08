@@ -1074,7 +1074,7 @@ else if(myisset("me"))
 	     echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
 	     if(time()-strtotime($r[2]) > 60*60*24*30)
 	       echo " The game has been running for over a month.".
-		 " Do you want to cancel it? <a href=\"$host?cancle=1&me=".$r[0]."\">yes</a>".
+		 " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
 		 " (clicking here is final and can't be restored)";
 	     echo "<br />";
 	   }
