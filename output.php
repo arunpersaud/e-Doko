@@ -15,8 +15,8 @@ function display_news()
 {
   global $wiki;
   echo "<div class=\"bug\">\n".
-    "  Please hit <strong>shift+reload</strong>.<br /><hr />\n".
-    "  The server now keeps score... (only from now on) <br /><hr />".
+    "  Schweinchen should work now (only for new games).<br
+  /><hr />".
     "  If you find more bugs, please list them in the <a href=\"".
     $wiki."\">wiki</a>.\n</div>\n";
   return;
@@ -317,7 +317,6 @@ function output_header()
 <body onload="high_last();">
 <div class="header">
 <h1> Welcome to E-Doko </h1>
-<p> Revision: <?php echo "$REV"; ?></p>
 </div>
 
 <?php
@@ -328,6 +327,14 @@ function output_header()
 
 function output_footer()
 {
+  global $REV;
+
+  echo "<div class=\"footer\">\n";
+  echo "<p class=\"left\"> copyright 2006-2007 Arun Persaud</p>\n";
+  echo "<p class=\"right\"> Revision: $REV; </p> \n";
+  echo "\n";
+  echo "</div>\n";
+
   echo "</body>\n";
   echo "</html>\n";
 

@@ -3,11 +3,16 @@
   text-align:center;
   border-bottom:3px solid gray;
 }
-.header p { 
-  position:absolute;
-  right:0;
-  top:0;
-}
+.footer { 
+ margin:0;
+ margin-top:0.3em;
+ padding:0;
+ border-top: 2px solid #444;
+ font-size:smaller;
+ clear:both;
+ }
+.footer .right{  float:right; }
+.footer .left{  float:left; }
 
 p.gamenumber { 
   position:absolute;

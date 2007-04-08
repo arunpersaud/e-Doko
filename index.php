@@ -49,6 +49,7 @@ if(myisset("new"))
     if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
       {
 	echo "couldn't find one of the names, please start a new game";
+	output_footer();
 	exit();
       }
     
@@ -66,6 +67,7 @@ if(myisset("new"))
     if($ruleset <0) 
       {
 	echo "Error defining ruleset: $ruleset";
+	output_footer();
 	exit();
       };
     
@@ -157,6 +159,7 @@ else if(myisset("cancle","me"))
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
 	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+	output_footer();
 	exit();
       }
     
@@ -203,6 +206,7 @@ else if(myisset("me"))
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
 	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+	output_footer();
 	exit();
       }
     
@@ -413,6 +417,7 @@ else if(myisset("me"))
 	      
 	      /* delete everything from the dB */
 	      DB_cancel_game($me);
+	      output_footer();
 	      exit();
 	    }
 
@@ -1029,6 +1034,7 @@ else if(myisset("me"))
     default:
       echo "error in testing the status";
     }
+    output_footer();
   exit();
  } 
 /* user status page */ 
@@ -1093,6 +1099,7 @@ else if(myisset("me"))
        {
 	 echo "sorry email and password don't match <br />";
        }
+     output_footer();
      exit();
    }
 /* page for registration */
