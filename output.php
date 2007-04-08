@@ -2,15 +2,6 @@
 
 /* functions which only ouput html  */
 
-function display_status($gametype)
-{
-  echo "<div class=\"info\">";
-  echo " Gametype: $gametype";
-  echo "</div>\n";
-  
-  return;
-}
-
 function display_news()
 {
   global $wiki;

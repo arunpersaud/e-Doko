@@ -14,12 +14,6 @@
 .footer .right{  float:right; }
 .footer .left{  float:left; }
 
-p.gamenumber { 
-  position:absolute;
-  top:0;
-  text-align:center;
-}
-
 .card { 
   position:absolute;
   z-index:20;
@@ -47,34 +41,33 @@ div.table img {
   z-index:9;
 }
 div.table span {
-/*  background-color:green;*/
+  /*background-color:green;*/
   position:absolute;
+  width:13em;
 }
 div.table span.table0 {
-  top:10em;
-  left:-5em;
+  top:9em;
+  left:-15em;
   text-align:right;
 }
 div.table span.table1 {
-  top:-2em;
+  top:-3.5em;
   left: 0em;
   width:20em;
   text-align:center;
 }
 div.table span.table2 {
-  top:10em;
-  left:21em;
+  top:9em;
+  left:22em;
   text-align:left;
   vertical-align:center;
 }
 div.table span.table3 {
-  top:23em;
+  top:21.5em;
   left: 0em;
   width:20em;
   text-align:center;
 }
-
-
 
 ul.tricks {
   position:relative;
@@ -83,11 +76,9 @@ ul.tricks {
   padding:0;
   /*background-color:yellow;*/
   text-align:center;
-
+  border-bottom:1px solid #444;
 }
-
 ul.tricks a { text-decoration:none; color:#000;}
-
 ul.tricks li {
   /*background-color:blue;*/
   margin:0.2em 0.5em;  
@@ -197,12 +188,12 @@ ul.tricks li div div span {
   z-index:11;
 }
 ul.tricks li div div.card0 span{
-  top:1em;
+  top:4em;
   left:-10em;
   border: 3px solid green;
 }
 ul.tricks li div div.card1 span{
-  top:0em;
+  top:-2em;
   left:1em;
   border: 3px solid green;
 }
@@ -212,7 +203,7 @@ ul.tricks li div div.card2 span{
   border: 3px solid green;
 }
 ul.tricks li div div.card3 span{
-  top:1em;
+  top:4em;
   left:3em;
   border: 3px solid green;
 }
@@ -220,7 +211,7 @@ ul.tricks li div div.card3 span{
 .mycards {
   clear:both;
   margin:0;
-  margin-top:38em;
+  margin-top:33em;
   padding:0;
   border:1px solid red;
   background-color:yellow;
@@ -237,16 +228,13 @@ ul.tricks li div div.card3 span{
   padding:0;
 }
 
-.info {
-  float:right;
-  border:2px solid gray;
-  border-top:0;
-}
 
 .ruleset {
-  float:right;
+  position:absolute;
+  top:7.5em;
   border:2px solid gray;
-  border-top:0;
+  padding:0.3em;
+  margin:0;
 }
 
 .time { 
@@ -256,16 +244,17 @@ ul.tricks li div div.card3 span{
 }
 
 .over { 
-  float:right;
+  position:absolute;
+  top:12.5em;
   border:2px solid black;
-  clear:right;
+
 }
 
 .bug {
-  float:left;
+  position:absolute;
+  top:14.5em;
   width:10em;
   border:2px solid gray;
-  border-top:0;
   padding-top:0.5em;
   clear:left;
 }

@@ -218,19 +218,33 @@ else if(myisset("me"))
     $mystatus = DB_get_status_by_hash($me);
     $mypos    = DB_get_pos_by_hash($me);
     
-    /* display the game number */
-    echo "<p class=\"gamenumber\"> Game $gameid </p>\n";
 
     /* display rule set */
-    echo "<div class=\"ruleset\">\n Rules: <br />";
+    echo "<div class=\"ruleset\">\n";
     $result = mysql_query("SELECT * FROM Rulesets LEFT JOIN Game ON Game.ruleset=Rulesets.id WHERE Game.id='$gameid'" );
     $r      = mysql_fetch_array($result,MYSQL_NUM);
 
     $RULES["dullen"]=$r[2];
     $RULES["schweinchen"]=$r[3];
-
-    echo "10ofhearts : ".$r[2]."<br />";
-    echo "schweinchen: ".$r[3]."<br />";
+    
+    /* get some infos about the game */
+    $gametype = DB_get_gametype_by_gameid($gameid);
+    $gamestatus = DB_get_game_status_by_gameid($gameid);
+    $GT = $gametype;
+    if($gametype=="solo")
+      {
+	$gametype = DB_get_solo_by_gameid($gameid);
+	$GT = $gametype." ".$GT;
+      }
+    else
+      $gametype="normal";
+    
+    if($gamestatus != 'pre')
+      echo " Gametype: $GT <br />\n";
+    
+    echo "Rules: <br />\n";
+    echo "10ofhearts : ".$r[2]."<br />\n";
+    echo "schweinchen: ".$r[3]."<br />\n";
     echo "</div>\n";
     
     /* does anyone have both foxes */
@@ -245,7 +259,6 @@ else if(myisset("me"))
 	    $GAME["schweinchen-who"]=$hash;
 	  }
       };
-        
 
     /* mystatus gets the player through the different stages of a game.
      * start:    yes/no
@@ -607,24 +620,6 @@ else if(myisset("me"))
       
       /* display useful things in divs */
       
-      /* display local time */
-      echo "<div class=\"time\">\n Local times:<table>";
-      $users = array();
-      $users = DB_get_all_userid_by_gameid($gameid);
-      foreach($users as $user)
-	{
-	  $offset = DB_get_user_timezone($user);
-	  $zone   = return_timezone($offset);
-	  date_default_timezone_set($zone);
-	  $name   = DB_get_name_by_userid($user);
-	  
-	  echo "<tr> <td>$name</td> <td>".date("Y-m-d H:i:s")."</td></tr>\n";
-	};
-      echo "</table>\n</div>\n";
-      
-      if($gamestatus != 'pre')
-	display_status($GT);
-      
       /* display links to the users status page */
       $result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
       $r      = mysql_fetch_array($result,MYSQL_NUM);
@@ -644,7 +639,8 @@ else if(myisset("me"))
       
       /* display the table and the names */
       $result = mysql_query("SELECT  User.fullname as name,".
-			    "        Hand.position as position ".
+			    "        Hand.position as position, ".
+			    "        User.id ".
 			    "FROM Hand ".
 			    "LEFT JOIN User ON User.id=Hand.user_id ".
 			    "WHERE Hand.game_id='".$gameid."' ".
@@ -656,11 +652,20 @@ else if(myisset("me"))
 	{
 	  $name = $r[0];
 	  $pos  = $r[1];
-	  
-	  echo " <span class=\"table".($pos-1)."\">$name</span>\n";
+	  $user = $r[2];
+
+	  $offset = DB_get_user_timezone($user);
+	  $zone   = return_timezone($offset);
+	  date_default_timezone_set($zone);
+
+	  echo " <span class=\"table".($pos-1)."\">\n";
+	  echo " $name <br />\n";
+	  echo " local time: ".date("Y-m-d H:i:s")."\n";
+	  echo " </span>\n";
+
 	}
       echo  "</div>\n";
-      
+
       /* get everything relevant to display the tricks */
       $result = mysql_query("SELECT Hand_Card.card_id as card,".
 			    "       Hand.position as position,".
@@ -684,7 +689,7 @@ else if(myisset("me"))
       $firstcard = ""; /* first card in a trick */
       
       echo "\n<ul class=\"tricks\">\n";
-      echo "  <li> Hello $myname!   History: </li>\n";
+      echo "  <li> Game $gameid: </li>\n";
       
       while($r = mysql_fetch_array($result,MYSQL_NUM))
 	{
