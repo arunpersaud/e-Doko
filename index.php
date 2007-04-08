@@ -689,7 +689,7 @@ else if(myisset("me"))
       $firstcard = ""; /* first card in a trick */
       
       echo "\n<ul class=\"tricks\">\n";
-      echo "  <li> Game $gameid: </li>\n";
+      echo "  <li class=\"nohighlight\"> Game $gameid: </li>\n";
       
       while($r = mysql_fetch_array($result,MYSQL_NUM))
 	{
@@ -711,14 +711,14 @@ else if(myisset("me"))
 	      if($trick!=$lasttrick)
 		{
 		  /* start of an old trick? */
-		  echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Trick $trickNR</a>\n".
+		  echo "  <li onclick=\"hl('$trickNR');\" class=\"old\"><a href=\"#\">Trick $trickNR</a>\n".
 		    "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
 		    "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 		}
 	      else if($trick==$lasttrick)
 		{
 		  /* start of a last trick? */
-		  echo "  <li onclick=\"hl('$trickNR');\"><a href=\"#\">Current Trick</a>\n".
+		  echo "  <li onclick=\"hl('$trickNR');\" class=\"current\"><a href=\"#\">Trick $trickNR</a>\n".
 		    "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
 		    "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 		};
