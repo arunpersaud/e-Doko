@@ -238,11 +238,13 @@ function check_want_to_play($me)
   return;
 }
 
-function output_home_page()
+function output_home_page($pre,$game,$done)
 {
 ?>
     <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
-    <p> Please <a href="index.php?register">register</a>, in case you haven't done yet  <br />
+    <p> At the moment there are <?php echo "$pre";?> games that are being started and <?php echo"$game"; ?> games that are ongoing. 
+    <?php echo"$done";?> games have been completed on this server. </p>
+    <p> Please <a href="index.php?register">register</a>, in case you haven't done that yet  <br />
         or login with you email-address or name and password here:
     </p>
         <form action="index.php" method="post">
@@ -321,7 +323,7 @@ function output_footer()
 
   echo "<div class=\"footer\">\n";
   echo "<p class=\"left\"> copyright 2006-2007 Arun Persaud</p>\n";
-  echo "<p class=\"right\"> Revision: $REV; </p> \n";
+  echo "<p class=\"right\"> Revision: $REV; <a href=\"http://svn.nubati.net/emaildoko/trunk/\">http://svn.nubati.net/emaildoko/trunk/</a></p> \n";
   echo "\n";
   echo "</div>\n";
 

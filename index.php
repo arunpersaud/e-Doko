@@ -623,7 +623,6 @@ else if(myisset("me"))
       /* display links to the users status page */
       $result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
       $r      = mysql_fetch_array($result,MYSQL_NUM);
-      //output_link_to_user_page($r[0],$r[1]);
       
       display_links($r[0],$r[1]);
       
@@ -1142,7 +1141,14 @@ else if(myisset("me"))
 /* default login page */
  else
    { 
-     output_home_page();
+     $pre=0;$game=0;$done=0;
+     $r=mysql_query("SELECT COUNT(id) FROM Game GROUP BY status");
+     if($r) {
+       $pre = mysql_fetch_array($r,MYSQL_NUM);     
+       $game = mysql_fetch_array($r,MYSQL_NUM);     
+       $done = mysql_fetch_array($r,MYSQL_NUM);     
+     }
+     output_home_page($pre[0],$game[0],$done[0]);
    }
 
 output_footer();
