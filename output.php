@@ -2,14 +2,13 @@
 
 /* functions which only ouput html  */
 
-function display_news()
+function display_links($email,$password)
 {
   global $wiki;
   echo "<div class=\"bug\">\n".
-    "  Schweinchen should work now (only for new games).<br
-  /><hr />".
-    "  If you find more bugs, please list them in the <a href=\"".
-    $wiki."\">wiki</a>.\n</div>\n";
+    "Report bugs in the <a href=\"". $wiki."\">wiki</a>.<hr />\n";
+  output_link_to_user_page($email,$password);
+  echo  "</div>\n";
   return;
 }
 

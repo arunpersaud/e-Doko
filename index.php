@@ -623,9 +623,9 @@ else if(myisset("me"))
       /* display links to the users status page */
       $result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
       $r      = mysql_fetch_array($result,MYSQL_NUM);
-      output_link_to_user_page($r[0],$r[1]);
+      //output_link_to_user_page($r[0],$r[1]);
       
-      display_news();
+      display_links($r[0],$r[1]);
       
       /* end display useful things*/
       

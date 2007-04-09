@@ -245,13 +245,6 @@ ul.tricks li div div.card3 span{
   border-top:0;
 }
 
-.over { 
-  position:absolute;
-  top:12.5em;
-  border:2px solid black;
-
-}
-
 .bug {
   position:absolute;
   top:14.5em;
