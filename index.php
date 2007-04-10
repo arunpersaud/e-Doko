@@ -406,7 +406,7 @@ else if(myisset("me"))
 	  /* check what kind of game we are playing */
 	  $gametype    = DB_get_gametype_by_gameid($gameid);
 	  $startplayer = DB_get_startplayer_by_gameid($gameid);
-	  
+
 	  /* nines? */
 	  $nines = 0;
 	  /* check for nines */
@@ -588,6 +588,15 @@ else if(myisset("me"))
 	{
 	  /* only set this after all poverty, etc. are handled*/
 	  DB_set_game_status_by_gameid($gameid,'play');
+
+	  /* email startplayer */
+	  $startplayer = DB_get_startplayer_by_gameid($gameid);
+	  $email       = DB_get_email_by_pos_and_gameid($startplayer,$gameid);
+	  $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
+
+	  $message = "It's your turn  now.\n".
+	    "Use this link to play a card: ".$host."?me=".$hash."\n\n" ;
+	  mymail($email,$EmailName."ready, set, go... ",$message);
 	}
       
       break;
@@ -1049,62 +1058,87 @@ else if(myisset("me"))
      /* test id and password, should really be done in one step */
      $email     = $_REQUEST["email"];
      $password  = $_REQUEST["password"];
-     
-     if(strlen($password)!=32)
-       $password = md5($password);
-     
-     $ok=1;
-     $uid = DB_get_userid_by_email_and_password($email,$password);
-     if(!$uid)
-       $ok=0;
-     
-     if($ok)
+
+     if(myisset("forgot"))
        {
-	 $time = DB_get_user_timestamp($uid);
-	 $unixtime =strtotime($time);
+	 $ok=1;
+
+	 $uid = DB_get_userid_by_email($email);
+	 if(!$uid)
+	   $ok=0;
 	 
-	 $offset = DB_get_user_timezone($uid);
-	 $zone = return_timezone($offset);
-	 date_default_timezone_set($zone);
-	 
-	 echo "last login: ".date("r",$unixtime)."<br />";
-	 
-	 DB_update_user_timestamp($uid);
-	 
-	 echo "<p>these are the games you are playing in:<br />\n";
-	 $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date from Hand".
-			       " LEFT JOIN Game On Hand.game_id=Game.id".
-			       " WHERE Hand.user_id='$uid' AND Game.status<>'gameover'" );
-	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	 if($ok)
 	   {
-	     echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
-	     if(time()-strtotime($r[2]) > 60*60*24*30)
-	       echo " The game has been running for over a month.".
-		 " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
-		 " (clicking here is final and can't be restored)";
-	     echo "<br />";
+	     echo "Hmm, you forgot your passwort...nothing I can do at the moment:(  ";
+	     echo " you need to email Arun for now... in the future it will be all automated and an ";
+	     echo "email with a new password will go to $email.";
 	   }
-	 echo "</p>\n";
-	 
-	 
-	 echo "<p>and these are your games that are already done:<br />Game: \n";
-	 $result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
-	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	   echo "<a href=\"".$host."?me=".$r[0]."\">#".$r[1]." </a>, ";
-	 echo "</p>\n";
-	 
-	 $names = DB_get_all_names();
-	 echo "<p>registered players:<br />\n";
-	 foreach ($names as $name)
-	   echo "$name, \n";
-	 echo "</p>\n";
-	 
-	 echo "<p>Want to start a new game? Visit <a href=\"".$host."?new\">this page.</a></p>";
+	 else
+	   {
+	     if($email=="")
+	       echo "you need to give me an email address!";
+	     else
+	       echo "couldn't find a player with this email, please contact Arun, if you think this is a mistake";
+	   } 
        }
-     else
-       {
-	 echo "sorry email and password don't match <br />";
-       }
+     else 
+     {
+       if(strlen($password)!=32)
+	 $password = md5($password);
+       
+       $ok=1;
+       $uid = DB_get_userid_by_email_and_password($email,$password);
+       if(!$uid)
+	 $ok=0;
+       
+       if($ok)
+	 {
+	   $time = DB_get_user_timestamp($uid);
+	   $unixtime =strtotime($time);
+	   
+	   $offset = DB_get_user_timezone($uid);
+	   $zone = return_timezone($offset);
+	   date_default_timezone_set($zone);
+	   
+	   echo "last login: ".date("r",$unixtime)."<br />";
+	   
+	   DB_update_user_timestamp($uid);
+	   
+	   echo "<p>these are the games you are playing in:<br />\n";
+	   $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date from Hand".
+				 " LEFT JOIN Game On Hand.game_id=Game.id".
+				 " WHERE Hand.user_id='$uid' AND Game.status<>'gameover'" );
+	   while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	     {
+	       echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
+	       if(time()-strtotime($r[2]) > 60*60*24*30)
+		 echo " The game has been running for over a month.".
+		   " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
+		   " (clicking here is final and can't be restored)";
+	       echo "<br />";
+	     }
+	   echo "</p>\n";
+	   
+	   
+	   echo "<p>and these are your games that are already done:<br />Game: \n";
+	   $result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
+	   while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	     echo "<a href=\"".$host."?me=".$r[0]."\">#".$r[1]." </a>, ";
+	   echo "</p>\n";
+	   
+	   $names = DB_get_all_names();
+	   echo "<p>registered players:<br />\n";
+	   foreach ($names as $name)
+	     echo "$name, \n";
+	   echo "</p>\n";
+	   
+	   echo "<p>Want to start a new game? Visit <a href=\"".$host."?new\">this page.</a></p>";
+	 }
+       else
+	 {
+	   echo "sorry email and password don't match <br />";
+	 }
+     };
      output_footer();
      exit();
    }

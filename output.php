@@ -18,7 +18,7 @@ function output_link_to_user_page($email,$password)
   echo "<form action=\"index.php\" method=\"post\">\n";
   echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
   echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
-  echo "  <input type=\"submit\" value=\"go to my user page\" />\n";
+  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"go to my user page\" />\n";
   echo "</form>\n";
   echo "</div>\n";
   
@@ -258,8 +258,8 @@ function output_home_page($pre,$game,$done)
                  <td><label for="password">Password:</label></td>
                  <td><input type="password" id="password" name="password" size="20" maxlength="30" /></td>
               </tr><tr>
-                <td> <input type="submit" value="login" /></td>
-                <td></td>
+                <td> <input type="submit" class="submitbutton" name="login" value="login" /></td>
+                <td> <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" /></td>
               </tr>
              </table>
           </fieldset>

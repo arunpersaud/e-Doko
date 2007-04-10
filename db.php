@@ -70,6 +70,21 @@ function DB_get_email_by_userid($id)
     return "";
 }
 
+function DB_get_email_by_pos_and_gameid($pos,$gameid)
+{
+  $result = mysql_query("SELECT email FROM User ".
+			"LEFT JOIN Hand ON User.id=Hand.user_id ".
+			"LEFT JOIN Game ON Game.id=Hand.game_id ". 
+			"WHERE Game.id=".DB_quote_smart($gameid)." ".
+			"AND Hand.position=".DB_quote_smart($pos)."");
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
 function DB_get_email_by_hash($hash)
 {
   $result = mysql_query("SELECT User.email FROM User LEFT JOIN Hand ON Hand.user_id=User.id WHERE Hand.hash=".DB_quote_smart($hash)."");
@@ -171,6 +186,17 @@ function DB_get_pos_by_hash($hash)
 function DB_get_name_by_hash($hash)
 {
   $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($hash));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
+function DB_get_name_by_email($email)
+{
+  $result = mysql_query("SELECT fullname FROM User WHERE email=".DB_quote_smart($email));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
   if($r)

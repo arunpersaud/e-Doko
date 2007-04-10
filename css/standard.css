@@ -253,3 +253,17 @@ ul.tricks li div div.card3 span{
   padding-top:0.5em;
   clear:left;
 }
+
+.over { 
+  text-align:center;
+  margin-bottom:0.1em;
+}
+
+.submitbutton { 
+ border:0;
+ background-color: #efe;
+ }
+
+.submitbutton:hover { 
+background-color:#afa; 
+}
