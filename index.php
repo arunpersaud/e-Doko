@@ -790,9 +790,11 @@ else if(myisset("me"))
 	      /* mark card as played */
 	      mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
 			  DB_quote_smart($card));
-	      
+	      /* update Game timestamp */
+	      DB_update_game_timestamp($gameid);
+
 	      /* check for schweinchen */
-	      echo "schweinchen = ".$GAME["schweinchen"]." --$card-<br />";
+	      //echo "schweinchen = ".$GAME["schweinchen"]." --$card-<br />";
 	      if($card == 19 || $card == 20 )
 		{
 		  $GAME["schweinchen"]++;

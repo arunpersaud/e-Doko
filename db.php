@@ -446,6 +446,13 @@ function DB_get_all_names()
   return $names;
 }
 
+function DB_update_game_timestamp($gameid)
+{
+  mysql_query("UPDATE Game SET mod_date = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($gameid));
+  return;
+}
+
+
 function DB_update_user_timestamp($userid)
 {
   mysql_query("UPDATE User SET last_login = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($userid));
