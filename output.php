@@ -25,6 +25,31 @@ function output_link_to_user_page($email,$password)
   return;
 }
 
+function output_user_settings($email,$password)
+{
+  echo "<div class=\"useroptions\">\n";
+  echo "<h4> Settings </h4>\n";
+  echo "<form action=\"index.php\" method=\"post\">\n";
+  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
+  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
+  echo "  <input type=\"submit\" class=\"submitbutton\" name=\"passwd\" value=\"change password\" /> <br />\n";
+  echo "</form>\n";
+  echo "<form action=\"index.php\" method=\"post\">\n";
+  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
+  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
+  echo "  <input type=\"hidden\" name=\"setpref\"  value=\"englishcards\" />\n";
+  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"use english cards\" /> <br />\n";
+  echo "</form>\n";
+  echo "<form action=\"index.php\" method=\"post\">\n";
+  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
+  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
+  echo "  <input type=\"hidden\" name=\"setpref\"  value=\"germancards\" />\n";
+  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"use german cards\" /> <br />\n";
+  echo "</form>\n";
+  echo "</div>\n";
+  return;
+}
+
 function output_register()
 {
   echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
@@ -144,12 +169,12 @@ function display_card($card,$dir="english")
   return;
 }
 
-function display_link_card($card,$dir="english")
+function display_link_card($card,$dir="english",$type="card")
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"\" />\n";
+    echo "<input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"\" />\n";
   else
-    echo "<input type=\"radio\" name=\"card\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"\" />\n";
+    echo "<input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"\" />\n";
   return;
 }
 
@@ -319,11 +344,15 @@ function output_header()
 
 function output_footer()
 {
-  global $REV;
+  global $REV,$PREF;
 
   echo "<div class=\"footer\">\n";
-  echo "<p class=\"left\"> copyright 2006-2007 Arun Persaud</p>\n";
-  echo "<p class=\"right\"> Revision: $REV; <a href=\"http://svn.nubati.net/emaildoko/trunk/\">http://svn.nubati.net/emaildoko/trunk/</a></p> \n";
+  echo "<p class=\"left\"> copyright 2006-2007 Arun Persaud <br />\n".
+    "Verwendung der [deutschen] Kartenbilder mit Genehmigung der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />".
+    "- ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />".
+    "a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
+  echo "<p class=\"right\"> Revision: $REV; <a href=\"http://svn.nubati.net/emaildoko/trunk/\">".
+    "http://svn.nubati.net/emaildoko/trunk/</a></p> \n";
   echo "\n";
   echo "</div>\n";
 

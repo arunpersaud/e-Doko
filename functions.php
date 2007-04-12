@@ -415,15 +415,34 @@ function card_value($card)
 
 function  create_array_of_random_numbers()
 {
+  global $debug;
+
   $r = array();
   $a = array();
   
   for($i=0;$i<48;$i++)
     $a[$i]=$i+1;
+
+  if(!$debug)
+    $r = array_rand($a,48);
+  else
+    {
+      $a[ 0]=1;     $a[12]=47;   $a[24]=13;   $a[36]=37;
+      $a[ 1]=2;     $a[13]=48;   $a[25]=14;	  $a[37]=38;
+      $a[ 2]=3;     $a[14]=27;   $a[26]=15;	  $a[38]=39;
+      $a[ 3]=4;     $a[15]=16;   $a[27]=28;	  $a[39]=40;
+      $a[ 4]=5;     $a[16]=17;   $a[28]=29;	  $a[40]=41;
+      $a[ 5]=6;     $a[17]=18;   $a[29]=30;	  $a[41]=42;
+      $a[ 6]=7;     $a[18]=19;   $a[30]=31;	  $a[42]=43;
+      $a[ 7]=8;     $a[19]=20;   $a[31]=32;	  $a[43]=44;
+      $a[ 8]=9;     $a[20]=45;   $a[32]=21;	  $a[44]=33;
+      $a[ 9]=10;    $a[21]=46;   $a[33]=22;	  $a[45]=34;
+      $a[10]=11;    $a[22]=35;   $a[34]=23;	  $a[46]=25;
+      $a[11]=12;    $a[23]=36;   $a[35]=24;	  $a[47]=26;
+    }
   
-#  $r = array_rand($a,48);
-  $r =$a; 
- 
+  $r =$a;    	    
+
   return $r;
 }
 
@@ -512,6 +531,9 @@ function set_gametype($gametype)
   switch($gametype)
     {
     case "normal":
+    case "wedding":
+    case "poverty":
+    case "dpoverty":
     case "trump":
     case "silent":
       $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 

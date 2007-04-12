@@ -223,6 +223,18 @@ ul.tricks li div div.card3 span{
   height:6em;
 }
 
+.exchange {
+  clear:both;
+  margin:0;
+  padding:0;
+  border:1px solid red;
+  background-color:yellow;
+}
+
+.exchange img {
+  height:6em;
+}
+
 .line{
   clear:both;
   border-top:2px solid gray;
@@ -233,7 +245,8 @@ ul.tricks li div div.card3 span{
 
 .ruleset {
   position:absolute;
-  top:7.5em;
+  top:17.5em;
+//  top:7.5em;
   border:2px solid gray;
   padding:0.3em;
   margin:0;
@@ -247,7 +260,8 @@ ul.tricks li div div.card3 span{
 
 .bug {
   position:absolute;
-  top:14.5em;
+  top:24.5em;
+//  top:14.5em;
   width:10em;
   border:2px solid gray;
   padding-top:0.5em;
@@ -266,4 +280,18 @@ ul.tricks li div div.card3 span{
 
 .submitbutton:hover { 
 background-color:#afa; 
+}
+
+.useroptions{
+  float:right;
+  padding-left:0.3em;
+  border-left: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+}
+.useroptions h4 {
+    margin:0.1em;
+    margin-left:0em;
+    padding:0.1em;
+    padding-left:0em;
+    text-aling:left;
 }

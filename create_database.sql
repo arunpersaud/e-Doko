@@ -72,6 +72,7 @@ CREATE TABLE `Game` (
   `randomnumbers` varchar(136) default NULL,
   `type` enum('normal','solo','wedding','poverty','dpoverty') default NULL,
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
+  `sickness` int(11) default NULL,
   `startplayer` tinyint(4) default '1', 
   `status` enum('pre','play','gameover') default NULL,
   `ruleset` int(11) default NULL,

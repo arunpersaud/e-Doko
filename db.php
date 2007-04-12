@@ -7,12 +7,15 @@
 function DB_open()
 {
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
-  if ( $DB = mysql_connect($DB_host,$DB_user, $DB_password) )
-    mysql_select_db($DB_database) or die('Could not select database'); 
+  $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
+  if ( $DB )
+    {
+      mysql_select_db($DB_database) or die('Could not select database'); 
+    }
   else
-    die (mysql_error());
+    return -1;
   
-  return;
+  return 0;
 }
 
 function DB_close()
@@ -160,6 +163,18 @@ function DB_get_handid_by_gameid_and_position($gameid,$pos)
   else
     return -1;
 }
+function DB_get_handid_by_gameid_and_userid($gameid,$userid)
+{
+  $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
+			DB_quote_smart($gameid)." AND user_id=".
+			DB_quote_smart($userid));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return -1;
+}
 
 function DB_get_userid_by_hash($hash)
 {
@@ -233,6 +248,22 @@ function DB_set_game_status_by_gameid($id,$status)
   return;
 }
 
+function DB_set_sickness_by_gameid($id,$status)
+{
+  mysql_query("UPDATE Game SET sickness='".$status."' WHERE id=".DB_quote_smart($id));
+  return;
+}
+function DB_get_sickness_by_gameid($id)
+{
+  $result = mysql_query("SELECT sickness FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+
 function DB_get_game_status_by_gameid($id)
 {
   $result = mysql_query("SELECT status FROM Game WHERE id=".DB_quote_smart($id));
@@ -265,6 +296,18 @@ function DB_get_hand_status_by_userid_and_gameid($uid,$gid)
 function DB_get_sickness_by_userid_and_gameid($uid,$gid)
 {
   $result = mysql_query("SELECT sickness FROM Hand WHERE user_id=".DB_quote_smart($uid).
+			" AND game_id=".DB_quote_smart($gid));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
+function DB_get_sickness_by_pos_and_gameid($pos,$gid)
+{
+  $result = mysql_query("SELECT sickness FROM Hand WHERE position=".DB_quote_smart($pos).
 			" AND game_id=".DB_quote_smart($gid));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
@@ -453,6 +496,17 @@ function DB_get_all_userid_by_gameid($id)
 function DB_get_hash_from_game_and_pos($id,$pos)
 {
   $result = mysql_query("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and position=".DB_quote_smart($pos));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
+function DB_get_hash_from_gameid_and_userid($id,$user)
+{
+  $result = mysql_query("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and user_id=".DB_quote_smart($user));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
   if($r)
