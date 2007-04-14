@@ -309,7 +309,7 @@ else if(myisset("me"))
 	 */
 	if( !myisset("in") )
 	  {
-	    echo "you need to answer the <a href=\"$host?me=$me\">question</a>.";
+	    echo "<p> you need to answer the <a href=\"$host?me=$me\">question</a>.</p>";
 	    DB_set_hand_status_by_hash($me,'start');
 	  }
 	else
@@ -649,17 +649,18 @@ else if(myisset("me"))
 		{
 		  /* user doesn't want to take trump */
 		  /* set next player who needs to be asked */
-		  $firstsick  = DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
-		  $secondsick = DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
-		  if($firstsick!="poverty")
-		    DB_set_sickness_by_gameid($gameid,$who+$add);
-		  else
+		  $firstsick  = (string) DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
+		  $secondsick = (string) DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
+		  
+		  if($firstsick=="poverty")
 		    {
-		      if($secondsick!="poverty")
-			DB_set_sickness_by_gameid($gameid,$who+$add*2);
-		      else
+		      if($secondsick=="poverty")
 			DB_set_sickness_by_gameid($gameid,$who+$add*3);
-		    };
+		      else
+			DB_set_sickness_by_gameid($gameid,$who+$add*2);
+		    }
+		  else
+		    DB_set_sickness_by_gameid($gameid,$who+$add);
 
 		  /* this user is done */
 		  DB_set_hand_status_by_hash($me,'play');
@@ -701,8 +702,6 @@ else if(myisset("me"))
 		  $trump    = $_REQUEST["trump"];
 		  $exchange = $_REQUEST["exchange"];
 		  $userhand = DB_get_handid_by_gameid_and_userid($gameid,$trump);
-
-		  echo "you give $exchange to your partner";
 
 		  /* if exchange is set to a value>0, exchange that card back to user $trump */
 		  if($exchange >0)
@@ -1218,7 +1217,7 @@ else if(myisset("me"))
 	{
 	  echo "Hello ".$myname.", it's your turn!  <br />\n";
 	  echo "Your cards are: <br />\n";
-	  echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
+	  echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
 	  
 	  /* do we have to follow suite? */
 	  $followsuit = 0;

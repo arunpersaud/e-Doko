@@ -172,9 +172,9 @@ function display_card($card,$dir="english")
 function display_link_card($card,$dir="english",$type="card")
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"\" />\n";
+    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"\" /></div>\n";
   else
-    echo "<input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"\" />\n";
+    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"\" /></div>\n";
   return;
 }
 

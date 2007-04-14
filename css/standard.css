@@ -244,24 +244,17 @@ ul.tricks li div div.card3 span{
 
 
 .ruleset {
-  position:absolute;
-  top:17.5em;
-//  top:7.5em;
+  float:left;
+  margin:0;
+  margin-top:10.5em;
   border:2px solid gray;
   padding:0.3em;
-  margin:0;
 }
 
-.time { 
-  float:left;
-  border:2px solid gray;
-  border-top:0;
-}
 
 .bug {
-  position:absolute;
-  top:24.5em;
-//  top:14.5em;
+  float:left;
+  margin-top:8.5em;
   width:10em;
   border:2px solid gray;
   padding-top:0.5em;
@@ -274,12 +267,12 @@ ul.tricks li div div.card3 span{
 }
 
 .submitbutton { 
- border:0;
- background-color: #efe;
- }
+  border:0;
+  background-color: #efe;
+}
 
 .submitbutton:hover { 
-background-color:#afa; 
+  background-color:#afa; 
 }
 
 .useroptions{
@@ -294,4 +287,18 @@ background-color:#afa;
     padding:0.1em;
     padding-left:0em;
     text-aling:left;
+}
+
+.cardinput {
+  display:inline;
+  position:relative;
+  border: 1px solid black;
+}
+
+.cardinput img {
+  width: 4em;
+}
+
+.cardinput:hover{
+  background-color:red;
 }
