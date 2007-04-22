@@ -333,7 +333,7 @@ function output_header()
   </head>
 <body onload="high_last();">
 <div class="header">
-<h1> Welcome to E-Doko </h1>
+<h1> Welcome to E-Doko <sup style="color:#888;">(beta)</sup> </h1>
 </div>
 
 <?php
