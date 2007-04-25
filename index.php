@@ -109,10 +109,11 @@ if(myisset("new"))
     $game_id = mysql_insert_id();
     
     /* create hash */
-    $hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA);
-    $hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB);
-    $hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC);
-    $hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD);
+    $TIME  = (string) time(); /* to avoid collisions */
+    $hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA.$TIME);
+    $hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB.$TIME);
+    $hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC.$TIME);
+    $hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD.$TIME);
     
     /* create hands */
     mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
