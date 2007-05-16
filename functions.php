@@ -442,7 +442,7 @@ function  create_array_of_random_numbers()
       for($i=0;$i<48;$i++)
 	$a[$i]=$i+1;
       
-      $r = array_rand($a,48);
+      $r = shuffle($a);
     };
 
   return $r;

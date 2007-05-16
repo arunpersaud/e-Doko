@@ -852,7 +852,7 @@ else if(myisset("me"))
 	    echo " Please, <a href=\"$host?me=$me\">start</a> the game.<br />";	 
 	}
       else
-	echo "You finished the setup, once everyone else has done the same you'll get an email when it is your turn..<br />";	 
+	echo "You finished the setup, at the moment you need to reload this page after everyone else has finished there setup so that the server can figure out vorbehalte... in future this will get an email in case you need to do anything, but this is not implemented yet :( <br />";	 
 
       break;
     case 'play':
