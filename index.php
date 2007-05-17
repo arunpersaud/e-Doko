@@ -933,7 +933,7 @@ else if(myisset("me"))
 			    "        User.id, ".
 			    "        Hand.party as party, ".
 			    "        Hand.sickness as sickness, ".
-			    "        Hand.point_call as call ".
+			    "        Hand.point_call ".
 			    "FROM Hand ".
 			    "LEFT JOIN User ON User.id=Hand.user_id ".
 			    "WHERE Hand.game_id='".$gameid."' ".
