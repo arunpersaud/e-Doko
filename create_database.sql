@@ -133,9 +133,7 @@ CREATE TABLE `Hand` (
   `party` enum('re','contra') default NULL,
   `sickness` enum('wedding','nines','poverty','solo') default NULL,
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
-  `sick_call` enum('true','false') default 'false',
-  `win_call` enum('true','false') default 'false',
-  `point_call` enum('90','60','30','0') default NULL,
+  `point_call` enum('120','90','60','30','0') default NULL,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

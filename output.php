@@ -267,8 +267,31 @@ function output_home_page($pre,$game,$done)
 {
 ?>
     <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
-    <p> At the moment there are <?php echo "$pre";?> games that are being started and <?php echo"$game"; ?> games that are ongoing. 
-    <?php echo"$done";?> games have been completed on this server. </p>
+<?php
+    if($pre == 0)
+      echo "<p> At the moment there are no games that are being started ";
+    else if($pre==1)
+      echo "<p> At the moment there is one games that is being started ";
+    else
+      echo "<p> At the moment there are $pre games that are being started ";
+
+    echo "and";
+
+    if($game==0)
+      echo " zero games that are ongoing. ";
+    else if($game==1)	
+      echo " one game that is ongoing. ";
+    else 
+      echo "$game games that are ongoing. ";
+
+    if($done==0)
+      echo "No game has been completed on this server. </p>";
+    else if($done==1)
+      echo "One game has been completed on this server. </p>";
+    else
+      echo "$done games have been completed on this server. </p>";
+?>
+
     <p> Please <a href="index.php?register">register</a>, in case you haven't done that yet  <br />
         or login with you email-address or name and password here:
     </p>

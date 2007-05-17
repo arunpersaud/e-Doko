@@ -6,7 +6,11 @@ function mymail($To,$Subject,$message)
 
   if($debug)
     {
-      $message = str_replace("\n","<br />",$message);
+      $message = str_replace("\n","<br />\n",$message);
+      $message = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
+                     "<a href=\"\\0\">\\0</a>", $message);
+      //$message = ereg_replace("(http.*)[ <>]","<a href=\"\\1\">\\1 </a>",$message);
+      
       echo "<br />To: $To<br />Subject: $Subject <br />$message<br />\n";
     }
   else
@@ -427,13 +431,13 @@ function  create_array_of_random_numbers()
       $a[ 2]=3;     $a[14]=27;   $a[26]=15;	  $a[38]=39;
       $a[ 3]=4;     $a[15]=16;   $a[27]=28;	  $a[39]=40;
       $a[ 4]=5;     $a[16]=17;   $a[28]=29;	  $a[40]=41;
-      $a[ 5]=6;     $a[17]=18;   $a[29]=30;	  $a[41]=42;
-      $a[ 6]=7;     $a[18]=19;   $a[30]=31;	  $a[42]=43;
-      $a[ 7]=8;     $a[19]=20;   $a[31]=32;	  $a[43]=44;
-      $a[ 8]=9;     $a[20]=45;   $a[32]=21;	  $a[44]=33;
-      $a[ 9]=10;    $a[21]=46;   $a[33]=22;	  $a[45]=34;
-      $a[10]=11;    $a[22]=35;   $a[34]=23;	  $a[46]=25;
-      $a[11]=12;    $a[23]=36;   $a[35]=24;	  $a[47]=26;
+      $a[ 5]=18;    $a[17]=6;    $a[29]=30;	  $a[41]=42;
+      $a[ 6]=19;    $a[18]=7;    $a[30]=31;	  $a[42]=43;
+      $a[ 7]=20;    $a[19]=8;    $a[31]=32;	  $a[43]=44;
+      $a[ 8]=45;    $a[20]=9;    $a[32]=21;	  $a[44]=33;
+      $a[ 9]=46;    $a[21]=10;   $a[33]=22;	  $a[45]=34;
+      $a[10]=35;    $a[22]=11;   $a[34]=23;	  $a[46]=25;
+      $a[11]=36;    $a[23]=12;   $a[35]=24;	  $a[47]=26;
 
       $r = $a;    	    
     }
@@ -638,6 +642,11 @@ function sort_comp($a,$b)
 		     $CARDS["hearts"],$CARDS["spades"],$CARDS["diamonds"]);
 
   return pos_array($a,$ALL)-pos_array($b,$ALL);
+}
+
+function can_call($what,$hash)
+{
+  return 1;
 }
 
 ?>

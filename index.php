@@ -117,16 +117,16 @@ if(myisset("new"))
     
     /* create hands */
     mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
-		", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,'false','false',NULL)");
+		", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,NULL)");
     $hand_idA = mysql_insert_id();							       
     mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridB).
-		", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,'false','false',NULL)");
+		", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,NULL)");
     $hand_idB = mysql_insert_id();							       
     mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridC).
-		", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,'false','false',NULL)");
+		", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,NULL)");
     $hand_idC = mysql_insert_id();							       
     mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
-		", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,'false','false',NULL)");
+		", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,NULL)");
     $hand_idD = mysql_insert_id();
     
     /* save cards */
@@ -150,7 +150,7 @@ if(myisset("new"))
       "$PlayerC\n".
       "$PlayerD\n\n".
       "If you want to join this game, please follow this link:\n\n".
-      " ".$host."?me=";
+      "".$host."?me=";
     
     mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
     mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
@@ -414,6 +414,29 @@ else if(myisset("me"))
 
       /* move on to the next stage*/
       DB_set_hand_status_by_hash($me,'poverty');
+
+      /* check if everyone has reached this stage, send out email */
+      $userids = DB_get_all_userid_by_gameid($gameid);
+      $ok=1;
+      foreach($userids as $user)
+	{
+	  $userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+	  if($userstat!='poverty' && $userstat!='play')
+	    $ok=0;
+	};
+      if($ok)
+	foreach($userids as $user)
+	  {
+	    $To = DB_get_email_by_userid($user);
+	    $userhash =DB_get_hash_from_gameid_and_userid($gameid,$user);
+	    if($userhash!=$me)
+	      {
+		$message = "Everyone finish the questionary, please visit this link now to continue: \n".
+		  " ".$host."?me=".$userhash."\n\n" ;
+		mymail($To,$EmailName." finished setup",$message);
+	      }
+	  };
+
       break;
 
     case 'poverty':
@@ -437,7 +460,7 @@ else if(myisset("me"))
       if(!$ok)
 	{
 	  echo "This step can only be handled after everyone finished the last step. ".
-	    "Seems like this is not the case, so you need to wait a bit... please check back later....<br />";
+	    "Seems like this is not the case, so you need to wait a bit... you will get an email once that is the case, please use the link in that email to continue the game.<br />";
 	}
       else
 	{
@@ -551,6 +574,7 @@ else if(myisset("me"))
 	  else if($wedding> 0)
 	    {
 	      DB_set_gametype_by_gameid($gameid,"wedding");
+	      DB_set_sickness_by_gameid($gameid,'-1'); /* wedding not resolved yet */
 	      $gametype = "wedding";
 	    };
 
@@ -610,9 +634,11 @@ else if(myisset("me"))
 	      $usersick = DB_get_sickness_by_userid_and_gameid($myid,$gameid);
 	      if($usersick == "wedding")
 		DB_set_party_by_hash($me,"re");
+	      else
+		DB_set_party_by_hash($me,"contra");
 	      
-	      echo "Don't know who will be Re and Contra, you need to ".
-		"figure that out at the end of the game yourself <br />\n";
+	      echo "Whoever will make the first trick will be on the re team. <br />\n";
+	      echo " Ok, the game can start now, please finish <a href=\"$host?me=$me\">the setup</a>.<br />";	     
 	      DB_set_hand_status_by_hash($me,'play');
 	      break;
 
@@ -630,7 +656,7 @@ else if(myisset("me"))
 	      /* check if poverty resolved (e.g. DB.Game who set to NULL)
 	       *   yes? =>trump was taken, start game; break; 
 	       */
-	      $who=DB_get_sickness_by_gameid($gameid);
+	      $who = DB_get_sickness_by_gameid($gameid);
 	      if($who<0)
 		{ /* trump has been taken */
 		  DB_set_hand_status_by_hash($me,'play');
@@ -638,12 +664,12 @@ else if(myisset("me"))
 		};
 	      
 	      if($who>9) /*= two people still have trump on the table*/
-		$add=10;
+		$add = 10;
 	      else
-		$add=1;
+		$add = 1;
 
 	      /* check if we are being asked now
-	       *    no, display wait message, e.g. player X is asked at the moment 
+	       *    no? display wait message, e.g. player X is asked at the moment 
 	       */
 	      $usersick = DB_get_sickness_by_userid_and_gameid($myid,$gameid);
 	      if(myisset("trump") && $_REQUEST["trump"]=="no" && ($who==$mypos || $who==$mypos*10))
@@ -673,7 +699,7 @@ else if(myisset("me"))
 		  $trump = $_REQUEST["trump"];
 
 		  /* get hand id for user $trump */
-		  $userhand=DB_get_handid_by_gameid_and_userid($gameid,$trump);
+		  $userhand = DB_get_handid_by_gameid_and_userid($gameid,$trump);
 		  /* copy trump from player A to B */
 		  $result = mysql_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 		  
@@ -726,11 +752,12 @@ else if(myisset("me"))
 			}
 		      else /* reduce poverty count by one, that is go to single digits $who */
 			{
-			  $add=1;
-			  $who=$who/10;
+			  $add = 1;
+			  $who = $who/10;
 
 			  $firstsick  = DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
 			  $secondsick = DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
+
 			  if($firstsick!="poverty")
 			    DB_set_sickness_by_gameid($gameid,$who+$add);
 			  else
@@ -803,8 +830,8 @@ else if(myisset("me"))
 	       */
 	    };
 	}
-      /* check if noone wanted to take trump, in that case the gamesickness would be set to 5 or 50 */
-      $who=DB_get_sickness_by_gameid($gameid);
+      /* check if no one wanted to take trump, in that case the gamesickness would be set to 5 or 50 */
+      $who = DB_get_sickness_by_gameid($gameid);
       if($who==5 || $who==50)
 	{
 	  $message = "Hello, \n\n".
@@ -852,7 +879,7 @@ else if(myisset("me"))
 	    echo " Please, <a href=\"$host?me=$me\">start</a> the game.<br />";	 
 	}
       else
-	echo "You finished the setup, at the moment you need to reload this page after everyone else has finished there setup so that the server can figure out vorbehalte... in future this will get an email in case you need to do anything, but this is not implemented yet :( <br />";	 
+	echo "\n <br />";	 
 
       break;
     case 'play':
@@ -895,7 +922,7 @@ else if(myisset("me"))
       /* has the game started? No, then just wait here...*/
       if($gamestatus == 'pre')
 	{
-	  echo "You finished the setup, but not everyone else finished it...so you need to wait for the others... <br />";
+	  echo "You finished the setup, but not everyone else finished it...so you need to wait for the others. Just wait for the an email... <br />";
 	  break; /* not sure this works... the idea is that you can 
 		  * only  play a card after everyone is ready to play */
 	}
@@ -903,7 +930,10 @@ else if(myisset("me"))
       /* display the table and the names */
       $result = mysql_query("SELECT  User.fullname as name,".
 			    "        Hand.position as position, ".
-			    "        User.id ".
+			    "        User.id, ".
+			    "        Hand.party as party, ".
+			    "        Hand.sickness as sickness, ".
+			    "        Hand.point_call as call ".
 			    "FROM Hand ".
 			    "LEFT JOIN User ON User.id=Hand.user_id ".
 			    "WHERE Hand.game_id='".$gameid."' ".
@@ -913,16 +943,48 @@ else if(myisset("me"))
 	"  <img src=\"pics/table.png\" alt=\"table\" />\n";
       while($r = mysql_fetch_array($result,MYSQL_NUM))
 	{
-	  $name = $r[0];
-	  $pos  = $r[1];
-	  $user = $r[2];
-
+	  $name  = $r[0];
+	  $pos   = $r[1];
+	  $user  = $r[2];
+	  $party = $r[3];
+	  $sickness= $r[4];
+	  $call  = $r[5];
+	  
 	  $offset = DB_get_user_timezone($user);
 	  $zone   = return_timezone($offset);
 	  date_default_timezone_set($zone);
 
 	  echo " <span class=\"table".($pos-1)."\">\n";
-	  echo " $name <br />\n";
+	  echo " $name ";
+	  /* add hints for poverty, wedding, solo, etc */
+	  if($GT=="poverty" && $party=="re")
+	    if($sickness=="poverty")
+	      echo "(poverty <)";
+	    else
+	      echo "(poverty >)";
+
+	  if($GT=="dpoverty")
+	    if($party=="re")
+	      if($sickness=="poverty")
+		echo "(poverty A <)";
+	      else
+		echo "(poverty A >)";
+	    else
+	      if($sickness=="poverty")
+		echo "(poverty B <)";
+	      else
+		echo "(poverty B >)";
+	      
+	  if($GT=="wedding" && $party=="re")
+	      if($sickness=="wedding")
+		echo "(wedding  +)";
+	      else
+		echo "(wedding)";
+	  /* add point calls */
+	  if($call!=NULL)
+	    echo " $party $call ";
+
+	  echo "<br />\n";
 	  echo " local time: ".date("Y-m-d H:i:s")."\n";
 	  echo " </span>\n";
 
@@ -1047,7 +1109,7 @@ else if(myisset("me"))
 	  $r = mysql_fetch_array($result,MYSQL_NUM);
 	  $handcardid = $r[0];
 	  
-	  if($handcardid)
+	  if($handcardid) /* everything ok, play card  */
 	    {
 	      $comment = "";
 
@@ -1058,6 +1120,19 @@ else if(myisset("me"))
 	      /* update Game timestamp */
 	      DB_update_game_timestamp($gameid);
 
+	      /* check if a call was made */
+	      if(myisset("call120") && $_REQUEST["call120"] == "yes")
+		$result = mysql_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
+	      if(myisset("call90")  && $_REQUEST["call90"]  == "yes")
+		$result = mysql_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
+	      if(myisset("call60")  && $_REQUEST["call60"]  == "yes")
+		$result = mysql_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
+	      if(myisset("call30")  && $_REQUEST["call30"]  == "yes")
+		$result = mysql_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
+	      if(myisset("call0")   && $_REQUEST["call0"]   == "yes")
+		$result = mysql_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
+		
+
 	      /* check for schweinchen */
 	      //echo "schweinchen = ".$GAME["schweinchen"]." --$card-<br />";
 	      if($card == 19 || $card == 20 )
@@ -1067,15 +1142,52 @@ else if(myisset("me"))
 		    $comment="Schweinchen! ";
 		  if($RULES["schweinchen"]=="both" )
 		    $comment="Schweinchen! ";
-		  echo "schweinchen = ".$GAME["schweinchen"]." ---<br />";
+		  if ($debug) echo "schweinchen = ".$GAME["schweinchen"]." ---<br />";
 		}
 
 	      /* get trick id or start new trick */
 	      $a = DB_get_current_trickid($gameid);
 	      $trickid  = $a[0];
 	      $sequence = $a[1];
+	      $tricknr  = $a[2];
 	      
 	      $playid = DB_play_card($trickid,$handcardid,$sequence);
+	      
+	      /* if sequence == 4 check who one in case of wedding */
+	      if($sequence == 4 && $GT == "wedding") 
+		{
+		  /* is wedding resolve */
+		  $resolved = DB_get_sickness_by_gameid($gameid); 
+		  if($resolved<0)
+		    {
+		      /* who has wedding */
+		      $userids = DB_get_all_userid_by_gameid($gameid);
+		      foreach($userids as $user)
+			{
+			  $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
+			  if($usersick == "wedding")
+			    $whosick = $user;
+			}
+		      /* who won the trick */
+		      $play     = DB_get_cards_by_trick($trickid);
+		      $winner   = get_winner($play,$gametype); /* returns the position */
+		      $winnerid = DB_get_userid_by_gameid_and_position($gameid,$winner);
+		      /* is tricknr <=3 */
+		      if($tricknr <=3 && $winnerid!=$whosick)
+			{
+			  /* set resolved at tricknr*/
+			  $resolved = DB_set_sickness_by_gameid($gameid,$tricknr); 
+			  /* set partner */
+			  $whash = DB_get_hash_from_gameid_and_userid($gameid,$winnerid);
+			  DB_set_party_by_hash($whash,"re");
+			}
+		      if($tricknr == 3 && $winnerid==$whosick)
+			{
+			  /* set resolved at tricknr*/
+			  $resolved = DB_set_sickness_by_gameid($gameid,'3'); 
+			}
+		    }
+		}
 	      
 	      /* check for coment */
 	      if(myisset("comment"))
@@ -1193,12 +1305,7 @@ else if(myisset("me"))
 		  
 		  $message = "It's your turn  now.\n".
 		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
-		  mymail($email,$EmailName."a card has been played",$message);
-		  
-		  if($debug)
-		    echo "DEBUG:<a href=\"index.php?me=".DB_get_hash_from_game_and_pos($gameid,$next).
-		      "\"> next player </a> <br />\n";
-		  
+		  mymail($email,$EmailName."a card has been played",$message);		  
 		}
 	    }
 	  else
@@ -1234,6 +1341,22 @@ else if(myisset("me"))
 		display_link_card($card,$PREF["cardset"]);
 	    }
 	  
+	  if( can_call(120,$me) )
+	      echo " re/contra (120):".
+		" <input type=\"radio\" name=\"call120\" value=\"yes\" /> ";
+	  if( can_call(90,$me) )
+	      echo " 90:".
+		" <input type=\"radio\" name=\"call90\" value=\"yes\" /> ";
+	  if( can_call(60,$me) )
+	      echo " 60:".
+		" <input type=\"radio\" name=\"call60\" value=\"yes\" /> ";
+	  if( can_call(30,$me) )
+	      echo " 30:".
+		" <input type=\"radio\" name=\"call30\" value=\"yes\" /> ";
+	  if( can_call(0,$me) )
+	      echo " 0:".
+		" <input type=\"radio\" name=\"call0\" value=\"yes\" /> ";
+
 	  echo "<br />\nA short comments:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"50\" />\n";
 	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
 	  echo "<input type=\"submit\" value=\"move\" />\n";

@@ -163,6 +163,20 @@ function DB_get_handid_by_gameid_and_position($gameid,$pos)
   else
     return -1;
 }
+function DB_get_userid_by_gameid_and_position($gameid,$pos)
+{
+  $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
+			DB_quote_smart($gameid)." AND position=".
+			DB_quote_smart($pos));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return -1;
+}
+
+
 function DB_get_handid_by_gameid_and_userid($gameid,$userid)
 {
   $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
@@ -426,6 +440,7 @@ function DB_get_current_trickid($gameid)
 {
   $trickid  = NULL;
   $sequence = NULL;
+  $number   = 0;
 
   $result = mysql_query("SELECT Trick.id,MAX(Play.sequence) FROM Play ".
 			"LEFT JOIN Trick ON Play.trick_id=Trick.id ".
@@ -435,6 +450,7 @@ function DB_get_current_trickid($gameid)
     {
       $trickid  = $r[0];
       $sequence = $r[1];
+      $number++;
     };
   
   if(!$sequence || $sequence==4)
@@ -442,13 +458,14 @@ function DB_get_current_trickid($gameid)
       mysql_query("INSERT INTO Trick VALUES (NULL,NULL,NULL, ".DB_quote_smart($gameid).")");
       $trickid  = mysql_insert_id();
       $sequence = 1;
+      $number++;
     }
   else
     {
       $sequence++;
     }
 
-  return array($trickid,$sequence);
+  return array($trickid,$sequence,$number);
 }
 
 function DB_get_max_trickid($gameid)
