@@ -192,7 +192,7 @@ else if(myisset("cancle","me"))
 	foreach($userids as $user)
 	  {
 	    $To = DB_get_email_by_userid($user);
-	    mymail($To,$EmailName."game cancled (timed out)",$message);
+	    mymail($To,$EmailName."game $gameid cancled (timed out)",$message);
 	  }
 	
 	/* delete everything from the dB */
@@ -325,7 +325,7 @@ else if(myisset("me"))
 		foreach($userids as $user)
 		  {
 		    $To = DB_get_email_by_userid($user);
-		    mymail($To,$EmailName."game canceled",$message);
+		    mymail($To,$EmailName."game $gameid canceled",$message);
 		  }
 		
 		/* delete everything from the dB */
@@ -431,7 +431,7 @@ else if(myisset("me"))
 	    $userhash =DB_get_hash_from_gameid_and_userid($gameid,$user);
 	    if($userhash!=$me)
 	      {
-		$message = "Everyone finish the questionary, please visit this link now to continue: \n".
+		$message = "Everyone finish the questionary in game $gameid, please visit this link now to continue: \n".
 		  " ".$host."?me=".$userhash."\n\n" ;
 		mymail($To,$EmailName." finished setup",$message);
 	      }
@@ -526,7 +526,7 @@ else if(myisset("me"))
 	      foreach($userids as $user)
 		{
 		  $To = DB_get_email_by_userid($user);
-		  mymail($To,$EmailName."game canceled",$message);
+		  mymail($To,$EmailName."game $gameid canceled",$message);
 		}
 	      
 	      /* delete everything from the dB */
@@ -689,6 +689,20 @@ else if(myisset("me"))
 		  else
 		    DB_set_sickness_by_gameid($gameid,$who+$add);
 
+		  /* email next player */
+		  $who = DB_get_sickness_by_gameid($gameid);
+		  if($who>9) $who = $who/10;
+		  
+		  if($who<=4)
+		    {
+		      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
+		      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
+		      
+		      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+			" ".$host."?me=".$userhash."\n\n" ;
+		      mymail($To,$EmailName." poverty",$message);
+		    }
+
 		  /* this user is done */
 		  DB_set_hand_status_by_hash($me,'play');
 		  break;		
@@ -703,19 +717,6 @@ else if(myisset("me"))
 		  /* copy trump from player A to B */
 		  $result = mysql_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 		  
-		  /* set re/contra, if it is  not already set */
-		  $party = DB_get_party_by_hash($me);
-		  if(!$party)
-		    {
-		      foreach($userids as $user)
-			{
-			  $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-			  if($user == $trump || $user == $myid)
-			    DB_set_party_by_hash($hash,"re");
-			  else
-			    DB_set_party_by_hash($hash,"contra");
-			}
-		    }
 		  /* add hidden button with trump in it to get to the next point */
 		  echo "<form action=\"index.php\" method=\"post\">\n";
 		  echo "  <input type=\"hidden\" name=\"exchange\" value=\"-1\" />\n";
@@ -755,6 +756,7 @@ else if(myisset("me"))
 			  $add = 1;
 			  $who = $who/10;
 
+			  /* whom to ask next */
 			  $firstsick  = DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
 			  $secondsick = DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
 
@@ -767,6 +769,19 @@ else if(myisset("me"))
 			      else
 				DB_set_sickness_by_gameid($gameid,$who+$add*3);
 			    };
+
+			  /* email next player */
+			  $who = DB_get_sickness_by_gameid($gameid);
+			  if($who<=4)
+			    {
+			      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
+			      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
+			      
+			      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+				" ".$host."?me=".$userhash."\n\n" ;
+			      mymail($To,$EmailName." poverty",$message);
+			    }
+
 			}
 		      
 		      /* this user is done */
@@ -774,6 +789,33 @@ else if(myisset("me"))
 		      /* and so is his partner */
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$trump);
 		      DB_set_hand_status_by_hash($hash,'play');
+
+		      /* set party to re, unless we had dpoverty, in that case check if we need to set re/contra*/
+		      $re_set=0;
+		      foreach($userids as $user)
+			{
+			  $userhash =DB_get_hash_from_gameid_and_userid($gameid,$user);
+			  $party=DB_get_party_by_hash($userhash);
+			  if($party=="re")
+			    $re_set=1;
+			}
+		      if($re_set)
+			{
+			  DB_set_party_by_hash($me,"contra");
+			  DB_set_party_by_hash($hash,"contra");
+			}
+		      else
+			{
+			  foreach($userids as $user)
+			    {
+			      $userhash =DB_get_hash_from_gameid_and_userid($gameid,$user);
+			      if($userhash==$hash||$userhash==$me)
+				DB_set_party_by_hash($userhash,"re");
+			      else
+				DB_set_party_by_hash($userhash,"contra");
+			    }
+			}
+
 
 		      break;
 		    }
@@ -816,10 +858,22 @@ else if(myisset("me"))
 		    }
 		  echo "I don't want to take any trump: ".
 		    "<a href=\"index.php?me=$me&amp;trump=no\">yes</a> <br />";
+
+		  echo "Your cards are: <br />\n";
+		  $mycards = DB_get_hand($me);
+		  sort($mycards);
+		  echo "<p class=\"mycards\" style=\"margin-top:8em;\">your cards are: <br />\n";
+		  foreach($mycards as $card) 
+		    display_card($card,$PREF["cardset"]);
+		  echo "</p>\n";   
 		}
 	      else
 		{
-		  echo "it's not your turn yet to decide if you want to take the trump or not.";
+		  $mysick = DB_get_sickness_by_userid_and_gameid($myid,$gameid);
+		  if($mysick=="poverty")
+		    echo "The others are asked if they want to take your trump, you have to wait (you'll get an email).";
+		  else
+		    echo "it's not your turn yet to decide if you want to take the trump or not.";
 		}
 	      /*
 	       *    yes, display number of trump and user's hand, ask if he wants to take it 
@@ -841,7 +895,7 @@ else if(myisset("me"))
 	  foreach($userids as $user)
 	    {
 	      $To = DB_get_email_by_userid($user);
-	      mymail($To,$EmailName."game cancled (poverty not resolved)",$message);
+	      mymail($To,$EmailName."game $gameid cancled (poverty not resolved)",$message);
 	    }
 	  
 	  /* delete everything from the dB */
@@ -871,7 +925,7 @@ else if(myisset("me"))
 	  if($hash!=$me)
 	    {
 	      /* email startplayer) */
-	      $message = "It's your turn now.\n".
+	      $message = "It's your turn now in game $gameid.\n".
 		"Use this link to play a card: ".$host."?me=".$hash."\n\n" ;
 	      mymail($email,$EmailName."ready, set, go... ",$message);
 	    }
@@ -1262,7 +1316,7 @@ else if(myisset("me"))
 		  foreach($userids as $user)
 		    {
 		      $To = DB_get_email_by_userid($user);
-		      mymail($To,$EmailName."game over",$message);
+		      mymail($To,$EmailName."game over (game $gameid)",$message);
 		    }
 		}
 	      
@@ -1303,7 +1357,8 @@ else if(myisset("me"))
 		  $next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
 		  $email     = DB_get_email_by_hash($next_hash);
 		  
-		  $message = "It's your turn  now.\n".
+		  $message = "A card has been played in game $gameid.\n\n".
+		    "It's your turn  now.\n".
 		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
 		  mymail($email,$EmailName."a card has been played",$message);		  
 		}
