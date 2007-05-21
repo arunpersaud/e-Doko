@@ -371,11 +371,15 @@ function output_footer()
 
   echo "<div class=\"footer\">\n";
   echo "<p class=\"left\"> copyright 2006-2007 Arun Persaud <br />\n".
-    "Verwendung der [deutschen] Kartenbilder mit Genehmigung der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />".
+    "Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />".
     "- ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />".
     "a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
-  echo "<p class=\"right\"> Revision: $REV; <a href=\"http://svn.nubati.net/emaildoko/trunk/\">".
-    "http://svn.nubati.net/emaildoko/trunk/</a></p> \n";
+  echo "<p class=\"right\"> Revision: $REV; <br /><a href=\"http://svn.nubati.net/emaildoko/trunk/\">".
+    "http://svn.nubati.net/emaildoko/trunk/</a> <br />".
+    "<a href=\"http://www.dreamhost.com/green.cgi\">".
+    "<img  border=\"0\" alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
+    "src=\"https://secure.newdream.net/green1.gif\" height=\"32\" width=\"100\" /></a>".
+    "</p> \n";
   echo "\n";
   echo "</div>\n";
 
