@@ -1,6 +1,6 @@
 <?php
 
-function mymail($To,$Subject,$message)
+function mymail($To,$Subject,$message,$header="")
 {  
   global $debug;
 
@@ -11,10 +11,16 @@ function mymail($To,$Subject,$message)
                      "<a href=\"\\0\">\\0</a>", $message);
       //$message = ereg_replace("(http.*)[ <>]","<a href=\"\\1\">\\1 </a>",$message);
       
-      echo "<br />To: $To<br />Subject: $Subject <br />$message<br />\n";
+      echo "<br />To: $To<br />";
+      if($header != "") 
+	echo $header."<br />";
+      echo "Subject: $Subject <br />$message<br />\n";
     }
   else
-    mail($To,$Subject,$message);
+    if($header != "")
+      mail($To,$Subject,$message,$header);
+    else
+      mail($To,$Subject,$message);
   return;
 }
 

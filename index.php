@@ -230,18 +230,8 @@ else if(myisset("me"))
     $myhand   = DB_get_handid_by_hash($me);
 
     /* get prefs and save them */
-    $result = mysql_query("SELECT value from User_Prefs".
-			  " WHERE user_id='$myid' AND pref_key='cardset'" );
-    $r = mysql_fetch_array($result,MYSQL_NUM);
-    if($r)
-      {
-	if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
-	  $PREF["cardset"]="altenburg";
-      else
-	$PREF["cardset"]="english";
-      }
-    else
-      $PREF["cardset"]="english";
+    DB_get_PREF($myid);
+    /* end set pref */
       
       
     /* get rule set for this game */
@@ -1312,11 +1302,27 @@ else if(myisset("me"))
 		  $message .= "\n";
 		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		    $message .= " FINAL SCORE: ".$r[0]." ".$r[1]."\n";
+		  
+		  /* check who wants to be CC'ed on the email */
+		  $h = array();
+		  $header = "";
+		  foreach($userids as $user)
+		    {
+		      $result = mysql_query("SELECT value from User_Prefs".
+					    " WHERE user_id='$user' AND pref_key='ccemail'" );
+		      $r = mysql_fetch_array($result,MYSQL_NUM);
+		      if($r && $r[0]=="yes")
+			$h[]   = DB_get_email_by_userid($user);
+		    }
+		  if(sizeof($h))
+		    $header = "CC: ".join(",",$h)."\r\n";
 
 		  foreach($userids as $user)
 		    {
-		      $To = DB_get_email_by_userid($user);
-		      mymail($To,$EmailName."game over (game $gameid)",$message);
+		      $To   = DB_get_email_by_userid($user);
+		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user)
+		      $mymessage = $message."Use this link to have a look at the game: ".$host."?me=".$hash."\n\n" ;
+		      mymail($To,$EmailName."game over (game $gameid)",$mymessage,$header);
 		    }
 		}
 	      
@@ -1492,6 +1498,7 @@ else if(myisset("me"))
      /* test id and password, should really be done in one step */
      $email     = $_REQUEST["email"];
      $password  = $_REQUEST["password"];
+     
 
      if(myisset("forgot"))
        {
@@ -1528,6 +1535,8 @@ else if(myisset("me"))
        
        if($ok)
 	 {
+	   DB_get_PREF($uid);
+
 	   if(myisset("setpref"))
 	     {
 	       $setpref=$_REQUEST["setpref"];
@@ -1544,6 +1553,21 @@ else if(myisset("me"))
 		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','cardset',".DB_quote_smart($setpref).")");
 		   echo "Ok, changed you preferences for the cards.\n";
 		   break;
+		 case "ccemail":
+		   $result = mysql_query("SELECT * from User_Prefs".
+					 " WHERE user_id='$uid' AND pref_key='ccemail'" );
+		   if( mysql_fetch_array($result,MYSQL_NUM))
+		     if($PREF["ccemail"]=="yes")
+		       $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart("no").
+					     " WHERE user_id='$uid' AND pref_key='ccemail'" );
+		     else
+		       $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart("yes").
+					     " WHERE user_id='$uid' AND pref_key='ccemail'" );
+		   else
+		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','ccemail',".DB_quote_smart("yes").")");
+		   echo "Ok, changed you preferences for being CC'ed on emails.\n";
+		   break;
+
 		 }
 	     }
 	   else /* output default user page */
@@ -1562,10 +1586,25 @@ else if(myisset("me"))
 	       
 	       DB_update_user_timestamp($uid);
 	       
+	       echo "<p>these are your games that haven't started yet:<br />\n";
+	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date from Hand".
+				     " LEFT JOIN Game On Hand.game_id=Game.id".
+				     " WHERE Hand.user_id='$uid' AND Game.status='pre'" );
+	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
+		 {
+		   echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
+		   if(time()-strtotime($r[2]) > 60*60*24*30)
+		     echo " The game has been running for over a month.".
+		       " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
+		       " (clicking here is final and can't be restored)";
+		   echo "<br />";
+		 }
+	       echo "</p>\n";
+
 	       echo "<p>these are the games you are playing in:<br />\n";
 	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date from Hand".
 				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$uid' AND Game.status<>'gameover'" );
+				     " WHERE Hand.user_id='$uid' AND Game.status='play'" );
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
 		   echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";

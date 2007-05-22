@@ -27,6 +27,8 @@ function output_link_to_user_page($email,$password)
 
 function output_user_settings($email,$password)
 {
+  global $PREF;
+
   echo "<div class=\"useroptions\">\n";
   echo "<h4> Settings </h4>\n";
   echo "<form action=\"index.php\" method=\"post\">\n";
@@ -45,6 +47,15 @@ function output_user_settings($email,$password)
   echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
   echo "  <input type=\"hidden\" name=\"setpref\"  value=\"germancards\" />\n";
   echo "  <input type=\"submit\" class=\"submitbutton\" value=\"use german cards\" /> <br />\n";
+  echo "</form>\n";
+  echo "<form action=\"index.php\" method=\"post\">\n";
+  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
+  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
+  echo "  <input type=\"hidden\" name=\"setpref\"  value=\"ccemail\" />\n";
+  if($PREF["ccemail"]=="no")
+    echo "  <input type=\"submit\" class=\"submitbutton\" value=\"CC me on final email\" /> <br />\n";
+  else
+    echo "  <input type=\"submit\" class=\"submitbutton\" value=\"don't CC me on final email\" /> <br />\n";
   echo "</form>\n";
   echo "</div>\n";
   return;

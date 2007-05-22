@@ -704,5 +704,32 @@ function DB_set_party_by_hash($hash,$party)
   return;
 }
 
+function DB_get_PREF($myid)
+{
+  global $PREF;
+
+    $result = mysql_query("SELECT value from User_Prefs".
+			  " WHERE user_id='$myid' AND pref_key='cardset'" );
+    $r = mysql_fetch_array($result,MYSQL_NUM);
+    if($r)
+      {
+	if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
+	  $PREF["cardset"]="altenburg";
+      else
+	$PREF["cardset"]="english";
+      }
+    else
+      $PREF["cardset"]="english";
+
+    $result = mysql_query("SELECT value from User_Prefs".
+			  " WHERE user_id='$myid' AND pref_key='ccemail'" );
+    $r = mysql_fetch_array($result,MYSQL_NUM);
+    if($r)
+      $PREF["ccemail"]=$r[0];
+    else
+      $PREF["ccemail"]="no";
+
+    return;
+}
 
 ?>
