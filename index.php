@@ -1316,11 +1316,11 @@ else if(myisset("me"))
 		    }
 		  if(sizeof($h))
 		    $header = "CC: ".join(",",$h)."\r\n";
-
+		  
 		  foreach($userids as $user)
 		    {
 		      $To   = DB_get_email_by_userid($user);
-		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user)
+		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		      $mymessage = $message."Use this link to have a look at the game: ".$host."?me=".$hash."\n\n" ;
 		      mymail($To,$EmailName."game over (game $gameid)",$mymessage,$header);
 		    }
