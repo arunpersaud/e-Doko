@@ -33,6 +33,7 @@ if(DB_open()<0)
     exit(); 
   }
 
+/* done major error checking, output header of HTML page */
 output_header();
 
 /* check if we want to start a new game */
@@ -421,8 +422,9 @@ else if(myisset("me"))
 	    $userhash =DB_get_hash_from_gameid_and_userid($gameid,$user);
 	    if($userhash!=$me)
 	      {
-		$message = "Everyone finish the questionary in game $gameid, please visit this link now to continue: \n".
-		  " ".$host."?me=".$userhash."\n\n" ;
+		$message = "Everyone finish the questionary in game $gameid, ".
+		           "please visit this link now to continue: \n".
+		           " ".$host."?me=".$userhash."\n\n" ;
 		mymail($To,$EmailName." finished setup",$message);
 	      }
 	  };
@@ -450,7 +452,9 @@ else if(myisset("me"))
       if(!$ok)
 	{
 	  echo "This step can only be handled after everyone finished the last step. ".
-	    "Seems like this is not the case, so you need to wait a bit... you will get an email once that is the case, please use the link in that email to continue the game.<br />";
+	       "Seems like this is not the case, so you need to wait a bit... ".
+	       "you will get an email once that is the case, please use the link in ".
+	       "that email to continue the game.<br />";
 	}
       else
 	{
@@ -767,8 +771,9 @@ else if(myisset("me"))
 			      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
 			      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
 			      
-			      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-				" ".$host."?me=".$userhash."\n\n" ;
+			      $message = "Someone has poverty, it's your turn to decide, ".
+				         "if you want to take the trump. Please visit:".
+				         " ".$host."?me=".$userhash."\n\n" ;
 			      mymail($To,$EmailName." poverty",$message);
 			    }
 
@@ -966,7 +971,8 @@ else if(myisset("me"))
       /* has the game started? No, then just wait here...*/
       if($gamestatus == 'pre')
 	{
-	  echo "You finished the setup, but not everyone else finished it...so you need to wait for the others. Just wait for the an email... <br />";
+	  echo "You finished the setup, but not everyone else finished it... ".
+	       "so you need to wait for the others. Just wait for the an email... <br />";
 	  break; /* not sure this works... the idea is that you can 
 		  * only  play a card after everyone is ready to play */
 	}
@@ -977,7 +983,8 @@ else if(myisset("me"))
 			    "        User.id, ".
 			    "        Hand.party as party, ".
 			    "        Hand.sickness as sickness, ".
-			    "        Hand.point_call ".
+			    "        Hand.point_call, ".
+			    "        User.last_login ".
 			    "FROM Hand ".
 			    "LEFT JOIN User ON User.id=Hand.user_id ".
 			    "WHERE Hand.game_id='".$gameid."' ".
@@ -991,8 +998,9 @@ else if(myisset("me"))
 	  $pos   = $r[1];
 	  $user  = $r[2];
 	  $party = $r[3];
-	  $sickness= $r[4];
-	  $call  = $r[5];
+	  $sickness  = $r[4];
+	  $call      = $r[5];
+	  $lastlogin = strtotime($r[6]);
 	  
 	  $offset = DB_get_user_timezone($user);
 	  $zone   = return_timezone($offset);
@@ -1003,19 +1011,43 @@ else if(myisset("me"))
 	  /* add hints for poverty, wedding, solo, etc */
 	  if($GT=="poverty" && $party=="re")
 	    if($sickness=="poverty")
-	      echo "(poverty <)";
+	      {
+		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		$cards = DB_get_all_hand($userhash);
+		$trumpNR = count_trump($cards);
+		if($trumpNR)
+		  echo "(poverty < trump back)";
+		else
+		  echo "(poverty <)";
+	      }
 	    else
 	      echo "(poverty >)";
 
 	  if($GT=="dpoverty")
 	    if($party=="re")
 	      if($sickness=="poverty")
-		echo "(poverty A <)";
+		{
+		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		$cards = DB_get_all_hand($userhash);
+		$trumpNR = count_trump($cards);
+		if($trumpNR)
+		  echo "(poverty A < trump back)";
+		else
+		  echo "(poverty A <)";
+		}
 	      else
 		echo "(poverty A >)";
 	    else
 	      if($sickness=="poverty")
-		echo "(poverty B <)";
+		{
+		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		$cards = DB_get_all_hand($userhash);
+		$trumpNR = count_trump($cards);
+		if($trumpNR)
+		  echo "(poverty B < trump back)";
+		else
+		  echo "(poverty B <)";
+		}
 	      else
 		echo "(poverty B >)";
 	      
@@ -1024,12 +1056,17 @@ else if(myisset("me"))
 		echo "(wedding  +)";
 	      else
 		echo "(wedding)";
+	  
+	  if(subst_compare($GT,"solo",0,4) && $party=="re")
+	     echo "($GT)";
+
 	  /* add point calls */
 	  if($call!=NULL)
 	    echo " $party $call ";
 
 	  echo "<br />\n";
 	  echo " local time: ".date("Y-m-d H:i:s")."\n";
+	  echo " last login: ".date("Y-m-d H:i:s",$unixtime)."<br />\n";
 	  echo " </span>\n";
 
 	}
@@ -1040,7 +1077,9 @@ else if(myisset("me"))
 			    "       Hand.position as position,".
 			    "       Play.sequence as sequence, ".
 			    "       Trick.id, ".
-			    "       Comment.comment ".
+			    "       Comment.comment, ".
+			    "       Play.create_date, ".
+			    "       Hand.user_id ".
 			    "FROM Trick ".
 			    "LEFT JOIN Play ON Trick.id=Play.trick_id ".
 			    "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
@@ -1066,7 +1105,13 @@ else if(myisset("me"))
 	  $seq     = $r[2];
 	  $trick   = $r[3];
 	  $comment = $r[4];
-	  
+	  $timeplayed = strtotime($r[5]);
+	  $user    = $r[6];
+
+	  $offset = DB_get_user_timezone($user);
+	  $zone   = return_timezone($offset);
+	  date_default_timezone_set($zone);
+
 	  /* check if first schweinchen has been played */
 	  if($r[0] == 19 || $r[0] == 20 )
 	    $GAME["schweinchen"]++;
@@ -1675,10 +1720,10 @@ else if(myisset("me"))
 /* default login page */
  else
    { 
-     $pre=0;$game=0;$done=0;
+     $pre[0]=0;$game[0]=0;$done[0]=0;
      $r=mysql_query("SELECT COUNT(id) FROM Game GROUP BY status");
      if($r) {
-       $pre = mysql_fetch_array($r,MYSQL_NUM);     
+       $pre  = mysql_fetch_array($r,MYSQL_NUM);     
        $game = mysql_fetch_array($r,MYSQL_NUM);     
        $done = mysql_fetch_array($r,MYSQL_NUM);     
      }
