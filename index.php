@@ -1057,7 +1057,7 @@ else if(myisset("me"))
 	      else
 		echo "(wedding)";
 	  
-	  if(subst_compare($GT,"solo",0,4) && $party=="re")
+	  if(substr_compare($GT,"solo",0,4)==0 && $party=="re")
 	     echo "($GT)";
 
 	  /* add point calls */
@@ -1065,8 +1065,8 @@ else if(myisset("me"))
 	    echo " $party $call ";
 
 	  echo "<br />\n";
-	  echo " local time: ".date("Y-m-d H:i:s")."\n";
-	  echo " last login: ".date("Y-m-d H:i:s",$unixtime)."<br />\n";
+	  echo " local time: ".date("Y-m-d H:i:s")."<br />\n";
+	  echo " last login: ".date("Y-m-d H:i:s",$lastlogin)."<br />\n";
 	  echo " </span>\n";
 
 	}
