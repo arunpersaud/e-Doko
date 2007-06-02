@@ -1059,7 +1059,7 @@ else if(myisset("me"))
 	      else
 		echo "(wedding)";
 	  
-	  if(substr_compare($GT,"solo",0,4)==0 && $party=="re")
+	  if(ereg("solo",$GT) && $party=="re")
 	     echo "($GT)";
 
 	  /* add point calls */

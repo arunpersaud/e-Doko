@@ -681,7 +681,7 @@ function can_call($what,$hash)
 	return 1;
       break;
     case "5th-card":
-      if( 27+4*($what/30)) <= $NRallcards + $offset*4)
+      if( 27+4*($what/30) <= $NRallcards + $offset*4)
 	return 1;
       break;
     case "9-cards":
