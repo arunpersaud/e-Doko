@@ -1731,7 +1731,14 @@ else if(myisset("me"))
        $game = mysql_fetch_array($r,MYSQL_NUM);     
        $done = mysql_fetch_array($r,MYSQL_NUM);     
      }
-     output_home_page($pre[0],$game[0],$done[0]);
+
+     $r=mysql_query("SELECT AVG(datediff(mod_date,create_date)) FROM Game where status='gameover' ");
+     if($r)
+       $avgage= mysql_fetch_array($r,MYSQL_NUM);     
+     else
+       $avgage[0]=0;
+
+     output_home_page($pre[0],$game[0],$done[0],$avgage[0]);
    }
 
 output_footer();

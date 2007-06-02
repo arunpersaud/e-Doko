@@ -282,7 +282,7 @@ function check_want_to_play($me)
   return;
 }
 
-function output_home_page($pre,$game,$done)
+function output_home_page($pre,$game,$done,$avgtime)
 {
 ?>
     <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
@@ -308,7 +308,7 @@ function output_home_page($pre,$game,$done)
     else if($done==1)
       echo "One game has been completed on this server. </p>";
     else
-      echo "$done games have been completed on this server. </p>";
+      echo "$done games have been completed on this server. Average time of a game: $avgtime days</p>";
 ?>
 
     <p> Please <a href="index.php?register">register</a>, in case you haven't done that yet  <br />
