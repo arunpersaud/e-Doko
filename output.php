@@ -106,6 +106,7 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"$playerD\" />\n";
   echo "  <input type=\"hidden\" name=\"dullen\"  value=\"".$RULES["dullen"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"schweinchen\" value=\"".$RULES["schweinchen"]."\" />\n";
+  echo "  <input type=\"hidden\" name=\"call\" value=\"".$RULES["call"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
   echo "  <input type=\"submit\" value=\"keep playing\" />\n";
   echo "</form>\n";
@@ -161,7 +162,16 @@ function output_form_for_new_game($names)
         </li>
         </ul>
       </p>
-      
+      <p> Call Re/Contra, etc.: 
+        <ul>
+           <li><input type="radio" name="call" value="1st-own-card" checked="checked" />
+                Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</li>
+           <li><input type="radio" name="call" value="5th-card" /> 
+                Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</li>
+           <li><input type="radio" name="call" value="9-cards"  /> 
+                Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</li>
+        </ul>
+      </p>      
    <input type="submit" value="start game" />
  </form>
 <?php
@@ -189,11 +199,9 @@ function display_link_card($card,$dir="english",$type="card")
   return;
 }
 
-function check_for_sickness($me,$mycards)
+function output_check_for_sickness($me,$mycards)
 {
  ?>
-  <p> Solo will work, but the first player will not change. Nothing else implemented. </p>	 	  
-
   <form action="index.php" method="post">
 
     do you want to play solo? 
@@ -211,7 +219,7 @@ function check_for_sickness($me,$mycards)
 
  <?php   
       
-  echo "wedding?";
+  echo "Wedding?";
   if(check_wedding($mycards))
      {
        echo " yes<input type=\"radio\" name=\"wedding\" value=\"yes\" checked=\"checked\" />";
@@ -222,7 +230,7 @@ function check_for_sickness($me,$mycards)
        echo " no <input type=\"hidden\" name=\"wedding\" value=\"no\" /> <br />\n";
      };
 
-  echo "do you have poverty?";
+  echo "Do you have poverty?";
   if(count_trump($mycards)<4)
     {
       echo " yes<input type=\"radio\" name=\"poverty\" value=\"yes\" checked=\"checked\" />";
@@ -233,7 +241,7 @@ function check_for_sickness($me,$mycards)
       echo " no <input type=\"hidden\" name=\"poverty\" value=\"no\" /> <br />\n";
     };
 
-   echo "do you have too many nines?";
+   echo "Do you have too many nines?";
   if(count_nines($mycards)>4)
      {
        echo " yes<input type=\"radio\" name=\"nines\" value=\"yes\" checked=\"checked\" />";

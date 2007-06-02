@@ -649,7 +649,48 @@ function sort_comp($a,$b)
 
 function can_call($what,$hash)
 {
-  return 1;
+  global $RULES;
+
+  /*TODO: check if this already has been call by teammate */
+  
+  $gameid   = DB_get_gameid_by_hash($hash);
+  $gametype = DB_get_gametype_by_gameid($gameid);
+
+  $NRcards  = count(DB_get_hand($me));
+  
+  $NRallcards = 0;
+  for ($i=1;$i<5;$i++)
+    {
+      $user         = DB_get_hash_from_game_and_pos($gameid,$i);
+      $NRallcards  += count(DB_get_hand($user));
+    };
+  
+  /* in case of a wedding, everything will be delayed by an offset */
+  $offset = 0;
+  if($gametype=="wedding")
+    {
+      $offset = DB_get_sickness_by_gameid($gameid); 
+      if ($offset <0) /* not resolved */
+	return 0;
+    };
+
+  switch ($RULES["call"])
+    {
+    case "1st-own-card":
+      if( 4-($what/30) >= 12 - $NRcards + $offset)
+	return 1;
+      break;
+    case "5th-card":
+      if( 27+4*($what/30)) <= $NRallcards + $offset*4)
+	return 1;
+      break;
+    case "9-cards":
+      if( ($what/10) <= $NRcards + $offset)
+	return 1;
+      break;
+    }
+
+  return 0;
 }
 
 ?>

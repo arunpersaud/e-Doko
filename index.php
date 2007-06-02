@@ -243,7 +243,9 @@ else if(myisset("me"))
 
     $RULES["dullen"]      = $r[2];
     $RULES["schweinchen"] = $r[3];
-    
+    $RULES["call"]        = "1st-own-card";
+
+
     /* get some infos about the game */
     $gametype   = DB_get_gametype_by_gameid($gameid);
     $gamestatus = DB_get_game_status_by_gameid($gameid);
@@ -333,7 +335,7 @@ else if(myisset("me"))
 		  display_card($card,$PREF["cardset"]);
 		echo "</p>\n";   
 		
-		check_for_sickness($me,$mycards);
+		output_check_for_sickness($me,$mycards);
 		
 		/* move on to the next stage*/
 		DB_set_hand_status_by_hash($me,'check');
@@ -1461,7 +1463,9 @@ else if(myisset("me"))
 		" <input type=\"radio\" name=\"call30\" value=\"yes\" /> ";
 	  if( can_call(0,$me) )
 	      echo " 0:".
-		" <input type=\"radio\" name=\"call0\" value=\"yes\" /> ";
+		" <input type=\"radio\" name=\"call0\" value=\"yes\" /> ".
+		" no call:".
+		" <input type=\"radio\" name=\"call0\" value=\"no\" /> ";
 
 	  echo "<br />\nA short comments:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"50\" />\n";
 	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
