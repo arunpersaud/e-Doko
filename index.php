@@ -62,6 +62,7 @@ if(myisset("new"))
       {
 	echo "couldn't find one of the names, please start a new game";
 	output_footer();
+	DB_close();
 	exit();
       }
     
@@ -80,6 +81,7 @@ if(myisset("new"))
       {
 	echo "Error defining ruleset: $ruleset";
 	output_footer();
+	DB_close();
 	exit();
       };
     
@@ -172,6 +174,7 @@ else if(myisset("cancle","me"))
 	echo "Can't find you in the database, please check the url.<br />\n";
 	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
 	output_footer();
+	DB_close();
 	exit();
       }
     
@@ -217,6 +220,7 @@ else if(myisset("me"))
 	echo "Can't find you in the database, please check the url.<br />\n";
 	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
 	output_footer();
+	DB_close();
 	exit();
       }
 
@@ -531,6 +535,7 @@ else if(myisset("me"))
 	      echo "The game has been canceled because ".DB_get_name_by_userid($nines).
 		" has five or more nines and nobody is playing solo.\n";
 	      output_footer();
+	      DB_close();
 	      exit();
 	    }
 	  else if($poverty==1)
@@ -900,6 +905,7 @@ else if(myisset("me"))
 	  
 	  echo "<p style=\"background-color:red\";>Game $gameid has been cancled.<br /><br /></p>";
 	  output_footer();
+	  DB_close();
 	  exit();
 	}
 
@@ -1539,6 +1545,7 @@ else if(myisset("me"))
       echo "error in testing the status";
     }
     output_footer();
+    DB_close();
     exit();
  } 
 /* user status page */ 
@@ -1667,15 +1674,15 @@ else if(myisset("me"))
 	       
 	       
 	       echo "<p>and these are your games that are already done:<br />Game: \n";
+	       $output=array();
 	       $result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
-		 echo "<a href=\"".$host."?me=".$r[0]."\">#".$r[1]." </a>, ";
-	       echo "</p>\n";
+		 $output[]= "<a href=\"".$host."?me=".$r[0]."\">#".$r[1]." </a>";
+	       echo implode(", ",$output)."</p>\n";
 	       
 	       $names = DB_get_all_names();
 	       echo "<p>registered players:<br />\n";
-	       foreach ($names as $name)
-		 echo "$name, \n";
+	       echo implode(", ",$names)."\n";
 	       echo "</p>\n";
 	       
 	       echo "<p>Want to start a new game? Visit <a href=\"".$host."?new\">this page.</a></p>";
@@ -1687,6 +1694,7 @@ else if(myisset("me"))
 	 }
      };
      output_footer();
+     DB_close();
      exit();
    }
 /* page for registration */

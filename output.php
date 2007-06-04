@@ -64,8 +64,7 @@ function output_user_settings($email,$password)
 function output_register()
 {
   echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
-  echo "TODO: convert timezone into a menu<br />\n";
-  echo "TODO: figure out a way to handle passwords <br />\n";
+  echo "TODO: figure out a better way to handle passwords <br />\n";
   ?>
         <form action="index.php" method="post">
           <fieldset>
@@ -83,7 +82,12 @@ function output_register()
               </tr><tr>
 	       <td><label for="Rtimezone">Timezone:</label></td>
                <td>
-                  <input type="text" id="Rtimezone" name="Rtimezone" size="4" maxsize="4" value="+1" />
+		  <select id="Rtimezone" name="Rtimezone" size="1">
+                     <option value="1">Berlin</option>
+                     <option value="-8">Berkeley</option>
+                     <option value="13">Wellington</option>
+		  </select>
+	         (If your timezone is not listed, just select whatever you want and email the admin your correct time zone.)
 	       </td>
               </tr><tr>
                <td colspan="2"> <input type="submit" value="register" /></td>
