@@ -431,7 +431,7 @@ else if(myisset("me"))
 		$message = "Everyone finish the questionary in game $gameid, ".
 		           "please visit this link now to continue: \n".
 		           " ".$host."?me=".$userhash."\n\n" ;
-		mymail($To,$EmailName." finished setup",$message);
+		mymail($To,$EmailName." finished setup in game $gameid",$message);
 	      }
 	  };
 
@@ -701,7 +701,7 @@ else if(myisset("me"))
 		      
 		      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
 			" ".$host."?me=".$userhash."\n\n" ;
-		      mymail($To,$EmailName." poverty",$message);
+		      mymail($To,$EmailName." poverty (game $gameid)",$message);
 		    }
 
 		  /* this user is done */
@@ -781,7 +781,7 @@ else if(myisset("me"))
 			      $message = "Someone has poverty, it's your turn to decide, ".
 				         "if you want to take the trump. Please visit:".
 				         " ".$host."?me=".$userhash."\n\n" ;
-			      mymail($To,$EmailName." poverty",$message);
+			      mymail($To,$EmailName." poverty (game $gameid)",$message);
 			    }
 
 			}
@@ -930,7 +930,7 @@ else if(myisset("me"))
 	      /* email startplayer) */
 	      $message = "It's your turn now in game $gameid.\n".
 		"Use this link to play a card: ".$host."?me=".$hash."\n\n" ;
-	      mymail($email,$EmailName."ready, set, go... ",$message);
+	      mymail($email,$EmailName."ready, set, go... (game $gameid) ",$message);
 	    }
 	  else
 	    echo " Please, <a href=\"$host?me=$me\">start</a> the game.<br />";	 
@@ -1419,7 +1419,7 @@ else if(myisset("me"))
 		  $message = "A card has been played in game $gameid.\n\n".
 		    "It's your turn  now.\n".
 		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
-		  mymail($email,$EmailName."a card has been played",$message);		  
+		  mymail($email,$EmailName."a card has been played in game $gameid",$message);		  
 		}
 	    }
 	  else
