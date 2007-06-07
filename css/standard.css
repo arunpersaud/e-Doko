@@ -242,6 +242,9 @@ ul.tricks li div div.card3 span{
   padding:0;
 }
 
+.session {
+  border-bottom:1px solid black;
+}
 
 .ruleset {
   float:left;

@@ -656,7 +656,7 @@ function can_call($what,$hash)
   $gameid   = DB_get_gameid_by_hash($hash);
   $gametype = DB_get_gametype_by_gameid($gameid);
 
-  $NRcards  = count(DB_get_hand($me));
+  $NRcards  = count(DB_get_hand($hash));
   
   $NRallcards = 0;
   for ($i=1;$i<5;$i++)

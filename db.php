@@ -629,6 +629,24 @@ function DB_set_startplayer_by_gameid($id,$p)
   return;
 }
 
+function DB_get_player_by_gameid($id)
+{
+  $result = mysql_query("SELECT player FROM Game WHERE id=".DB_quote_smart($id));
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+function DB_set_player_by_gameid($id,$p)
+{
+  mysql_query("UPDATE Game SET player='".DB_quote_smart($p)."' WHERE id=".DB_quote_smart($id));
+  return;
+}
+
+
+
 function DB_get_ruleset_by_gameid($id)
 {
   $result = mysql_query("SELECT ruleset FROM Game WHERE id=".DB_quote_smart($id));
@@ -660,6 +678,20 @@ function DB_get_max_session()
     return $r[0];
   else
     return 0;
+}
+
+function DB_get_hashes_by_session($session,$user)
+{
+  $r = array();
+
+  $result = mysql_query("SELECT Hand.hash FROM Hand".
+			" LEFT JOIN Game ON Game.id=Hand.game_id ".
+			" WHERE Game.session=".DB_quote_smart($session).
+			" AND Hand.user_id=".DB_quote_smart($user));
+  while($t = mysql_fetch_array($result,MYSQL_NUM))
+    $r[] = $t[0];
+
+  return $r;
 }
 
 function DB_get_ruleset($dullen,$schweinchen)

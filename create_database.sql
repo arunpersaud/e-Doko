@@ -74,6 +74,7 @@ CREATE TABLE `Game` (
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `sickness` int(11) default NULL,
   `startplayer` tinyint(4) default '1', 
+  `playerid` int(11) default NULL, 
   `status` enum('pre','play','gameover') default NULL,
   `ruleset` int(11) default NULL,
   `session` int(11) default NULL,
@@ -102,6 +103,7 @@ CREATE TABLE `Rulesets` (
   `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
   `dullen` enum('none','firstwins','secondwins') default 'secondwins',
   `schweinchen` enum ('none','both','second','secondaftercall') default 'second',
+  `call` enum ('1st-own-card','5th-card','9-cards') default '1st-own-card',
   `id` int(11) NOT NULL auto_increment,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
