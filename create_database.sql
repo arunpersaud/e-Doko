@@ -74,7 +74,7 @@ CREATE TABLE `Game` (
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `sickness` int(11) default NULL,
   `startplayer` tinyint(4) default '1', 
-  `playerid` int(11) default NULL, 
+  `player` int(11) default NULL, 
   `status` enum('pre','play','gameover') default NULL,
   `ruleset` int(11) default NULL,
   `session` int(11) default NULL,
