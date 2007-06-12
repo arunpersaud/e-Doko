@@ -94,7 +94,7 @@ if(myisset("new"))
 	$ruleset = DB_get_ruleset_by_gameid($followup); /* just copy ruleset from old game, 
 							 this way no manipulation is possible */
 	if($session)
-	  mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','pre',".
+	  mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','1','pre',".
 		      "'$ruleset','$session' ,NULL)");
 	else
 	  {
@@ -102,12 +102,12 @@ if(myisset("new"))
 	    $max = DB_get_max_session();
 	    $max++;
 	    mysql_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
-	    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','pre',".
+	    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','1','pre',".
 			"'$ruleset','$max' ,NULL)");
 	  }
       }
     else
-      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','pre', ".
+      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','1','pre', ".
 		  "'$ruleset',NULL ,NULL)");
     $game_id = mysql_insert_id();
     

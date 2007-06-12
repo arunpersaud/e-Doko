@@ -677,7 +677,7 @@ function can_call($what,$hash)
   switch ($RULES["call"])
     {
     case "1st-own-card":
-      if( 4-($what/30) >= 12 - $NRcards + $offset)
+      if( 4-($what/30) >= 12 - ($NRcards + $offset))
 	return 1;
       break;
     case "5th-card":
