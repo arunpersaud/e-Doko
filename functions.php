@@ -9,7 +9,6 @@ function mymail($To,$Subject,$message,$header="")
       $message = str_replace("\n","<br />\n",$message);
       $message = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
                      "<a href=\"\\0\">\\0</a>", $message);
-      //$message = ereg_replace("(http.*)[ <>]","<a href=\"\\1\">\\1 </a>",$message);
       
       echo "<br />To: $To<br />";
       if($header != "") 
