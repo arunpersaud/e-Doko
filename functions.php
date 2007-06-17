@@ -422,7 +422,7 @@ function card_value($card)
 }
 
 
-function  create_array_of_random_numbers()
+function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
 {
   global $debug;
 
@@ -445,10 +445,21 @@ function  create_array_of_random_numbers()
     }
   else
     {
+      /* check if we can find a game were non of the player was involved and return 
+       * cards insted 
+       */
+      $userstr = implode(",",array($useridA,$useridB,$useridC,$useridD));
+      $randomnumbers = DB_get_unused_randomnumbers($userstr);
+      $randomnumbers = explode(":",$randomnumbers);
+      
+      if(sizeof($randomnumbers)==48)
+	return $randomnumbers;
+      
+      /* need to create new numbers */
       for($i=0;$i<48;$i++)
 	$r[$i]=$i+1;
       
-      shuffle($r);
+      shuffle($r); 
     };
 
   return $r;

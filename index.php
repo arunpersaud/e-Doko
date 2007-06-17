@@ -72,7 +72,7 @@ if(myisset("new"))
     $useridD  = DB_get_userid_by_name($PlayerD);
     
     /* create random numbers */
-    $randomNR       = create_array_of_random_numbers();
+    $randomNR       = create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD);
     $randomNRstring = join(":",$randomNR);
     
     /* get ruleset information or create new one */

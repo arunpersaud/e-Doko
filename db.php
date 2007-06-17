@@ -764,4 +764,19 @@ function DB_get_PREF($myid)
     return;
 }
 
+function DB_get_unused_randomnumbers($userstr)
+{
+  $queryresult = mysql_query("SELECT randomnumbers,Game.id FROM Game ".
+			     "  LEFT JOIN Hand ON Hand.game_id=Game.id ".
+			     "                 AND  user_id not in (".$userstr.")".
+			     "  GROUP BY  Game.id ".
+			     "  HAVING num=4");
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
 ?>
