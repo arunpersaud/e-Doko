@@ -753,14 +753,6 @@ function DB_get_PREF($myid)
     else
       $PREF["cardset"]="english";
 
-    $result = mysql_query("SELECT value from User_Prefs".
-			  " WHERE user_id='$myid' AND pref_key='ccemail'" );
-    $r = mysql_fetch_array($result,MYSQL_NUM);
-    if($r)
-      $PREF["ccemail"]=$r[0];
-    else
-      $PREF["ccemail"]="no";
-
     return;
 }
 

@@ -1384,26 +1384,23 @@ else if(myisset("me"))
 		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		    $message .= "    ".$r[0]." ".$r[1]."\n";
 		  
-		  /* check who wants to be CC'ed on the email */
-		  $h = array();
-		  $header = "";
+		  /* send out final email */
+		  $all = array();
+
 		  foreach($userids as $user)
-		    {
-		      $result = mysql_query("SELECT value from User_Prefs".
-					    " WHERE user_id='$user' AND pref_key='ccemail'" );
-		      $r = mysql_fetch_array($result,MYSQL_NUM);
-		      if($r && $r[0]=="yes")
-			$h[]   = DB_get_email_by_userid($user);
-		    }
-		  if(sizeof($h))
-		    $header = "CC: ".join(",",$h)."\r\n";
-		  
+		    $all[] = DB_get_email_by_userid($user);
+		  $TO = implode(",",$all);
+
+		  $help = "\n\n (you can use reply all on this email to reach all the players.)\n";
+		  mymail($To,$EmailName."game over (game $gameid) part 1(2)",$message.$help);
+
 		  foreach($userids as $user)
 		    {
 		      $To   = DB_get_email_by_userid($user);
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		      $mymessage = $message."Use this link to have a look at the game: ".$host."?me=".$hash."\n\n" ;
-		      mymail($To,$EmailName."game over (game $gameid)",$mymessage,$header);
+		      
+		      $link = "Use this link to have a look at game $gameid: ".$host."?me=".$hash."\n\n" ;
+		      mymail($To,$EmailName."game over (game $gameid) part 2(2)",$link);
 		    }
 		}
 	      
@@ -1644,21 +1641,6 @@ else if(myisset("me"))
 		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','cardset',".DB_quote_smart($setpref).")");
 		   echo "Ok, changed you preferences for the cards.\n";
 		   break;
-		 case "ccemail":
-		   $result = mysql_query("SELECT * from User_Prefs".
-					 " WHERE user_id='$uid' AND pref_key='ccemail'" );
-		   if( mysql_fetch_array($result,MYSQL_NUM))
-		     if($PREF["ccemail"]=="yes")
-		       $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart("no").
-					     " WHERE user_id='$uid' AND pref_key='ccemail'" );
-		     else
-		       $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart("yes").
-					     " WHERE user_id='$uid' AND pref_key='ccemail'" );
-		   else
-		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','ccemail',".DB_quote_smart("yes").")");
-		   echo "Ok, changed you preferences for being CC'ed on emails.\n";
-		   break;
-
 		 }
 	     }
 	   else /* output default user page */
