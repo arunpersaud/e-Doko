@@ -1518,6 +1518,24 @@ else if(myisset("me"))
 	  echo "Your cards were: <br />\n";
 	  foreach($oldcards as $card) 
 	    display_card($card,$PREF["cardset"]);
+	  
+	  $userids = DB_get_all_userid_by_gameid($gameid);
+          foreach($userids as $user)
+            {
+              $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+	      
+              if($userhash!=$me)
+                {
+                  echo "<br />";
+		  
+                  $name = DB_get_name_by_userid($user);
+                  $oldcards = DB_get_all_hand($userhash);
+                  $oldcards = mysort($oldcards,$gametype);
+                  echo "$name's cards were: <br />\n";
+                  foreach($oldcards as $card)
+                    display_card($card,$PREF["cardset"]);
+                }
+            }
 	}
       echo "</div>\n";
       
