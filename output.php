@@ -289,14 +289,16 @@ function output_home_page($pre,$game,$done,$avgtime)
     else
       echo "<p> At the moment there are $pre games that are being started ";
 
-    echo "and";
+    echo "and ";
 
     if($game==0)
-      echo " zero games that are ongoing. ";
+      echo "zero games that are ongoing. ";
     else if($game==1)	
-      echo " one game that is ongoing. ";
+      echo "one game that is ongoing. ";
     else 
       echo "$game games that are ongoing. ";
+
+    echo "<br />\n";
 
     if($done==0)
       echo "No game has been completed on this server. </p>";
