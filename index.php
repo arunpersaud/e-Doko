@@ -1042,12 +1042,12 @@ else if(myisset("me"))
 		$cards    = DB_get_all_hand($userhash);
 		$trumpNR  = count_trump($cards);
 		if($trumpNR)
-		  echo "(poverty < trump back)";
+		  echo "<img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
 		else
-		  echo "(poverty <)";
+		  echo "<img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
 	      }
 	    else
-	      echo "(poverty >)";
+	      echo "<img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
 
 	  if($GT=="dpoverty")
 	    if($party=="re")
@@ -1057,12 +1057,12 @@ else if(myisset("me"))
 		$cards    = DB_get_all_hand($userhash);
 		$trumpNR  = count_trump($cards);
 		if($trumpNR)
-		  echo "(poverty A < trump back)";
+		  echo "<img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
 		else
-		  echo "(poverty A <)";
+		  echo "<img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
 		}
 	      else
-		echo "(poverty A >)";
+		echo "<img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
 	    else
 	      if($sickness=="poverty")
 		{
@@ -1070,25 +1070,60 @@ else if(myisset("me"))
 		$cards    = DB_get_all_hand($userhash);
 		$trumpNR  = count_trump($cards);
 		if($trumpNR)
-		  echo "(poverty B < trump back)";
+		  echo "<img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" alt=\"poverty2 < trump back\" />";
 		else
-		  echo "(poverty B <)";
+		  echo "<img src=\"pics/button/poverty2_notrump_button.png\" class=\"button\" alt=\"poverty2 <\" />";
 		}
 	      else
-		echo "(poverty B >)";
+		echo "<img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" alt=\"poverty2 >\" />";
 	      
 	  if($GT=="wedding" && $party=="re")
 	      if($sickness=="wedding")
-		echo "(wedding  +)";
+		echo "<img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" />";
 	      else
-		echo "(wedding)";
+		echo "<img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" />";
 	  
 	  if(ereg("solo",$GT) && $party=="re")
-	     echo "($GT)";
+	    {
+	      if(ereg("queen",$GT))
+		echo "<img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	      else if(ereg("jack",$GT))
+		echo "<img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	      else if(ereg("club",$GT))
+		echo "<img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	      else if(ereg("spade",$GT))
+		echo "<img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	      else if(ereg("heart",$GT))
+		echo "<img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	      else if(ereg("trumpless",$GT))
+		echo "<img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	      else if(ereg("trump",$GT))
+		echo "<img src=\"pics/button/diamandsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    }
 
 	  /* add point calls */
 	  if($call!=NULL)
-	    echo " $party $call ";
+	    {
+	      if($party=="re")
+		echo "<img src=\"pics/button/re_button.png\" class=\"button\" alt=\"re\" />";
+	      else
+		echo "<img src=\"pics/button/contra_button.png\" class=\"button\" alt=\"contra\" />";
+	      switch($call)
+		{
+		case "0":
+		  echo "<img src=\"pics/button/0_button.png\" class=\"button\" alt=\"0\" />";
+		  break;
+		case "30":
+		  echo "<img src=\"pics/button/30_button.png\" class=\"button\" alt=\"30\" />";
+		  break;
+		case "60":
+		  echo "<img src=\"pics/button/60_button.png\" class=\"button\" alt=\"60\" />";
+		  break;
+		case "90":
+		  echo "<img src=\"pics/button/90_button.png\" class=\"button\" alt=\"90\" />";
+		  break;
+		}
+	    }
 
 	  echo "<br />\n";
 	  echo " local time: ".date("Y-m-d H:i:s")."<br />\n";

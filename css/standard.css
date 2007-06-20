@@ -305,3 +305,9 @@ ul.tricks li div div.card3 span{
 .cardinput:hover{
   background-color:red;
 }
+
+div span img.button {
+  height: 2em; 
+  width: 2em;
+
+}
