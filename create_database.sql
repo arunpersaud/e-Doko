@@ -204,9 +204,13 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `Score`;
 CREATE TABLE `Score` (
   `id` int(11) NOT NULL auto_increment,
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
   `game_id` int(11) NOT NULL default '0',
   `hand_id` int(11) NOT NULL default '0',
-  `score` tinyint(4) default NULL,
+  `score` enum('120', 'call120','against120','90','call90','against90',
+          '60','call60','against60','30','call30','against30',
+          '0','call0','against0',
+          'fox','karlchen','dulle','doko','againstqueens') default NULL,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -230,6 +234,7 @@ CREATE TABLE `Trick` (
   `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
   `id` int(11) NOT NULL auto_increment,
   `game_id` int(11) NOT NULL default '0',
+  `winner`  tinyint(4) default NULL,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

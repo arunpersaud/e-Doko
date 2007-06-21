@@ -466,7 +466,7 @@ function DB_get_current_trickid($gameid)
   
   if(!$sequence || $sequence==4)
     {
-      mysql_query("INSERT INTO Trick VALUES (NULL,NULL,NULL, ".DB_quote_smart($gameid).")");
+      mysql_query("INSERT INTO Trick VALUES (NULL,NULL,NULL, ".DB_quote_smart($gameid).",NULL)");
       $trickid  = mysql_insert_id();
       $sequence = 1;
       $number++;

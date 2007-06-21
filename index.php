@@ -1370,6 +1370,30 @@ else if(myisset("me"))
 			}
 		    }
 		}
+
+	      /* if sequence == 4, set winner of the trick, count points and set the next player */
+	      if($sequence==4)
+		{
+		  $play   = DB_get_cards_by_trick($trickid);
+		  $winner = get_winner($play,$gametype); /* returns the position */
+
+		  if($winner>0)
+		    mysql_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
+		  else
+		    echo "ERROR during scoring";
+
+		  if($debug)
+		    echo "DEBUG: position $winner won the trick <br />";
+
+		  /* who is the next player? */
+		  $next = $winner;
+		}
+	      else
+		{
+		  $next = DB_get_pos_by_hash($me)+1;
+		}
+	      if($next==5) $next=1;
+
 	      
 	      /* check for coment */
 	      if(myisset("comment"))
@@ -1404,40 +1428,45 @@ else if(myisset("me"))
 		  $done=0;
 	      
 	      if($done)
+		DB_set_game_status_by_gameid($gameid,"gameover");
+
+	      /* email next player, if game is still running */
+	      if(DB_get_game_status_by_gameid($gameid)=='play')
 		{
-		  DB_set_game_status_by_gameid($gameid,"gameover");
-		  /* get score for last trick 
-		   * all other tricks are handled a few lines further down*/
-		  $play   = DB_get_cards_by_trick($trickid);
-		  $winner = get_winner($play,$gametype); /* returns the position */
-		  /* get points of last trick and save it */
-		  $points = 0;
-		  foreach($play as $card)
-		    $points = $points + card_value($card["card"]);
-		  $winnerid = DB_get_handid_by_gameid_and_position($gameid,$winner);
-		  if($winnerid>0)
-		    mysql_query("INSERT INTO Score VALUES (NULL, '$gameid', '$winnerid', '$points')");
-		  else
-		    {
-		      myerror("ERROR during scoring");
-		    }		  
-		  /* email all players */
+		  $next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
+		  $email     = DB_get_email_by_hash($next_hash);
+		  $who       = DB_get_userid_by_email($email);
+		  DB_set_player_by_gameid($gameid,$who);
+		  
+		  $message = "A card has been played in game $gameid.\n\n".
+		    "It's your turn  now.\n".
+		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
+		  mymail($email,$EmailName."a card has been played in game $gameid",$message);
+		}
+	      else /* send out final email */
+		{
 		  /* individual score */
-		  $result = mysql_query("SELECT fullname, IFNULL(SUM(score),0), Hand.party FROM Hand".
-					" LEFT JOIN Score ON Hand.id=Score.hand_id".
-					" LEFT JOIN User ON Hand.user_id=User.id".
-					" WHERE Hand.game_id=$gameid".
-					" GROUP BY fullname" );
+		  $result = mysql_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand".
+				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				" LEFT JOIN User ON User.id=Hand.user_id".
+				" LEFT JOIN Play ON Trick.id=Play.trick_id".
+				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				" WHERE Hand.game_id='$gameid'".
+				" GROUP BY User.fullname" );
 		  $message  = "The game is over. Thanks for playing :)\n";
 		  $message .= "Final score:\n";
 		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		    $message .= "   ".$r[0]."(".$r[2].") ".$r[1]."\n";
 
-		  $result = mysql_query("SELECT Hand.party, IFNULL(SUM(score),0) FROM Hand".
-					" LEFT JOIN Score ON Hand.id=Score.hand_id".
-					" LEFT JOIN User ON Hand.user_id=User.id".
-					" WHERE Hand.game_id=$gameid".
-					" GROUP BY Hand.party" );
+		  $result = mysql_query("SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
+				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				" LEFT JOIN User ON User.id=Hand.user_id".
+				" LEFT JOIN Play ON Trick.id=Play.trick_id".
+				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				" WHERE Hand.game_id='$gameid'".
+				" GROUP BY User.fullname" );
 		  $message .= "\nTotals:\n";
 		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		    $message .= "    ".$r[0]." ".$r[1]."\n";
@@ -1460,52 +1489,6 @@ else if(myisset("me"))
 		      $link = "Use this link to have a look at game $gameid: ".$host."?me=".$hash."\n\n" ;
 		      mymail($To,$EmailName."game over (game $gameid) part 2(2)",$link);
 		    }
-		}
-	      
-	      
-	      /* email next player */
-	      if(DB_get_game_status_by_gameid($gameid)=='play')
-		{
-		  if($sequence==4)
-		    {
-		      $play   = DB_get_cards_by_trick($trickid);
-		      $winner = get_winner($play,$gametype); /* returns the position */
-		      
-		      /* get points of last trick and save it, last trick is handled 
-		       * a few lines further up  */
-		      $points = 0;
-		      foreach($play as $card)
-			$points = $points + card_value($card["card"]);
-		      
-		      $winnerid = DB_get_handid_by_gameid_and_position($gameid,$winner);
-		      if($winnerid>0)
-			mysql_query("INSERT INTO Score VALUES (NULL, '$gameid', '$winnerid', '$points')");
-		      else
-			{
-			  myerror("ERROR during scoring");
-			};
-		      if($debug)
-			echo "DEBUG: $winner got $points <br />";
-		      
-		      /* who is the next player? */
-		      $next = $winner;
-		    }
-		  else
-		    {
-		      $next = DB_get_pos_by_hash($me)+1;
-		    }
-		  if($next==5) $next=1;
-		  
-		  /* email next player */
-		  $next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
-		  $email     = DB_get_email_by_hash($next_hash);
-		  $who       = DB_get_userid_by_email($email);
-		  DB_set_player_by_gameid($gameid,$who);
-
-		  $message = "A card has been played in game $gameid.\n\n".
-		    "It's your turn  now.\n".
-		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
-		  mymail($email,$EmailName."a card has been played in game $gameid",$message);		  
 		}
 	    }
 	  else
@@ -1611,21 +1594,28 @@ else if(myisset("me"))
 	{
 	  echo "the game is over now...<br />\n";
 	  
-	  $result = mysql_query("SELECT fullname, IFNULL(SUM(score),0), Hand.party FROM Hand".
-				" LEFT JOIN Score ON Hand.id=Score.hand_id".
-				" LEFT JOIN User ON Hand.user_id=User.id".
-				" WHERE Hand.game_id=$gameid".
-				" GROUP BY fullname" );
+	  $result = mysql_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand".
+				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				" LEFT JOIN User ON User.id=Hand.user_id".
+				" LEFT JOIN Play ON Trick.id=Play.trick_id".
+				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				" WHERE Hand.game_id='$gameid'".
+				" GROUP BY User.fullname" );
 	  echo "Final Score:<br />\n".
 	    " <table>\n";;
 	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	    echo "  <tr><td>  ".$r[0]."</td><td>(".$r[2].")</td><td> ".$r[1]."</td></tr>";
 	  echo "</table>\n";
 
-	  $result = mysql_query("SELECT Hand.party, IFNULL(SUM(score),0) FROM Hand".
-				" LEFT JOIN Score ON Hand.id=Score.hand_id".
-				" LEFT JOIN User ON Hand.user_id=User.id".
-				" WHERE Hand.game_id=$gameid".
+
+	  $result = mysql_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
+				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				" LEFT JOIN User ON User.id=Hand.user_id".
+				" LEFT JOIN Play ON Trick.id=Play.trick_id".
+				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				" WHERE Hand.game_id='$gameid'".
 				" GROUP BY Hand.party" );
 	  echo "Totals:<br />\n".
 	    " <table> \n";
