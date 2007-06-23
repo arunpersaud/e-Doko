@@ -28,7 +28,7 @@ function myisset()
   /* returns 1 if all names passed as args are defined by a GET or POST statement,
    * else return 0
    */
-
+  
   $ok   = 1;
   $args = func_get_args();
   
@@ -41,10 +41,17 @@ function myisset()
   return $ok;
 }
 
+function myerror($message)
+{
+  echo "<span class=\"error\">".htmlspecialchars($message)."</span>\n";
+  mymail($ADMIN_EMAIL,$EmailName." Error in Code",$message);
+  return;
+}
+
 function pos_array($c,$arr)
 {
   $ret = 0;
-
+  
   $i   = 0;
   foreach($arr as $a)
     {
@@ -335,7 +342,8 @@ function card_value($card)
     case 48:	               
       return 0;
     default:
-      echo "something went wrong, please contact the admin. ErrorCode: 2 - $card<br>";
+      myerror("something went wrong, please contact $ADMIN_NAME at $ADMIN_EMAIL. ErrorCode: 2 - $card<br>");
+      echo "something went wrong, please contact $ADMIN_NAME at $ADMIN_EMAIL. ErrorCode: 2 - $card<br>";
       return 0;
     }
 }

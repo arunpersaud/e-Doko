@@ -13,6 +13,23 @@ if(isset($EMAIL_REPLY))
   {
     ini_set("sendmail_from",$EMAIL_REPLY);
   }
+if(!isset($ADMIN_NAME))
+  {
+    output_header();
+    echo "<h1>Setup not completed</h1>";
+    echo "You need to set \$ADMIN_NAME in config.php.";
+    output_footer(); 
+    exit(); 
+  }    
+if(!isset($ADMIN_EMAIL))
+  {
+    output_header();
+    echo "<h1>Setup not completed</h1>";
+    echo "You need to set \$ADMIN_EMAIL in config.php. ".
+      "If something goes wrong an email will send to this address.";
+    output_footer(); 
+    exit(); 
+  }
 
 /* in case work has to be done on the database or other section we can
  * shut down the server and tell people to come back later 
@@ -28,7 +45,8 @@ if(0)
 if(DB_open()<0)
   {
     output_header();
-    echo "Database error, can't connect...";
+    echo "Database error, can't connect... Please wait a while and try again. ".
+      "If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
     output_footer(); 
     exit(); 
   }
@@ -79,7 +97,7 @@ if(myisset("new"))
     $ruleset = DB_get_ruleset($dullen,$schweinchen);
     if($ruleset <0) 
       {
-	echo "Error defining ruleset: $ruleset";
+	myerror("Error defining ruleset: $ruleset");
 	output_footer();
 	DB_close();
 	exit();
@@ -379,7 +397,7 @@ else if(myisset("me"))
 	  /* all these variables have a pre-selected default,
 	   * so we should never get here,
 	   * unless a user tries to cheat ;) */
-	  echo "something went wrong...please contact the admin.";
+	  echo "something went wrong during the setup...please contact the $ADMIN_NAME at $ADMIN_EMAIL.";
 	}
       else
 	{
@@ -771,7 +789,8 @@ else if(myisset("me"))
 		  $r      = mysql_fetch_array($result,MYSQL_NUM);
 		  if(!$r)
 		    {
-		      die("error in poverty");
+		      myerror("error in poverty");
+		      die();
 		    };
 		  if($r[0]==12)
 		    {
@@ -1396,8 +1415,9 @@ else if(myisset("me"))
 		  if($winnerid>0)
 		    mysql_query("INSERT INTO Score VALUES (NULL, '$gameid', '$winnerid', '$points')");
 		  else
-		    echo "ERROR during scoring";
-		  
+		    {
+		      myerror("ERROR during scoring");
+		    }		  
 		  /* email all players */
 		  /* individual score */
 		  $result = mysql_query("SELECT fullname, IFNULL(SUM(score),0), Hand.party FROM Hand".
@@ -1458,8 +1478,9 @@ else if(myisset("me"))
 		      if($winnerid>0)
 			mysql_query("INSERT INTO Score VALUES (NULL, '$gameid', '$winnerid', '$points')");
 		      else
-			echo "ERROR during scoring";
-		      
+			{
+			  myerror("ERROR during scoring");
+			};
 		      if($debug)
 			echo "DEBUG: $winner got $points <br />";
 		      
@@ -1627,7 +1648,7 @@ else if(myisset("me"))
 	}
       break;
     default:
-      echo "error in testing the status";
+      myerror("error in testing the status");
     }
     output_footer();
     DB_close();
