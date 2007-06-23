@@ -9,6 +9,10 @@ include_once("functions.php");   /* the rest */
 /* check if some variables are set in the config file, else set defaults */
 if(!isset($EmailName))
      $EmailName="[DoKo] ";
+if(isset($EMAIL_REPLY))
+  {
+    ini_set("sendmail_from",$EMAIL_REPLY);
+  }
 
 /* in case work has to be done on the database or other section we can
  * shut down the server and tell people to come back later 
@@ -1412,7 +1416,7 @@ else if(myisset("me"))
 
 		  foreach($userids as $user)
 		    $all[] = DB_get_email_by_userid($user);
-		  $TO = implode(",",$all);
+		  $To = implode(",",$all);
 
 		  $help = "\n\n (you can use reply all on this email to reach all the players.)\n";
 		  mymail($To,$EmailName."game over (game $gameid) part 1(2)",$message.$help);
