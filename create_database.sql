@@ -310,10 +310,38 @@ CREATE TABLE `User_Prefs` (
 --
 
 
-/*!40000 ALTER TABLE `User_Prefs` DISABLE KEYS */;
-LOCK TABLES `User_Prefs` WRITE;
+
+
+/*!40000 ALTER TABLE `Recovery` DISABLE KEYS */;
+LOCK TABLES `Recovery` WRITE;
 UNLOCK TABLES;
-/*!40000 ALTER TABLE `User_Prefs` ENABLE KEYS */;
+/*!40000 ALTER TABLE `Recovery` ENABLE KEYS */;
+
+
+DROP TABLE IF EXISTS `Recovery`;
+CREATE TABLE `Recovery` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) NOT NULL default '0',
+  `password` varchar(32) default NULL,
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Recovery`
+--
+
+
+
+
+/*!40000 ALTER TABLE `Recovery` DISABLE KEYS */;
+LOCK TABLES `Recovery` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Recovery` ENABLE KEYS */;
+
+
+
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

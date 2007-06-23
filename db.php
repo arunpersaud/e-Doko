@@ -134,6 +134,17 @@ function DB_get_userid_by_email_and_password($email,$password)
   $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($email)." AND password=".DB_quote_smart($password));
   $r      = mysql_fetch_array($result,MYSQL_NUM);
   
+  /* test if a recovery password has been set */
+  if(!$r)
+    {
+      $result = mysql_query("SELECT User.id FROM User".
+			    " LEFT JOIN Recovery ON User.id=Recovery.user_id".
+			    " WHERE email=".DB_quote_smart($email).
+			    " AND Recovery.password=".DB_quote_smart($password).
+			    " AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
+      $r      = mysql_fetch_array($result,MYSQL_NUM);
+    }
+
   if($r)
     return $r[0];
   else
@@ -771,4 +782,25 @@ function DB_get_unused_randomnumbers($userstr)
     return "";
 }
 
+function DB_get_number_of_passwords_recovery($user)
+{
+  $queryresult = mysql_query("SELECT COUNT(*) FROM Recovery ".
+			     "  WHERE user_id=$user ".
+			     "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
+			     "  GROUP BY user_id " );
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
+function DB_set_recovery_password($user,$newpw)
+{
+  mysql_query("INSERT INTO Recovery VALUES(NULL,".DB_quote_smart($user).
+	      ",".DB_quote_smart($newpw).",NULL)");
+	      
+  return;
+}
 ?>

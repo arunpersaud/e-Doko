@@ -34,7 +34,8 @@ function output_user_settings($email,$password)
   echo "<form action=\"index.php\" method=\"post\">\n";
   echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
   echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
-  echo "  <input type=\"submit\" class=\"submitbutton\" name=\"passwd\" value=\"change password\" /> <br />\n";
+  echo "  <input type=\"hidden\" name=\"passwd\"  value=\"ask\" />\n";
+  echo "  <input type=\"submit\" class=\"submitbutton\" name=\"pass\" value=\"change password\" /> <br />\n";
   echo "</form>\n";
   echo "<form action=\"index.php\" method=\"post\">\n";
   echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
@@ -403,5 +404,37 @@ function output_footer()
   echo "</html>\n";
 
   return;
+}
+
+function output_password_recovery($email,$password)
+{
+?>
+   <form action="index.php" method="post">
+<?php
+  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
+  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
+  echo "  <input type=\"hidden\" name=\"passwd\"  value=\"set\" />\n";
+?>    
+     <fieldset>
+       <legend>Password recovery</legend>
+        <table>
+         <tr>
+            <td><label for="email">Old password:</label></td>
+            <td><input type="password" id="password0" name="password0" size="20" maxlength="30" /> </td>
+         </tr><tr>
+            <td><label for="password">New password:</label></td>
+            <td><input type="password" id="password1" name="password1" size="20" maxlength="30" /></td>
+         </tr><tr>
+            <td><label for="password">Retype:</label></td>
+            <td><input type="password" id="password2" name="password2" size="20" maxlength="30" /></td>
+         </tr><tr>
+           <td></td>
+           <td> <input type="submit" class="submitbutton" name="passwd" value="set" /></td>
+         </tr>
+        </table>
+     </fieldset>
+   </form>
+
+<?php
 }
 ?>

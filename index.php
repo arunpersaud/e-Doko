@@ -1643,16 +1643,49 @@ else if(myisset("me"))
 	 
 	 if($ok)
 	   {
-	     echo "Hmm, you forgot your passwort...nothing I can do at the moment:(  ";
-	     echo " you need to email Arun for now... in the future it will be all automated and an ";
-	     echo "email with a new password will go to $email.";
+	     /* check how many entries in recovery table */
+	     $number = DB_get_number_of_passwords_recovery($uid);
+	     
+	     /* if less than N recent ones, add a new one and send out email */
+	     if( $number < 5 )
+	       {
+		 echo "Ok, I send you a new password. <br />";
+		 if($number >1)
+		   echo "N.B. You tried this already $number times during the last day and it will only work ".
+		     " 5 times during a day.<br />";
+		 echo "The new password will be valid for one day, make sure you reset it to something else.<br />";
+		 echo "Back to the  <a href=\"$host\">main page</a>.";
+		 
+		 $TIME  = (string) time(); /* to avoid collisions */
+		 $hash  = md5("Anewpassword".$email.$TIME);
+		 $newpw = substr($hash,1,8);
+		 
+		 $message = "Someone (hopefully you) requested a new password. \n".
+		   "You can use this email and the following password: \n".
+		   "   $newpw    \n".
+		   "to log into the server. The new password is valid for 24h, so make\n".
+		   "sure you reset your password to something new. Your old password will\n".
+		   " also still be valid until you set a new one\n";
+		 mymail($email,$EmailName."recovery ",$message);
+		 
+		 DB_set_recovery_password($uid,md5($newpw));
+	       }
+	     else
+	       {
+		 echo "Sorry you already tried 5 times during the last 24h.<br />".
+		   "You need to use one of those passwords or wait to get a new one.<br />";
+		 echo "Back to the <a href=\"$host\">main page</a>.";
+	       }
 	   }
 	 else
 	   {
 	     if($email=="")
-	       echo "you need to give me an email address!";
+	       echo "You need to give me an email address! <br />".
+		 "Please try <a href=\"$host\">again</a>.";
 	     else
-	       echo "couldn't find a player with this email, please contact Arun, if you think this is a mistake";
+	       echo "Couldn't find a player with this email! <br />".
+		 "Please contact Arun, if you think this is a mistake <br />".
+		 "or else try <a href=\"$host\">again</a>.";
 	   } 
        }
      else 
@@ -1683,9 +1716,46 @@ else if(myisset("me"))
 		     $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
 					   " WHERE user_id='$uid' AND pref_key='cardset'" );
 		   else
-		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','cardset',".DB_quote_smart($setpref).")");
+		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','cardset',".
+					   DB_quote_smart($setpref).")");
 		   echo "Ok, changed you preferences for the cards.\n";
 		   break;
+		 }
+	     }
+	   else if(myisset("passwd"))
+	     {
+	       if( $_REQUEST["passwd"]=="ask" )
+		 {
+		   /* reset password form*/
+		   output_password_recovery($email,$password);	       
+		 }
+	       else if($_REQUEST["passwd"]=="set")
+		 {
+		   /* reset password */
+		   $ok = 1;
+
+		   /* check if old password matches */
+		   if($password != md5($_REQUEST["password0"]))
+		     $ok = -1;
+		   /* check if new passwords are types the same twice */
+		   if($_REQUEST["password1"] != $_REQUEST["password2"] )
+		     $ok = -2;
+		   
+		   switch($ok)
+		     {
+		     case '-2':
+		       echo "The new passwords don't match. <br />";
+		       break;
+		     case '-1':
+		       echo "The old password is not correct. <br />";
+		       break;
+		     case '1':
+		       echo "Changed the password.<br />";
+		       mysql_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
+				   "' WHERE id=".DB_quote_smart($uid));
+		       break;
+		     }
+		   /* set password */
 		 }
 	     }
 	   else /* output default user page */
