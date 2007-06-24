@@ -94,7 +94,7 @@ if(myisset("new"))
 	$ruleset = DB_get_ruleset_by_gameid($followup); /* just copy ruleset from old game, 
 							 this way no manipulation is possible */
 	if($session)
-	  mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','1','pre',".
+	  mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 		      "'$ruleset','$session' ,NULL)");
 	else
 	  {
@@ -102,12 +102,12 @@ if(myisset("new"))
 	    $max = DB_get_max_session();
 	    $max++;
 	    mysql_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
-	    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','1','pre',".
+	    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 			"'$ruleset','$max' ,NULL)");
 	  }
       }
     else
-      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1','1','pre', ".
+      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
 		  "'$ruleset',NULL ,NULL)");
     $game_id = mysql_insert_id();
     
@@ -439,21 +439,29 @@ else if(myisset("me"))
 	    {
 	      $userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
 	      if($userstat!='poverty' && $userstat!='play')
-		$ok = 0;
+		{
+		  $ok = 0;
+		  DB_set_player_by_gameid($gameid,$user);
+		}
 	    };
 	  if($ok)
-	    foreach($userids as $user)
-	      {
-		$To       = DB_get_email_by_userid($user);
-		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		if($userhash != $me)
-		  {
-		    $message = "Everyone finish the questionary in game $gameid, ".
-		      "please visit this link now to continue: \n".
-		      " ".$host."?me=".$userhash."\n\n" ;
-		    mymail($To,$EmailName." finished setup in game $gameid",$message);
-		  }
-	      };
+	    {
+	      /* reset player = everyone has to do something now */
+	      DB_set_player_by_gameid($gameid,NULL);
+	      
+	      foreach($userids as $user)
+		{
+		  $To       = DB_get_email_by_userid($user);
+		  $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		  if($userhash != $me)
+		    {
+		      $message = "Everyone finish the questionary in game $gameid, ".
+			"please visit this link now to continue: \n".
+			" ".$host."?me=".$userhash."\n\n" ;
+		      mymail($To,$EmailName." finished setup in game $gameid",$message);
+		    }
+		};
+	    };
 	};
 
       break;
@@ -803,7 +811,6 @@ else if(myisset("me"))
 				         " ".$host."?me=".$userhash."\n\n" ;
 			      mymail($To,$EmailName." poverty (game $gameid)",$message);
 			    }
-
 			}
 		      
 		      /* this user is done */
@@ -896,63 +903,64 @@ else if(myisset("me"))
 		  else
 		    echo "it's not your turn yet to decide if you want to take the trump or not.";
 		}
-
 	    };
-	}
-      /* check if no one wanted to take trump, in that case the gamesickness would be set to 5 or 50 */
-      $who = DB_get_sickness_by_gameid($gameid);
-      if($who==5 || $who==50)
-	{
-	  $message = "Hello, \n\n".
-	    "Game $gameid has been cancled since nobody wanted to take the trump.\n";
-	  
-	  $userids = DB_get_all_userid_by_gameid($gameid);
-	  foreach($userids as $user)
+	  /* check if no one wanted to take trump, in that case the gamesickness would be set to 5 or 50 */
+	  $who = DB_get_sickness_by_gameid($gameid);
+	  if($who==5 || $who==50)
 	    {
-	      $To = DB_get_email_by_userid($user);
-	      mymail($To,$EmailName."game $gameid cancled (poverty not resolved)",$message);
+	      $message = "Hello, \n\n".
+		"Game $gameid has been cancled since nobody wanted to take the trump.\n";
+	      
+	      $userids = DB_get_all_userid_by_gameid($gameid);
+	      foreach($userids as $user)
+		{
+		  $To = DB_get_email_by_userid($user);
+		  mymail($To,$EmailName."game $gameid cancled (poverty not resolved)",$message);
+		}
+	      
+	      /* delete everything from the dB */
+	      DB_cancel_game($me);
+	      
+	      echo "<p style=\"background-color:red\";>Game $gameid has been cancled.<br /><br /></p>";
+	      output_footer();
+	      DB_close();
+	      exit();
 	    }
 	  
-	  /* delete everything from the dB */
-	  DB_cancel_game($me);
+	  /* check if all players are ready to play */
+	  $ok = 1;
+	  foreach($userids as $user)
+	    if(DB_get_hand_status_by_userid_and_gameid($user,$gameid)!='play')
+	      {
+		$ok = 0;
+		DB_set_player_by_gameid($gameid,$user);
+	      }
 	  
-	  echo "<p style=\"background-color:red\";>Game $gameid has been cancled.<br /><br /></p>";
-	  output_footer();
-	  DB_close();
-	  exit();
-	}
-
-      /* check if all players are ready to play */
-      $ok = 1;
-      foreach($userids as $user)
-	if(DB_get_hand_status_by_userid_and_gameid($user,$gameid)!='play')
-	  $ok = 0;
-
-      if($ok)
-	{
-	  /* only set this after all poverty, etc. are handled*/
-	  DB_set_game_status_by_gameid($gameid,'play');
-
-	  /* email startplayer */
-	  $startplayer = DB_get_startplayer_by_gameid($gameid);
-	  $email       = DB_get_email_by_pos_and_gameid($startplayer,$gameid);
-	  $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-	  $who         = DB_get_userid_by_email($email);
-	  DB_set_player_by_gameid($gameid,$who);
-	  
-	  if($hash!=$me)
+	  if($ok)
 	    {
-	      /* email startplayer) */
-	      $message = "It's your turn now in game $gameid.\n".
-		"Use this link to play a card: ".$host."?me=".$hash."\n\n" ;
-	      mymail($email,$EmailName."ready, set, go... (game $gameid) ",$message);
+	      /* only set this after all poverty, etc. are handled*/
+	      DB_set_game_status_by_gameid($gameid,'play');
+	      
+	      /* email startplayer */
+	      $startplayer = DB_get_startplayer_by_gameid($gameid);
+	      $email       = DB_get_email_by_pos_and_gameid($startplayer,$gameid);
+	      $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
+	      $who         = DB_get_userid_by_email($email);
+	      DB_set_player_by_gameid($gameid,$who);
+	      
+	      if($hash!=$me)
+		{
+		  /* email startplayer) */
+		  $message = "It's your turn now in game $gameid.\n".
+		    "Use this link to play a card: ".$host."?me=".$hash."\n\n" ;
+		  mymail($email,$EmailName."ready, set, go... (game $gameid) ",$message);
+		}
+	      else
+		echo " Please, <a href=\"$host?me=$me\">start</a> the game.<br />";	 
 	    }
 	  else
-	    echo " Please, <a href=\"$host?me=$me\">start</a> the game.<br />";	 
+	    echo "\n <br />";	 
 	}
-      else
-	echo "\n <br />";	 
-
       break;
     case 'play':
     case 'gameover': 
@@ -1781,16 +1789,14 @@ else if(myisset("me"))
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
 		   echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a>";
-		   if($r[3])
+		   if($r[3]==$uid || $r[3]==NULL)
+		     echo "(it's <strong>your</strong> turn)\n";
+		   else
 		     {
-		       if($r[3]==$uid)
-			 echo "(it's <strong>your</strong> turn)\n";
-		       else
-			 {
-			   $name = DB_get_name_by_userid($r[3]);
-			   echo "(it's $name's turn)\n";
-			 };
-		     }
+		       $name = DB_get_name_by_userid($r[3]);
+		       echo "(it's $name's turn)\n";
+		     };
+		     
 		   if(time()-strtotime($r[2]) > 60*60*24*30)
 		     echo " The game has been running for over a month.".
 		       " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
