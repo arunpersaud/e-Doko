@@ -705,12 +705,13 @@ function DB_get_hashes_by_session($session,$user)
   return $r;
 }
 
-function DB_get_ruleset($dullen,$schweinchen)
+function DB_get_ruleset($dullen,$schweinchen,$call)
 {
   $r = array();
   
   $result = mysql_query("SELECT id FROM Rulesets WHERE".
 			" dullen=".DB_quote_smart($dullen)." AND ".
+			" call=".DB_quote_smart($call)." AND ".
 			" schweinchen=".DB_quote_smart($schweinchen));
   if($result)
     $r    = mysql_fetch_array($result,MYSQL_NUM);
@@ -722,7 +723,8 @@ function DB_get_ruleset($dullen,$schweinchen)
       /* create new one */
       $result = mysql_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
 			    DB_quote_smart($dullen).",".
-			    DB_quote_smart($schweinchen).
+			    DB_quote_smart($schweinchen).",".
+			    DB_quote_smart($call).
 			    ", NULL)");
       if($result)
 	return mysql_insert_id();

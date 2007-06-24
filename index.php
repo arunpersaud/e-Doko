@@ -61,7 +61,7 @@ if(myisset("new"))
     output_form_for_new_game($names);
   }
 /*check if everything is ready to set up a new game */
- else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen" ))
+ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","call" ))
   {
     $PlayerA = $_REQUEST["PlayerA"];
     $PlayerB = $_REQUEST["PlayerB"];
@@ -70,7 +70,8 @@ if(myisset("new"))
 
     $dullen      = $_REQUEST["dullen"];
     $schweinchen = $_REQUEST["schweinchen"];
-    
+    $call        = $_REQUEST["call"];
+
     $EmailA  = DB_get_email_by_name($PlayerA);
     $EmailB  = DB_get_email_by_name($PlayerB);
     $EmailC  = DB_get_email_by_name($PlayerC);
@@ -92,17 +93,7 @@ if(myisset("new"))
     /* create random numbers */
     $randomNR       = create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD);
     $randomNRstring = join(":",$randomNR);
-    
-    /* get ruleset information or create new one */
-    $ruleset = DB_get_ruleset($dullen,$schweinchen);
-    if($ruleset <0) 
-      {
-	myerror("Error defining ruleset: $ruleset");
-	output_footer();
-	DB_close();
-	exit();
-      };
-    
+        
     /* create game */
     $followup = NULL;
     if(myisset("followup") )
@@ -125,8 +116,20 @@ if(myisset("new"))
 	  }
       }
     else
-      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
+      {
+	/* get ruleset information or create new one */
+	$ruleset = DB_get_ruleset($dullen,$schweinchen,$call);
+	if($ruleset <0) 
+	  {
+	    myerror("Error defining ruleset: $ruleset");
+	    output_footer();
+	    DB_close();
+	    exit();
+	  };
+	
+	mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
 		  "'$ruleset',NULL ,NULL)");
+      }
     $game_id = mysql_insert_id();
     
     /* create hash */
