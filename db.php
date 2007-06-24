@@ -803,4 +803,16 @@ function DB_set_recovery_password($user,$newpw)
 	      
   return;
 }
+
+function DB_get_card_name($card)
+{
+  $queryresult = mysql_query("SELECT strength,suite FROM Card WHERE id='$card'");
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0]." of ".$r[1];
+  else
+    return "Error during get_card_name ".$card;
+}
+
 ?>

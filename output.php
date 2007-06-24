@@ -179,9 +179,9 @@ function display_card($card,$dir="english")
    * convert even cards to the matching odd value */
 
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<img src=\"cards/".$dir."/".$card.".png\"  alt=\"".card_to_name($card)."\" />\n";
+    echo "<img src=\"cards/".$dir."/".$card.".png\"  alt=\"".DB_get_card_name($card)."\" />\n";
   else
-    echo "<img src=\"cards/".$dir."/".($card-1).".png\"  alt=\"".card_to_name($card-1)."\" />\n";
+    echo "<img src=\"cards/".$dir."/".($card-1).".png\"  alt=\"".DB_get_card_name($card-1)."\" />\n";
 
   return;
 }
@@ -189,9 +189,9 @@ function display_card($card,$dir="english")
 function display_link_card($card,$dir="english",$type="card")
 {
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"\" /></div>\n";
+    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"".DB_get_card_name($card)."\" /></div>\n";
   else
-    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"\" /></div>\n";
+    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"".DB_get_card_name($card-1)."\" /></div>\n";
   return;
 }
 
