@@ -1132,7 +1132,7 @@ else if(myisset("me"))
 	      else if(ereg("trumpless",$GT))
 		echo "<img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	      else if(ereg("trump",$GT))
-		echo "<img src=\"pics/button/diamandsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+		echo "<img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	    }
 
 	  /* add point calls */
