@@ -309,7 +309,7 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
       /* check if we can find a game were non of the player was involved and return 
        * cards insted 
        */
-      $userstr = implode(",",array($useridA,$useridB,$useridC,$useridD));
+      $userstr = "'".implode("','",array($useridA,$useridB,$useridC,$useridD))."'";
       $randomnumbers = DB_get_unused_randomnumbers($userstr);
       $randomnumbers = explode(":",$randomnumbers);
       

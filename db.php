@@ -771,9 +771,9 @@ function DB_get_PREF($myid)
 
 function DB_get_unused_randomnumbers($userstr)
 {
-  $queryresult = mysql_query("SELECT randomnumbers,Game.id FROM Game ".
+  $queryresult = mysql_query("SELECT randomnumbers,Game.id, COUNT(*) as num FROM Game ".
 			     "  LEFT JOIN Hand ON Hand.game_id=Game.id ".
-			     "                 AND  user_id not in (".$userstr.")".
+			     "                 AND user_id not in (".$userstr.")".
 			     "  GROUP BY  Game.id ".
 			     "  HAVING num=4");
   
