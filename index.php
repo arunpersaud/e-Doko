@@ -561,13 +561,13 @@ else if(myisset("me"))
 	    }
 	  else if($nines)
 	    {
-	      /* cancle game */
+	      /* cancel game */
 	      /* TODO: should we keep statistics of this? */
 	      $message = "Hello, \n\n".
-		"the game has been canceled because ".DB_get_name_by_userid($nines).
-		" has five or more nines and nobody is playing solo.\n";
-	      
-	      /* TODO: add info about redeal in case this is a game of a series */
+		" the game has been canceled because ".DB_get_name_by_userid($nines).
+		" has five or more nines and nobody is playing solo.\n\n".
+		" To redeal either start a new game or, in case the game was part of a tournament, \n".
+		" go to the last game and use the link at the bottom of the page to redeal.";
 	      
 	      $userids = DB_get_all_userid_by_gameid($gameid);
 	      foreach($userids as $user)
@@ -1634,9 +1634,14 @@ else if(myisset("me"))
 	  
 	  if(!$session || $gameid==$r[0])
 	    {
-	      /* suggest a new game with the same people in it, just rotated once */
+	      /* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
 	      $names = DB_get_all_names_by_gameid($gameid);
-	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+	      $type  = DB_get_gametype_by_gameid($gameid);
+	      
+	      if($type=="solo")
+		output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
+	      else
+		output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	    }
 	}
       break;
