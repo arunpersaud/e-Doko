@@ -256,7 +256,7 @@ function output_check_for_sickness($me,$mycards)
   return;
 }
 
-function check_want_to_play($me)
+function output_check_want_to_play($me)
 {
    ?>
  <form action="index.php" method="post">

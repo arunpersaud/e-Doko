@@ -289,9 +289,9 @@ else if(myisset("me"))
       echo " Gametype: $GT <br />\n";
     
     echo "Rules: <br />\n";
-    echo "10ofhearts : ".$r[2]."<br />\n";
-    echo "schweinchen: ".$r[3]."<br />\n";
-    echo "call:        ".$r[4]."<br />\n";
+    echo "10ofhearts : ".$RULES["dullen"]      ."<br />\n";
+    echo "schweinchen: ".$RULES["schweinchen"] ."<br />\n";
+    echo "call:        ".$RULES["call"]        ."<br />\n";
     echo "</div>\n";
 
     /* output extra division in case this game is part of a session */
@@ -341,7 +341,7 @@ else if(myisset("me"))
       case 'start':
 	if( !myisset("in") )
 	  {
-	    check_want_to_play($me);
+	    output_check_want_to_play($me);
 	    break;
 	  }
 	else
@@ -1796,11 +1796,11 @@ else if(myisset("me"))
 	     }
 	   else /* output default user page */
 	     {
-	       $time = DB_get_user_timestamp($uid);
-	       $unixtime =strtotime($time);
+	       $time     = DB_get_user_timestamp($uid);
+	       $unixtime = strtotime($time);
 	       
-	       $offset = DB_get_user_timezone($uid);
-	       $zone = return_timezone($offset);
+	       $offset   = DB_get_user_timezone($uid);
+	       $zone     = return_timezone($offset);
 	       date_default_timezone_set($zone);
 	       
 	       /* display links to settings */
@@ -1876,7 +1876,7 @@ else if(myisset("me"))
 	 }
        else
 	 {
-	   echo "Sorry email and password don't match <br />";
+	   echo "Sorry email and password don't match. Please <a href=\"$host\">try again</a>. <br />";
 	 }
      };
      output_footer();
@@ -1912,7 +1912,7 @@ else if(myisset("me"))
 	 if($r)
 	   echo " added you to the database";
 	 else
-	   echo " something went wrong";
+	   echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
        }
    }
 /* default login page */
