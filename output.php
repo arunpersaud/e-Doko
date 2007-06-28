@@ -263,13 +263,7 @@ function check_want_to_play($me)
    Do you want to play a game of DoKo?
    yes<input type="radio" name="in" value="yes" />
    no<input type="radio" name="in" value="no" /> <br />
-
 <?php   
-/*
-   Do you want to get an email for every card played or only if it your move?
-   every card<input type="radio" name="update" value="card" />
-   only on my turn<input type="radio" name="update" value="turn" /> <br />
-*/
   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
   echo "\n";
   echo "<input type=\"submit\" value=\"count me in\" />\n";

@@ -339,24 +339,30 @@ else if(myisset("me"))
     switch($mystatus)
       {
       case 'start':
-	check_want_to_play($me);
-	/* move on to the next stage*/
-	DB_set_hand_status_by_hash($me,'init');
-	break;
+	if( !myisset("in") )
+	  {
+	    check_want_to_play($me);
+	    break;
+	  }
+	else
+	  {
+	    /* move on to the next stage*/
+	    DB_set_hand_status_by_hash($me,'init');
+	  }
       case 'init':
 	/* first check if everything went ok  in the last step
 	 * if not, send user back, if yes, check what he did
 	 */
 	if( !myisset("in") )
 	  {
-	    echo "<p> you need to answer the <a href=\"$host?me=$me\">question</a>.</p>";
+	    echo "<p> You need to answer the <a href=\"$host?me=$me\">question</a>.</p>";
 	    DB_set_hand_status_by_hash($me,'start');
 	  }
 	else
 	  {
 	    if($_REQUEST["in"] == "no")
 	      {
-		/* cancle the game */
+		/* cancel the game */
 		$message = "Hello, \n\n".
 		  "the game has been canceled due to the request of one of the players.\n";
 		
@@ -372,7 +378,7 @@ else if(myisset("me"))
 	      }
 	    else
 	      {
-		echo "thanks for joining the game...";
+		echo "Thanks for joining the game...";
 		
 		$mycards = DB_get_hand($me);
 		sort($mycards);
@@ -393,17 +399,20 @@ else if(myisset("me"))
       /* ok, user is in the game, saw his cards and selected his vorbehalt
        * so first we check what he selected
        */
-      echo "Processing what you selected in the last step...<br />";
-
       if(!myisset("solo","wedding","poverty","nines") )
 	{
 	  /* all these variables have a pre-selected default,
 	   * so we should never get here,
-	   * unless a user tries to cheat ;) */
-	  echo "something went wrong during the setup...please contact the $ADMIN_NAME at $ADMIN_EMAIL.";
+	   * unless a user tries to cheat ;)
+	   * can also happen if user reloads the page!
+	   */
+	  echo "<p> You need to answer the <a href=\"$host?me=$me&in=yes\">questions</a>.</p>";
+	  DB_set_hand_status_by_hash($me,'init');
 	}
       else
 	{
+	  echo "Processing what you selected in the last step...<br />";
+      
 	  /* check if this sickness needs to be handled first */
 	  $gametype    = DB_get_gametype_by_gameid($gameid);
 	  $startplayer = DB_get_startplayer_by_gameid($gameid);
@@ -493,7 +502,7 @@ else if(myisset("me"))
        * set that one in the Game table
        * tell people about it.
        */
-      echo "<br /> Checking if someone else selected solo, nines or wedding or poverty.<br />";
+      echo "<br /> Checking if someone else selected solo, nines, wedding or poverty.<br />";
       
       /* check if everyone has reached this stage */
       $userids = DB_get_all_userid_by_gameid($gameid);
@@ -635,7 +644,7 @@ else if(myisset("me"))
 	  foreach($userids as $user)
 	    {
 	      /* userids are sorted by position... 
-	       * so output whatever the firstone has, then whatever the next one has
+	       * so output whatever the first one has, then whatever the next one has
 	       * stop when the sickness is the same as the gametype 
 	       */
 	      
