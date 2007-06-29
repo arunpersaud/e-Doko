@@ -1564,24 +1564,8 @@ else if(myisset("me"))
 		display_link_card($card,$PREF["cardset"]);
 	    }
 	  
-	  if( can_call(120,$me) )
-	      echo " re/contra (120):".
-		" <input type=\"radio\" name=\"call120\" value=\"yes\" /> ";
-	  if( can_call(90,$me) )
-	      echo " 90:".
-		" <input type=\"radio\" name=\"call90\" value=\"yes\" /> ";
-	  if( can_call(60,$me) )
-	      echo " 60:".
-		" <input type=\"radio\" name=\"call60\" value=\"yes\" /> ";
-	  if( can_call(30,$me) )
-	      echo " 30:".
-		" <input type=\"radio\" name=\"call30\" value=\"yes\" /> ";
-	  if( can_call(0,$me) )
-	      echo " 0:".
-		" <input type=\"radio\" name=\"call0\" value=\"yes\" /> ".
-		" no call:".
-		" <input type=\"radio\" name=\"call0\" value=\"no\" /> ";
-
+	  output_form_calls($me);
+	  
 	  echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
 	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
 	  echo "<input type=\"submit\" value=\"submit\" />\n";
@@ -1594,6 +1578,7 @@ else if(myisset("me"))
 	    display_card($card,$PREF["cardset"]);
 
 	  echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
+	  output_form_calls($me);
 	  echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
 	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
 	  echo "<input type=\"submit\" value=\"submit\" />\n";

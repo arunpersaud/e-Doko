@@ -526,10 +526,16 @@ function can_call($what,$hash)
 {
   global $RULES;
 
-  /*TODO: check if this already has been call by teammate */
-  
   $gameid   = DB_get_gameid_by_hash($hash);
   $gametype = DB_get_gametype_by_gameid($gameid);
+  $oldcall  = DB_get_call_by_hash($hash);
+  $pcall    = DB_get_partner_call_by_hash($hash);
+
+  if( ($pcall!=NULL && $what >= $pcall) || 
+      ($oldcall!=NULL && $what >=$oldcall) )
+    {
+      return 0;
+    }
 
   $NRcards  = count(DB_get_hand($hash));
   
@@ -560,8 +566,40 @@ function can_call($what,$hash)
 	return 1;
       break;
     case "9-cards":
-      if( ($what/10) <= $NRcards + $offset)
-	return 1;
+      
+      if($oldcall!=NULL && $pcall!=NULL)
+	$mincall = ($oldcall>$pcall) ? $pcall : $oldcall;
+      else if($oldcall!=NULL)
+	$mincall = $oldcall;
+      else if ($pcall!=NULL)
+	$mincall = $pcall;
+      else
+	$mincall = -1;
+
+      if( 12 <= ($NRcards + $offset))
+	{
+	  return 1;
+	}
+      else if ( 9 <= ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall==120) )
+	    return 1;
+	}
+      else if ( 6 <= ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall<=90 && $what<=60 ) )
+	    return 1;
+	}
+      else if ( 3 <= ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall<=60 && $what<=30 ) )
+	    return 1;
+	}
+      else if ( 0 <= ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall<=30 && $what==0 ) )
+	    return 1;
+	};
       break;
     }
 

@@ -240,6 +240,28 @@ function output_check_for_sickness($me,$mycards)
   return;
 }
 
+function output_form_calls($me)
+{
+  if( can_call(120,$me) )
+    echo " re/contra (120):".
+      " <input type=\"radio\" name=\"call120\" value=\"yes\" /> <br />";
+  if( can_call(90,$me) )
+    echo " 90:".
+      " <input type=\"radio\" name=\"call90\" value=\"yes\" /> <br />";
+  if( can_call(60,$me) )
+    echo " 60:".
+      " <input type=\"radio\" name=\"call60\" value=\"yes\" /> ";
+  if( can_call(30,$me) )
+    echo " 30:".
+      " <input type=\"radio\" name=\"call30\" value=\"yes\" /> ";
+  if( can_call(0,$me) )
+    echo " 0:".
+      " <input type=\"radio\" name=\"call0\" value=\"yes\" /> ".
+      " no call:".
+      " <input type=\"radio\" name=\"call0\" value=\"no\" /> ";
+}
+
+
 function output_check_want_to_play($me)
 {
    ?>

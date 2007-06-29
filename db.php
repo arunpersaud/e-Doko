@@ -842,4 +842,45 @@ function DB_get_current_playid($gameid)
   return "";
 }
 
+function DB_get_call_by_hash($hash)
+{
+  $queryresult = mysql_query("SELECT point_call FROM Hand WHERE hash='$hash'");
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+  
+  return NULL;
+}
+
+function DB_get_partner_call_by_hash($hash)
+{
+  $partner = DB_get_partner_hash_by_hash($hash);
+  
+  if($partner)
+    {
+      $queryresult = mysql_query("SELECT point_call FROM Hand WHERE hash='$partner'");
+      
+      $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+      if($r)
+	return $r[0];
+    }
+  
+  return NULL;
+}
+
+function DB_get_partner_hash_by_hash($hash)
+{
+  $gameid = DB_get_gameid_by_hash($hash);
+  $party  = DB_get_party_by_hash($hash);
+  
+  $queryresult = mysql_query("SELECT hash FROM Hand WHERE game_id='$gameid' AND party='$party' AND hash<>'$hash'");
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+
+  return NULL;
+}
+
 ?>
