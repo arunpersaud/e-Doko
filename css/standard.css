@@ -180,34 +180,43 @@ ul.tricks li div div.card3 img {
 }
 
 
-ul.tricks li div div span {
+ul.tricks li div div span.comment {
   position:absolute;
   background-color:white;
   margin:0;
   padding:0;
   width:10em;
   border: 1px solid yellow;
+  z-index:-11;
+}
+ul.tricks li div div span.comment:hover {
   z-index:11;
 }
-ul.tricks li div div.card0 span{
+ul.tricks li div div.card0 span.comment{
   top:4em;
   left:-10em;
   border: 3px solid green;
 }
-ul.tricks li div div.card1 span{
+ul.tricks li div div.card1 span.comment{
   top:-2em;
   left:1em;
   border: 3px solid green;
 }
-ul.tricks li div div.card2 span{
+ul.tricks li div div.card2 span.comment{
   top:-2em;
   left:0em;
   border: 3px solid green;
 }
-ul.tricks li div div.card3 span{
+ul.tricks li div div.card3 span.comment{
   top:2em;
   left:20em;
   border: 3px solid green;
+}
+ul.tricks li div div span.comment span{
+  display:block;
+  width:10em;
+  text-align:left;
+  border-top:1px solid green;
 }
 
 .mycards {

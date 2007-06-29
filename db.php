@@ -484,7 +484,6 @@ function DB_get_max_trickid($gameid)
   $result = mysql_query("SELECT MAX(id) FROM Trick WHERE game_id=".DB_quote_smart($gameid));
   $r = mysql_fetch_array($result,MYSQL_NUM) ;
   
-  
   return ($r?$r[0]:NULL);
 }
 
@@ -591,6 +590,7 @@ function DB_get_user_timezone($userid)
 function DB_insert_comment($comment,$playid,$userid)
 {
   mysql_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid, ".DB_quote_smart($comment).")");
+
   return;
 }
 
@@ -815,6 +815,21 @@ function DB_get_card_name($card)
     return $r[0]." of ".$r[1];
   else
     return "Error during get_card_name ".$card;
+}
+
+function DB_get_current_playid($gameid)
+{
+  $trick = DB_get_max_trickid($gameid);
+  
+  if(!$trick) return NULL;
+  
+  $queryresult = mysql_query("SELECT id FROM Play WHERE trick_id='$trick' ORDER BY create_date DESC LIMIT 1");
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+  
+  return "";
 }
 
 ?>

@@ -1176,12 +1176,28 @@ else if(myisset("me"))
 	}
       echo  "</div>\n";
 
+      /* get time from the last action of the game */
+      $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
+      $r       = mysql_fetch_array($result,MYSQL_NUM);
+      $gameend = time() - strtotime($r[0]);
+
+      /* handel comments in case player didn't play a card, allow comments a week after the end of the game */
+      if( (!myisset("card") && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
+	if(myisset("comment"))
+	  {
+	    $comment = $_REQUEST["comment"];
+	    $playid = DB_get_current_playid($gameid);
+	    
+	    if($comment != "")
+	      DB_insert_comment($comment,$playid,$myid);
+	  };  
+
       /* get everything relevant to display the tricks */
       $result = mysql_query("SELECT Hand_Card.card_id as card,".
 			    "       Hand.position as position,".
 			    "       Play.sequence as sequence, ".
 			    "       Trick.id, ".
-			    "       Comment.comment, ".
+			    "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>') SEPARATOR '\n' ), ".
 			    "       Play.create_date, ".
 			    "       Hand.user_id ".
 			    "FROM Trick ".
@@ -1189,8 +1205,10 @@ else if(myisset("me"))
 			    "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
 			    "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
 			    "LEFT JOIN Comment ON Play.id=Comment.play_id ".
+			    "LEFT JOIN User On User.id=Comment.user_id ".
 			    "WHERE Trick.game_id='".$gameid."' ".
-			    "ORDER BY Trick.id,sequence ASC");
+			    "GROUP BY Trick.id, sequence ".
+			    "ORDER BY Trick.id, sequence  ASC");
       $trickNR   = 1;
       $lasttrick = DB_get_max_trickid($gameid);
       
@@ -1287,7 +1305,7 @@ else if(myisset("me"))
 	$myturn = 1;
       else
 	$myturn = 0;
-      
+
       /* do we want to play a card? */
       if(myisset("card") && $myturn)
 	{
@@ -1303,8 +1321,6 @@ else if(myisset("me"))
 	  
 	  if($handcardid) /* everything ok, play card  */
 	    {
-	      $comment = "";
-
 	      /* update Game timestamp */
 	      DB_update_game_timestamp($gameid);
 
@@ -1324,18 +1340,6 @@ else if(myisset("me"))
 	      mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
 			  DB_quote_smart($card));
 
-	      /* check for schweinchen */
-	      //echo "schweinchen = ".$GAME["schweinchen"]." --$card-<br />";
-	      if($card == 19 || $card == 20 )
-		{
-		  $GAME["schweinchen"]++;
-		  if($GAME["schweinchen"]==3 && $RULES["schweinchen"]=="second" )
-		    $comment="Schweinchen! ";
-		  if($RULES["schweinchen"]=="both" )
-		    $comment="Schweinchen! ";
-		  if ($debug) echo "schweinchen = ".$GAME["schweinchen"]." ---<br />";
-		}
-
 	      /* get trick id or start new trick */
 	      $a = DB_get_current_trickid($gameid);
 	      $trickid  = $a[0];
@@ -1343,7 +1347,19 @@ else if(myisset("me"))
 	      $tricknr  = $a[2];
 	      
 	      $playid = DB_play_card($trickid,$handcardid,$sequence);
-	      
+
+	      /* check for schweinchen */
+	      if($card == 19 || $card == 20 )
+		{
+		  $GAME["schweinchen"]++;
+		  if($GAME["schweinchen"]==3 && $RULES["schweinchen"]=="second" )
+		    DB_insert_comment("Schweinchen! ",$playid,$myid);
+		  if($RULES["schweinchen"]=="both" )
+		    DB_insert_comment("Schweinchen! ",$playid,$myid);
+		  if ($debug) 
+		    echo "schweinchen = ".$GAME["schweinchen"]." ---<br />";
+		}
+
 	      /* if sequence == 4 check who one in case of wedding */
 	      if($sequence == 4 && $GT == "wedding") 
 		{
@@ -1403,19 +1419,21 @@ else if(myisset("me"))
 		}
 	      if($next==5) $next=1;
 
-	      
 	      /* check for coment */
 	      if(myisset("comment"))
 		{
-		  $comment.=$_REQUEST["comment"];
+		  $comment = $_REQUEST["comment"];
+		  if($comment != "")
+		    DB_insert_comment($comment,$playid,$myid);
 		};  
-	      if($comment != "")
-		DB_insert_comment($comment,$playid,$myid);
-
+	      
 	      /* display played card */
 	      echo "<div class=\"card\">";
 	      echo " you played  <br />";
+	      /* display comments */
 	      display_card($card,$PREF["cardset"]);
+	      if($comment!="")
+		echo "       <br /> Your comment:<br /><span class=\"comment\">".$comment."</span>\n";
 	      echo "</div>\n";
 	      
 	      /*check if we still have cards left, else set status to gameover */
@@ -1551,19 +1569,40 @@ else if(myisset("me"))
 		" no call:".
 		" <input type=\"radio\" name=\"call0\" value=\"no\" /> ";
 
-	  echo "<br />\nA short comments:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"50\" />\n";
+	  echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
 	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
-	  echo "<input type=\"submit\" value=\"move\" />\n";
+	  echo "<input type=\"submit\" value=\"submit\" />\n";
 	  echo "</form>\n";
 	}
-      else if($mystatus=='play')
-	{
+      else if($mystatus=='play' )
+	{	  
 	  echo "Your cards are: <br />\n";
 	  foreach($mycards as $card) 
 	    display_card($card,$PREF["cardset"]);
+
+	  echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
+	  echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
+	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
+	  echo "<input type=\"submit\" value=\"submit\" />\n";
+	  echo "</form>\n";
+
 	}
       else if($mystatus=='gameover')
 	{
+	  /* get time from the last action of the game */
+	  $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
+	  $r       = mysql_fetch_array($result,MYSQL_NUM);
+	  $gameend = time() - strtotime($r[0]);
+	  
+	  if( $gameend < 60*60*24*7 )
+	    {
+	      echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
+	      echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
+	      echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
+	      echo "<input type=\"submit\" value=\"submit\" />\n";
+	      echo "</form>\n";
+	    }
+
 	  $oldcards = DB_get_all_hand($me);
 	  $oldcards = mysort($oldcards,$gametype);
 	  echo "Your cards were: <br />\n";
@@ -1586,13 +1625,14 @@ else if(myisset("me"))
                   foreach($oldcards as $card)
                     display_card($card,$PREF["cardset"]);
                 }
-            }
+            };
 	}
       echo "</div>\n";
       
       /* if the game is over do some extra stuff, therefore exit the swtich statement if we are still playing*/
       if($mystatus=='play')
 	break;
+
       /* the following happens only when the gamestatus is 'gameover' */
       /* check if game is over, display results */
       if(DB_get_game_status_by_gameid($gameid)=='play')
