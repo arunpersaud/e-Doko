@@ -1475,7 +1475,7 @@ else if(myisset("me"))
 				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
 				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
 				" WHERE Hand.game_id='$gameid'".
-				" GROUP BY User.fullname" );
+				" GROUP BY Hand.party" );
 		  $message .= "\nTotals:\n";
 		  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		    $message .= "    ".$r[0]." ".$r[1]."\n";
