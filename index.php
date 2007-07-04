@@ -1532,7 +1532,7 @@ else if(myisset("me"))
       $mycards = mysort($mycards,$gametype);
       echo "<div class=\"mycards\">\n";
       
-      if($myturn && !myisset("card"))
+      if($myturn && !myisset("card") && $mystatus=='play' )
 	{
 	  echo "Hello ".$myname.", it's your turn!  <br />\n";
 	  echo "Your cards are: <br />\n";
