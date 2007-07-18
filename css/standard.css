@@ -75,7 +75,6 @@ ul.tricks {
   margin:3px;
   padding:0;
   padding-bottom:3px;
-  /*background-color:yellow;*/
   text-align:center;
   border-bottom:1px solid #444;
 }
@@ -89,7 +88,6 @@ ul.tricks li {
 ul.tricks li.old {  background-color:#fff; }
 ul.tricks li:hover {  background-color: #bbb;}
 ul.tricks li.nohighlight:hover {  background-color: #fff;}
-
 
 ul.tricks li div.trick {
   position:absolute;
@@ -253,20 +251,20 @@ ul.tricks li div div span.comment span{
 
 .session {
   border-bottom:1px solid black;
+  text-align:center;
 }
 
 .ruleset {
-  float:left;
-  margin:0;
-  margin-top:10.5em;
+  position:absolute;
+  top:10.5em;
   border:2px solid gray;
   padding:0.3em;
 }
 
 
 .bug {
-  float:left;
-  margin-top:8.5em;
+  position:absolute;
+  top:17.5em;
   width:10em;
   border:2px solid gray;
   padding-top:0.5em;
