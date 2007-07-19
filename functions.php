@@ -320,7 +320,14 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
       for($i=0;$i<48;$i++)
 	$r[$i]=$i+1;
       
-      shuffle($r); 
+      /* shuffle using a better random generator than the standard one */
+      for ($i = 0; $i <48; $i++)
+	{
+	  $j = @mt_rand(0, $i);
+	  $tmp = $r[$i];
+	  $r[$i] = $r[$j];
+	  $r[$j] = $tmp;
+	}
     };
 
   return $r;
