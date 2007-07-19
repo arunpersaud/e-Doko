@@ -14,14 +14,8 @@ function display_links($email,$password)
 
 function output_link_to_user_page($email,$password)
 {
-  echo "<div class=\"over\">\n";
-  echo "<form action=\"index.php\" method=\"post\">\n";
-  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
-  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
-  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"go to my user page\" />\n";
-  echo "</form>\n";
-  echo "</div>\n";
-  
+  echo "<a href=\"index.php\"> go to my user page </a>";
+
   return;
 }
 
@@ -31,25 +25,15 @@ function output_user_settings($email,$password)
 
   echo "<div class=\"useroptions\">\n";
   echo "<h4> Settings </h4>\n";
-  echo "<form action=\"index.php\" method=\"post\">\n";
-  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
-  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
-  echo "  <input type=\"hidden\" name=\"passwd\"  value=\"ask\" />\n";
-  echo "  <input type=\"submit\" class=\"submitbutton\" name=\"pass\" value=\"change password\" /> <br />\n";
-  echo "</form>\n";
-  echo "<form action=\"index.php\" method=\"post\">\n";
-  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
-  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
-  echo "  <input type=\"hidden\" name=\"setpref\"  value=\"englishcards\" />\n";
-  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"use english cards\" /> <br />\n";
-  echo "</form>\n";
-  echo "<form action=\"index.php\" method=\"post\">\n";
-  echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
-  echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
-  echo "  <input type=\"hidden\" name=\"setpref\"  value=\"germancards\" />\n";
-  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"use german cards\" /> <br />\n";
-  echo "</form>\n";
+  echo "<a href=\"index.php?passwd=ask\">change password</a><br /";
+
+  if( $PREF["cardset"] == "english" )
+    echo "<a href=\"index.php?setpref=germancards\">use german cards</a><br />";
+  else
+    echo "<a href=\"index.php?setpref=englishcards\">use english cards</a> <br />";
+
   echo "</div>\n";
+
   return;
 }
 
@@ -374,8 +358,6 @@ function output_header()
   return;
 }
 
-
-
 function output_footer()
 {
   global $REV,$PREF;
@@ -399,6 +381,17 @@ function output_footer()
 
   return;
 }
+
+function output_status($name)
+{
+  echo "<div class=\"status\">\n";
+  echo $name;
+  echo " <a href=\"index.php?logout=1\">logout</a>\n";
+  echo "</div>";
+
+  return;
+}
+
 
 function output_password_recovery($email,$password)
 {

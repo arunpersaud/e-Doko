@@ -61,6 +61,16 @@ function DB_get_email_by_name($name)
   else
     return "";
 }
+function DB_get_passwd_by_name($name)
+{
+  $result = mysql_query("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
 
 function DB_get_email_by_userid($id)
 {
@@ -760,8 +770,8 @@ function DB_get_PREF($myid)
       {
 	if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
 	  $PREF["cardset"]="altenburg";
-      else
-	$PREF["cardset"]="english";
+	else
+	  $PREF["cardset"]="english";
       }
     else
       $PREF["cardset"]="english";

@@ -333,9 +333,6 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
   return $r;
 }
 
-
-
-
 function display_cards($me,$myturn)
 {
   return;

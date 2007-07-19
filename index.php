@@ -51,11 +51,21 @@ if(DB_open()<0)
     exit(); 
   }
 
+/* start a session, if it is not already running */
+session_start();
+
 /* done major error checking, output header of HTML page */
 output_header();
 
 /* check if we want to start a new game */
-if(myisset("new"))
+if(myisset("logout"))
+  {
+    session_unset();
+    session_destroy();
+    $_SESSION = array();
+    echo "you are now logged out!";
+  }
+else if(myisset("new"))
   {
     $names = DB_get_all_names();
     output_form_for_new_game($names);
@@ -204,7 +214,7 @@ else if(myisset("cancle","me"))
     /* get some information from the DB */
     $gameid   = DB_get_gameid_by_hash($me);
     $myname   = DB_get_name_by_hash($me);
-    
+
     /* check if game really is old enough */
     $result = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
     $r = mysql_fetch_array($result,MYSQL_NUM);
@@ -244,6 +254,9 @@ else if(myisset("me"))
 	DB_close();
 	exit();
       }
+
+    if(isset($_SESSION["name"]))
+      output_status($_SESSION["name"]);
 
     /* the user had done something, update the timestamp */
     DB_update_user_timestamp($myid);
@@ -1702,13 +1715,21 @@ else if(myisset("me"))
     exit();
  } 
 /* user status page */ 
- else if(myisset("email","password"))
+else if( myisset("email","password") || isset($_SESSION["name"]) )
    {
      /* test id and password, should really be done in one step */
-     $email     = $_REQUEST["email"];
-     $password  = $_REQUEST["password"];
+     if(!isset($_SESSION["name"]))
+       {
+	 $email     = $_REQUEST["email"];
+	 $password  = $_REQUEST["password"];
+       }
+     else
+       {
+	 $name = $_SESSION["name"];
+	 $email     = DB_get_email_by_name($name);
+	 $password  = DB_get_passwd_by_name($name);
+       };
      
-
      if(myisset("forgot"))
        {
 	 $ok = 1;
@@ -1842,6 +1863,12 @@ else if(myisset("me"))
 	       $offset   = DB_get_user_timezone($uid);
 	       $zone     = return_timezone($offset);
 	       date_default_timezone_set($zone);
+
+	       $myname = DB_get_name_by_email($email);
+	       $_SESSION["name"] = $myname;
+
+	       if(isset($_SESSION["name"]))
+		 output_status($_SESSION["name"]);
 	       
 	       /* display links to settings */
 	       output_user_settings($email,$password);
