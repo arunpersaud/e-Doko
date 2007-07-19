@@ -1817,7 +1817,8 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		   $ok = 1;
 
 		   /* check if old password matches */
-		   if($password != md5($_REQUEST["password0"]))
+		   $oldpasswd = md5($_REQUEST["password0"]);
+		   if(!( ($password == $oldpasswd) || DB_check_recovery_passwords($oldpasswd,$email) ))
 		     $ok = -1;
 		   /* check if new passwords are types the same twice */
 		   if($_REQUEST["password1"] != $_REQUEST["password2"] )

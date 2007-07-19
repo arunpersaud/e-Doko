@@ -161,6 +161,22 @@ function DB_get_userid_by_email_and_password($email,$password)
     return 0;
 }
 
+function DB_check_recovery_passwords($password,$email)
+{
+  $result = mysql_query("SELECT User.id FROM User".
+			" LEFT JOIN Recovery ON User.id=Recovery.user_id".
+			" WHERE email=".DB_quote_smart($email).
+			" AND Recovery.password=".DB_quote_smart($password).
+			" AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
+  $r      = mysql_fetch_array($result,MYSQL_NUM);
+
+  if($r)
+    return 1;
+  else
+    return 0;
+  
+}
+
 function DB_get_handid_by_hash($hash)
 {
   $result = mysql_query("SELECT id FROM Hand WHERE hash=".DB_quote_smart($hash));
