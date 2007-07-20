@@ -797,11 +797,14 @@ function DB_get_PREF($myid)
 
 function DB_get_unused_randomnumbers($userstr)
 {
-  $queryresult = mysql_query("SELECT randomnumbers,Game.id, COUNT(*) as num FROM Game ".
-			     "  LEFT JOIN Hand ON Hand.game_id=Game.id ".
-			     "                 AND user_id not in (".$userstr.")".
-			     "  GROUP BY  Game.id ".
-			     "  HAVING num=4");
+  $queryresult = mysql_query(" SELECT randomnumbers FROM Game".
+			     "   WHERE randomnumbers NOT IN".
+			     "           (SELECT randomnumbers FROM Game".
+			     "                LEFT JOIN Hand ON Game.id=Hand.game_id".
+			     "                WHERE user_id IN  (". $userstr .")".
+			     "                GROUP BY randomnumbers".
+			     "           )");
+
   
   $r = mysql_fetch_array($queryresult,MYSQL_NUM);
   if($r)
