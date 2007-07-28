@@ -1,25 +1,44 @@
 .header {
-  background-color:white;
-  text-align:center;
-  border-bottom:3px solid gray;
+  background-color: white;
+  text-align:       center;
+  height:           4em;
+  border-bottom:    3px solid gray;
 }
+
+.main {
+  min-height: 40em;
+}
+
 .footer { 
- margin:0;
- margin-top:0.3em;
- padding:0;
- border-top: 2px solid #444;
- font-size:smaller;
- clear:both;
- }
+  margin:0;
+  margin-top:0.3em;
+  padding:0;
+  border-top: 2px solid #444;
+  font-size:smaller;
+  clear:both;
+}
 .footer .right{  float:right; }
 .footer .left{  float:left; }
 
 .status {
- position:absolute;
- right:1em;
- top:0.1em;
- font-size: smaller;
- }
+  position:absolute;
+  right:1em;
+  top:0.1em;
+  font-size: smaller;
+} 
+
+.joingame,.sickness,.poverty {
+ position: absolute;
+ width: 18em;
+
+ top:21em;
+ left:22em;
+
+ text-align: center;
+}
+
+
+
 
 .card { 
   position:absolute;
@@ -52,6 +71,11 @@ div.table span {
   position:absolute;
   width:13em;
 }
+div.table span span{
+  /*background-color:green;*/
+  position:relative;
+}
+
 div.table span.table0 {
   top:9em;
   left:-15em;
@@ -225,7 +249,6 @@ ul.tricks li div div span.comment span{
 }
 
 .mycards {
-  clear:both;
   margin:0;
   margin-top:33em;
   padding:0;
@@ -261,21 +284,37 @@ ul.tricks li div div span.comment span{
   text-align:center;
 }
 
-.ruleset {
+.gameinfo {
   position:absolute;
-  top:10.5em;
-  border:2px solid gray;
+  top:9em;
+  right:0em;
+
+  width:12em;
+
+  border-top:    2px solid gray;
+  border-left:   2px solid gray;
+  border-bottom: 2px solid gray;
+
   padding:0.3em;
+
+  background-color: #eee;
 }
 
 
-.bug {
+.usermenu {
   position:absolute;
-  top:17.5em;
-  width:10em;
-  border:2px solid gray;
-  padding-top:0.5em;
-  clear:left;
+  top:9em;
+  left:0em;
+
+  width: 12em;
+
+  border-top:    2px solid gray;
+  border-right:  2px solid gray;
+  border-bottom: 2px solid gray;
+
+  padding:0.3em;
+
+  background-color: #eee;
 }
 
 .over { 

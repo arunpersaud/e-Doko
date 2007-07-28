@@ -239,7 +239,6 @@ else if(myisset("me"))
     DB_get_PREF($myid);
     /* end set pref */
       
-      
     /* get rule set for this game */
     $result = mysql_query("SELECT * FROM Rulesets".
 			  " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
@@ -250,7 +249,6 @@ else if(myisset("me"))
     $RULES["schweinchen"] = $r[3];
     $RULES["call"]        = $r[4];
 
-
     /* get some infos about the game */
     $gametype   = DB_get_gametype_by_gameid($gameid);
     $gamestatus = DB_get_game_status_by_gameid($gameid);
@@ -260,9 +258,31 @@ else if(myisset("me"))
 	$gametype = DB_get_solo_by_gameid($gameid);
 	$GT  = $gametype." ".$GT;
       }
+    
+    /* does anyone have both foxes */
+    $GAME["schweinchen"]=0; 
+    for($i=1;$i<5;$i++)
+      {
+	$hash  = DB_get_hash_from_game_and_pos($gameid,$i);
+	$cards = DB_get_all_hand($hash);
+	if( in_array("19",$cards) && in_array("20",$cards) )
+	  {
+	    $GAME["schweinchen"]=1;
+	    $GAME["schweinchen-who"]=$hash;
+	  }
+      };
 
-    /* display rule set for this game */
-    echo "<div class=\"ruleset\">\n";
+    /* put everyting in a form */
+    echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
+
+    /* output left menu */
+
+    display_user_menu();
+
+    /* output right menu */
+
+      /* display rule set for this game */
+    echo "<div class=\"gameinfo\">\n";
 
     if($gamestatus != 'pre')
       echo " Gametype: $GT <br />\n";
@@ -271,7 +291,21 @@ else if(myisset("me"))
     echo "10ofhearts : ".$RULES["dullen"]      ."<br />\n";
     echo "schweinchen: ".$RULES["schweinchen"] ."<br />\n";
     echo "call:        ".$RULES["call"]        ."<br />\n";
+
+    echo "<hr />\n";
+    if($mystatus == 'play' )
+      {
+	output_form_calls($me);
+	
+	echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+	echo "<hr />";
+      }
+
+    echo "<input type=\"submit\" value=\"submit\" />\n";
+
     echo "</div>\n";
+
+    /* output game */
 
     /* output extra division in case this game is part of a session */
     if($session)
@@ -290,20 +324,9 @@ else if(myisset("me"))
 	  }
 	echo "</div>\n";
       }
-
-    
-    /* does anyone have both foxes */
-    $GAME["schweinchen"]=0; 
-    for($i=1;$i<5;$i++)
-      {
-	$hash  = DB_get_hash_from_game_and_pos($gameid,$i);
-	$cards = DB_get_all_hand($hash);
-	if( in_array("19",$cards) && in_array("20",$cards) )
-	  {
-	    $GAME["schweinchen"]=1;
-	    $GAME["schweinchen-who"]=$hash;
-	  }
-      };
+      
+    /* display the table and the names */
+    display_table();
 
     /* mystatus gets the player through the different stages of a game.
      * start:    yes/no
@@ -357,16 +380,15 @@ else if(myisset("me"))
 	      }
 	    else
 	      {
-		echo "Thanks for joining the game...";
-		
 		$mycards = DB_get_hand($me);
 		sort($mycards);
-		echo "<p class=\"mycards\" style=\"margin-top:8em;\">your cards are: <br />\n";
+
+		output_check_for_sickness($me,$mycards);
+		
+		echo "<p class=\"mycards\">your cards are: <br />\n";
 		foreach($mycards as $card) 
 		  display_card($card,$PREF["cardset"]);
 		echo "</p>\n";   
-		
-		output_check_for_sickness($me,$mycards);
 		
 		/* move on to the next stage*/
 		DB_set_hand_status_by_hash($me,'check');
@@ -755,12 +777,11 @@ else if(myisset("me"))
 		  $result = mysql_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 		  
 		  /* add hidden button with trump in it to get to the next point */
-		  echo "<form action=\"index.php\" method=\"post\">\n";
+		  echo "<div class=\"poverty\">\n";
 		  echo "  <input type=\"hidden\" name=\"exchange\" value=\"-1\" />\n";
 		  echo "  <input type=\"hidden\" name=\"trump\" value=\"".$trump."\" />\n";
-		  echo "  <input type=\"hidden\" name=\"me\" value=\"".$me."\" />\n";
 		  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select cards to give back\" />\n";
-		  echo "</form>\n";
+		  echo "</div>\n";
 		}
 	      else if(myisset("trump","exchange") && $_REQUEST["trump"]>0 && ($who==$mypos || $who==$mypos*10))
 		{
@@ -861,24 +882,24 @@ else if(myisset("me"))
 		  else
 		    {
 		      /* else show all trump, have lowest card pre-selected, have hidden setting for */
-		      echo "you need to get rid of a few cards<br />\n";
+		      echo "<div class=\"poverty\"> you need to get rid of a few cards</div>\n";
 		      
 		      set_gametype($gametype); /* this sets the $CARDS variable */
 		      $mycards = DB_get_hand($me);
 		      $mycards = mysort($mycards,$gametype);
 
-		      echo "<form class=\"exchange\" action=\"index.php\" method=\"post\">\n";
 		      $type="exchange";
+		      echo "<div class=\"mycards\">Your cards are: <br />\n";
 		      foreach($mycards as $card) 
 			display_link_card($card,$PREF["cardset"],$type);
 		      echo "  <input type=\"hidden\" name=\"trump\" value=\"".$trump."\" />\n";
-		      echo "  <input type=\"hidden\" name=\"me\" value=\"".$me."\" />\n";
 		      echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select one card to give back\" />\n";
-		      echo "</form>\n";
+		      echo "</div>\n";
 		    }
 		}
 	      else if($who == $mypos || $who == $mypos*10)
 		{
+		  echo "<div class=\"poverty\">\n";
 		  foreach($userids as $user)
 		    {
 		      $name     = DB_get_name_by_userid($user);
@@ -892,15 +913,16 @@ else if(myisset("me"))
 			  /* count trump */
 			  if($nrtrump<4)
 			    echo "Player $name has $nrtrump trump. Do you want to take them?".
-			      "<a href=\"index.php?me=$me&amp;trump=$user\">yes</a> <br />";
+			      "<a href=\"index.php?me=$me&amp;trump=$user\">yes</a> <br />\n";
 			}
 		    }
-		  echo "<a href=\"index.php?me=$me&amp;trump=no\">No,way I take those trump...</a> <br />";
-
+		  echo "<a href=\"index.php?me=$me&amp;trump=no\">No,way I take those trump...</a> <br />\n";
+		  echo "</div>\n";
+		  
 		  echo "Your cards are: <br />\n";
 		  $mycards = DB_get_hand($me);
 		  sort($mycards);
-		  echo "<p class=\"mycards\" style=\"margin-top:8em;\">your cards are: <br />\n";
+		  echo "<p class=\"mycards\">your cards are: <br />\n";
 		  foreach($mycards as $card) 
 		    display_card($card,$PREF["cardset"]);
 		  echo "</p>\n";   
@@ -999,16 +1021,6 @@ else if(myisset("me"))
       /* get some infos about the game */
       $gamestatus = DB_get_game_status_by_gameid($gameid);
       
-      /* display useful things in divs */
-      
-      /* display links to the users status page */
-      $result = mysql_query("SELECT email,password from User WHERE id='$myid'" );
-      $r      = mysql_fetch_array($result,MYSQL_NUM);
-      
-      display_links($r[0],$r[1]);
-      
-      /* end display useful things*/
-      
       /* has the game started? No, then just wait here...*/
       if($gamestatus == 'pre')
 	{
@@ -1017,143 +1029,6 @@ else if(myisset("me"))
 	  break; /* not sure this works... the idea is that you can 
 		  * only  play a card after everyone is ready to play */
 	}
-      
-      /* display the table and the names */
-      $result = mysql_query("SELECT  User.fullname as name,".
-			    "        Hand.position as position, ".
-			    "        User.id, ".
-			    "        Hand.party as party, ".
-			    "        Hand.sickness as sickness, ".
-			    "        Hand.point_call, ".
-			    "        User.last_login, ".
-			    "        Hand.hash        ".
-			    "FROM Hand ".
-			    "LEFT JOIN User ON User.id=Hand.user_id ".
-			    "WHERE Hand.game_id='".$gameid."' ".
-			    "ORDER BY position ASC");
-      
-      echo "<div class=\"table\">\n".
-	"  <img src=\"pics/table.png\" alt=\"table\" />\n";
-      while($r = mysql_fetch_array($result,MYSQL_NUM))
-	{
-	  $name  = $r[0];
-	  $pos   = $r[1];
-	  $user  = $r[2];
-	  $party = $r[3];
-	  $sickness  = $r[4];
-	  $call      = $r[5];
-	  $lastlogin = strtotime($r[6]);
-	  $hash      = $r[7];
-
-	  $offset = DB_get_user_timezone($user);
-	  $zone   = return_timezone($offset);
-	  date_default_timezone_set($zone);
-
-	  echo " <span class=\"table".($pos-1)."\">\n";
-	  if(!$debug)
-	    echo " $name \n";
-	  else
-	    {
-	      echo "<a href=\"".$host."?me=".$hash."\">$name</a>\n";
-	    }
-	  /* add hints for poverty, wedding, solo, etc */
-	  if($GT=="poverty" && $party=="re")
-	    if($sickness=="poverty")
-	      {
-		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		$cards    = DB_get_all_hand($userhash);
-		$trumpNR  = count_trump($cards);
-		if($trumpNR)
-		  echo "<img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
-		else
-		  echo "<img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
-	      }
-	    else
-	      echo "<img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
-
-	  if($GT=="dpoverty")
-	    if($party=="re")
-	      if($sickness=="poverty")
-		{
-		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		$cards    = DB_get_all_hand($userhash);
-		$trumpNR  = count_trump($cards);
-		if($trumpNR)
-		  echo "<img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
-		else
-		  echo "<img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
-		}
-	      else
-		echo "<img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
-	    else
-	      if($sickness=="poverty")
-		{
-		$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		$cards    = DB_get_all_hand($userhash);
-		$trumpNR  = count_trump($cards);
-		if($trumpNR)
-		  echo "<img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" alt=\"poverty2 < trump back\" />";
-		else
-		  echo "<img src=\"pics/button/poverty2_notrump_button.png\" class=\"button\" alt=\"poverty2 <\" />";
-		}
-	      else
-		echo "<img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" alt=\"poverty2 >\" />";
-	      
-	  if($GT=="wedding" && $party=="re")
-	      if($sickness=="wedding")
-		echo "<img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" />";
-	      else
-		echo "<img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" />";
-	  
-	  if(ereg("solo",$GT) && $party=="re")
-	    {
-	      if(ereg("queen",$GT))
-		echo "<img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	      else if(ereg("jack",$GT))
-		echo "<img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	      else if(ereg("club",$GT))
-		echo "<img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	      else if(ereg("spade",$GT))
-		echo "<img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	      else if(ereg("heart",$GT))
-		echo "<img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	      else if(ereg("trumpless",$GT))
-		echo "<img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	      else if(ereg("trump",$GT))
-		echo "<img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
-	    }
-
-	  /* add point calls */
-	  if($call!=NULL)
-	    {
-	      if($party=="re")
-		echo "<img src=\"pics/button/re_button.png\" class=\"button\" alt=\"re\" />";
-	      else
-		echo "<img src=\"pics/button/contra_button.png\" class=\"button\" alt=\"contra\" />";
-	      switch($call)
-		{
-		case "0":
-		  echo "<img src=\"pics/button/0_button.png\" class=\"button\" alt=\"0\" />";
-		  break;
-		case "30":
-		  echo "<img src=\"pics/button/30_button.png\" class=\"button\" alt=\"30\" />";
-		  break;
-		case "60":
-		  echo "<img src=\"pics/button/60_button.png\" class=\"button\" alt=\"60\" />";
-		  break;
-		case "90":
-		  echo "<img src=\"pics/button/90_button.png\" class=\"button\" alt=\"90\" />";
-		  break;
-		}
-	    }
-
-	  echo "<br />\n";
-	  echo " local time: ".date("Y-m-d H:i:s")."<br />\n";
-	  echo " last login: ".date("Y-m-d H:i:s",$lastlogin)."<br />\n";
-	  echo " </span>\n";
-
-	}
-      echo  "</div>\n";
 
       /* get time from the last action of the game */
       $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
@@ -1515,7 +1390,6 @@ else if(myisset("me"))
 	{
 	  echo "Hello ".$myname.", it's your turn!  <br />\n";
 	  echo "Your cards are: <br />\n";
-	  echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
 	  
 	  /* do we have to follow suite? */
 	  $followsuit = 0;
@@ -1529,27 +1403,12 @@ else if(myisset("me"))
 	      else
 		display_link_card($card,$PREF["cardset"]);
 	    }
-	  
-	  output_form_calls($me);
-	  
-	  echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
-	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
-	  echo "<input type=\"submit\" value=\"submit\" />\n";
-	  echo "</form>\n";
 	}
       else if($mystatus=='play' )
 	{	  
 	  echo "Your cards are: <br />\n";
 	  foreach($mycards as $card) 
 	    display_card($card,$PREF["cardset"]);
-
-	  echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
-	  output_form_calls($me);
-	  echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
-	  echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
-	  echo "<input type=\"submit\" value=\"submit\" />\n";
-	  echo "</form>\n";
-
 	}
       else if($mystatus=='gameover')
 	{
@@ -1560,11 +1419,9 @@ else if(myisset("me"))
 	  
 	  if( $gameend < 60*60*24*7 )
 	    {
-	      echo "<form  action=\"index.php?me=$me\" method=\"post\">\n";
 	      echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
 	      echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
 	      echo "<input type=\"submit\" value=\"submit\" />\n";
-	      echo "</form>\n";
 	    }
 
 	  $oldcards = DB_get_all_hand($me);
@@ -1661,6 +1518,7 @@ else if(myisset("me"))
     default:
       myerror("error in testing the status");
     }
+    echo "</form>\n";
     output_footer();
     DB_close();
     exit();

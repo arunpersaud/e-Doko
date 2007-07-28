@@ -2,23 +2,6 @@
 
 /* functions which only ouput html  */
 
-function display_links($email,$password)
-{
-  global $wiki;
-  echo "<div class=\"bug\">\n".
-    "Report bugs in the <a href=\"". $wiki."\">wiki</a>.<hr />\n";
-  output_link_to_user_page($email,$password);
-  echo  "</div>\n";
-  return;
-}
-
-function output_link_to_user_page($email,$password)
-{
-  echo "<a href=\"index.php\"> go to my user page </a>";
-
-  return;
-}
-
 function output_user_settings($email,$password)
 {
   global $PREF;
@@ -145,7 +128,7 @@ function display_link_card($card,$dir="english",$type="card")
 function output_check_for_sickness($me,$mycards)
 {
  ?>
-  <form action="index.php" method="post">
+  <div class="sickness"> Thanks for joining the game...<br />
 
     do you want to play solo? 
     <select name="solo" size="1">
@@ -198,7 +181,7 @@ function output_check_for_sickness($me,$mycards)
    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
    echo "<input type=\"submit\" value=\"count me in\" />\n";
 
-   echo "</form>\n";
+   echo "</div>\n";
 
   return;
 }
@@ -213,30 +196,30 @@ function output_form_calls($me)
       " <input type=\"radio\" name=\"call90\" value=\"yes\" /> <br />";
   if( can_call(60,$me) )
     echo " 60:".
-      " <input type=\"radio\" name=\"call60\" value=\"yes\" /> ";
+      " <input type=\"radio\" name=\"call60\" value=\"yes\" /> <br />";
   if( can_call(30,$me) )
     echo " 30:".
-      " <input type=\"radio\" name=\"call30\" value=\"yes\" /> ";
+      " <input type=\"radio\" name=\"call30\" value=\"yes\" /> <br />";
   if( can_call(0,$me) )
     echo " 0:".
-      " <input type=\"radio\" name=\"call0\" value=\"yes\" /> ".
+      " <input type=\"radio\" name=\"call0\" value=\"yes\" /> <br />".
       " no call:".
-      " <input type=\"radio\" name=\"call0\" value=\"no\" /> ";
+      " <input type=\"radio\" name=\"call0\" value=\"no\" /> <br />";
 }
 
 
 function output_check_want_to_play($me)
 {
    ?>
- <form action="index.php" method="post">
-   Do you want to play a game of DoKo?
+ <div class="joingame">
+   Do you want to play a game of DoKo? <br />
    yes<input type="radio" name="in" value="yes" />
    no<input type="radio" name="in" value="no" /> <br />
 <?php   
   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
   echo "\n";
-  echo "<input type=\"submit\" value=\"count me in\" />\n";
-  echo " </form>\n";
+  echo "<input type=\"submit\" value=\"submit\" />\n";
+  echo " </div>\n";
 
   return;
 }
@@ -338,7 +321,7 @@ function output_header()
 <div class="header">
 <h1> Welcome to E-Doko <sup style="color:#888;">(beta)</sup> </h1>
 </div>
-
+<div class="main">
 <?php
   return;
 }
@@ -347,6 +330,7 @@ function output_footer()
 {
   global $REV,$PREF;
 
+  echo "</div>";
   echo "<div class=\"footer\">\n";
   echo "<p class=\"left\"> copyright 2006-2007 Arun Persaud <br />\n".
     "Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />".
