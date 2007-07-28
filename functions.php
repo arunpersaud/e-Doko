@@ -51,7 +51,10 @@ function config_check()
 
 function mymail($To,$Subject,$message,$header="")
 {  
-  global $debug;
+  global $debug,$EMAIL_REPLY;
+
+  if(isset($EMAIL_REPLY))
+    $header .= "From: e-DoKo daemon <$EMAIL_REPLY>\r\n";
 
   if($debug)
     {
