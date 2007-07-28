@@ -37,43 +37,6 @@ function output_user_settings($email,$password)
   return;
 }
 
-function output_register()
-{
-  echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
-  echo "TODO: figure out a better way to handle passwords <br />\n";
-  ?>
-        <form action="index.php" method="post">
-          <fieldset>
-            <legend>Register</legend>
-             <table>
-              <tr>
-               <td><label for="Rfullname">Full name:</label></td>
-	       <td><input type="text" id="Rfullname" name="Rfullname" size="20" maxsize="30" /> </td>
-              </tr><tr>
-               <td><label for="Remail">Email:</label></td>
-	       <td><input type="text" id="Remail" name="Remail" size="20" maxsize="30" /></td>
-              </tr><tr>
-	       <td><label for="Rpassword">Password(will be displayed in cleartext on the next page):</label></td>
-               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxsize="30" /></td>
-              </tr><tr>
-	       <td><label for="Rtimezone">Timezone:</label></td>
-               <td>
-		  <select id="Rtimezone" name="Rtimezone" size="1">
-                     <option value="1">Berlin</option>
-                     <option value="-8">Berkeley</option>
-                     <option value="13">Wellington</option>
-		  </select>
-	         (If your timezone is not listed, just select whatever you want and email the admin your correct time zone.)
-	       </td>
-              </tr><tr>
-               <td colspan="2"> <input type="submit" value="register" /></td>
-             </table>
-          </fieldset>
-        </form>
-<?php
-  return;
-}					   
-
 function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 {
   global $RULES;
@@ -309,7 +272,7 @@ function output_home_page($pre,$game,$done,$avgtime)
       echo "$done games have been completed on this server. Average time of a game: $avgtime days</p>";
 ?>
 
-    <p> Please <a href="index.php?register">register</a>, in case you haven't done that yet  <br />
+    <p> Please <a href="register.php">register</a>, in case you haven't done that yet  <br />
         or login with you email-address or name and password here:
     </p>
         <form action="index.php" method="post">

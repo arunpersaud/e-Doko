@@ -1902,38 +1902,6 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
      DB_close();
      exit();
    }
-/* page for registration */
- else if(myisset("register") )
-   {
-     output_register();
-   }
-/* new user wants to register */
- else if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
-   {
-     $ok=1;
-     if(DB_get_userid_by_name($_REQUEST["Rfullname"]))
-       {
-	 echo "please chose another name<br />";
-	 $ok=0;
-       }
-     if(DB_get_userid_by_email($_REQUEST["Remail"]))
-       {
-	 echo "this email address is already used ?!<br />";
-	 $ok=0;
-       }
-     if($ok)
-       {
-	 $r=mysql_query("INSERT INTO User VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
-			",".DB_quote_smart($_REQUEST["Remail"]).
-			",".DB_quote_smart(md5($_REQUEST["Rpassword"])).
-			",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL)"); 
-	 
-	 if($r)
-	   echo " added you to the database";
-	 else
-	   echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
-       }
-   }
 /* default login page */
  else
    { 
