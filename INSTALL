@@ -3,40 +3,48 @@ Installation
 
 0) get files
 
-get all files from 
+  get all files from 
 
-http://svn.nubati.net/emaildoko/trunk
+  http://nubati.net/git/e-DoKo
 
 1) create database
 
-create a mysql database using the provided file
+  create a mysql database using the provided file
 
-mysql < create_database.sql
+  mysql < create_database.sql
 
-use user, password, database and host option of mysql as needed
+  use user, password, database and host option of mysql as needed
 
 2) create a config.php file that defines the following variables:
 
-$host : for example "http://localhost/index.php", note: include the index.php here
+  $host:  for example "http://localhost/index.php", note: include the index.php here
 
-database info:
+  database info:
 
-$DB_host 
-$DB_user 
-$DB_password 
-$DB_database 
+    $DB_host 
+    $DB_user 
+    $DB_password 
+    $DB_database 
 
-you can also turn the debug mode on by defining:
-$debug=1;
+  working on the database:
+    in case you need to work on the database for some reason, you can suspend the game
+    by setting $DB_work to 1
 
-this will give some extra output and won't send out emails, but display them in the browser
+  debug mode:
+    you can also turn the debug mode on by defining:
+    $debug=1;
 
-If you hvae problem with the timezone, that is an older PHP version, try adding this in config.php
+    this will give some extra output and won't send out emails, but
+    display them in the browser
 
-function	date_default_timezone_set($zone)
-{
-  return;
-}
+  timezone problem:
+    If you hvae problem with the timezone, that is an older PHP version,
+    try adding this in config.php
+
+    function	date_default_timezone_set($zone)
+    {
+       return;
+    }
 
 
 3) log in and enjoy ;)

@@ -6,41 +6,7 @@ include_once("output.php");      /* html output only */
 include_once("db.php");          /* database only */
 include_once("functions.php");   /* the rest */
 
-/* check if some variables are set in the config file, else set defaults */
-if(!isset($EmailName))
-     $EmailName="[DoKo] ";
-if(isset($EMAIL_REPLY))
-  {
-    ini_set("sendmail_from",$EMAIL_REPLY);
-  }
-if(!isset($ADMIN_NAME))
-  {
-    output_header();
-    echo "<h1>Setup not completed</h1>";
-    echo "You need to set \$ADMIN_NAME in config.php.";
-    output_footer(); 
-    exit(); 
-  }    
-if(!isset($ADMIN_EMAIL))
-  {
-    output_header();
-    echo "<h1>Setup not completed</h1>";
-    echo "You need to set \$ADMIN_EMAIL in config.php. ".
-      "If something goes wrong an email will send to this address.";
-    output_footer(); 
-    exit(); 
-  }
-
-/* in case work has to be done on the database or other section we can
- * shut down the server and tell people to come back later 
- */
-if(0) 
-  {
-    output_header();
-    echo "Working on the database...please check back in a few mintues"; 
-    output_footer(); 
-    exit(); 
-  }
+config_check();
 
 if(DB_open()<0)
   {

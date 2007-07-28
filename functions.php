@@ -1,5 +1,54 @@
 <?php
 
+function config_check()
+{
+  global $EmailName,$EMAIL_REPLY,$ADMIN_NAME,$ADMIN_EMAIL,$DB_work;
+
+  /* check if some variables are set in the config file, else set defaults */
+  if(!isset($EmailName))
+    $EmailName="[DoKo] ";
+  if(isset($EMAIL_REPLY))
+    {
+      ini_set("sendmail_from",$EMAIL_REPLY);
+    }
+  if(!isset($ADMIN_NAME))
+    {
+      output_header();
+      echo "<h1>Setup not completed</h1>";
+      echo "You need to set \$ADMIN_NAME in config.php.";
+      output_footer(); 
+      exit(); 
+    }    
+  if(!isset($ADMIN_EMAIL))
+    {
+      output_header();
+      echo "<h1>Setup not completed</h1>";
+      echo "You need to set \$ADMIN_EMAIL in config.php. ".
+	"If something goes wrong an email will be send to this address.";
+      output_footer(); 
+      exit(); 
+    }
+  if(!isset($DB_work))
+    {
+      output_header();
+      echo "<h1>Setup not completed</h1>";
+      echo "You need to set \$DB_work in config.php. ".
+	"If this is set to 1, the game will be suspended and one can work safely on the database.".
+	"The default should be 0 for the game to work.";
+      output_footer(); 
+      exit(); 
+    }
+  if($DB_work) 
+    {
+      output_header();
+      echo "Working on the database...please check back later."; 
+      output_footer(); 
+      exit(); 
+    }
+  
+  return;
+}
+
 function mymail($To,$Subject,$message,$header="")
 {  
   global $debug;
