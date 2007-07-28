@@ -389,8 +389,8 @@ function output_footer()
     "Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />".
     "- ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />".
     "a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
-  echo "<p class=\"right\"> Revision: $REV; <br /><a href=\"http://svn.nubati.net/emaildoko/trunk/\">".
-    "http://svn.nubati.net/emaildoko/trunk/</a> <br />".
+ echo "<p class=\"right\"> See the latest changes <a href=\"http://nubati.net/cgi-bin/gitweb.cgi?p=e-DoKo.git;a=summary\">".
+    "via git </a> <br />or download the source via <br />'git clone http://nubati.net/git/e-DoKo.git' <br />".
     "<a href=\"http://www.dreamhost.com/green.cgi\">".
     "<img  border=\"0\" alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
     "src=\"https://secure.newdream.net/green1.gif\" height=\"32\" width=\"100\" /></a>".
