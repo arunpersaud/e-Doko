@@ -25,7 +25,6 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   global $RULES;
 
   echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
-  echo "<form action=\"index.php\" method=\"post\">\n";
   echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"$playerA\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"$playerC\" />\n";
@@ -35,7 +34,6 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   echo "  <input type=\"hidden\" name=\"call\" value=\"".$RULES["call"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
   echo "  <input type=\"submit\" value=\"keep playing\" />\n";
-  echo "</form>\n";
 
   return;
 }
@@ -296,7 +294,7 @@ function output_header()
        function hl(num) {
          if(document.getElementById){
 	   var i;
-	   for(i=1;i<13;i++){
+	   for(i=1;i<14;i++){
 	     if(document.getElementById("trick"+i))
 	       document.getElementById("trick"+i).style.display = 'none';
 	   }
@@ -306,7 +304,7 @@ function output_header()
        function high_last(){
 	 if(document.getElementById){
 	   var i;
-	   for(i=12;i>0;i--) {
+	   for(i=13;i>0;i--) {
 	     if(document.getElementById("trick"+i))
 	       {
 		 hl(i);

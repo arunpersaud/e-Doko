@@ -27,7 +27,7 @@
   font-size: smaller;
 } 
 
-.joingame,.sickness,.poverty {
+.joingame,.sickness,.poverty,.total {
  position: absolute;
  width: 18em;
 
@@ -152,16 +152,16 @@ ul.tricks li div div.card0 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 9em;
-  right:27em;
+  top: 7em;
+  right:22em;
 }
 ul.tricks li div div.card1 {
   position:absolute;
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: -3em;
-  left:-3em;
+  top: 1em;
+  left:-7em;
   width:28em;
   text-align:center;
 }
@@ -170,16 +170,16 @@ ul.tricks li div div.card2 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 9em;
-  right:-2em;
+  top: 7em;
+  left: 15em;
 }
 ul.tricks li div div.card3 {
   position:absolute;
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 20em;
-  left:-3em;
+  top: 15em;
+  left:-7em;
   width:28em;
   text-align:center;
 }
@@ -191,24 +191,6 @@ ul.tricks li div div img {
   padding:0;
 }
 
-ul.tricks li div div.card0 img {
-  top: -2em;
-  left:5em;
-}
-ul.tricks li div div.card1 img {
-  top: 3em;
-  left:10em;
-}
-ul.tricks li div div.card2 img {
-  top: -2em;
-  left:-6em;
-}
-ul.tricks li div div.card3 img {
-  top: -6em;
-  left:10em;
-}
-
-
 ul.tricks li div div span.comment {
   position:absolute;
   background-color:white;
@@ -218,27 +200,53 @@ ul.tricks li div div span.comment {
   border: 1px solid yellow;
   z-index:-11;
 }
+
+ul.tricks li div div span.score {
+  position:absolute;
+  width:5em;
+  background-color: #fff;
+}
+ul.tricks li div div.card0 span.score {
+  top: 1em;
+  left: 2em;
+}
+ul.tricks li div div.card1 span.score {
+    top: -1em;
+    left: 14em;
+}
+ul.tricks li div div.card2 span.score {
+    top: 1em;
+    left: -1em;
+}
+ul.tricks li div div.card3 span.score {
+    top: 2em;
+    left: 14em;
+}
+
 ul.tricks li div div span.comment:hover {
   z-index:11;
 }
+ul.tricks li div div span.comment {
+  z-index:-11;
+}
 ul.tricks li div div.card0 span.comment{
-  top:4em;
-  left:-10em;
+  top:6em;
+  left:-15em;
   border: 3px solid green;
 }
 ul.tricks li div div.card1 span.comment{
-  top:-2em;
-  left:1em;
+  top:-5em;
+  left:-4em;
   border: 3px solid green;
 }
 ul.tricks li div div.card2 span.comment{
-  top:-2em;
-  left:0em;
+  top:-8em;
+  left:6em;
   border: 3px solid green;
 }
 ul.tricks li div div.card3 span.comment{
-  top:2em;
-  left:20em;
+  top:5em;
+  left:27em;
   border: 3px solid green;
 }
 ul.tricks li div div span.comment span{

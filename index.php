@@ -303,6 +303,33 @@ else if(myisset("me"))
 
     echo "<input type=\"submit\" value=\"submit\" />\n";
 
+
+    if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
+      {
+	echo "<hr />\n";
+	
+	$session = DB_get_session_by_gameid($gameid);
+	$result  = mysql_query("SELECT id,create_date FROM Game".
+			       " WHERE session=$session".
+			       " ORDER BY create_date DESC".
+			       " LIMIT 1");
+	$r = -1;
+	if($result)
+	  $r = mysql_fetch_array($result,MYSQL_NUM);
+	
+	if(!$session || $gameid==$r[0])
+	  {
+	    /* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
+	    $names = DB_get_all_names_by_gameid($gameid);
+	    $type  = DB_get_gametype_by_gameid($gameid);
+	    
+	    if($type=="solo")
+	      output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
+	    else
+	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+	  }
+      }
+
     echo "</div>\n";
 
     /* output game */
@@ -1132,15 +1159,10 @@ else if(myisset("me"))
 	  if($seq==4)
 	    {
 	      $trickNR++;
-	      echo "    </div>\n  </li>\n";  /* end div table, end li table */
+	      echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
 	    }
 	}
-      
-      if($seq!=4 && $trickNR>1) 
-	echo "    </div>\n  </li>\n";  /* end div table, end li table */
-      
-      echo "</ul>\n";
-      
+            
       /* whos turn is it? */
       if($seq==4)
 	{
@@ -1282,13 +1304,20 @@ else if(myisset("me"))
 		};  
 	      
 	      /* display played card */
-	      echo "<div class=\"card\">";
-	      echo " you played  <br />";
+	      $pos = DB_get_pos_by_hash($me);
+	      if($sequence==1)
+		{
+		  echo "  <li onclick=\"hl('".($tricknr)."');\" class=\"current\"><a href=\"#\">Trick ".($tricknr)."</a>\n".
+		    "    <div class=\"trick\" id=\"trick".($tricknr)."\">\n".
+		    "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
+		}
+	      
+	      echo "<div class=\"card".($pos-1)."\">";
 	      /* display comments */
 	      display_card($card,$PREF["cardset"]);
 	      if($comment!="")
-		echo "       <br /> Your comment:<br /><span class=\"comment\">".$comment."</span>\n";
-	      echo "</div>\n";
+		echo "  <span class=\"comment\"> ".$comment."</span>\n";
+	      echo "</div></div></li>\n";
 	      
 	      /*check if we still have cards left, else set status to gameover */
 	      if(sizeof(DB_get_hand($me))==0)
@@ -1381,6 +1410,36 @@ else if(myisset("me"))
 	{
 	  echo "please wait until it's your turn! <br />\n";
 	}
+
+      if($seq!=4 && $trickNR>1) 
+	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+
+      /* display points in case game is over */
+      if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
+	{
+	  echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">Score</a>\n".
+	    "    <div class=\"trick\" id=\"trick13\">\n";
+	  /* add pic for re/contra
+	   "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
+	  
+	  $result = mysql_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand".
+				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				" LEFT JOIN User ON User.id=Hand.user_id".
+				" LEFT JOIN Play ON Trick.id=Play.trick_id".
+				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				" WHERE Hand.game_id='$gameid'".
+				" GROUP BY User.fullname" );
+	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	    echo "      <div class=\"card".($r[3]-1)."\">\n".
+	         "        <span class=\"score\">".$r[2]."<br /> ".$r[1]."</span>\n".
+	         "      </div>\n";
+	  
+	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	}
+
+      
+      echo "</ul>\n"; /* end ul tricks*/
       
       $mycards = DB_get_hand($me);
       $mycards = mysort($mycards,$gametype);
@@ -1462,23 +1521,6 @@ else if(myisset("me"))
 	}
       else
 	{
-	  echo "the game is over now...<br />\n";
-	  
-	  $result = mysql_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand".
-				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				" LEFT JOIN User ON User.id=Hand.user_id".
-				" LEFT JOIN Play ON Trick.id=Play.trick_id".
-				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-				" WHERE Hand.game_id='$gameid'".
-				" GROUP BY User.fullname" );
-	  echo "Final Score:<br />\n".
-	    " <table>\n";;
-	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	    echo "  <tr><td>  ".$r[0]."</td><td>(".$r[2].")</td><td> ".$r[1]."</td></tr>";
-	  echo "</table>\n";
-
-
 	  $result = mysql_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
 				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
 				" LEFT JOIN User ON User.id=Hand.user_id".
@@ -1487,32 +1529,11 @@ else if(myisset("me"))
 				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
 				" WHERE Hand.game_id='$gameid'".
 				" GROUP BY Hand.party" );
-	  echo "Totals:<br />\n".
-	    " <table> \n";
+	  echo "<div class=\"total\"> Totals:<br />\n";
 	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	    echo "  <tr><td>".$r[0]."</td><td> ".$r[1]."</td></tr>\n";
-	  echo "</table>\n";
+	    echo "  ".$r[0]." ".$r[1]."<br />\n";
+	  echo "</div>\n";
 	  
-	  $session = DB_get_session_by_gameid($gameid);
-	  $result  = mysql_query("SELECT id,create_date FROM Game".
-				 " WHERE session=$session".
-				 " ORDER BY create_date DESC".
-				 " LIMIT 1");
-	  $r = -1;
-	  if($result)
-	    $r = mysql_fetch_array($result,MYSQL_NUM);
-	  
-	  if(!$session || $gameid==$r[0])
-	    {
-	      /* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
-	      $names = DB_get_all_names_by_gameid($gameid);
-	      $type  = DB_get_gametype_by_gameid($gameid);
-	      
-	      if($type=="solo")
-		output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
-	      else
-		output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
-	    }
 	}
       break;
     default:
