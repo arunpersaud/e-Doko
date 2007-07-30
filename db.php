@@ -902,4 +902,17 @@ function DB_get_partner_hash_by_hash($hash)
   return NULL;
 }
 
+function DB_format_gameid($gameid)
+{
+  $session = DB_get_session_by_gameid($gameid);
+  
+  /* get number of game */
+  $result = mysql_query("SELECT COUNT(*),create_date FROM Game WHERE session='$session' ".
+			" GROUP by session".
+			" HAVING TIMEDIFF(create_date, (SELECT create_date FROM Game WHERE id='$gameid'))<=0");
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+  
+  return $session.".".$r[0];
+}
+
 ?>
