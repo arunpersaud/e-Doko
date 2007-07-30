@@ -1721,10 +1721,11 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       echo "<p>These are your games that haven't started yet:<br />\n";
 	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player from Hand".
 				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$uid' AND Game.status='pre'" );
+				     " WHERE Hand.user_id='$uid' AND Game.status='pre'".
+				     " ORDER BY Game.session" );
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
-		   echo "<a href=\"".$host."?me=".$r[0]."\">game".DB_format_gameid($r[1])." </a>";
+		   echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a>";
 		   if($r[3]==$uid || $r[3]==NULL)
 		     echo "(it's <strong>your</strong> turn)\n";
 		   else
@@ -1744,7 +1745,8 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       echo "<p>These are the games you are playing in:<br />\n";
 	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player from Hand".
 				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$uid' AND Game.status='play'" );
+				     " WHERE Hand.user_id='$uid' AND Game.status='play'".
+				     " ORDER BY Game.session" );
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
 		   echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a>";
@@ -1769,7 +1771,10 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       
 	       echo "<p>And these are your games that are already done:<br />Game: \n";
 	       $output = array();
-	       $result = mysql_query("SELECT hash,game_id from Hand WHERE user_id='$uid' AND status='gameover'" );
+	       $result = mysql_query("SELECT hash,game_id from Hand".
+				     " LEFT JOIN Game ON Game.id=Hand.game_id".
+				     " WHERE user_id='$uid' AND Game.status='gameover'".
+				     " ORDER BY Game.session,Game.create_date" );
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 $output[] = "<a href=\"".$host."?me=".$r[0]."\">".DB_format_gameid($r[1])." </a>";
 	       echo implode(", ",$output)."</p>\n";
