@@ -44,13 +44,19 @@ function output_form_for_new_game($names)
     <h2> Players </h2>
     <p>Please select four players (or use the randomly pre-selected names)</p>
        <form action="index.php" method="post">
+
+   <div class="table">
+     <img src="pics/table.png" alt="table" />
 <?php
     /* ask for player names */
+    $i=0;
   foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
   {
     srand((float) microtime() * 10000000);
     $randkey = array_rand($names);
     $rand = $names[$randkey];
+    echo  "<span class=\"table".$i."\">";
+    $i++;
     echo "    Name:  <select name=\"$player\" size=\"1\" />  \n";
     foreach($names as $name)
     {
@@ -61,10 +67,11 @@ function output_form_for_new_game($names)
       else
 	echo "     <option>$name</option>\n";
     }
-    echo "  </select>\n";
+    echo "  </select></span>\n";
    }
 ?>   
-   <h2> Rules </h2> 
+    </div>
+   <h2 class="rules"> Rules </h2> 
       <p> Some areas are grayed out which means that the rule is not implemented yet and therefore cannot be selected </p>
       <p> ten of hearts: 
          <ul>

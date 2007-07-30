@@ -818,7 +818,7 @@ function display_user_menu()
 
   while( $r = mysql_fetch_array($result,MYSQL_NUM))
     {
-      echo "<a href=\"".$host."?me=".$r[0]."\">game #".$r[1]." </a><br />\n";
+      echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
   
   echo

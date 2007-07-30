@@ -33,8 +33,15 @@ if(myisset("logout"))
   }
 else if(myisset("new"))
   {
-    $names = DB_get_all_names();
-    output_form_for_new_game($names);
+    if( isset($_SESSION["name"]) )
+      {
+	$names = DB_get_all_names();
+	output_form_for_new_game($names);
+      }
+    else
+      {
+	echo "Please log in.";
+      }
   }
 /*check if everything is ready to set up a new game */
  else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","call" ))
