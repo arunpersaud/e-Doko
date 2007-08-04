@@ -1714,86 +1714,70 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       /* display links to settings */
 	       output_user_settings($email,$password);
 	       
-	       echo "last login: ".date("r",$unixtime)."<br />";
+	       echo "<div style=\"position:absolute; font-size:smaller; top:0; left:0; \">last login: ".date("r",$unixtime)."</div>";
 	       
 	       DB_update_user_timestamp($myid);
 	     
 	       display_user_menu();
   
-	       echo "<h4>These are your games that haven't started yet:</h4>\n";
-	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player from Hand".
-				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$myid' AND Game.status='pre'".
-				     " ORDER BY Game.session" );
-	       echo "<p>\n";
-	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
-		 {
-		   echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a>";
-		   if($r[3]==$myid || $r[3]==NULL)
-		     echo "(it's <strong>your</strong> turn)\n";
-		   else
-		     {
-		       $name = DB_get_name_by_userid($r[3]);
-		       echo "(it's $name's turn)\n";
-		     };
-		     
-		   if(time()-strtotime($r[2]) > 60*60*24*30)
-		     echo " The game has been running for over a month.".
-		       " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
-		       " (clicking here is final and can't be restored)";
-		   echo "<br />";
-		 }
-	       echo "</p>\n";
-
-	       echo "<h4>These are the games you are playing in:</h4>\n";
-	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player from Hand".
-				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$myid' AND Game.status='play'".
-				     " ORDER BY Game.session" );
-	       echo "<p>\n";
-	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
-		 {
-		   echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a>";
-		   if($r[3])
-		     {
-		       if($r[3]==$myid)
-			 echo "(it's <strong>your</strong> turn)\n";
-		       else
-			 {
-			   $name = DB_get_name_by_userid($r[3]);
-			   echo "(it's $name's turn)\n";
-			 };
-		     }
-		   if(time()-strtotime($r[2]) > 60*60*24*30)
-		     echo " The game has been running for over a month.".
-		       " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
-		       " (clicking here is final and can't be restored)";
-		   echo "<br />";
-		 }
+	       echo "<h4>These are all your games:</h4>\n";
+	       echo "<p>Session: <br />\n";
+	       echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
+	       echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
+	       echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
 	       echo "</p>\n";
 	       
-	       
-	       echo "<h4>And these are your games that are already done:</h4>\n";
-	       echo "<p>Session:\n";
 	       $output = array();
-	       $result = mysql_query("SELECT hash,game_id from Hand".
+	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
 				     " LEFT JOIN Game ON Game.id=Hand.game_id".
-				     " WHERE user_id='$myid' AND Game.status='gameover'".
+				     " WHERE user_id='$myid'".
 				     " ORDER BY Game.session,Game.create_date" );
-	       $gamenrold = 0;
-	       echo "<br />\n";
+	       $gamenrold = -1;
+	       echo "<table>\n <tr><td>\n";
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
 		   $game = DB_format_gameid($r[1]);
 		   $gamenr = (int) $game;
 		   if($gamenrold < $gamenr)
 		     {
+		       if($gamenrold!=-1)
+			 echo "</td></tr>\n <tr> <td>$gamenr:</td><td> ";
+		       else
+			 echo "$gamenr:</td><td> ";
 		       $gamenrold = $gamenr;
-		       echo "<br /> $gamenr: ";
 		     }
-		   echo "<a href=\"".$host."?me=".$r[0]."\">I </a>";
+		   if($r[4]=='pre')
+		     {
+		       echo "\n   <span class=\"gamestatuspre\"><a href=\"".$host."?me=".$r[0]."\">p </a></span> ";
+
+		     }
+		   else if ($r[4]=='gameover')
+		     echo "\n   <span class=\"gamestatusover\"><a href=\"".$host."?me=".$r[0]."\">F </a></span> ";
+		   else
+		     {
+		       echo "\n   <span class=\"gamestatusplay\"><a href=\"".$host."?me=".$r[0]."\">P </a></span> ";
+		     }
+		   if($r[4] != 'gameover')
+		     {
+		       echo "</td><td>\n    ";
+		       if($r[3])
+			 {
+			   if($r[3]==$myid)
+			     echo "(it's <strong>your</strong> turn)\n";
+			   else
+			     {
+			       $name = DB_get_name_by_userid($r[3]);
+			       echo "(it's $name's turn)\n";
+			     };
+			 }
+		       if(time()-strtotime($r[2]) > 60*60*24*30)
+			 echo " The game has been running for over a month.".
+			   " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
+			   " (clicking here is final and can't be restored)";
+
+		     }
 		 }
-	       echo "</p>\n";
+	       echo "</td></tr>\n</table>\n";
 	       $names = DB_get_all_names();
 	       echo "<h4>Registered players:</h4>\n<p>\n";
 	       echo implode(", ",$names)."\n";

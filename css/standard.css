@@ -362,5 +362,18 @@ ul.tricks li div div span.comment span{
 div span img.button {
   height: 2em; 
   width: 2em;
+}
 
+.gamestatuspre {
+   padding: 0 0.3em;
+    
+    background-color: #fd8901;
+}
+.gamestatusover {
+   padding:0 0.3em;
+  background-color: #f82c20 ;
+}
+.gamestatusplay {
+  padding:0 0.3em;
+  background-color: #15de26;
 }

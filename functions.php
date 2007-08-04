@@ -821,7 +821,7 @@ function display_user_menu()
       echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
   
-  echo "<hr> <a href=\"".$host."?new\">start a new game</a>";
+  echo "<hr /> <a href=\"".$host."?new\">start a new game</a>";
 	       
 
   echo
