@@ -7,6 +7,8 @@
 
 .main {
   min-height: 40em;
+//  margin-left: 12.5em;
+//  margin-right: 12.5em;
 }
 
 .footer { 
@@ -294,10 +296,11 @@ ul.tricks li div div span.comment span{
   text-align:center;
 }
 
-.gameinfo {
-  position:absolute;
-  top:9em;
-  right:0em;
+.gameinfo, .useroptions {
+  float:right;
+  margin:1em;
+  margin-top:3em;
+  margin-right:0em;
 
   width:12em;
 
@@ -310,11 +313,11 @@ ul.tricks li div div span.comment span{
   background-color: #eee;
 }
 
-
 .usermenu {
-  position:absolute;
-  top:9em;
-  left:0em;
+  float: left;
+  margin:1em;
+  margin-top:3em;
+  margin-left:0em;
 
   width: 12em;
 
@@ -341,19 +344,6 @@ ul.tricks li div div span.comment span{
   background-color:#afa; 
 }
 
-.useroptions{
-  float:right;
-  padding-left:0.3em;
-  border-left: 1px solid #aaa;
-  border-bottom: 1px solid #aaa;
-}
-.useroptions h4 {
-    margin:0.1em;
-    margin-left:0em;
-    padding:0.1em;
-    padding-left:0em;
-    text-align:left;
-}
 
 .cardinput {
   display:inline;

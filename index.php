@@ -1574,14 +1574,14 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
        {
 	 $ok = 1;
 
-	 $uid = DB_get_userid_by_email($email);
-	 if(!$uid)
+	 $myid = DB_get_userid_by_email($email);
+	 if(!$myid)
 	   $ok = 0;
 	 
 	 if($ok)
 	   {
 	     /* check how many entries in recovery table */
-	     $number = DB_get_number_of_passwords_recovery($uid);
+	     $number = DB_get_number_of_passwords_recovery($myid);
 	     
 	     /* if less than N recent ones, add a new one and send out email */
 	     if( $number < 5 )
@@ -1605,7 +1605,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		   " also still be valid until you set a new one\n";
 		 mymail($email,$EmailName."recovery ",$message);
 		 
-		 DB_set_recovery_password($uid,md5($newpw));
+		 DB_set_recovery_password($myid,md5($newpw));
 	       }
 	     else
 	       {
@@ -1632,13 +1632,13 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	 $password = md5($password);
        
        $ok  = 1;
-       $uid = DB_get_userid_by_email_and_password($email,$password);
-       if(!$uid)
+       $myid = DB_get_userid_by_email_and_password($email,$password);
+       if(!$myid)
 	 $ok = 0;
        
        if($ok)
 	 {
-	   DB_get_PREF($uid);
+	   DB_get_PREF($myid);
 
 	   if(myisset("setpref"))
 	     {
@@ -1648,12 +1648,12 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		 case "germancards":
 		 case "englishcards":
 		   $result = mysql_query("SELECT * from User_Prefs".
-					 " WHERE user_id='$uid' AND pref_key='cardset'" );
+					 " WHERE user_id='$myid' AND pref_key='cardset'" );
 		   if( mysql_fetch_array($result,MYSQL_NUM))
 		     $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
-					   " WHERE user_id='$uid' AND pref_key='cardset'" );
+					   " WHERE user_id='$myid' AND pref_key='cardset'" );
 		   else
-		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$uid','cardset',".
+		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','cardset',".
 					   DB_quote_smart($setpref).")");
 		   echo "Ok, changed you preferences for the cards.\n";
 		   break;
@@ -1690,7 +1690,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		     case '1':
 		       echo "Changed the password.<br />";
 		       mysql_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
-				   "' WHERE id=".DB_quote_smart($uid));
+				   "' WHERE id=".DB_quote_smart($myid));
 		       break;
 		     }
 		   /* set password */
@@ -1698,10 +1698,10 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	     }
 	   else /* output default user page */
 	     {
-	       $time     = DB_get_user_timestamp($uid);
+	       $time     = DB_get_user_timestamp($myid);
 	       $unixtime = strtotime($time);
 	       
-	       $offset   = DB_get_user_timezone($uid);
+	       $offset   = DB_get_user_timezone($myid);
 	       $zone     = return_timezone($offset);
 	       date_default_timezone_set($zone);
 
@@ -1716,17 +1716,20 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       
 	       echo "last login: ".date("r",$unixtime)."<br />";
 	       
-	       DB_update_user_timestamp($uid);
-	       
-	       echo "<p>These are your games that haven't started yet:<br />\n";
+	       DB_update_user_timestamp($myid);
+	     
+	       display_user_menu();
+  
+	       echo "<h4>These are your games that haven't started yet:</h4>\n";
 	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player from Hand".
 				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$uid' AND Game.status='pre'".
+				     " WHERE Hand.user_id='$myid' AND Game.status='pre'".
 				     " ORDER BY Game.session" );
+	       echo "<p>\n";
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
 		   echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a>";
-		   if($r[3]==$uid || $r[3]==NULL)
+		   if($r[3]==$myid || $r[3]==NULL)
 		     echo "(it's <strong>your</strong> turn)\n";
 		   else
 		     {
@@ -1742,17 +1745,18 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		 }
 	       echo "</p>\n";
 
-	       echo "<p>These are the games you are playing in:<br />\n";
+	       echo "<h4>These are the games you are playing in:</h4>\n";
 	       $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player from Hand".
 				     " LEFT JOIN Game On Hand.game_id=Game.id".
-				     " WHERE Hand.user_id='$uid' AND Game.status='play'".
+				     " WHERE Hand.user_id='$myid' AND Game.status='play'".
 				     " ORDER BY Game.session" );
+	       echo "<p>\n";
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
 		 {
 		   echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a>";
 		   if($r[3])
 		     {
-		       if($r[3]==$uid)
+		       if($r[3]==$myid)
 			 echo "(it's <strong>your</strong> turn)\n";
 		       else
 			 {
@@ -1769,22 +1773,31 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       echo "</p>\n";
 	       
 	       
-	       echo "<p>And these are your games that are already done:<br />Game: \n";
+	       echo "<h4>And these are your games that are already done:</h4>\n";
+	       echo "<p>Session:\n";
 	       $output = array();
 	       $result = mysql_query("SELECT hash,game_id from Hand".
 				     " LEFT JOIN Game ON Game.id=Hand.game_id".
-				     " WHERE user_id='$uid' AND Game.status='gameover'".
+				     " WHERE user_id='$myid' AND Game.status='gameover'".
 				     " ORDER BY Game.session,Game.create_date" );
+	       $gamenrold = 0;
+	       echo "<br />\n";
 	       while( $r = mysql_fetch_array($result,MYSQL_NUM))
-		 $output[] = "<a href=\"".$host."?me=".$r[0]."\">".DB_format_gameid($r[1])." </a>";
-	       echo implode(", ",$output)."</p>\n";
-	       
+		 {
+		   $game = DB_format_gameid($r[1]);
+		   $gamenr = (int) $game;
+		   if($gamenrold < $gamenr)
+		     {
+		       $gamenrold = $gamenr;
+		       echo "<br /> $gamenr: ";
+		     }
+		   echo "<a href=\"".$host."?me=".$r[0]."\">I </a>";
+		 }
+	       echo "</p>\n";
 	       $names = DB_get_all_names();
-	       echo "<p>Registered players:<br />\n";
+	       echo "<h4>Registered players:</h4>\n<p>\n";
 	       echo implode(", ",$names)."\n";
 	       echo "</p>\n";
-	       
-	       echo "<p>Want to start a new game? Visit <a href=\"".$host."?new\">this page.</a></p>";
 	     }
 	 }
        else

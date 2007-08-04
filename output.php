@@ -8,7 +8,7 @@ function output_user_settings($email,$password)
 
   echo "<div class=\"useroptions\">\n";
   echo "<h4> Settings </h4>\n";
-  echo "<a href=\"index.php?passwd=ask\">change password</a><br /";
+  echo "<a href=\"index.php?passwd=ask\">change password</a><br />";
 
   if( $PREF["cardset"] == "english" )
     echo "<a href=\"index.php?setpref=germancards\">use german cards</a><br />";
