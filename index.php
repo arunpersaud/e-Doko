@@ -303,10 +303,16 @@ else if(myisset("me"))
     echo "call:        ".$RULES["call"]        ."<br />\n";
 
     echo "<hr />\n";
-    if($mystatus == 'play' )
+    if($gamestatus == 'play' )
+      output_form_calls($me);
+
+    /* get time from the last action of the game */
+    $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
+    $r       = mysql_fetch_array($result,MYSQL_NUM);
+    $gameend = time() - strtotime($r[0]);
+    
+    if($gamestatus == 'play' || $gameend < 60*60*24*7)
       {
-	output_form_calls($me);
-	
 	echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
 	echo "<hr />";
       }
@@ -1481,18 +1487,6 @@ else if(myisset("me"))
 	}
       else if($mystatus=='gameover')
 	{
-	  /* get time from the last action of the game */
-	  $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
-	  $r       = mysql_fetch_array($result,MYSQL_NUM);
-	  $gameend = time() - strtotime($r[0]);
-	  
-	  if( $gameend < 60*60*24*7 )
-	    {
-	      echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"30\" maxlength=\"100\" />\n";
-	      echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
-	      echo "<input type=\"submit\" value=\"submit\" />\n";
-	    }
-
 	  $oldcards = DB_get_all_hand($me);
 	  $oldcards = mysort($oldcards,$gametype);
 	  echo "Your cards were: <br />\n";
