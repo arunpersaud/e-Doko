@@ -336,13 +336,33 @@ CREATE TABLE `Recovery` (
 -- Dumping data for table `Recovery`
 --
 
-
-
-
 /*!40000 ALTER TABLE `Recovery` DISABLE KEYS */;
 LOCK TABLES `Recovery` WRITE;
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `Recovery` ENABLE KEYS */;
+
+/*!40000 ALTER TABLE `Reminder` DISABLE KEYS */;
+LOCK TABLES `Reminder` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Reminder` ENABLE KEYS */;
+
+DROP TABLE IF EXISTS `Reminder`;
+CREATE TABLE `Reminder` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) NOT NULL default '0',
+  `game_id` int(11) NOT NULL default '0',
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Reminder`
+--
+
+/*!40000 ALTER TABLE `Reminder` DISABLE KEYS */;
+LOCK TABLES `Reminder` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Reminder` ENABLE KEYS */;
 
 
 

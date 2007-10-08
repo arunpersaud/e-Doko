@@ -214,6 +214,58 @@ else if(myisset("cancle","me"))
     else
       echo "<p>You need to wait longer before you can cancle a game...</p>\n";
   }
+/* send out a reminder */
+else if(myisset("remind","me"))
+  {
+    $me = $_REQUEST["me"];
+    
+    /* test for valid ID */
+    $myid = DB_get_userid_by_hash($me);
+    if(!$myid)
+      {
+	echo "Can't find you in the database, please check the url.<br />\n";
+	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+	output_footer();
+	DB_close();
+	exit();
+      }
+    
+    DB_update_user_timestamp($myid);
+    
+    /* get some information from the DB */
+    $gameid   = DB_get_gameid_by_hash($me);
+    $myname   = DB_get_name_by_hash($me);
+
+    /* check if game really is old enough */
+    $result = mysql_query("SELECT mod_date,player,status from Game WHERE id='$gameid' " );
+    $r = mysql_fetch_array($result,MYSQL_NUM);
+    if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week */
+      {
+	$name = DB_get_name_by_userid($r[1]);
+	$To = DB_get_email_by_userid($r[1]);
+	$userhash = DB_get_hash_from_gameid_and_userid($gameid,$r[1]);
+	
+	$message = "Hello $name, \n\n".
+	  "It's your turn in game ".DB_format_gameid($gameid)." \n".
+	  "Actually everyone else is waiting for you for more than a week now ;)\n\n".
+	  "Please visit this link now to continue: \n".
+	  " ".$host."?me=".$userhash."\n\n" ;
+	
+	if(DB_get_reminder($r[1],$gameid)>0)
+	  {
+	    echo "<p>An email has already been sent out.</p>\n";
+	  }
+	else
+	  {
+	    DB_set_reminder($r[1],$gameid);
+	    mymail($To,$EmailName."Reminder: game ".DB_format_gameid($gameid)." it's your turn",$message);
+	    
+	    echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).": an email has been sent out.<br /><br /></p>";
+	  }
+      }
+    else
+      echo "<p>You need to wait longer before you can send out a reminder...</p>\n";
+  }
 /* handle request from one specific player for one game,
  * (the hash is set on a per game base) */
 else if(myisset("me"))
@@ -1761,12 +1813,17 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 			   else
 			     {
 			       $name = DB_get_name_by_userid($r[3]);
+			       $gameid = $r[1];
+			       if(DB_get_reminder($r[3],$gameid)==0)
+				 if(time()-strtotime($r[2]) > 60*60*24*7)
+				   echo "".
+				     "<a href=\"$host?remind=1&amp;me=".$r[0]."\">Send a reminder.</a>";
 			       echo "(it's $name's turn)\n";
 			     };
 			 }
 		       if(time()-strtotime($r[2]) > 60*60*24*30)
-			 echo " The game has been running for over a month.".
-			   " Do you want to cancel it? <a href=\"$host?cancle=1&amp;me=".$r[0]."\">yes</a>".
+			 echo "".
+			   "<a href=\"$host?cancle=1&amp;me=".$r[0]."\">Cancel?</a>".
 			   " (clicking here is final and can't be restored)";
 
 		     }

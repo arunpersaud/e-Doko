@@ -916,4 +916,28 @@ function DB_format_gameid($gameid)
   return $session.".".$r[0];
 }
 
+function DB_get_reminder($user,$gameid)
+{
+  $queryresult = mysql_query("SELECT COUNT(*) FROM Reminder ".
+			     "  WHERE user_id=$user ".
+			     "  AND game_id=$gameid ".
+			     "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
+			     "  GROUP BY user_id " );
+  
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
+function DB_set_reminder($user,$gameid)
+{
+  mysql_query("INSERT INTO Reminder ".
+	      "  VALUES(NULL, ".DB_quote_smart($user).", ".DB_quote_smart($gameid).
+              ", NULL) ");
+  return 0;
+}
+
+
 ?>
