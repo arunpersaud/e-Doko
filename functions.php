@@ -692,7 +692,7 @@ function display_table ()
       $zone   = return_timezone($offset);
       date_default_timezone_set($zone);
       
-      echo " <span class=\"table".($pos-1)."\">\n";
+      echo " <div class=\"table".($pos-1)."\">\n";
       if(!$debug)
 	echo " $name \n";
       else
@@ -792,7 +792,7 @@ function display_table ()
       echo "<br />\n";
       echo " <span title=\"".date("Y-m-d H:i:s")."\">local time</span>";
       echo " <span title=\"".date("Y-m-d H:i:s",$lastlogin)."\">last login</span>";
-      echo " </span>\n";
+      echo " </div>\n";
       
     }
   echo  "</div>\n"; /* end output table */

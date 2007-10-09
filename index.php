@@ -337,69 +337,6 @@ else if(myisset("me"))
     /* put everyting in a form */
     echo "<form action=\"index.php?me=$me\" method=\"post\">\n";
 
-    /* output left menu */
-
-    display_user_menu();
-
-    /* output right menu */
-
-      /* display rule set for this game */
-    echo "<div class=\"gameinfo\">\n";
-
-    if($gamestatus != 'pre')
-      echo " Gametype: $GT <br />\n";
-    
-    echo "Rules: <br />\n";
-    echo "10ofhearts : ".$RULES["dullen"]      ."<br />\n";
-    echo "schweinchen: ".$RULES["schweinchen"] ."<br />\n";
-    echo "call:        ".$RULES["call"]        ."<br />\n";
-
-    echo "<hr />\n";
-    if($gamestatus == 'play' )
-      output_form_calls($me);
-
-    /* get time from the last action of the game */
-    $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
-    $r       = mysql_fetch_array($result,MYSQL_NUM);
-    $gameend = time() - strtotime($r[0]);
-    
-    if($gamestatus == 'play' || $gameend < 60*60*24*7)
-      {
-	echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
-	echo "<hr />";
-      }
-
-    echo "<input type=\"submit\" value=\"submit\" />\n";
-
-
-    if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
-      {
-	echo "<hr />\n";
-	
-	$session = DB_get_session_by_gameid($gameid);
-	$result  = mysql_query("SELECT id,create_date FROM Game".
-			       " WHERE session=$session".
-			       " ORDER BY create_date DESC".
-			       " LIMIT 1");
-	$r = -1;
-	if($result)
-	  $r = mysql_fetch_array($result,MYSQL_NUM);
-	
-	if(!$session || $gameid==$r[0])
-	  {
-	    /* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
-	    $names = DB_get_all_names_by_gameid($gameid);
-	    $type  = DB_get_gametype_by_gameid($gameid);
-	    
-	    if($type=="solo")
-	      output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
-	    else
-	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
-	  }
-      }
-
-    echo "</div>\n";
-
     /* output game */
 
     /* output extra division in case this game is part of a session */
@@ -1595,6 +1532,69 @@ else if(myisset("me"))
     default:
       myerror("error in testing the status");
     }
+    /* output left menu */
+    display_user_menu();
+
+    /* output right menu */
+
+      /* display rule set for this game */
+    echo "<div class=\"gameinfo\">\n";
+
+    if($gamestatus != 'pre')
+      echo " Gametype: $GT <br />\n";
+    
+    echo "Rules: <br />\n";
+    echo "10ofhearts : ".$RULES["dullen"]      ."<br />\n";
+    echo "schweinchen: ".$RULES["schweinchen"] ."<br />\n";
+    echo "call:        ".$RULES["call"]        ."<br />\n";
+
+    echo "<hr />\n";
+    if($gamestatus == 'play' )
+      output_form_calls($me);
+
+    /* get time from the last action of the game */
+    $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
+    $r       = mysql_fetch_array($result,MYSQL_NUM);
+    $gameend = time() - strtotime($r[0]);
+    
+    if($gamestatus == 'play' || $gameend < 60*60*24*7)
+      {
+	echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+	echo "<hr />";
+      }
+
+    echo "<input type=\"submit\" value=\"submit\" />\n";
+
+
+    if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
+      {
+	echo "<hr />\n";
+	
+	$session = DB_get_session_by_gameid($gameid);
+	$result  = mysql_query("SELECT id,create_date FROM Game".
+			       " WHERE session=$session".
+			       " ORDER BY create_date DESC".
+			       " LIMIT 1");
+	$r = -1;
+	if($result)
+	  $r = mysql_fetch_array($result,MYSQL_NUM);
+	
+	if(!$session || $gameid==$r[0])
+	  {
+	    /* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
+	    $names = DB_get_all_names_by_gameid($gameid);
+	    $type  = DB_get_gametype_by_gameid($gameid);
+	    
+	    if($type=="solo")
+	      output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
+	    else
+	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+	  }
+      }
+
+    echo "</div>\n";
+
+
     echo "</form>\n";
     output_footer();
     DB_close();
@@ -1766,6 +1766,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	     
 	       display_user_menu();
   
+	       echo "<div class=\"user\">";
 	       echo "<h4>These are all your games:</h4>\n";
 	       echo "<p>Session: <br />\n";
 	       echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
@@ -1832,7 +1833,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       $names = DB_get_all_names();
 	       echo "<h4>Registered players:</h4>\n<p>\n";
 	       echo implode(", ",$names)."\n";
-	       echo "</p>\n";
+	       echo "</p>\n</div>";
 	     }
 	 }
        else

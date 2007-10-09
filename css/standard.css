@@ -7,8 +7,6 @@
 
 .main {
   min-height: 40em;
-//  margin-left: 12.5em;
-//  margin-right: 12.5em;
 }
 
 .footer { 
@@ -58,49 +56,55 @@ margin-top:20em;
 /* display the table and the names */
 div.table {
   position:absolute;
+  left:25%;
+  right:25%;
   margin:0;
   padding:0;
 /*  border: 5px solid blue;*/
-  top: 14em;
-  left: 20em;
+  top: 16em;
+  text-align:center;
 }
 
 div.table img { 
-  height:20em;
-  width:20em;
+  top:25%;
+  bottom:25%;
+  height:50%;
+  width:50%;
   z-index:9;
+  display: block;
+  margin-left: auto;
+  margin-right: auto
 }
-div.table span {
+div.table div {
   /*background-color:green;*/
   position:absolute;
-  width:13em;
+  width:25%;
+  height:25%;
 }
-div.table span span{
+div.table div img{
   /*background-color:green;*/
-  position:relative;
+  width:25%;
+  height:25%;
 }
 
-div.table span.table0 {
-  top:9em;
-  left:-15em;
+div.table div.table0 {
+  top:37.5%;
+  left:0%;
   text-align:right;
 }
-div.table span.table1 {
-  top:-3.5em;
-  left: 0em;
-  width:20em;
+div.table div.table1 {
+  top:-25%;
+  left:37.5%; 
   text-align:center;
 }
-div.table span.table2 {
-  top:9em;
-  left:22em;
+div.table div.table2 {
+  top:37.5%;
+  left:75%;
   text-align:left;
-  vertical-align:center;
 }
-div.table span.table3 {
-  top:21.5em;
-  left: 0em;
-  width:20em;
+div.table div.table3 {
+  bottom:-25%;
+  left: 37.5%;
   text-align:center;
 }
 
@@ -126,13 +130,12 @@ ul.tricks li.nohighlight:hover {  background-color: #fff;}
 
 ul.tricks li div.trick {
   position:absolute;
+  left:37.5%;
+  right:37.5%;
+  top:9em;
   margin:0;
   padding:0;
 /*  border: 5px solid green;*/
-  top: 8em;
-  left: 20em;
-  height:20em;
-  width:20em;
   z-index:9;
   display:none;
 }
@@ -297,9 +300,11 @@ ul.tricks li div div span.comment span{
 }
 
 .gameinfo, .useroptions {
-  float:right;
+  position:absolute;
+  top:10em;
+  right:0em;
   margin:1em;
-  margin-top:3em;
+  margin-top:0em;
   margin-right:0em;
 
   width:12em;
@@ -314,9 +319,11 @@ ul.tricks li div div span.comment span{
 }
 
 .usermenu {
-  float: left;
+  position:absolute;
+  top:10em;
+  left:0;
   margin:1em;
-  margin-top:3em;
+  margin-top:0em;
   margin-left:0em;
 
   width: 12em;
@@ -329,6 +336,8 @@ ul.tricks li div div span.comment span{
 
   background-color: #eee;
 }
+
+.user { margin-left:25%;margin-right:25%; } 
 
 .over { 
   text-align:center;
