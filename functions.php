@@ -692,11 +692,11 @@ function display_table ()
       $zone   = return_timezone($offset);
       date_default_timezone_set($zone);
       
-      echo " <div class=\"table".($pos-1)."\">\n";
+      echo "  <div class=\"table".($pos-1)."\">\n";
       if(!$debug)
-	echo " $name \n";
+	echo "   $name \n";
       else
-	echo "<a href=\"".$host."?me=".$hash."\">$name</a>\n";
+	echo "   <a href=\"".$host."?me=".$hash."\">$name</a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
       if($GT=="poverty" && $party=="re")
@@ -706,12 +706,12 @@ function display_table ()
 	    $cards    = DB_get_all_hand($userhash);
 	    $trumpNR  = count_trump($cards);
 	    if($trumpNR)
-	      echo "<img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
+	      echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
 	    else
-	      echo "<img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
+	      echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
 	  }
 	else
-	  echo "<img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
+	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
       
       if($GT=="dpoverty")
 	if($party=="re")
@@ -721,12 +721,12 @@ function display_table ()
 	      $cards    = DB_get_all_hand($userhash);
 	      $trumpNR  = count_trump($cards);
 	      if($trumpNR)
-		echo "<img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
+		echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" />";
 	      else
-		echo "<img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
+		echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" />";
 	    }
 	  else
-	    echo "<img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
+	    echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
 	else
 	  if($sickness=="poverty")
 	    {
@@ -734,65 +734,65 @@ function display_table ()
 	      $cards    = DB_get_all_hand($userhash);
 	      $trumpNR  = count_trump($cards);
 	      if($trumpNR)
-		echo "<img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" alt=\"poverty2 < trump back\" />";
+		echo "   <img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" alt=\"poverty2 < trump back\" />";
 	      else
-		echo "<img src=\"pics/button/poverty2_notrump_button.png\" class=\"button\" alt=\"poverty2 <\" />";
+		echo "   <img src=\"pics/button/poverty2_notrump_button.png\" class=\"button\" alt=\"poverty2 <\" />";
 	    }
 	  else
-	    echo "<img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" alt=\"poverty2 >\" />";
+	    echo "   <img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" alt=\"poverty2 >\" />";
       
       if($GT=="wedding" && $party=="re")
 	if($sickness=="wedding")
-	  echo "<img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" />";
+	  echo "   <img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" />";
 	else
-	  echo "<img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" />";
+	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" />";
       
       if(ereg("solo",$GT) && $party=="re")
 	{
 	  if(ereg("queen",$GT))
-	    echo "<img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	  else if(ereg("jack",$GT))
-	    echo "<img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	  else if(ereg("club",$GT))
-	    echo "<img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	  else if(ereg("spade",$GT))
-	    echo "<img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	  else if(ereg("heart",$GT))
-	    echo "<img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	  else if(ereg("trumpless",$GT))
-	    echo "<img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	  else if(ereg("trump",$GT))
-	    echo "<img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
+	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	}
       
       /* add point calls */
       if($call!=NULL)
 	{
 	  if($party=="re")
-	    echo "<img src=\"pics/button/re_button.png\" class=\"button\" alt=\"re\" />";
+	    echo "  <img src=\"pics/button/re_button.png\" class=\"button\" alt=\"re\" />";
 	  else
-	    echo "<img src=\"pics/button/contra_button.png\" class=\"button\" alt=\"contra\" />";
+	    echo "  <img src=\"pics/button/contra_button.png\" class=\"button\" alt=\"contra\" />";
 	  switch($call)
 	    {
 	    case "0":
-	      echo "<img src=\"pics/button/0_button.png\" class=\"button\" alt=\"0\" />";
+	      echo "   <img src=\"pics/button/0_button.png\" class=\"button\" alt=\"0\" />";
 	      break;
 	    case "30":
-	      echo "<img src=\"pics/button/30_button.png\" class=\"button\" alt=\"30\" />";
+	      echo "   <img src=\"pics/button/30_button.png\" class=\"button\" alt=\"30\" />";
 	      break;
 	    case "60":
-	      echo "<img src=\"pics/button/60_button.png\" class=\"button\" alt=\"60\" />";
+	      echo "   <img src=\"pics/button/60_button.png\" class=\"button\" alt=\"60\" />";
 	      break;
 	    case "90":
-	      echo "<img src=\"pics/button/90_button.png\" class=\"button\" alt=\"90\" />";
+	      echo "   <img src=\"pics/button/90_button.png\" class=\"button\" alt=\"90\" />";
 	      break;
 	    }
 	}
       
-      echo "<br />\n";
-      echo " <span title=\"".date("Y-m-d H:i:s")."\">local time</span>";
-      echo " <span title=\"".date("Y-m-d H:i:s",$lastlogin)."\">last login</span>";
-      echo " </div>\n";
+      echo "    <br />\n";
+      echo "    <span title=\"".date("Y-m-d H:i:s")."\">local time</span>\n";
+      echo "    <span title=\"".date("Y-m-d H:i:s",$lastlogin)."\">last login</span>\n";
+      echo "   </div>\n";
       
     }
   echo  "</div>\n"; /* end output table */
@@ -821,7 +821,7 @@ function display_user_menu()
       echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
   
-  echo "<hr /> <a href=\"".$host."?new\">start a new game</a>";
+  echo "<hr /> <a href=\"".$host."?new\">start a new game</a>\n";
 	       
 
   echo

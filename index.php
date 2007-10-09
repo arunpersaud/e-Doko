@@ -349,9 +349,9 @@ else if(myisset("me"))
 	foreach($hashes as $hash)
 	  {
 	    if($hash == $me)
-	      echo "$i ";
+	      echo "$i \n";
 	    else 
-	      echo "<a href=\"".$host."?me=".$hash."\">$i</a> ";
+	      echo "<a href=\"".$host."?me=".$hash."\">$i</a> \n";
 	    $i++;
 	  }
 	echo "</div>\n";
