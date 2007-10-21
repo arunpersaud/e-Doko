@@ -29,11 +29,11 @@
 
 .joingame,.sickness,.poverty,.total {
  position: absolute;
- width: 18em;
+ width: 10%;
 
- top:21em;
- left:22em;
-
+ top:24em;
+ left:45%;
+ right:45%;
  text-align: center;
 }
 
@@ -80,6 +80,7 @@ div.table div {
   position:absolute;
   width:25%;
   height:25%;
+  text-align:center;
 }
 div.table div img{
   /*background-color:green;*/
@@ -90,22 +91,18 @@ div.table div img{
 div.table div.table0 {
   top:37.5%;
   left:0%;
-  text-align:right;
 }
 div.table div.table1 {
   top:-25%;
   left:37.5%; 
-  text-align:center;
 }
 div.table div.table2 {
   top:37.5%;
   left:75%;
-  text-align:left;
 }
 div.table div.table3 {
   bottom:-25%;
   left: 37.5%;
-  text-align:center;
 }
 
 ul.tricks {
@@ -129,14 +126,6 @@ ul.tricks li:hover {  background-color: #bbb;}
 ul.tricks li.nohighlight:hover {  background-color: #fff;}
 
 ul.tricks li div.trick {
-  position:absolute;
-  left:37.5%;
-  right:37.5%;
-  top:9em;
-  margin:0;
-  padding:0;
-/*  border: 5px solid green;*/
-  z-index:9;
   display:none;
 }
 
@@ -144,121 +133,114 @@ ul.tricks li div.trick img.arrow {
   position:absolute;
   margin:0;
   padding:0;
-  top: 4em;
-  left: 3em;
-  height:14em;
-  z-index:-2;
+/*  border: 5px solid blue;*/
+  text-align:center;
+  width:16%;
+  left:42%;
+  right:42%;
+  top:12em;
+  z-index:8;
 }
 
 hr {clear:both;}
 
 /*ul.tricks li:hover div.table{ display:block; }*/
 
-ul.tricks li div div.card0 {
+ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score{
   position:absolute;
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 7em;
-  right:22em;
-}
-ul.tricks li div div.card1 {
-  position:absolute;
-  margin:0;
-  padding:0;
-  /*border: 1px solid red;*/
-  top: 1em;
-  left:-7em;
-  width:28em;
-  text-align:center;
-}
-ul.tricks li div div.card2 {
-  position:absolute;
-  margin:0;
-  padding:0;
-  /*border: 1px solid red;*/
-  top: 7em;
-  left: 15em;
-}
-ul.tricks li div div.card3 {
-  position:absolute;
-  margin:0;
-  padding:0;
-  /*border: 1px solid red;*/
-  top: 15em;
-  left:-7em;
-  width:28em;
-  text-align:center;
-}
-
-ul.tricks li div div img {
-  position:absolute;
-  height:6em;
-  margin:0;
-  padding:0;
-}
-
-ul.tricks li div div span.comment {
-  position:absolute;
-  background-color:white;
-  margin:0;
-  padding:0;
-  width:10em;
-  border: 1px solid yellow;
-  z-index:-11;
-}
-
-ul.tricks li div div span.score {
-  position:absolute;
-  width:5em;
-  background-color: #fff;
-}
-ul.tricks li div div.card0 span.score {
-  top: 1em;
-  left: 2em;
-}
-ul.tricks li div div.card1 span.score {
-    top: -1em;
-    left: 14em;
-}
-ul.tricks li div div.card2 span.score {
-    top: 1em;
-    left: -1em;
-}
-ul.tricks li div div.card3 span.score {
-    top: 2em;
-    left: 14em;
-}
-
-ul.tricks li div div span.comment:hover {
-  z-index:11;
-}
-ul.tricks li div div span.comment {
-  z-index:-11;
+  top: 16em;
+  left:37.5%;
+  right:56x.5%;
+  width:6%;
+  z-index:9;
 }
 ul.tricks li div div.card0 span.comment{
-  top:6em;
-  left:-15em;
-  border: 3px solid green;
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 3em;
+  right:66.5%;
+  left:17.5%;
+  width:16%;
+}
+ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score {
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 10em;
+  left:47%;
+  right:47%;
+  width:6%;
+  text-align:center;
+  z-index:9;
 }
 ul.tricks li div div.card1 span.comment{
-  top:-5em;
-  left:-4em;
-  border: 3px solid green;
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 3em;
+  left:66.5%;
+  right:17.5%;
+  width:16%;
+  text-align:center;
+}
+ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score{
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 16em;
+  right:37.5%;
+  left:56x.5%;
+  width:6%;
+  z-index:9;
 }
 ul.tricks li div div.card2 span.comment{
-  top:-8em;
-  left:6em;
-  border: 3px solid green;
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 24em;
+  left:66.5%;
+  right:17.5%;
+  width:16%;
+  text-align:center;
+}
+ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score{
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 22em;
+  left:47%;
+  right:47%;
+  width:6%;
+  text-align:center;
+  z-index:9;
 }
 ul.tricks li div div.card3 span.comment{
-  top:5em;
-  left:27em;
-  border: 3px solid green;
+  position:absolute;
+  margin:0;
+  padding:0;
+  /*border: 1px solid red;*/
+  top: 24em;
+  right:66.5%;
+  left:17.5%;
+  width:16%;
 }
+
+span.comment{
+ border: 3px solid green;
+}
+
 ul.tricks li div div span.comment span{
   display:block;
-  width:10em;
   text-align:left;
   border-top:1px solid green;
 }
