@@ -1120,7 +1120,7 @@ else if(myisset("me"))
 	  date_default_timezone_set($zone);
 
 	  /* check if first schweinchen has been played */
-	  if($r[0] == 19 || $r[0] == 20 )
+	  if( $GAME["schweinchen"] && ($r[0] == 19 || $r[0] == 20) )
 	    $GAME["schweinchen"]++;
 	  
 	  /* save card to be able to find the winner of the trick later */
@@ -1230,9 +1230,9 @@ else if(myisset("me"))
 	      $playid = DB_play_card($trickid,$handcardid,$sequence);
 
 	      /* check for schweinchen */
-	      if($card == 19 || $card == 20 )
+	      if($GAME["schweinchen"] && ($card == 19 || $card == 20) )
 		{
-		  $GAME["schweinchen"]++;
+		  $GAME["schweinchen"]++; // count how many have been played including this one
 		  if($GAME["schweinchen"]==3 && $RULES["schweinchen"]=="second" )
 		    DB_insert_comment("Schweinchen! ",$playid,$myid);
 		  if($RULES["schweinchen"]=="both" )
