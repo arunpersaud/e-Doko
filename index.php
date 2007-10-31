@@ -461,88 +461,104 @@ else if(myisset("me"))
 	}
       else
 	{
-	  echo "<p class=\"message\">Processing what you selected in the last step...";
-      
-	  /* check if this sickness needs to be handled first */
-	  $gametype    = DB_get_gametype_by_gameid($gameid);
-	  $startplayer = DB_get_startplayer_by_gameid($gameid);
-	  
-	  if( $_REQUEST["solo"]!="No")
-	    {
-	      /* user wants to play a solo */
+	  /* check if someone selected more than one vorbehalt */
+	  $Nvorbehalt = 0;
+	  if($_REQUEST["solo"]!="No")       $Nvorbehalt++;
+	  if($_REQUEST["wedding"] == "yes") $Nvorbehalt++;
+	  if($_REQUEST["poverty"] == "yes") $Nvorbehalt++;
+	  if($_REQUEST["nines"] == "yes")   $Nvorbehalt++;
 
-	      /* store the info in the user's hand info */
-	      DB_set_solo_by_hash($me,$_REQUEST["solo"]);
-	      DB_set_sickness_by_hash($me,"solo");
+	  if($Nvorbehalt>1)
+	    {
+	      echo "<p class=\"message\"> You selected more than one vorbehalt, please go back ".
+		"and answer the <a href=\"$host?me=$me&in=yes\">question</a> again.</p>";
+	      DB_set_hand_status_by_hash($me,'init');
+	    }
+	  else
+	    {
+	      echo "<p class=\"message\">Processing what you selected in the last step...";
 
-	      echo "<br />Seems like you want to play a ".$_REQUEST["solo"]." solo. Got it.<br />\n";
-	      
-	      if($gametype == "solo" && $startplayer<$mypos)
-		{}/* do nothing, since someone else already is playing solo */
-	      else
+	      /* check if this sickness needs to be handled first */
+	      $gametype    = DB_get_gametype_by_gameid($gameid);
+	      $startplayer = DB_get_startplayer_by_gameid($gameid);
+
+	      if( $_REQUEST["solo"]!="No")
 		{
-		  /* this solo comes first 
-		   * store info in game table
-		   */
-		  DB_set_gametype_by_gameid($gameid,"solo");
-		  DB_set_startplayer_by_gameid($gameid,$mypos);
-		  DB_set_solo_by_gameid($gameid,$_REQUEST["solo"]);
-		};
-	    }
-	  else if($_REQUEST["wedding"] == "yes")
-	    {
-	      /* TODO: add silent solo somewhere*/
-	      echo "Ok, you don't want to play a silent solo...wedding was chosen.<br />\n";
-	      DB_set_sickness_by_hash($me,"wedding");
-	    }
-	  else if($_REQUEST["poverty"] == "yes")
-	    {
-	      echo "Don't think you can win with just a few trump...? ok, poverty chosen <br />\n";
-	      DB_set_sickness_by_hash($me,"poverty");
-	    }
-	  else if($_REQUEST["nines"] == "yes")
-	    {
-	      echo "What? You just don't want to play a game because you have a few nines? Well, if no one".
-		" is playing solo, this game will be canceled.<br />\n";
-	      DB_set_sickness_by_hash($me,"nines");
-	    }
-	  
-	  echo " Ok, done with checking, please go to the <a href=\"$host?me=$me\">next step of the setup</a>.</p>";
-	  
-	  /* move on to the next stage*/
-	  DB_set_hand_status_by_hash($me,'poverty');
-	  
-	  /* check if everyone has reached this stage, send out email */
-	  $userids = DB_get_all_userid_by_gameid($gameid);
-	  $ok = 1;
-	  foreach($userids as $user)
-	    {
-	      $userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
-	      if($userstat!='poverty' && $userstat!='play')
-		{
-		  $ok = 0;
-		  DB_set_player_by_gameid($gameid,$user);
+		  /* user wants to play a solo */
+
+		  /* store the info in the user's hand info */
+		  DB_set_solo_by_hash($me,$_REQUEST["solo"]);
+		  DB_set_sickness_by_hash($me,"solo");
+
+		  echo "<br />Seems like you want to play a ".$_REQUEST["solo"]." solo. Got it.<br />\n";
+
+		  if($gametype == "solo" && $startplayer<$mypos)
+		    {}/* do nothing, since someone else already is playing solo */
+		  else
+		    {
+		      /* this solo comes first
+		       * store info in game table
+		       */
+		      DB_set_gametype_by_gameid($gameid,"solo");
+		      DB_set_startplayer_by_gameid($gameid,$mypos);
+		      DB_set_solo_by_gameid($gameid,$_REQUEST["solo"]);
+		    };
 		}
-	    };
-	  if($ok)
-	    {
-	      /* reset player = everyone has to do something now */
-	      DB_set_player_by_gameid($gameid,NULL);
-	      
+	      else if($_REQUEST["wedding"] == "yes")
+		{
+		  /* TODO: add silent solo somewhere*/
+		  echo "Ok, you don't want to play a silent solo...wedding was chosen.<br />\n";
+		  DB_set_sickness_by_hash($me,"wedding");
+		}
+	      else if($_REQUEST["poverty"] == "yes")
+		{
+		  echo "Don't think you can win with just a few trump...? ok, poverty chosen <br />\n";
+		  DB_set_sickness_by_hash($me,"poverty");
+		}
+	      else if($_REQUEST["nines"] == "yes")
+		{
+		  echo "What? You just don't want to play a game because you have a few nines? Well, if no one".
+		    " is playing solo, this game will be canceled.<br />\n";
+		  DB_set_sickness_by_hash($me,"nines");
+		}
+
+	      echo " Ok, done with checking, please go to the <a href=\"$host?me=$me\">next step of the setup</a>.</p>";
+
+	      /* move on to the next stage*/
+	      DB_set_hand_status_by_hash($me,'poverty');
+
+	      /* check if everyone has reached this stage, send out email */
+	      $userids = DB_get_all_userid_by_gameid($gameid);
+	      $ok = 1;
 	      foreach($userids as $user)
 		{
-		  $To       = DB_get_email_by_userid($user);
-		  $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);		  if($userhash != $me)
+		  $userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+		  if($userstat!='poverty' && $userstat!='play')
 		    {
-		      $message = "Everyone finish the questionary in game ".DB_format_gameid($gameid).", ".
-			"please visit this link now to continue: \n".
-			" ".$host."?me=".$userhash."\n\n" ;
-		      mymail($To,$EmailName." finished setup in game ".DB_format_gameid($gameid),$message);
+		      $ok = 0;
+		      DB_set_player_by_gameid($gameid,$user);
 		    }
+		};
+	      if($ok)
+		{
+		  /* reset player = everyone has to do something now */
+		  DB_set_player_by_gameid($gameid,NULL);
+
+		  foreach($userids as $user)
+		    {
+		      $To       = DB_get_email_by_userid($user);
+		      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		      if($userhash != $me)
+			{
+			  $message = "Everyone finish the questionary in game ".DB_format_gameid($gameid).", ".
+			    "please visit this link now to continue: \n".
+			    " ".$host."?me=".$userhash."\n\n" ;
+			  mymail($To,$EmailName." finished setup in game ".DB_format_gameid($gameid),$message);
+			}
+		    };
 		};
 	    };
 	};
-
       break;
 
     case 'poverty':
