@@ -939,5 +939,17 @@ function DB_set_reminder($user,$gameid)
   return 0;
 }
 
+function DB_is_session_active($session)
+{
+  $queryresult = mysql_query("SELECT COUNT(*) FROM Game ".
+			     "  WHERE session=$session ".
+			     "  AND status<>'gameover' ");
+
+  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  if($r)
+    return $r[0];
+  else
+    return -1;
+}
 
 ?>

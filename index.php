@@ -85,6 +85,23 @@ else if(myisset("new"))
 	$session = DB_get_session_by_gameid($followup);
 	$ruleset = DB_get_ruleset_by_gameid($followup); /* just copy ruleset from old game, 
 							 this way no manipulation is possible */
+
+	/* check if there is a game in pre or play mode, in that case do nothing */
+	if( DB_is_session_active($session) > 0 )
+	  {
+	    echo "<p class=\"message\"> There is already a game going on in session $session, you can't start a new one</p>";
+	    output_footer();
+	    DB_close();
+	    exit();
+	  }
+	else if ( DB_is_session_active($session) < 0 )
+	  {
+	    echo "<p class=\"message\"> ERROR: status of session $session couldn't be determined.</p>";
+	    output_footer();
+	    DB_close();
+	    exit();
+	  }
+
 	if($session)
 	  mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 		      "'$ruleset','$session' ,NULL)");
