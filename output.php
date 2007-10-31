@@ -2,7 +2,7 @@
 
 /* functions which only ouput html  */
 
-function output_user_settings($email,$password)
+function output_user_settings()
 {
   global $PREF;
 

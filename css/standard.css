@@ -5,6 +5,13 @@
   border-bottom:    3px solid gray;
 }
 
+.lastlogin {
+  position:absolute;
+  font-size:smaller;
+  top:0;
+  left:0;
+}
+
 .main {
   min-height: 40em;
 }

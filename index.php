@@ -214,7 +214,8 @@ else if(myisset("cancle","me"))
     if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
       {
 	$message = "Hello, \n\n".
-	  "Game ".DB_format_gameid($gameid)." has been cancled since nothing happend for a while and $myname requested it.\n";
+	  "Game ".DB_format_gameid($gameid).
+	  " has been cancled since nothing happend for a while and $myname requested it.\n";
 	
 	$userids = DB_get_all_userid_by_gameid($gameid);
 	foreach($userids as $user)
@@ -226,7 +227,8 @@ else if(myisset("cancle","me"))
 	/* delete everything from the dB */
 	DB_cancel_game($me);
 	
-	echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been cancled.<br /><br /></p>";
+	echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
+	  " has been cancled.<br /><br /></p>";
       }
     else
       echo "<p>You need to wait longer before you can cancle a game...</p>\n";
@@ -277,7 +279,8 @@ else if(myisset("remind","me"))
 	    DB_set_reminder($r[1],$gameid);
 	    mymail($To,$EmailName."Reminder: game ".DB_format_gameid($gameid)." it's your turn",$message);
 	    
-	    echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).": an email has been sent out.<br /><br /></p>";
+	    echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
+	      ": an email has been sent out.<br /><br /></p>";
 	  }
       }
     else
@@ -1117,7 +1120,8 @@ else if(myisset("me"))
 			    "       Hand.position as position,".
 			    "       Play.sequence as sequence, ".
 			    "       Trick.id, ".
-			    "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>') SEPARATOR '\n' ), ".
+			    "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>')".
+			    "                    SEPARATOR '\n' ), ".
 			    "       Play.create_date, ".
 			    "       Hand.user_id ".
 			    "FROM Trick ".
@@ -1792,9 +1796,9 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		 output_status($_SESSION["name"]);
 	       
 	       /* display links to settings */
-	       output_user_settings($email,$password);
+	       output_user_settings();
 	       
-	       echo "<div style=\"position:absolute; font-size:smaller; top:0; left:0; \">last login: ".date("r",$unixtime)."</div>";
+	       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
 	       
 	       DB_update_user_timestamp($myid);
 	     
