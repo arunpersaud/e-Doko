@@ -389,7 +389,7 @@ else if(myisset("me"))
 	 */
 	if( !myisset("in") )
 	  {
-	    echo "<p> You need to answer the <a href=\"$host?me=$me\">question</a>.</p>";
+	    echo "<p class=\"message\"> You need to answer the <a href=\"$host?me=$me\">question</a>.</p>";
 	    DB_set_hand_status_by_hash($me,'start');
 	  }
 	else
@@ -439,12 +439,12 @@ else if(myisset("me"))
 	   * unless a user tries to cheat ;)
 	   * can also happen if user reloads the page!
 	   */
-	  echo "<p> You need to answer the <a href=\"$host?me=$me&in=yes\">questions</a>.</p>";
+	  echo "<p class=\"message\"> You need to answer the <a href=\"$host?me=$me&in=yes\">questions</a>.</p>";
 	  DB_set_hand_status_by_hash($me,'init');
 	}
       else
 	{
-	  echo "Processing what you selected in the last step...<br />";
+	  echo "<p class=\"message\">Processing what you selected in the last step...";
       
 	  /* check if this sickness needs to be handled first */
 	  $gametype    = DB_get_gametype_by_gameid($gameid);
@@ -490,7 +490,7 @@ else if(myisset("me"))
 	      DB_set_sickness_by_hash($me,"nines");
 	    }
 	  
-	  echo " Ok, done with checking, please go to the <a href=\"$host?me=$me\">next step of the setup</a>.<br />";
+	  echo " Ok, done with checking, please go to the <a href=\"$host?me=$me\">next step of the setup</a>.</p>";
 	  
 	  /* move on to the next stage*/
 	  DB_set_hand_status_by_hash($me,'poverty');
@@ -515,8 +515,7 @@ else if(myisset("me"))
 	      foreach($userids as $user)
 		{
 		  $To       = DB_get_email_by_userid($user);
-		  $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		  if($userhash != $me)
+		  $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);		  if($userhash != $me)
 		    {
 		      $message = "Everyone finish the questionary in game ".DB_format_gameid($gameid).", ".
 			"please visit this link now to continue: \n".
@@ -535,7 +534,8 @@ else if(myisset("me"))
        * set that one in the Game table
        * tell people about it.
        */
-      echo "<br /> Checking if someone else selected solo, nines, wedding or poverty.<br />";
+      echo "<div class=\"message\">\n";
+      echo "<p> Checking if someone else selected solo, nines, wedding or poverty.</p>";
       
       /* check if everyone has reached this stage */
       $userids = DB_get_all_userid_by_gameid($gameid);
@@ -809,11 +809,11 @@ else if(myisset("me"))
 		  $result = mysql_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 		  
 		  /* add hidden button with trump in it to get to the next point */
-		  echo "<div class=\"poverty\">\n";
+		  echo "</div><div class=\"poverty\">\n";
 		  echo "  <input type=\"hidden\" name=\"exchange\" value=\"-1\" />\n";
 		  echo "  <input type=\"hidden\" name=\"trump\" value=\"".$trump."\" />\n";
 		  echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select cards to give back\" />\n";
-		  echo "</div>\n";
+		  echo "</div><div>\n";
 		}
 	      else if(myisset("trump","exchange") && $_REQUEST["trump"]>0 && ($who==$mypos || $who==$mypos*10))
 		{
@@ -914,7 +914,7 @@ else if(myisset("me"))
 		  else
 		    {
 		      /* else show all trump, have lowest card pre-selected, have hidden setting for */
-		      echo "<div class=\"poverty\"> you need to get rid of a few cards</div>\n";
+		      echo "</div><div class=\"poverty\"> you need to get rid of a few cards</div>\n";
 		      
 		      set_gametype($gametype); /* this sets the $CARDS variable */
 		      $mycards = DB_get_hand($me);
@@ -926,12 +926,12 @@ else if(myisset("me"))
 			display_link_card($card,$PREF["cardset"],$type);
 		      echo "  <input type=\"hidden\" name=\"trump\" value=\"".$trump."\" />\n";
 		      echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select one card to give back\" />\n";
-		      echo "</div>\n";
+		      echo "</div><div>\n";
 		    }
 		}
 	      else if($who == $mypos || $who == $mypos*10)
 		{
-		  echo "<div class=\"poverty\">\n";
+		  echo "</div><div class=\"poverty\">\n";
 		  foreach($userids as $user)
 		    {
 		      $name     = DB_get_name_by_userid($user);
@@ -949,7 +949,7 @@ else if(myisset("me"))
 			}
 		    }
 		  echo "<a href=\"index.php?me=$me&amp;trump=no\">No,way I take those trump...</a> <br />\n";
-		  echo "</div>\n";
+		  echo "</div><div>\n";
 		  
 		  echo "Your cards are: <br />\n";
 		  $mycards = DB_get_hand($me);
@@ -1025,6 +1025,7 @@ else if(myisset("me"))
 	  else
 	    echo "\n <br />";	 
 	}
+      echo "</div>\n";
       break;
     case 'play':
     case 'gameover': 
@@ -1056,8 +1057,8 @@ else if(myisset("me"))
       /* has the game started? No, then just wait here...*/
       if($gamestatus == 'pre')
 	{
-	  echo "You finished the setup, but not everyone else finished it... ".
-	       "so you need to wait for the others. Just wait for the an email... <br />";
+	  echo "<p class=\"message\"> You finished the setup, but not everyone else finished it... ".
+	       "so you need to wait for the others. Just wait for the an email... </p>";
 	  break; /* not sure this works... the idea is that you can 
 		  * only  play a card after everyone is ready to play */
 	}

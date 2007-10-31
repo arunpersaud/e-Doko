@@ -27,14 +27,20 @@
   font-size: smaller;
 } 
 
-.joingame,.sickness,.poverty,.total {
+.joingame,.sickness,.poverty,.total,.message {
  position: absolute;
- width: 10%;
+ width: 20%;
 
- top:24em;
- left:45%;
- right:45%;
+ top:20em;
+ left:40%;
+ right:40%;
  text-align: center;
+}
+
+.poverty {
+  top:32em;
+  z-index:15;
+  background-color:#fff;
 }
 
 .rules {
