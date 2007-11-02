@@ -1,13 +1,17 @@
+
 Installation
 ------------
 
-0) get files
+-1) What you need
+   all you need is PHP and MYSQL
 
-  get all files from 
+0) Get files
+
+  get all files from
 
   http://nubati.net/git/e-DoKo
 
-1) create database
+1) Create database
 
   create a mysql database using the provided file
 
@@ -15,16 +19,18 @@ Installation
 
   use user, password, database and host option of mysql as needed
 
-2) create a config.php file that defines the following variables:
+2) Configure
+
+  Copy config.php_template to config.php and edit it. These variables need to be set:
 
   $host:  for example "http://localhost/index.php", note: include the index.php here
 
   database info:
 
-    $DB_host 
-    $DB_user 
-    $DB_password 
-    $DB_database 
+    $DB_host
+    $DB_user
+    $DB_password
+    $DB_database
 
   working on the database:
     in case you need to work on the database for some reason, you can suspend the game
@@ -46,7 +52,6 @@ Installation
        return;
     }
 
-
-3) log in and enjoy ;)
+3) Log in and enjoy ;)
 
 Arun

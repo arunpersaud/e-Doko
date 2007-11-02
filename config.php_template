@@ -1,0 +1,32 @@
+<?php
+
+    /* the program needs this to access the mysql database */
+    $DB_host	 = "";
+    $DB_user	 = "";
+    $DB_password = "";
+    $DB_database = "";
+
+    /* set this to 1 to debug the server
+     * emails won't be send out, but  be shown on the page;
+     * each player name at the table will be a link to get
+     * to his view;
+     */
+    $debug = 0;
+
+    /* set this to 1, if you want to work on the DB
+     * the users won't be able to log in and get a message
+     * to check back later
+     */
+    $DB_work = 0;
+
+    $ADMIN_NAME = "";
+    $ADMIN_EMAIL = "";
+
+    /* the prefix for the subject of each email */
+    $EmailName = "[DoKo]";
+    /* used as the reply email in each email */
+    $EMAIL_REPLY="";
+
+    /* this should point to your index.file */
+    $host = "http://.../index.php"
+?>
