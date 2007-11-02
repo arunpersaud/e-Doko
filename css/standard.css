@@ -381,3 +381,12 @@ div span img.button {
   padding:0 0.3em;
   background-color: #15de26;
 }
+
+.scoretable{
+  height:10em;
+  overflow: auto;
+}
+table.score {
+  width:10em;
+  border-collapse:collapse;
+}

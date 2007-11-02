@@ -16,17 +16,17 @@ function config_check()
       output_header();
       echo "<h1>Setup not completed</h1>";
       echo "You need to set \$ADMIN_NAME in config.php.";
-      output_footer(); 
-      exit(); 
-    }    
+      output_footer();
+      exit();
+    }
   if(!isset($ADMIN_EMAIL))
     {
       output_header();
       echo "<h1>Setup not completed</h1>";
       echo "You need to set \$ADMIN_EMAIL in config.php. ".
 	"If something goes wrong an email will be send to this address.";
-      output_footer(); 
-      exit(); 
+      output_footer();
+      exit();
     }
   if(!isset($DB_work))
     {
@@ -35,22 +35,22 @@ function config_check()
       echo "You need to set \$DB_work in config.php. ".
 	"If this is set to 1, the game will be suspended and one can work safely on the database.".
 	"The default should be 0 for the game to work.";
-      output_footer(); 
-      exit(); 
+      output_footer();
+      exit();
     }
-  if($DB_work) 
+  if($DB_work)
     {
       output_header();
-      echo "Working on the database...please check back later."; 
-      output_footer(); 
-      exit(); 
+      echo "Working on the database...please check back later.";
+      output_footer();
+      exit();
     }
-  
+
   return;
 }
 
 function mymail($To,$Subject,$message,$header="")
-{  
+{
   global $debug,$EMAIL_REPLY;
 
   if(isset($EMAIL_REPLY))
@@ -61,9 +61,9 @@ function mymail($To,$Subject,$message,$header="")
       $message = str_replace("\n","<br />\n",$message);
       $message = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
                      "<a href=\"\\0\">\\0</a>", $message);
-      
+
       echo "<br />To: $To<br />";
-      if($header != "") 
+      if($header != "")
 	echo $header."<br />";
       echo "Subject: $Subject <br />$message<br />\n";
     }
@@ -80,15 +80,15 @@ function myisset()
   /* returns 1 if all names passed as args are defined by a GET or POST statement,
    * else return 0
    */
-  
+
   $ok   = 1;
   $args = func_get_args();
-  
+
   foreach($args as $arg)
     {
       $ok = $ok * isset($_REQUEST[$arg]);
       /*echo "$arg: ok = $ok <br />";
-       */ 
+       */
     }
   return $ok;
 }
@@ -103,7 +103,7 @@ function myerror($message)
 function pos_array($c,$arr)
 {
   $ret = 0;
-  
+
   $i   = 0;
   foreach($arr as $a)
     {
@@ -117,26 +117,26 @@ function pos_array($c,$arr)
   return $ret;
 }
 
-function is_trump($c) 
-{ 
+function is_trump($c)
+{
   global $CARDS;
 
   if(in_array($c,$CARDS["trump"]))
     return 1;
-  else 
+  else
     return 0;
 }
 
-function is_same_suite($c1,$c2) 
+function is_same_suite($c1,$c2)
 {
   global $CARDS;
-  
+
   if(in_array($c1,$CARDS["trump"]   ) && in_array($c2,$CARDS["trump"]   ) ) return 1;
   if(in_array($c1,$CARDS["clubs"]   ) && in_array($c2,$CARDS["clubs"]   ) ) return 1;
   if(in_array($c1,$CARDS["hearts"]  ) && in_array($c2,$CARDS["hearts"]  ) ) return 1;
   if(in_array($c1,$CARDS["spades"]  ) && in_array($c2,$CARDS["spades"]  ) ) return 1;
   if(in_array($c1,$CARDS["diamonds"]) && in_array($c2,$CARDS["diamonds"]) ) return 1;
-  
+
   return 0;
 }
 
@@ -148,8 +148,8 @@ function compare_cards($a,$b,$game)
   global $RULES;
   global $GAME;
 
-  /* first map all cards to the odd number, 
-   * this insure that the first card wins the trick 
+  /* first map all cards to the odd number,
+   * this insure that the first card wins the trick
    * if they are the same card
    */
   if( $a/2 - (int)($a/2) != 0.5)
@@ -184,13 +184,13 @@ function compare_cards($a,$b,$game)
 	if($a==1 && $b==1) /* both 10 of hearts */
 	  return 0;        /* second one wins.*/
     }
-  
+
   /* normal case */
   if(is_trump($a) && is_trump($b) && $a<=$b)
     return 1;
   else if(is_trump($a) && is_trump($b) )
     return 0;
-  else 
+  else
     { /*$a is not a trump */
       if(is_trump($b))
 	return 0;
@@ -232,35 +232,35 @@ function compare_cards($a,$b,$game)
 	      return 1;
 	    else
 	      return 0;
-	  
+
 	  /* not the same suit and no trump: a wins */
 	  return 1;
-	}	  
+	}
     }
-} 
+}
 
 function get_winner($p,$mode)
 {
   /* get all 4 cards played in a trick, in the order they are played */
   $tmp = $p[1];
   $c1    = $tmp["card"];
-  $c1pos = $tmp["pos"]; 
+  $c1pos = $tmp["pos"];
 
   $tmp = $p[2];
   $c2    = $tmp["card"];
-  $c2pos = $tmp["pos"]; 
+  $c2pos = $tmp["pos"];
 
   $tmp = $p[3];
   $c3    = $tmp["card"];
-  $c3pos = $tmp["pos"]; 
+  $c3pos = $tmp["pos"];
 
   $tmp = $p[4];
   $c4    = $tmp["card"];
-  $c4pos = $tmp["pos"]; 
+  $c4pos = $tmp["pos"];
 
   /* first card is better than all the rest */
   if( compare_cards($c1,$c2,$mode) && compare_cards($c1,$c3,$mode) && compare_cards($c1,$c4,$mode) )
-    return $c1pos; 
+    return $c1pos;
 
   /* second card is better than first and better than the rest */
   if( !compare_cards($c1,$c2,$mode) &&  compare_cards($c2,$c3,$mode) && compare_cards($c2,$c4,$mode) )
@@ -290,7 +290,7 @@ function count_nines($cards)
       else if($c == "41" || $c == "42") $nines++;
       else if($c == "47" || $c == "48") $nines++;
     }
-  
+
   return $nines;
 }
 
@@ -311,7 +311,7 @@ function count_trump($cards)
 
   /* count each trump */
   foreach($cards as $c)
-    if( (int)($c) <27) 
+    if( (int)($c) <27)
       $trump++;
 
   switch($RULES["schweinchen"])
@@ -340,7 +340,7 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
   global $debug;
 
   $r = array();
-  
+
   if($debug)
     {
       $r[ 0]=1;     $r[12]=47;   $r[24]=13;       $r[36]=37;
@@ -358,20 +358,20 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
     }
   else
     {
-      /* check if we can find a game were non of the player was involved and return 
-       * cards insted 
+      /* check if we can find a game were non of the player was involved and return
+       * cards insted
        */
       $userstr = "'".implode("','",array($useridA,$useridB,$useridC,$useridD))."'";
       $randomnumbers = DB_get_unused_randomnumbers($userstr);
       $randomnumbers = explode(":",$randomnumbers);
-      
+
       if(sizeof($randomnumbers)==48)
 	return $randomnumbers;
-      
+
       /* need to create new numbers */
       for($i=0;$i<48;$i++)
 	$r[$i]=$i+1;
-      
+
       /* shuffle using a better random generator than the standard one */
       for ($i = 0; $i <48; $i++)
 	{
@@ -406,7 +406,7 @@ function return_timezone($offset)
     default:
       $zone = "Europe/London";
     }
-  
+
   return $zone;
 }
 
@@ -452,10 +452,10 @@ function same_type($card,$c)
   else if(in_array($c,$CARDS["diamonds"]))
     $suite = $CARDS["diamonds"];
 
-  /* card is the same suid return 1 */ 
+  /* card is the same suid return 1 */
   if(in_array($card,$suite))
     return 1;
-  
+
   return 0;
 }
 
@@ -472,7 +472,7 @@ function set_gametype($gametype)
     case "dpoverty":
     case "trump":
     case "silent":
-      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				 '17','18','19','20','21','22','23','24','25','26');
       $CARDS["diamonds"] = array();
       $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
@@ -481,7 +481,7 @@ function set_gametype($gametype)
       $CARDS["foxes"]    = array('19','20');
       if($RULES["dullen"]=='none')
 	{
-	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				     '17','18','19','20','21','22','23','24','25','26');
 	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
 	}
@@ -511,7 +511,7 @@ function set_gametype($gametype)
       $CARDS["foxes"]    = array();
       break;
     case "club":
-      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				 '17','18','27','28','29','30','31','32','33','34');
       $CARDS["clubs"]    = array();
       $CARDS["spades"]   = array('35','36','37','38','39','40','41','42');
@@ -520,13 +520,13 @@ function set_gametype($gametype)
       $CARDS["foxes"]    = array();
       if($RULES["dullen"]=='none')
 	{
-	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				     '17','18','27','28','29','30','31','32','33','34');
 	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
 	}
       break;
     case "spade":
-      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				 '17','18','35','36','37','38','39','40','41','42');
       $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
       $CARDS["spades"]   = array();
@@ -535,13 +535,13 @@ function set_gametype($gametype)
       $CARDS["foxes"]    = array();
       if($RULES["dullen"]=='none')
 	{
-	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				     '17','18','35','36','37','38','39','40','41','42');
 	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
 	}
       break;
     case "heart":
-      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+      $CARDS["trump"]    = array('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				 '17','18','43','44','45','46','47','48');
       $CARDS["clubs"]    = array('27','28','29','30','31','32','33','34');
       $CARDS["spades"]   = array('35','36','37','38','39','40','41','42');
@@ -550,7 +550,7 @@ function set_gametype($gametype)
       $CARDS["foxes"]    = array();
       if($RULES["dullen"]=='none')
 	{
-	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16', 
+	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 			    '17','18','43','44','1','2','45','46','47','48');
 	}
       break;
@@ -583,26 +583,26 @@ function can_call($what,$hash)
   $oldcall  = DB_get_call_by_hash($hash);
   $pcall    = DB_get_partner_call_by_hash($hash);
 
-  if( ($pcall!=NULL && $what >= $pcall) || 
+  if( ($pcall!=NULL && $what >= $pcall) ||
       ($oldcall!=NULL && $what >=$oldcall) )
     {
       return 0;
     }
 
   $NRcards  = count(DB_get_hand($hash));
-  
+
   $NRallcards = 0;
   for ($i=1;$i<5;$i++)
     {
       $user         = DB_get_hash_from_game_and_pos($gameid,$i);
       $NRallcards  += count(DB_get_hand($user));
     };
-  
+
   /* in case of a wedding, everything will be delayed by an offset */
   $offset = 0;
   if($gametype=="wedding")
     {
-      $offset = DB_get_sickness_by_gameid($gameid); 
+      $offset = DB_get_sickness_by_gameid($gameid);
       if ($offset <0) /* not resolved */
 	return 0;
     };
@@ -618,7 +618,7 @@ function can_call($what,$hash)
 	return 1;
       break;
     case "9-cards":
-      
+
       if($oldcall!=NULL && $pcall!=NULL)
 	$mincall = ($oldcall>$pcall) ? $pcall : $oldcall;
       else if($oldcall!=NULL)
@@ -674,7 +674,7 @@ function display_table ()
 			"LEFT JOIN User ON User.id=Hand.user_id ".
 			"WHERE Hand.game_id='".$gameid."' ".
 			"ORDER BY position ASC");
-  
+
   echo "<div class=\"table\">\n".
     "  <img src=\"pics/table.png\" alt=\"table\" />\n";
   while($r = mysql_fetch_array($result,MYSQL_NUM))
@@ -687,11 +687,11 @@ function display_table ()
       $call      = $r[5];
       $lastlogin = strtotime($r[6]);
       $hash      = $r[7];
-      
+
       $offset = DB_get_user_timezone($user);
       $zone   = return_timezone($offset);
       date_default_timezone_set($zone);
-      
+
       echo "  <div class=\"table".($pos-1)."\">\n";
       if(!$debug)
 	echo "   $name \n";
@@ -712,7 +712,7 @@ function display_table ()
 	  }
 	else
 	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" />";
-      
+
       if($GT=="dpoverty")
 	if($party=="re")
 	  if($sickness=="poverty")
@@ -740,13 +740,13 @@ function display_table ()
 	    }
 	  else
 	    echo "   <img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" alt=\"poverty2 >\" />";
-      
+
       if($GT=="wedding" && $party=="re")
 	if($sickness=="wedding")
 	  echo "   <img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" />";
 	else
 	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" />";
-      
+
       if(ereg("solo",$GT) && $party=="re")
 	{
 	  if(ereg("queen",$GT))
@@ -764,7 +764,7 @@ function display_table ()
 	  else if(ereg("trump",$GT))
 	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" />";
 	}
-      
+
       /* add point calls */
       if($call!=NULL)
 	{
@@ -788,16 +788,16 @@ function display_table ()
 	      break;
 	    }
 	}
-      
+
       echo "    <br />\n";
       echo "    <span title=\"".date("Y-m-d H:i:s")."\">local time</span>\n";
       echo "    <span title=\"".date("Y-m-d H:i:s",$lastlogin)."\">last login</span>\n";
       echo "   </div>\n";
-      
+
     }
   echo  "</div>\n"; /* end output table */
-  
-  
+
+
   return;
 }
 
@@ -820,14 +820,70 @@ function display_user_menu()
     {
       echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
-  
+
   echo "<hr /> <a href=\"".$host."?new\">start a new game</a>\n";
-	       
+
 
   echo
     "<hr />Report bugs in the <a href=\"". $wiki."\">wiki</a>\n";
   echo  "</div>\n";
   return;
+}
+
+function generate_score_table($session)
+{
+
+  /* get all ids */
+  $gameids = DB_get_gameids_of_finished_games_by_session($session);
+
+  if($gameids == NULL)
+    return "";
+
+  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <tr>\n";
+
+
+  /* get player id, names... from the first game */
+  $player = array();
+  $result = mysql_query("SELECT User.id, User.fullname from Hand".
+			" LEFT JOIN User On Hand.user_id=User.id".
+			" WHERE Hand.game_id=".$gameids[0]);
+  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+    {
+      $player[] = array( 'id' => $r[0], 'points' => 0 );
+      $output.= "  <td> ".substr($r[1],0,2)." </td>\n";
+    }
+  $output.="  <td>P</td>\n </tr>\n";
+
+  /* get points and generate table */
+  foreach($gameids as $gameid)
+    {
+      $output.=" <tr>\n";
+
+      $re_score = DB_get_score_by_gameid($gameid);
+      foreach($player as $key=>$pl)
+	{
+	  $party = DB_get_party_by_gameid_and_userid($gameid,$pl['id']);
+	  if($party == "re")
+	    if(DB_get_gametype_by_gameid($gameid)=="solo")
+	      $player[$key]['points'] += 3*$re_score;
+	    else
+	      $player[$key]['points'] += $re_score;
+	  else if ($party == "contra")
+	    $player[$key]['points'] -= $re_score;
+
+	  $output.="  <td>".$player[$key]['points']."</td>\n";
+	}
+      $output.="  <td>".abs($re_score);
+
+      /* check for solo */
+      if(DB_get_gametype_by_gameid($gameid)=="solo")
+	$output.= " S";
+      $output.="</td>\n </tr>\n";
+    }
+
+  $output.="</table></div>\n";
+
+  return $output;
 }
 
 ?>
