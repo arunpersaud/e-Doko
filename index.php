@@ -1547,7 +1547,7 @@ else if(myisset("me"))
 
 			      if($re>$p-$offset)
 				mysql_query("INSERT INTO Score".
-					    " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'$p')");
+					    " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
 			    }
 
 			  /* re called something and won */
@@ -1574,11 +1574,11 @@ else if(myisset("me"))
 
 			      if($re>$p-$offset)
 				mysql_query("INSERT INTO Score".
-					    " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'$p')");
+					    " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
 			    }
 
-			  /* re called something and won */
-			  if($call_re!=NULL)
+			  /* contra called something and won */
+			  if($call_contra!=NULL)
 			    foreach(array(0,30,60,90,120) as $p)
 			      {
 				if($call_contra<$p+1)
