@@ -1048,7 +1048,7 @@ else if(myisset("me"))
 	      $who         = DB_get_userid_by_email($email);
 	      DB_set_player_by_gameid($gameid,$who);
 
-	      if($hash!=$me)
+	      if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
 		{
 		  /* email startplayer) */
 		  $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
@@ -1441,7 +1441,8 @@ else if(myisset("me"))
 		  $message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		    "It's your turn  now.\n".
 		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
-		  mymail($email,$EmailName."a card has been played in game ".DB_format_gameid($gameid),$message);
+		  if( DB_get_email_pref_by_uid($who)!="emailaddict" )
+		    mymail($email,$EmailName."a card has been played in game ".DB_format_gameid($gameid),$message);
 		}
 	      else /* send out final email */
 		{
@@ -1603,7 +1604,8 @@ else if(myisset("me"))
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 
 		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".$host."?me=".$hash."\n\n" ;
-		      mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
+		      if( DB_get_email_pref_by_uid($user) != "emailaddict" )
+			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
 		    }
 		}
 	    }
@@ -1909,6 +1911,18 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','cardset',".
 					   DB_quote_smart($setpref).")");
 		   echo "Ok, changed you preferences for the cards.\n";
+		   break;
+		 case "emailaddict":
+		 case "emailnonaddict":
+		   $result = mysql_query("SELECT * from User_Prefs".
+					 " WHERE user_id='$myid' AND pref_key='email'" );
+		   if( mysql_fetch_array($result,MYSQL_NUM))
+		     $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
+					   " WHERE user_id='$myid' AND pref_key='email'" );
+		   else
+		     $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','email',".
+					   DB_quote_smart($setpref).")");
+		   echo "Ok, changed you preferences for sending out emails.\n";
 		   break;
 		 }
 	     }

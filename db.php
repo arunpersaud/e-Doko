@@ -792,20 +792,68 @@ function DB_get_PREF($myid)
 {
   global $PREF;
 
-    $result = mysql_query("SELECT value from User_Prefs".
-			  " WHERE user_id='$myid' AND pref_key='cardset'" );
-    $r = mysql_fetch_array($result,MYSQL_NUM);
-    if($r)
-      {
-	if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
-	  $PREF["cardset"]="altenburg";
-	else
-	  $PREF["cardset"]="english";
-      }
-    else
-      $PREF["cardset"]="english";
+  /* Cardset */
+  $result = mysql_query("SELECT value from User_Prefs".
+			" WHERE user_id='$myid' AND pref_key='cardset'" );
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+  if($r)
+    {
+      if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
+	$PREF["cardset"]="altenburg";
+      else
+	$PREF["cardset"]="english";
+    }
+  else
+    $PREF["cardset"]="english";
 
-    return;
+  /* Email */
+  $result = mysql_query("SELECT value FROM User_Prefs".
+			" WHERE user_id='$myid' AND pref_key='email'" );
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+  if($r)
+    {
+      if($r[0]=="emailaddict")
+	$PREF["email"]="emailaddict";
+      else
+	$PREF["email"]="emailnonaddict";
+    }
+  else
+    $PREF["email"]="emailnonaddict";
+
+  return;
+}
+
+function DB_get_email_pref_by_hash($hash)
+{
+  $result = mysql_query("SELECT value FROM Hand".
+			" LEFT JOIN User_Prefs ON Hand.user_id=User_Prefs.user_id".
+			" WHERE hash='$hash' AND pref_key='email'" );
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+  if($r)
+    {
+      if($r[0]=="emailaddict")
+	return "emailaddict";
+      else
+	return "emailnonaddict";
+    }
+  else
+    return "emailnonaddict";
+}
+
+function DB_get_email_pref_by_uid($uid)
+{
+  $result = mysql_query("SELECT value FROM User_Prefs ".
+			" WHERE user_id='$uid' AND pref_key='email'" );
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+  if($r)
+    {
+      if($r[0]=="emailaddict")
+	return "emailaddict";
+      else
+	return "emailnonaddict";
+    }
+  else
+    return "emailnonaddict";
 }
 
 function DB_get_unused_randomnumbers($userstr)

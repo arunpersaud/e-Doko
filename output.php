@@ -10,10 +10,17 @@ function output_user_settings()
   echo "<h4> Settings </h4>\n";
   echo "<a href=\"index.php?passwd=ask\">change password</a><br />";
 
+  echo "<h5> Card set </h5>\n";
   if( $PREF["cardset"] == "english" )
     echo "<a href=\"index.php?setpref=germancards\">use german cards</a><br />";
   else
     echo "<a href=\"index.php?setpref=englishcards\">use english cards</a> <br />";
+
+  echo "<h5> Email </h5>\n";
+  if( $PREF["email"] == "emailaddict" )
+    echo "<a href=\"index.php?setpref=emailnonaddict\">I'm not addicted (emails for each move)</a><br />";
+  else
+    echo "<a href=\"index.php?setpref=emailaddict\">Addicted (minimal amount of emails)</a> <br />";
 
   echo "</div>\n";
 
