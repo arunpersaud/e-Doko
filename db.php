@@ -723,7 +723,8 @@ function DB_get_hashes_by_session($session,$user)
   $result = mysql_query("SELECT Hand.hash FROM Hand".
 			" LEFT JOIN Game ON Game.id=Hand.game_id ".
 			" WHERE Game.session=".DB_quote_smart($session).
-			" AND Hand.user_id=".DB_quote_smart($user));
+			" AND Hand.user_id=".DB_quote_smart($user).
+			" ORDER BY Game.create_date ASC");
   while($t = mysql_fetch_array($result,MYSQL_NUM))
     $r[] = $t[0];
 
