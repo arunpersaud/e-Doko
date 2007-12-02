@@ -823,6 +823,7 @@ function display_user_menu()
 
   echo "<hr /> <a href=\"".$host."?new\">start a new game</a>\n";
 
+  echo "<hr /> <a href=\"".substr($host,0,-9)."stats.php\">Statistics</a>\n";
 
   echo
     "<hr />Report bugs in the <a href=\"". $wiki."\">wiki</a>\n";
