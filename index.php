@@ -1479,8 +1479,13 @@ else if(myisset("me"))
 		      else if($r[0] == "contra")
 			$contra = $r[1];
 		    }
-		  /* save score in database */
-		  // get calls from re/contra
+
+		  /*
+		   * save score in database
+		   *
+		   */
+
+		  /* get calls from re/contra */
 		  $call_re     = NULL;
 		  $call_contra = NULL;
 		  foreach($userids as $user)
@@ -1509,85 +1514,126 @@ else if(myisset("me"))
 			    }
 			}
 		    }
-		  // no call, check 120:120
-		  if($call_re == NULL && $call_contra==NULL)
-		    if($re==120)
-		      mysql_query("INSERT INTO Score".
-				  " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
 
-		  // no call or one call do scoring
-		  if($call_re != NULL && $call_contra!=NULL)
-		    {
-		      // two calls: not sure what to do yet
-		    }
+		  /* figure out who one */
+		  $winning_party = NULL;
+
+		  if($call_re == NULL && $call_contra==NULL)
+		    if($re>120)
+		      $winning_party="re";
+		    else
+		      $winning_party="contra";
 		  else
 		    {
-		      $offset = 0;
-
-		      if($call_re!=NULL)
-			$offset = 120 - $call_re;
-		      else if($call_contra!=NULL)
-			$offset = -1*(120 - $call_contra)-1;
-
-		      if($call_re==0)
-			$offset -= 1;
-
-		      if($call_contra==0)
-			$offset += 1;
-
-		      if($re > 120 + $offset)
+		      if($call_re)
 			{
-			  /* re won */
+			  $offset = 120 - $call_re;
+			  if($call_re == 0)
+			    $offset--; /* since we use a > in the next equation */
 
-			  /* normal win */
-			  foreach(array(120,150,180,210,240) as $p)
-			    {
-			      $offset = 0;
-			      if($p==240)
-				$offset = 1;
-
-			      if($re>$p-$offset)
-				mysql_query("INSERT INTO Score".
-					    " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
-			    }
-
-			  /* re called something and won */
-			  if($call_re!=NULL)
-			    foreach(array(0,30,60,90,120) as $p)
-			      {
-				if($call_re<$p+1)
-				  mysql_query("INSERT INTO Score".
-					      " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
-			      }
+			  if($re > 120+$offset)
+			    $winning_party="re";
+			  else if ( $call_contra == NULL )
+			    $winning_party="contra";
 			}
-		      else
+
+		      if($call_contra)
 			{
-			  /* contra won */
-			  mysql_query("INSERT INTO Score".
-				      " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
+			  $offset = 120 - $call_contra;
+			  if($call_contra == 0)
+			    $offset--; /* since we use a > in the next equation */
 
-			  /* normal win */
-			  foreach(array(120,150,180,210,240) as $p)
-			    {
-			      $offset = 0;
-			      if($p==240)
-				$offset = 1;
-
-			      if($re>$p-$offset)
-				mysql_query("INSERT INTO Score".
-					    " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
-			    }
-
-			  /* contra called something and won */
-			  if($call_contra!=NULL)
-			    foreach(array(0,30,60,90,120) as $p)
-			      {
-				if($call_contra<$p+1)
-				  mysql_query("INSERT INTO Score".
-					      " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
-			      }
+			  if($contra > 120+$offset)
+			    $winning_party="contra";
+			  else if ( $call_contra == NULL )
+			    $winning_party="re";
 			}
 		    }
+
+		  /* one point for each call of the other party in case the other party didn't win
+		   * and one point each in case the party made more than points than one of the calls
+		   */
+		  if($winning_party!="contra" && $call_contra!=NULL)
+		    {
+		      for( $p=$call_contra;$p<=120; $p+=30 )
+			{
+			  mysql_query("INSERT INTO Score".
+				      " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'against$p')");
+			}
+
+		      for( $p=$call_contra; $p<120; $p+=30)
+			{
+			  if( $re >= $p )
+			    mysql_query("INSERT INTO Score".
+					" VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
+			}
+		    }
+		  if($winning_party!="re" and $call_re!=NULL)
+		    {
+		      for( $p=$call_re;$p<=120; $p+=30 )
+			{
+			  mysql_query("INSERT INTO Score".
+				      " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'against$p')");
+			}
+
+		      for( $p=$call_re; $p<120; $p+=30)
+			{
+			  if( $contra>=$p )
+			    mysql_query("INSERT INTO Score".
+					" VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'made$p')");
+			}
+		    }
+
+		  /* point in case contra won */
+		  if($winning_party=="contra")
+		    {
+		      mysql_query("INSERT INTO Score".
+				  " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
+		    }
+
+		  /* one point each for winning and each 30 points + calls */
+		  if($winning_party=="re")
+		    {
+		      foreach(array(120,150,180,210,240) as $p)
+			{
+			  $offset = 0;
+			  if($p==240 || $call_contra!=NULL)
+			    $offset = 1;
+
+			  if($re>$p-$offset)
+			    mysql_query("INSERT INTO Score".
+					" VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
+			}
+		      /* re called something and won */
+		      foreach(array(0,30,60,90,120) as $p)
+			{
+			  if($call_re!=NULL && $call_re<$p+1)
+			    mysql_query("INSERT INTO Score".
+					" VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
+			}
+		    }
+		  else if( $winning_party=="contra")
+		    {
+		      foreach(array(120,150,180,210,240) as $p)
+			{
+			  $offset = 0;
+			  if($p==240 || $call_re!=NULL)
+			    $offset = 1;
+
+			  if($contra>$p-$offset)
+			    mysql_query("INSERT INTO Score".
+					" VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
+			}
+		      /* re called something and won */
+		      foreach(array(0,30,60,90,120) as $p)
+			{
+			  if($call_contra!=NULL && $call_contra<$p+1)
+			    mysql_query("INSERT INTO Score".
+					" VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
+			}
+		    }
+
+
 		  /* send out final email */
 		  $all = array();
 
