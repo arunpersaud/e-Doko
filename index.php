@@ -1774,7 +1774,25 @@ else if(myisset("me"))
 	  echo "<div class=\"total\"> Totals:<br />\n";
 	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	    echo "  ".$r[0]." ".$r[1]."<br />\n";
+
+	  echo "<div class=\"re\">\n Points Re: <br />\n";
+	  $queryresult = mysql_query("SELECT score FROM Score ".
+				     "  WHERE game_id=$gameid AND party='re'".
+				     " ");
+	  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+	    echo "   ".$r[0]."<br />\n";
 	  echo "</div>\n";
+
+	  echo "<div class=\"contra\">\n Points Contra: <br />\n";
+	  $queryresult = mysql_query("SELECT score FROM Score ".
+				     "  WHERE game_id=$gameid AND party='contra'".
+				     " ");
+	  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+	    echo "   ".$r[0]."<br />\n";
+	  echo "</div>\n";
+
+	  echo "</div>\n";
+
 
 	}
       break;

@@ -16,7 +16,7 @@
   min-height: 40em;
 }
 
-.footer { 
+.footer {
   margin:0;
   margin-top:0.3em;
   padding:0;
@@ -32,7 +32,7 @@
   right:1em;
   top:0.1em;
   font-size: smaller;
-} 
+}
 
 .joingame,.sickness,.poverty,.total,.message {
  position: absolute;
@@ -43,6 +43,21 @@
  right:40%;
  text-align: center;
 }
+
+.total .re {
+ position: absolute;
+ left: -4em;
+ top:8em;
+ background-color: #fff;
+}
+.total .contra {
+ position: absolute;
+ right: -4em;
+ top:8em;
+ background-color: #fff;
+}
+
+
 
 .poverty {
   top:32em;
@@ -55,7 +70,7 @@ margin-top:20em;
 }
 
 
-.card { 
+.card {
   position:absolute;
   z-index:20;
   top:18em;
@@ -78,7 +93,7 @@ div.table {
   text-align:center;
 }
 
-div.table img { 
+div.table img {
   top:25%;
   bottom:25%;
   height:50%;
@@ -107,7 +122,7 @@ div.table div.table0 {
 }
 div.table div.table1 {
   top:-25%;
-  left:37.5%; 
+  left:37.5%;
 }
 div.table div.table2 {
   top:37.5%;
@@ -131,7 +146,7 @@ ul.tricks a { text-decoration:none; color:#000;}
 ul.tricks li {
   /*background-color:blue;*/
   margin:0;
-  padding:0.2em 0.5em;  
+  padding:0.2em 0.5em;
   display:inline;
 }
 ul.tricks li.old {  background-color:#fff; }
@@ -332,20 +347,20 @@ ul.tricks li div div span.comment span{
   background-color: #eee;
 }
 
-.user { margin-left:25%;margin-right:25%; } 
+.user { margin-left:25%;margin-right:25%; }
 
-.over { 
+.over {
   text-align:center;
   margin-bottom:0.1em;
 }
 
-.submitbutton { 
+.submitbutton {
   border:0;
   background-color: #efe;
 }
 
-.submitbutton:hover { 
-  background-color:#afa; 
+.submitbutton:hover {
+  background-color:#afa;
 }
 
 
@@ -364,13 +379,12 @@ ul.tricks li div div span.comment span{
 }
 
 div span img.button {
-  height: 2em; 
   width: 2em;
 }
 
 .gamestatuspre {
    padding: 0 0.3em;
-    
+
     background-color: #fd8901;
 }
 .gamestatusover {
