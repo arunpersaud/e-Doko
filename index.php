@@ -29,18 +29,22 @@ if(myisset("logout"))
     session_unset();
     session_destroy();
     $_SESSION = array();
-    echo "you are now logged out!";
+    echo "<div class=\"message\"><span class=\"bigger\">You are now logged out!</span><br />\n".
+      "(<a href=\"$host\">This will take you back to the home-page</a>)</div>";
   }
 else if(myisset("new"))
   {
     if( isset($_SESSION["name"]) )
       {
 	$names = DB_get_all_names();
+	echo "<div class=\"user\">\n";
 	output_form_for_new_game($names);
+	echo "</div>\n";
+	display_user_menu();
       }
     else
       {
-	echo "Please log in.";
+	echo "<div class=\"message\">Please <a href=\"$host\">log in</a>.</div>";
       }
   }
 /*check if everything is ready to set up a new game */
@@ -1401,13 +1405,13 @@ else if(myisset("me"))
 		    "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 		}
 
-	      echo "<div class=\"card".($pos-1)."\">";
+	      echo "      <div class=\"card".($pos-1)."\">\n        ";
 
 	      /* display comments */
 	      display_card($card,$PREF["cardset"]);
 	      if($comment!="")
-		echo "  <span class=\"comment\"> ".$comment."</span>\n";
-	      echo "</div></div></li>\n";
+		echo "\n        <span class=\"comment\"> ".$comment."</span>\n";
+	      echo "      </div>\n";
 
 	      /*check if we still have cards left, else set status to gameover */
 	      if(sizeof(DB_get_hand($me))==0)
@@ -1686,7 +1690,7 @@ else if(myisset("me"))
 				" GROUP BY User.fullname" );
 	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	    echo "      <div class=\"card".($r[3]-1)."\">\n".
-	         "        <span class=\"score\">".$r[2]."<br /> ".$r[1]."</span>\n".
+	         "        <div class=\"score\">".$r[2]."<br /> ".$r[1]."</div>\n".
 	         "      </div>\n";
 
 	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
@@ -1759,7 +1763,7 @@ else if(myisset("me"))
       /* check if game is over, display results */
       if(DB_get_game_status_by_gameid($gameid)=='play')
 	{
-	  echo "the game is over for you.. other people still need to play though";
+	  echo "The game is over for you.. other people still need to play though";
 	}
       else
 	{
@@ -2123,7 +2127,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	 }
        else
 	 {
-	   echo "Sorry email and password don't match. Please <a href=\"$host\">try again</a>. <br />";
+	   echo "<div class=\"message\">Sorry email and password don't match. Please <a href=\"$host\">try again</a>. </div>";
 	 }
      };
      output_footer();

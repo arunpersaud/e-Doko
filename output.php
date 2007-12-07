@@ -8,19 +8,19 @@ function output_user_settings()
 
   echo "<div class=\"useroptions\">\n";
   echo "<h4> Settings </h4>\n";
-  echo "<a href=\"index.php?passwd=ask\">change password</a><br />";
+  echo "<a href=\"index.php?passwd=ask\">Change password</a><br />";
 
   echo "<h5> Card set </h5>\n";
   if( $PREF["cardset"] == "english" )
-    echo "<a href=\"index.php?setpref=germancards\">use german cards</a><br />";
+    echo "<a href=\"index.php?setpref=germancards\">Change to German cards</a><br />";
   else
-    echo "<a href=\"index.php?setpref=englishcards\">use english cards</a> <br />";
+    echo "<a href=\"index.php?setpref=englishcards\">Change to English cards</a> <br />";
 
   echo "<h5> Email </h5>\n";
   if( $PREF["email"] == "emailaddict" )
-    echo "<a href=\"index.php?setpref=emailnonaddict\">I'm not addicted (emails for each move)</a><br />";
+    echo "<a href=\"index.php?setpref=emailnonaddict\">Change to non-addicted mode (emails for each move)</a><br />";
   else
-    echo "<a href=\"index.php?setpref=emailaddict\">Addicted (minimal amount of emails)</a> <br />";
+    echo "<a href=\"index.php?setpref=emailaddict\">Change to addicted mode (minimal amount of emails)</a> <br />";
 
   echo "</div>\n";
 
@@ -58,58 +58,58 @@ function output_form_for_new_game($names)
     /* ask for player names */
     $i=0;
   foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
-  {
-    srand((float) microtime() * 10000000);
-    $randkey = array_rand($names);
-    $rand = $names[$randkey];
-    echo  "<span class=\"table".$i."\">";
-    $i++;
-    echo "    Name:  <select name=\"$player\" size=\"1\" />  \n";
-    foreach($names as $name)
     {
-      if($name==$rand)
+      srand((float) microtime() * 10000000);
+      $randkey = array_rand($names);
+      $rand = $names[$randkey];
+      echo  "<div class=\"table".$i."\">\n";
+      $i++;
+      echo "    Name:  \n  <select name=\"$player\" size=\"1\" />  \n";
+      foreach($names as $name)
 	{
-	  echo "     <option selected=\"selected\">$name</option>\n";
+	  if($name==$rand)
+	    {
+	      echo "     <option selected=\"selected\">$name</option>\n";
+	    }
+	  else
+	    echo "     <option>$name</option>\n";
 	}
-      else
-	echo "     <option>$name</option>\n";
+      echo "  </select>\n</div>\n";
     }
-    echo "  </select></span>\n";
-   }
-?>   
+?>
     </div>
-   <h2 class="rules"> Rules </h2> 
+   <h2 class="rules"> Rules </h2>
       <p> Some areas are grayed out which means that the rule is not implemented yet and therefore cannot be selected </p>
-      <p> ten of hearts: 
+      <p> Ten of hearts:
          <ul>
          <li> <input type="radio" name="dullen" value="none" /> just normal non-trump  </li>
          <li> <input type="radio" name="dullen" value="firstwins" /> first ten of hearts wins the trick </li>
          <li> <input type="radio" name="dullen" value="secondwins" checked="checked" /> second ten of hearts wins the trick </li>
          </ul>
       </p>
-      <p> schweinchen (both foxes), only in normal games or silent solos: 
+      <p> Schweinchen (both foxes), only in normal games or silent solos:
         <ul>
         <li> <input type="radio" name="schweinchen" value="none" checked="checked" /> none </li>
-        <li> <input type="radio" name="schweinchen" value="both" /> 
+        <li> <input type="radio" name="schweinchen" value="both" />
               both become highest trump (automatic call at beginning of the game)
         </li>
-        <li> <input type="radio" name="schweinchen" value="second" /> 
+        <li> <input type="radio" name="schweinchen" value="second" />
               first one normal, second one becomes highest (call during the game) </li>
-        <li> <input type="radio" name="schweinchen" value="secondaftercall"  disabled="disabled" /> 
+        <li> <input type="radio" name="schweinchen" value="secondaftercall"  disabled="disabled" />
       second one become highest only in case re/contra was announced (not working yet)
         </li>
         </ul>
       </p>
-      <p> Call Re/Contra, etc.: 
+      <p> Call Re/Contra, etc.:
         <ul>
            <li><input type="radio" name="call" value="1st-own-card" checked="checked" />
                 Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</li>
-           <li><input type="radio" name="call" value="5th-card" /> 
+           <li><input type="radio" name="call" value="5th-card" />
                 Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</li>
-           <li><input type="radio" name="call" value="9-cards"  /> 
+           <li><input type="radio" name="call" value="9-cards"  />
                 Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</li>
         </ul>
-      </p>      
+      </p>
    <input type="submit" value="start game" />
  </form>
 <?php
@@ -117,7 +117,7 @@ function output_form_for_new_game($names)
 
 function display_card($card,$dir="english")
 {
-  /* cards are only availabl for the odd values, e.g. 1.png, 3.png, ... 
+  /* cards are only availabl for the odd values, e.g. 1.png, 3.png, ...
    * convert even cards to the matching odd value */
 
   if( $card/2 - (int)($card/2) == 0.5)
@@ -142,7 +142,7 @@ function output_check_for_sickness($me,$mycards)
  ?>
   <div class="sickness"> Thanks for joining the game...<br />
 
-    do you want to play solo? 
+    do you want to play solo?
     <select name="solo" size="1">
       <option selected="selected">No</option>
       <option>trumpless</option>
@@ -152,11 +152,11 @@ function output_check_for_sickness($me,$mycards)
       <option>club</option>
       <option>spade</option>
       <option>heart</option>
-    </select>     
+    </select>
     <br />
 
- <?php   
-      
+ <?php
+
   echo "Wedding?";
   if(check_wedding($mycards))
      {
@@ -227,7 +227,7 @@ function output_check_want_to_play($me)
    Do you want to play a game of DoKo? <br />
    yes<input type="radio" name="in" value="yes" />
    no<input type="radio" name="in" value="no" /> <br />
-<?php   
+<?php
   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
   echo "\n";
   echo "<input type=\"submit\" value=\"submit\" />\n";
@@ -252,9 +252,9 @@ function output_home_page($pre,$game,$done,$avgtime)
 
     if($game==0)
       echo "zero games that are ongoing. ";
-    else if($game==1)	
+    else if($game==1)
       echo "one game that is ongoing. ";
-    else 
+    else
       echo "$game games that are ongoing. ";
 
     echo "<br />\n";
@@ -303,7 +303,7 @@ function output_header()
   <head>
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
-     <link rel="stylesheet" type="text/css" href="css/standard.css" />	
+     <link rel="stylesheet" type="text/css" href="css/standard.css" />
      <script type="text/javascript">
        function hl(num) {
          if(document.getElementById){
@@ -382,7 +382,7 @@ function output_password_recovery($email,$password)
   echo "  <input type=\"hidden\" name=\"email\" value=\"".$email."\" />\n";
   echo "  <input type=\"hidden\" name=\"password\" value=\"".$password."\" />\n";
   echo "  <input type=\"hidden\" name=\"passwd\"  value=\"set\" />\n";
-?>    
+?>
      <fieldset>
        <legend>Password recovery</legend>
         <table>

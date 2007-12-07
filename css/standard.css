@@ -24,8 +24,8 @@
   font-size:smaller;
   clear:both;
 }
-.footer .right{  float:right; }
-.footer .left{  float:left; }
+.footer .right { float:right; }
+.footer .left  { float:left; }
 
 .status {
   position:absolute;
@@ -37,27 +37,28 @@
 .joingame,.sickness,.poverty,.total,.message {
  position: absolute;
  width: 20%;
-
- top:20em;
+ top:22em;
  left:40%;
  right:40%;
  text-align: center;
+ z-index:22
 }
+
 
 .total .re {
  position: absolute;
  left: -4em;
  top:8em;
  background-color: #fff;
+ z-index:15;
 }
 .total .contra {
  position: absolute;
  right: -4em;
  top:8em;
  background-color: #fff;
+ z-index:15;
 }
-
-
 
 .poverty {
   top:32em;
@@ -84,53 +85,53 @@ margin-top:20em;
 /* display the table and the names */
 div.table {
   position:absolute;
-  left:25%;
-  right:25%;
+  width:99%;
+  height:35em;
   margin:0;
   padding:0;
-/*  border: 5px solid blue;*/
-  top: 16em;
+//  border: 3px solid blue;
+  top: 8.2em;
   text-align:center;
 }
 
-div.table img {
-  top:25%;
-  bottom:25%;
-  height:50%;
-  width:50%;
+div.table img.table {
+  position:absolute;
+  width:25%;
+  top:20%;
+  height:22em;
+  left:37.5%;
   z-index:9;
   display: block;
-  margin-left: auto;
-  margin-right: auto
+  margin:0;
+  padding:0;
 }
 div.table div {
   /*background-color:green;*/
   position:absolute;
-  width:25%;
-  height:25%;
+  width:12.5%;
   text-align:center;
+  z-index:20;
 }
 div.table div img{
   /*background-color:green;*/
-  width:25%;
-  height:25%;
+  width:20%;
 }
 
 div.table div.table0 {
-  top:37.5%;
-  left:0%;
+  top:45%;
+  right:62.5%;
 }
 div.table div.table1 {
-  top:-25%;
-  left:37.5%;
+  top:5%;
+  left:43.75%;
 }
 div.table div.table2 {
-  top:37.5%;
-  left:75%;
+  top:45%;
+  left:62.5%;
 }
 div.table div.table3 {
-  bottom:-25%;
-  left: 37.5%;
+  bottom:5%;
+  left: 43.75%;
 }
 
 ul.tricks {
@@ -145,7 +146,7 @@ ul.tricks {
 ul.tricks a { text-decoration:none; color:#000;}
 ul.tricks li {
   /*background-color:blue;*/
-  margin:0;
+  margin:0.1em;
   padding:0.2em 0.5em;
   display:inline;
 }
@@ -153,6 +154,16 @@ ul.tricks li.old {  background-color:#fff; }
 ul.tricks li:hover {  background-color: #bbb;}
 ul.tricks li.nohighlight:hover {  background-color: #fff;}
 
+ul.tricks li div.trick {
+  position:absolute;
+  width:100%;
+  height:35em;
+  top:1.2em;
+  margin:0;
+  padding:0;
+//  border: 2px solid red;
+  display:block;
+}
 ul.tricks li div.trick {
   display:none;
 }
@@ -164,9 +175,10 @@ ul.tricks li div.trick img.arrow {
 /*  border: 5px solid blue;*/
   text-align:center;
   width:16%;
+  height:16em;
   left:42%;
   right:42%;
-  top:12em;
+  top:9em;
   z-index:8;
 }
 
@@ -179,7 +191,7 @@ ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 16em;
+  top: 40%;
   left:37.5%;
   right:56x.5%;
   width:6%;
@@ -190,7 +202,7 @@ ul.tricks li div div.card0 span.comment{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 3em;
+  top: 5%;
   right:66.5%;
   left:17.5%;
   width:16%;
@@ -200,7 +212,7 @@ ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 10em;
+  top: 20%;
   left:47%;
   right:47%;
   width:6%;
@@ -212,7 +224,7 @@ ul.tricks li div div.card1 span.comment{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 3em;
+  top: 5%;
   left:66.5%;
   right:17.5%;
   width:16%;
@@ -223,7 +235,7 @@ ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 16em;
+  top: 40%;
   right:37.5%;
   left:56x.5%;
   width:6%;
@@ -234,7 +246,7 @@ ul.tricks li div div.card2 span.comment{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 24em;
+  top: 80%;
   left:66.5%;
   right:17.5%;
   width:16%;
@@ -245,7 +257,7 @@ ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 22em;
+  bottom: 20%;
   left:47%;
   right:47%;
   width:6%;
@@ -257,7 +269,7 @@ ul.tricks li div div.card3 span.comment{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 24em;
+  top: 80%;
   right:66.5%;
   left:17.5%;
   width:16%;
@@ -275,7 +287,7 @@ ul.tricks li div div span.comment span{
 
 .mycards {
   margin:0;
-  margin-top:33em;
+  margin-top:34.5em;
   padding:0;
   border:1px solid red;
   background-color:yellow;
@@ -403,4 +415,8 @@ div span img.button {
 table.score {
   width:10em;
   border-collapse:collapse;
+}
+
+.bigger {
+  font-size:larger;
 }

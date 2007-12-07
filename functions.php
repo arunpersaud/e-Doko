@@ -676,7 +676,7 @@ function display_table ()
 			"ORDER BY position ASC");
 
   echo "<div class=\"table\">\n".
-    "  <img src=\"pics/table.png\" alt=\"table\" />\n";
+    "  <img class=\"table\" src=\"pics/table.png\" alt=\"table\" />\n";
   while($r = mysql_fetch_array($result,MYSQL_NUM))
     {
       $name  = $r[0];
@@ -806,7 +806,7 @@ function display_user_menu()
 {
   global $wiki,$myid,$host;
   echo "<div class=\"usermenu\">\n".
-    "<a href=\"index.php\"> go to my user page </a>";
+    "<a href=\"index.php\"> Go to my user page </a>";
 
   $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 			" LEFT JOIN Game On Hand.game_id=Game.id".
@@ -821,7 +821,7 @@ function display_user_menu()
       echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
 
-  echo "<hr /> <a href=\"".$host."?new\">start a new game</a>\n";
+  echo "<hr /> <a href=\"".$host."?new\">Start a new game</a>\n";
 
   echo "<hr /> <a href=\"".substr($host,0,-9)."stats.php\">Statistics</a>\n";
 
