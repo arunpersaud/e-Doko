@@ -19,7 +19,6 @@ if(DB_open()<0)
 
 /* start a session, if it is not already running */
 session_start();
-
 /* done major error checking, output header of HTML page */
 output_header();
 
@@ -80,6 +79,16 @@ else if( isset($_SESSION["name"]) )
 	 $GameN =  $r[0];
 	 echo " $GameN </p>\n";
 
+	 echo "<p>The contra party wins in ";
+	 $result = mysql_query("SELECT COUNT(*) from Score".
+			       " LEFT JOIN Game ON Game.id=game_id".
+			       " WHERE score='againstqueens'".
+			       " AND Game.status='gameover'");
+	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	   echo $r[0];
+	 echo " games</p>\n";
+
+
 	 /* number of solos */
 	 echo "<p>These kind of games have been played this often: <br />";
 	 $result = mysql_query("SELECT COUNT(*) as c,type from Game".
@@ -87,7 +96,7 @@ else if( isset($_SESSION["name"]) )
 			       " GROUP BY type".
 			       " ORDER BY c DESC");
 	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	   echo "".$r[1]." (".$r[0].")<br />";
+	   echo "".$r[1]." (".$r[0].") <br />";
 	 echo " </p>\n";
 
 	 /* break up solos in types */
@@ -113,12 +122,12 @@ else if( isset($_SESSION["name"]) )
  select id,type,solo,status from game where id in (select id from game where randomnumbers in (select randomnumbers from game where id=27));
 
 	 */
-	 echo "<p>Most extra points in a game::<br />\n";
+	 echo "<p>Most extra points (doko, fox, karlchen) in a game::<br />\n";
 	 $result = mysql_query("SELECT COUNT(*) as c,fullname FROM Score".
 			       " LEFT JOIN User ON User.id=winner_id" .
 			       " WHERE score IN ('fox','doko','karlchen')".
-			       " GROUP BY fullname".
-			       " ORDER BY c DESC LIMIT 1" );
+			       " GROUP BY game_id,fullname".
+			       " ORDER BY c DESC LIMIT 3" );
 	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	   echo $r[1]." (".$r[0].") <br />\n";
 	 echo "</p>\n";
@@ -202,15 +211,6 @@ else if( isset($_SESSION["name"]) )
 	 echo " games</p>\n";
 	 */
 
-	 echo "<p>The contra party wins in ";
-	 $result = mysql_query("SELECT COUNT(*) from Score".
-			       " LEFT JOIN Game ON Game.id=game_id".
-			       " WHERE score='againstqueens'".
-			       " AND Game.status='gameover'".
-			       " AND Game.type<>'solo'");
-	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
-	   echo $r[0];
-	 echo " games</p>\n";
 
 	 /*
 	  how often is the last trick a non-trump trick
