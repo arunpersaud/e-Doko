@@ -1638,6 +1638,30 @@ else if(myisset("me"))
 		    }
 
 
+		  /* add score points to email */
+		  $message .= "\n";
+		  $Tpoint = 0;
+		  $message .= " Points Re: \n";
+		  $queryresult = mysql_query("SELECT score FROM Score ".
+					     "  WHERE game_id=$gameid AND party='re'".
+					     " ");
+		  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+		    {
+		      $message .= "   ".$r[0]."\n";
+		      $Tpoint ++;
+		    }
+		  $message .= " Points Contra: \n";
+		  $queryresult = mysql_query("SELECT score FROM Score ".
+					     "  WHERE game_id=$gameid AND party='contra'".
+					     " ");
+		  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+		    {
+		      $message .= "   ".$r[0]."\n";
+		      $Tpoint --;
+		    }
+		  $message .= " Total Points (from Re points of view): $Tpoint\n";
+		  $message .= "\n";
+
 		  /* send out final email */
 		  $all = array();
 
