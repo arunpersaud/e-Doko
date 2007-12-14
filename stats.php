@@ -86,7 +86,7 @@ else if( isset($_SESSION["name"]) )
 			       " AND Game.status='gameover'");
 	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	   echo $r[0];
-	 echo " games</p>\n";
+	 echo " games.</p>\n";
 
 
 	 /* number of solos */
@@ -122,7 +122,7 @@ else if( isset($_SESSION["name"]) )
  select id,type,solo,status from game where id in (select id from game where randomnumbers in (select randomnumbers from game where id=27));
 
 	 */
-	 echo "<p>Most extra points (doko, fox, karlchen) in a game::<br />\n";
+	 echo "<p>Most extra points (doko, fox, karlchen) in a single game:<br />\n";
 	 $result = mysql_query("SELECT COUNT(*) as c,fullname FROM Score".
 			       " LEFT JOIN User ON User.id=winner_id" .
 			       " WHERE score IN ('fox','doko','karlchen')".
@@ -133,12 +133,13 @@ else if( isset($_SESSION["name"]) )
 	 echo "</p>\n";
 
 	 /* longest and shortest game */
-	 $r=mysql_query("SELECT MIN(datediff(mod_date,create_date)),session".
+	 $r=mysql_query("SELECT MIN(timediff(mod_date,create_date)),session,id".
 			" FROM Game WHERE status='gameover' GROUP BY status");
 	 if($r)
 	   {
 	     $short= mysql_fetch_array($r,MYSQL_NUM);
-	     echo "<p> The shortest game took only ".$short[0]." days.<br />\n";
+	     $names = DB_get_all_names_by_gameid($short[2]);
+	     echo "<p> The shortest game took only ".$short[0]." hours and was played by  ".join(", ",$names).".<br />\n";
 	   }
 
 	 $r=mysql_query("SELECT MAX(datediff(mod_date,create_date)),session".
@@ -147,6 +148,16 @@ else if( isset($_SESSION["name"]) )
 	   {
 	     $long= mysql_fetch_array($r,MYSQL_NUM);
 	     echo "The longest game took ".$long[0]." days.</p>\n";
+	   }
+
+	 $r=mysql_query("SELECT COUNT(*) as c, session, id FROM Game ".
+			" GROUP BY session ORDER BY c DESC LIMIT 1");
+	 if($r)
+	   {
+	     $long  = mysql_fetch_array($r,MYSQL_NUM);
+	     $names = DB_get_all_names_by_gameid($long[2]);
+	     echo "The longest session is session ".$long[1]." with ".$long[0].
+	       " games played by ".join(", ",$names).".</p>\n";
 	   }
 
 	 /* most reminders */
