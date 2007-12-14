@@ -812,7 +812,8 @@ function display_user_menu()
 			" LEFT JOIN Game On Hand.game_id=Game.id".
 			" WHERE Hand.user_id='$myid'".
 			" AND Game.player='$myid'".
-			" AND Game.status<>'gameover'" );
+			" AND Game.status<>'gameover'".
+			" ORDER BY Game.session" );
   if(mysql_num_rows($result))
       echo "<hr />It's your turn in these games:<br />\n";
 
