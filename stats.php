@@ -134,8 +134,10 @@ else if( isset($_SESSION["name"]) )
 	 echo "</p>\n";
 
 	 /* longest and shortest game */
-	 $r=mysql_query("SELECT MIN(timediff(mod_date,create_date)),session,id".
-			" FROM Game WHERE status='gameover' GROUP BY status");
+	 $r=mysql_query("SELECT timediff(mod_date,create_date) ,session,id".
+			" FROM Game WHERE status='gameover'".
+			" ORDER BY time_to_sec(timediff(mod_date,create_date)) ASC LIMIT 1");
+
 	 if($r)
 	   {
 	     $short= mysql_fetch_array($r,MYSQL_NUM);
@@ -143,8 +145,9 @@ else if( isset($_SESSION["name"]) )
 	     echo "<p> The shortest game took only ".$short[0]." hours and was played by  ".join(", ",$names).".<br />\n";
 	   }
 
-	 $r=mysql_query("SELECT MAX(datediff(mod_date,create_date)),session".
-			" FROM Game where status='gameover' GROUP BY status");
+	 $r=mysql_query("SELECT datediff(mod_date,create_date) ,session,id".
+			" FROM Game WHERE status='gameover'".
+			" ORDER BY time_to_sec(timediff(mod_date,create_date)) DESC LIMIT 1");
 	 if($r)
 	   {
 	     $long= mysql_fetch_array($r,MYSQL_NUM);
