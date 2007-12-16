@@ -640,7 +640,7 @@ function can_call($what,$hash)
 
 function display_table ()
 {
-  global $gameid, $GT, $debug,$host;
+  global $gameid, $GT, $debug,$host,$defaulttimezone;
 
   $result = mysql_query("SELECT  User.fullname as name,".
 			"        Hand.position as position, ".
@@ -668,10 +668,10 @@ function display_table ()
       $call      = $r[5];
       $hash      = $r[7];
       $timezone  = $r[8];
+      date_default_timezone_set($defaulttimezone);
+      $lastlogin = strtotime($r[6]);
       date_default_timezone_set($timezone);
       $timenow   = strtotime(date("Y-m-d H:i:s"));
-      $lastlogin = strtotime($r[6]);
-
 
       echo "  <div class=\"table".($pos-1)."\">\n";
       if(!$debug)

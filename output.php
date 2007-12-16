@@ -366,6 +366,7 @@ function output_footer()
 
 function output_status()
 {
+  global $defaulttimezone;
    if(isset($_SESSION["name"]))
      {
        $name = $_SESSION["name"];
@@ -379,10 +380,11 @@ function output_status()
        /* last logon time */
        $myid  = DB_get_userid_by_name($name);
        $zone  = DB_get_user_timezone($myid);
-       date_default_timezone_set($zone);
 
        $time     = DB_get_user_timestamp($myid);
+       date_default_timezone_set($defaulttimezone);
        $unixtime = strtotime($time);
+       date_default_timezone_set($zone);
 
        echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
      };
