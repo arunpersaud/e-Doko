@@ -267,7 +267,7 @@ function output_home_page($pre,$game,$done,$avgtime)
       echo "$done games have been completed on this server. Average time of a game: $avgtime days</p>";
 ?>
 
-    <p> Please <a href="register.php">register</a>, in case you haven't done that yet  <br />
+    <p> Please <a href="register.php">register</a>, in case you have not done that yet  <br />
         or login with you email-address or name and password here:
     </p>
         <form action="index.php" method="post">
@@ -333,8 +333,29 @@ function output_header()
 <div class="header">
 <h1> Welcome to E-Doko <sup style="color:#888;">(beta)</sup> </h1>
 </div>
-<div class="main">
 <?php
+   if(isset($_SESSION["name"]))
+     {
+       $name = $_SESSION["name"];
+
+       /* logout info */
+       echo "<div class=\"status\">\n";
+       echo $name;
+       echo " <a href=\"index.php?logout=1\">logout</a>\n";
+       echo "</div>";
+
+       /* last logon time */
+       $myid   = DB_get_userid_by_name($name);
+       $zone   = DB_get_user_timezone($myid);
+       date_default_timezone_set($zone);
+
+       $time     = DB_get_user_timestamp($myid);
+       $unixtime = strtotime($time);
+
+       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
+     };
+
+  echo "<div class=\"main\">";
   return;
 }
 
@@ -365,10 +386,6 @@ function output_footer()
 
 function output_status($name)
 {
-  echo "<div class=\"status\">\n";
-  echo $name;
-  echo " <a href=\"index.php?logout=1\">logout</a>\n";
-  echo "</div>";
 
   return;
 }

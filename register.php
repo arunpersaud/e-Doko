@@ -71,9 +71,10 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 	       <td><label for="Rtimezone">Timezone:</label></td>
                <td>
 		  <select id="Rtimezone" name="Rtimezone" size="1">
-                     <option value="1">Berlin</option>
-                     <option value="-8">Berkeley</option>
-                     <option value="13">Wellington</option>
+                     <option value="Europe/London">Berlin</option>
+                     <option value="Europe/Berlin">Berlin</option>
+                     <option value="America/Vancouver">Berkeley</option>
+                     <option value="Pacific/Auckland">Wellington</option>
 		  </select>
 	         (If your timezone is not listed, just select whatever you want and email the admin your correct time zone.)
 	       </td>

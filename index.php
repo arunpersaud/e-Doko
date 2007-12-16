@@ -1153,12 +1153,7 @@ else if(myisset("me"))
 	  $seq     = $r[2];
 	  $trick   = $r[3];
 	  $comment = $r[4];
-	  $timeplayed = strtotime($r[5]);
 	  $user    = $r[6];
-
-	  $offset = DB_get_user_timezone($user);
-	  $zone   = return_timezone($offset);
-	  date_default_timezone_set($zone);
 
 	  /* check if first schweinchen has been played */
 	  if( $GAME["schweinchen"] && ($r[0] == 19 || $r[0] == 20) )
@@ -2057,23 +2052,11 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	     }
 	   else /* output default user page */
 	     {
-	       $time     = DB_get_user_timestamp($myid);
-	       $unixtime = strtotime($time);
-
-	       $offset   = DB_get_user_timezone($myid);
-	       $zone     = return_timezone($offset);
-	       date_default_timezone_set($zone);
-
 	       $myname = DB_get_name_by_email($email);
 	       $_SESSION["name"] = $myname;
 
-	       if(isset($_SESSION["name"]))
-		 output_status($_SESSION["name"]);
-
 	       /* display links to settings */
 	       output_user_settings();
-
-	       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
 
 	       DB_update_user_timestamp($myid);
 

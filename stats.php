@@ -52,17 +52,6 @@ else if( isset($_SESSION["name"]) )
        {
 	 DB_get_PREF($myid);
 
-	 $time     = DB_get_user_timestamp($myid);
-	 $unixtime = strtotime($time);
-
-	 $offset   = DB_get_user_timezone($myid);
-	 $zone     = return_timezone($offset);
-	 date_default_timezone_set($zone);
-
-	 output_status($name);
-
-	 echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
-
 	 DB_update_user_timestamp($myid);
 
 	 display_user_menu();

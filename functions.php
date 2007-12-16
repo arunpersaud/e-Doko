@@ -390,26 +390,6 @@ function display_cards($me,$myturn)
   return;
 }
 
-function return_timezone($offset)
-{
-  switch($offset)
-    {
-    case '1':
-      $zone = "Europe/Berlin";
-      break;
-    case '-8':
-      $zone = "America/Vancouver";
-      break;
-    case '13':
-      $zone = "Pacific/Auckland";
-      break;
-    default:
-      $zone = "Europe/London";
-    }
-
-  return $zone;
-}
-
 function have_suit($cards,$c)
 {
   global $CARDS;
@@ -669,7 +649,8 @@ function display_table ()
 			"        Hand.sickness as sickness, ".
 			"        Hand.point_call, ".
 			"        User.last_login, ".
-			"        Hand.hash        ".
+			"        Hand.hash,       ".
+			"        User.timezone    ".
 			"FROM Hand ".
 			"LEFT JOIN User ON User.id=Hand.user_id ".
 			"WHERE Hand.game_id='".$gameid."' ".
@@ -685,12 +666,12 @@ function display_table ()
       $party = $r[3];
       $sickness  = $r[4];
       $call      = $r[5];
-      $lastlogin = strtotime($r[6]);
       $hash      = $r[7];
+      $timezone  = $r[8];
+      date_default_timezone_set($timezone);
+      $timenow   = strtotime(date("Y-m-d H:i:s"));
+      $lastlogin = strtotime($r[6]);
 
-      $offset = DB_get_user_timezone($user);
-      $zone   = return_timezone($offset);
-      date_default_timezone_set($zone);
 
       echo "  <div class=\"table".($pos-1)."\">\n";
       if(!$debug)
@@ -790,7 +771,7 @@ function display_table ()
 	}
 
       echo "    <br />\n";
-      echo "    <span title=\"".date("Y-m-d H:i:s")."\">local time</span>\n";
+      echo "    <span title=\"".date("Y-m-d H:i:s",$timenow).  "\">local time</span>\n";
       echo "    <span title=\"".date("Y-m-d H:i:s",$lastlogin)."\">last login</span>\n";
       echo "   </div>\n";
 
