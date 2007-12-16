@@ -48,7 +48,8 @@ CREATE TABLE `Comment` (
   `user_id` int(11) default NULL,
   `play_id` int(11) default NULL,
   `comment` text,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `play_id` (`play_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -136,7 +137,9 @@ CREATE TABLE `Hand` (
   `sickness` enum('wedding','nines','poverty','solo') default NULL,
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `point_call` enum('120','90','60','30','0') default NULL,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `game_id` (`game_id`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -159,7 +162,8 @@ CREATE TABLE `Hand_Card` (
   `hand_id` int(11) NOT NULL default '0',
   `card_id` int(11) NOT NULL default '0',
   `played` enum('true','false') default 'false',
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `hand_id` (`hand_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -184,7 +188,8 @@ CREATE TABLE `Play` (
   `trick_id` int(11) NOT NULL default '0',
   `hand_card_id` int(11) NOT NULL default '0',
   `sequence` tinyint(4) NOT NULL default '0',
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `trick_id` (`trick_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -213,7 +218,8 @@ CREATE TABLE `Score` (
           '60','call60','against60','made60','30','call30','against30','made30',
           '0','call0','against0','made0',
           'fox','karlchen','dulle','doko','againstqueens') default NULL,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `game_id` (`game_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -237,7 +243,8 @@ CREATE TABLE `Trick` (
   `id` int(11) NOT NULL auto_increment,
   `game_id` int(11) NOT NULL default '0',
   `winner`  tinyint(4) default NULL,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `game_id` (`game_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -286,7 +293,8 @@ CREATE TABLE `User_Game_Prefs` (
   `game_id` int(11) NOT NULL default '0',
   `pref_key` varchar(64) default NULL,
   `value` varchar(64) default NULL,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -309,7 +317,8 @@ CREATE TABLE `User_Prefs` (
   `user_id` int(11) NOT NULL default '0',
   `pref_key` varchar(64) default NULL,
   `value` varchar(64) default NULL,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -365,9 +374,6 @@ CREATE TABLE `Reminder` (
 LOCK TABLES `Reminder` WRITE;
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `Reminder` ENABLE KEYS */;
-
-
-
 
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
