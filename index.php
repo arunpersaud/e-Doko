@@ -34,6 +34,7 @@ if(myisset("logout"))
   }
 else if(myisset("new"))
   {
+    output_status();
     if( isset($_SESSION["name"]) )
       {
 	$names = DB_get_all_names();
@@ -188,11 +189,14 @@ else if(myisset("new"))
     mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
     mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
 
-    echo "You started a new game. The emails have been sent out!";
+    output_status();
+    echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
   }    /* end set up a new game */
 /* cancle a game, if nothing has happend in the last N minutes */
 else if(myisset("cancle","me"))
   {
+    output_status();
+
     $me = $_REQUEST["me"];
 
     /* test for valid ID */
@@ -240,6 +244,8 @@ else if(myisset("cancle","me"))
 /* send out a reminder */
 else if(myisset("remind","me"))
   {
+    output_status();
+
     $me = $_REQUEST["me"];
 
     /* test for valid ID */
@@ -306,6 +312,8 @@ else if(myisset("me"))
 	DB_close();
 	exit();
       }
+
+    output_status();
 
     if(isset($_SESSION["name"]))
       output_status($_SESSION["name"]);
@@ -1108,7 +1116,8 @@ else if(myisset("me"))
       $r       = mysql_fetch_array($result,MYSQL_NUM);
       $gameend = time() - strtotime($r[0]);
 
-      /* handel comments in case player didn't play a card, allow comments a week after the end of the game */      if( (!myisset("card") && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
+      /* handel comments in case player didn't play a card, allow comments a week after the end of the game */
+      if( (!myisset("card") && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
 	if(myisset("comment"))
 	  {
 	    $comment = $_REQUEST["comment"];
@@ -1980,6 +1989,10 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 
        if($ok)
 	 {
+	   $myname = DB_get_name_by_email($email);
+	   $_SESSION["name"] = $myname;
+	   output_status();
+
 	   DB_get_PREF($myid);
 
 	   if(myisset("setpref"))
@@ -2052,9 +2065,6 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	     }
 	   else /* output default user page */
 	     {
-	       $myname = DB_get_name_by_email($email);
-	       $_SESSION["name"] = $myname;
-
 	       /* display links to settings */
 	       output_user_settings();
 

@@ -334,26 +334,6 @@ function output_header()
 <h1> Welcome to E-Doko <sup style="color:#888;">(beta)</sup> </h1>
 </div>
 <?php
-   if(isset($_SESSION["name"]))
-     {
-       $name = $_SESSION["name"];
-
-       /* logout info */
-       echo "<div class=\"status\">\n";
-       echo $name;
-       echo " <a href=\"index.php?logout=1\">logout</a>\n";
-       echo "</div>";
-
-       /* last logon time */
-       $myid   = DB_get_userid_by_name($name);
-       $zone   = DB_get_user_timezone($myid);
-       date_default_timezone_set($zone);
-
-       $time     = DB_get_user_timestamp($myid);
-       $unixtime = strtotime($time);
-
-       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
-     };
 
   echo "<div class=\"main\">";
   return;
@@ -384,9 +364,28 @@ function output_footer()
   return;
 }
 
-function output_status($name)
+function output_status()
 {
+   if(isset($_SESSION["name"]))
+     {
+       $name = $_SESSION["name"];
 
+       /* logout info */
+       echo "<div class=\"status\">\n";
+       echo $name;
+       echo " <a href=\"index.php?logout=1\">logout</a>\n";
+       echo "</div>";
+
+       /* last logon time */
+       $myid  = DB_get_userid_by_name($name);
+       $zone  = DB_get_user_timezone($myid);
+       date_default_timezone_set($zone);
+
+       $time     = DB_get_user_timestamp($myid);
+       $unixtime = strtotime($time);
+
+       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
+     };
   return;
 }
 

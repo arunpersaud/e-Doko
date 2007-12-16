@@ -609,7 +609,7 @@ function DB_get_user_timezone($userid)
   if($r)
     return $r[0];
   else
-    return 0;
+    return "Europe/London";
 }
 
 function DB_insert_comment($comment,$playid,$userid)

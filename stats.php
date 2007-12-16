@@ -38,7 +38,6 @@ else if( isset($_SESSION["name"]) )
      $email     = DB_get_email_by_name($name);
      $password  = DB_get_passwd_by_name($name);
 
-
      /* verify password and email */
      if(strlen($password)!=32)
        $password = md5($password);
@@ -50,6 +49,8 @@ else if( isset($_SESSION["name"]) )
 
      if($ok)
        {
+	 output_status();
+
 	 DB_get_PREF($myid);
 
 	 DB_update_user_timestamp($myid);
