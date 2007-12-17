@@ -30,7 +30,7 @@ if(myisset("logout"))
     session_destroy();
     $_SESSION = array();
     echo "<div class=\"message\"><span class=\"bigger\">You are now logged out!</span><br />\n".
-      "(<a href=\"$host\">This will take you back to the home-page</a>)</div>";
+      "(<a href=\"$INDEX\">This will take you back to the home-page</a>)</div>";
   }
 else if(myisset("new"))
   {
@@ -45,7 +45,7 @@ else if(myisset("new"))
       }
     else
       {
-	echo "<div class=\"message\">Please <a href=\"$host\">log in</a>.</div>";
+	echo "<div class=\"message\">Please <a href=\"$INDEX\">log in</a>.</div>";
       }
   }
 /*check if everything is ready to set up a new game */
@@ -182,7 +182,7 @@ else if(myisset("new"))
       "$PlayerC\n".
       "$PlayerD\n\n".
       "If you want to join this game, please follow this link:\n\n".
-      "".$host."?me=";
+      "".$HOST.$INDEX."?me=";
 
     mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
     mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
@@ -204,7 +204,7 @@ else if(myisset("cancle","me"))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+	echo "perhaps the game has been cancled, check by login in <a href=\"$INDEX\">here</a>.";
 	output_footer();
 	DB_close();
 	exit();
@@ -253,7 +253,7 @@ else if(myisset("remind","me"))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+	echo "perhaps the game has been cancled, check by login in <a href=\"$INDEX\">here</a>.";
 	output_footer();
 	DB_close();
 	exit();
@@ -278,7 +278,7 @@ else if(myisset("remind","me"))
 	  "It's your turn in game ".DB_format_gameid($gameid)." \n".
 	  "Actually everyone else is waiting for you for more than a week now ;)\n\n".
 	  "Please visit this link now to continue: \n".
-	  " ".$host."?me=".$userhash."\n\n" ;
+	  " ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
 
 	if(DB_get_reminder($r[1],$gameid)>0)
 	  {
@@ -307,7 +307,7 @@ else if(myisset("me"))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$host\">here</a>.";
+	echo "perhaps the game has been cancled, check by login in <a href=\"$INDEX\">here</a>.";
 	output_footer();
 	DB_close();
 	exit();
@@ -383,7 +383,7 @@ else if(myisset("me"))
 	    if($hash == $me)
 	      echo "$i \n";
 	    else
-	      echo "<a href=\"".$host."?me=".$hash."\">$i</a> \n";
+	      echo "<a href=\"".$INDEX."?me=".$hash."\">$i</a> \n";
 	    $i++;
 	  }
 	echo "</div>\n";
@@ -421,7 +421,7 @@ else if(myisset("me"))
 	 */
 	if( !myisset("in") )
 	  {
-	    echo "<p class=\"message\"> You need to answer the <a href=\"$host?me=$me\">question</a>.</p>";
+	    echo "<p class=\"message\"> You need to answer the <a href=\"$INDEX?me=$me\">question</a>.</p>";
 	    DB_set_hand_status_by_hash($me,'start');
 	  }
 	else
@@ -471,7 +471,7 @@ else if(myisset("me"))
 	   * unless a user tries to cheat ;)
 	   * can also happen if user reloads the page!
 	   */
-	  echo "<p class=\"message\"> You need to answer the <a href=\"$host?me=$me&in=yes\">questions</a>.</p>";
+	  echo "<p class=\"message\"> You need to answer the <a href=\"$INDEX?me=$me&in=yes\">questions</a>.</p>";
 	  DB_set_hand_status_by_hash($me,'init');
 	}
       else
@@ -486,7 +486,7 @@ else if(myisset("me"))
 	  if($Nvorbehalt>1)
 	    {
 	      echo "<p class=\"message\"> You selected more than one vorbehalt, please go back ".
-		"and answer the <a href=\"$host?me=$me&in=yes\">question</a> again.</p>";
+		"and answer the <a href=\"$INDEX?me=$me&in=yes\">question</a> again.</p>";
 	      DB_set_hand_status_by_hash($me,'init');
 	    }
 	  else
@@ -537,7 +537,7 @@ else if(myisset("me"))
 		  DB_set_sickness_by_hash($me,"nines");
 		}
 
-	      echo " Ok, done with checking, please go to the <a href=\"$host?me=$me\">next step of the setup</a>.</p>";
+	      echo " Ok, done with checking, please go to the <a href=\"$INDEX?me=$me\">next step of the setup</a>.</p>";
 
 	      /* move on to the next stage*/
 	      DB_set_hand_status_by_hash($me,'poverty');
@@ -567,7 +567,7 @@ else if(myisset("me"))
 			{
 			  $message = "Everyone finish the questionary in game ".DB_format_gameid($gameid).", ".
 			    "please visit this link now to continue: \n".
-			    " ".$host."?me=".$userhash."\n\n" ;
+			    " ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
 			  mymail($To,$EmailName." finished setup in game ".DB_format_gameid($gameid),$message);
 			}
 		    };
@@ -776,7 +776,7 @@ else if(myisset("me"))
 		DB_set_party_by_hash($me,"contra");
 
 	      echo "Whoever will make the first trick will be on the re team. <br />\n";
-	      echo " Ok, the game can start now, please finish <a href=\"$host?me=$me\">the setup</a>.<br />";
+	      echo " Ok, the game can start now, please finish <a href=\"$INDEX?me=$me\">the setup</a>.<br />";
 	      DB_set_hand_status_by_hash($me,'play');
 	      break;
 
@@ -838,7 +838,7 @@ else if(myisset("me"))
 		      DB_set_player_by_gameid($gameid,$who);
 
 		      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-			" ".$host."?me=".$userhash."\n\n" ;
+			" ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
 		      mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
 		    }
 
@@ -919,7 +919,7 @@ else if(myisset("me"))
 
 			      $message = "Someone has poverty, it's your turn to decide, ".
 				         "if you want to take the trump. Please visit:".
-				         " ".$host."?me=".$userhash."\n\n" ;
+				         " ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
 			      mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
 			    }
 			}
@@ -1064,11 +1064,11 @@ else if(myisset("me"))
 		{
 		  /* email startplayer) */
 		  $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		    "Use this link to play a card: ".$host."?me=".$hash."\n\n" ;
+		    "Use this link to play a card: ".$HOST.$INDEX."?me=".$hash."\n\n" ;
 		  mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 		}
 	      else
-		echo " Please, <a href=\"$host?me=$me\">start</a> the game.<br />";
+		echo " Please, <a href=\"$INDEX?me=$me\">start</a> the game.<br />";
 	    }
 	  else
 	    echo "\n <br />";
@@ -1448,7 +1448,7 @@ else if(myisset("me"))
 
 		  $message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		    "It's your turn  now.\n".
-		    "Use this link to play a card: ".$host."?me=".$next_hash."\n\n" ;
+		    "Use this link to play a card: ".$HOST.$INDEX."?me=".$next_hash."\n\n" ;
 		  if( DB_get_email_pref_by_uid($who)!="emailaddict" )
 		    mymail($email,$EmailName."a card has been played in game ".DB_format_gameid($gameid),$message);
 		}
@@ -1681,7 +1681,8 @@ else if(myisset("me"))
 		      $To   = DB_get_email_by_userid($user);
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 
-		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".$host."?me=".$hash."\n\n" ;
+		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".
+			$HOST.$INDEX."?me=".$hash."\n\n" ;
 		      if( DB_get_email_pref_by_uid($user) != "emailaddict" )
 			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
 		    }
@@ -1942,7 +1943,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		   echo "N.B. You tried this already $number times during the last day and it will only work ".
 		     " 5 times during a day.<br />";
 		 echo "The new password will be valid for one day, make sure you reset it to something else.<br />";
-		 echo "Back to the  <a href=\"$host\">main page</a>.";
+		 echo "Back to the  <a href=\"$INDEX\">main page</a>.";
 
 		 $TIME  = (string) time(); /* to avoid collisions */
 		 $hash  = md5("Anewpassword".$email.$TIME);
@@ -1962,18 +1963,18 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	       {
 		 echo "Sorry you already tried 5 times during the last 24h.<br />".
 		   "You need to use one of those passwords or wait to get a new one.<br />";
-		 echo "Back to the <a href=\"$host\">main page</a>.";
+		 echo "Back to the <a href=\"$INDEX\">main page</a>.";
 	       }
 	   }
 	 else
 	   {
 	     if($email=="")
 	       echo "You need to give me an email address! <br />".
-		 "Please try <a href=\"$host\">again</a>.";
+		 "Please try <a href=\"$INDEX\">again</a>.";
 	     else
 	       echo "Couldn't find a player with this email! <br />".
 		 "Please contact Arun, if you think this is a mistake <br />".
-		 "or else try <a href=\"$host\">again</a>.";
+		 "or else try <a href=\"$INDEX\">again</a>.";
 	   }
        }
      else
@@ -2101,14 +2102,14 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		     }
 		   if($r[4]=='pre')
 		     {
-		       echo "\n   <span class=\"gamestatuspre\"><a href=\"".$host."?me=".$r[0]."\">p </a></span> ";
+		       echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?me=".$r[0]."\">p </a></span> ";
 
 		     }
 		   else if ($r[4]=='gameover')
-		     echo "\n   <span class=\"gamestatusover\"><a href=\"".$host."?me=".$r[0]."\">F </a></span> ";
+		     echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?me=".$r[0]."\">F </a></span> ";
 		   else
 		     {
-		       echo "\n   <span class=\"gamestatusplay\"><a href=\"".$host."?me=".$r[0]."\">P </a></span> ";
+		       echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?me=".$r[0]."\">P </a></span> ";
 		     }
 		   if($r[4] != 'gameover')
 		     {
@@ -2124,13 +2125,13 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 			       if(DB_get_reminder($r[3],$gameid)==0)
 				 if(time()-strtotime($r[2]) > 60*60*24*7)
 				   echo "".
-				     "<a href=\"$host?remind=1&amp;me=".$r[0]."\">Send a reminder.</a>";
+				     "<a href=\"$INDEX?remind=1&amp;me=".$r[0]."\">Send a reminder.</a>";
 			       echo "(it's $name's turn)\n";
 			     };
 			 }
 		       if(time()-strtotime($r[2]) > 60*60*24*30)
 			 echo "".
-			   "<a href=\"$host?cancle=1&amp;me=".$r[0]."\">Cancel?</a>".
+			   "<a href=\"$INDEX?cancle=1&amp;me=".$r[0]."\">Cancel?</a>".
 			   " (clicking here is final and can't be restored)";
 
 		     }
@@ -2144,7 +2145,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	 }
        else
 	 {
-	   echo "<div class=\"message\">Sorry email and password don't match. Please <a href=\"$host\">try again</a>. </div>";
+	   echo "<div class=\"message\">Sorry email and password don't match. Please <a href=\"$INDEX\">try again</a>. </div>";
 	 }
      };
      output_footer();

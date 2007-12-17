@@ -29,7 +29,7 @@ if(myisset("logout"))
     session_destroy();
     $_SESSION = array();
     echo "<div class=\"message\"><span class=\"bigger\">You are now logged out!</span><br />\n".
-      "(<a href=\"$host\">This will take you back to the home-page</a>)</div>";
+      "(<a href=\"$INDEX\">This will take you back to the home-page</a>)</div>";
   }
 /* user status page */
 else if( isset($_SESSION["name"]) )
@@ -228,7 +228,7 @@ else if( isset($_SESSION["name"]) )
    {
      /* send them back to the login page */
     echo "<div class=\"message\"><span class=\"bigger\">You need to log in!</span><br />\n".
-      "(<a href=\"$host\">This will take you back to the login-page</a>)</div>";
+      "(<a href=\"$INDEX\">This will take you back to the login-page</a>)</div>";
    }
 
 output_footer();

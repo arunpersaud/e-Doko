@@ -27,8 +27,10 @@
     /* used as the reply email in each email */
     $EMAIL_REPLY="";
 
-    /* this should point to your index.file, probably without the http:// to avoid extra requests */
-    $host = "http://.../index.php"
+    /* this should point to your index.file and to your domain*/
+    $INDEX = "/index.php";
+    $HOST  = "http://www.example.com";
 
+    /* the default timezone for you domain */
     $defaulttimezone = date_default_timezone_get();
 ?>

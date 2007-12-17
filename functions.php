@@ -640,7 +640,7 @@ function can_call($what,$hash)
 
 function display_table ()
 {
-  global $gameid, $GT, $debug,$host,$defaulttimezone;
+  global $gameid, $GT, $debug,$INDEX,$defaulttimezone;
 
   $result = mysql_query("SELECT  User.fullname as name,".
 			"        Hand.position as position, ".
@@ -677,7 +677,7 @@ function display_table ()
       if(!$debug)
 	echo "   $name \n";
       else
-	echo "   <a href=\"".$host."?me=".$hash."\">$name</a>\n";
+	echo "   <a href=\"".$INDEX."?me=".$hash."\">$name</a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
       if($GT=="poverty" && $party=="re")
@@ -785,9 +785,9 @@ function display_table ()
 
 function display_user_menu()
 {
-  global $wiki,$myid,$host;
+  global $wiki,$myid,$INDEX,$STATS;
   echo "<div class=\"usermenu\">\n".
-    "<a href=\"index.php\"> Go to my user page </a>";
+    "<a href=\"".$INDEX."\"> Go to my user page </a>";
 
   $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 			" LEFT JOIN Game On Hand.game_id=Game.id".
@@ -800,15 +800,15 @@ function display_user_menu()
 
   while( $r = mysql_fetch_array($result,MYSQL_NUM))
     {
-      echo "<a href=\"".$host."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
+      echo "<a href=\"".$INDEX."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
 
-  echo "<hr /> <a href=\"".$host."?new\">Start a new game</a>\n";
+  echo "<hr /> <a href=\"".$INDEX."?new\">Start a new game</a>\n";
 
-  echo "<hr /> <a href=\"".substr($host,0,-9)."stats.php\">Statistics</a>\n";
+  echo "<hr /> <a href=\"".$STATS."\">Statistics</a>\n";
 
   echo
-    "<hr />Report bugs in the <a href=\"". $wiki."\">wiki</a>\n";
+    "<hr />Report bugs in the <a href=\"".$wiki."\">wiki</a>\n";
   echo  "</div>\n";
   return;
 }

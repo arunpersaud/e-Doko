@@ -23,7 +23,9 @@ Installation
 
   Copy config.php_template to config.php and edit it. These variables need to be set:
 
-  $host:  for example "http://localhost/index.php", note: include the index.php here
+  $HOST:  for example "http://localhost"
+  $INDEX: the absolute web path to your index.php file e.g. "/mypath/index.php"
+  $STATS: the absolute web path to your stats.php file e.g. "/mypath/stast.php"
 
   database info:
 

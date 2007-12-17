@@ -24,6 +24,7 @@ output_header();
 /* new user wants to register */
 if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
   {
+    global $HOST,$INDEX;
     $ok=1;
     if(DB_get_userid_by_name($_REQUEST["Rfullname"]))
       {
@@ -44,7 +45,7 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 	
 	if($r)
 	  echo " Welcome to e-DoKo, you are now registered, please visit the".
-	    " <a href=\"$host\">homepage</a> to continue.";
+	    " <a href=\"".$HOST.$INDEX."\">homepage</a> to continue.";
 	else
 	  echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
       }
