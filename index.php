@@ -192,8 +192,8 @@ else if(myisset("new"))
     output_status();
     echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
   }    /* end set up a new game */
-/* cancle a game, if nothing has happend in the last N minutes */
-else if(myisset("cancle","me"))
+/* cancel a game, if nothing has happend in the last N minutes */
+else if(myisset("cancel","me"))
   {
     output_status();
 
@@ -204,7 +204,7 @@ else if(myisset("cancle","me"))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$INDEX\">here</a>.";
+	echo "perhaps the game has been canceled, check by login in <a href=\"$INDEX\">here</a>.";
 	output_footer();
 	DB_close();
 	exit();
@@ -223,23 +223,23 @@ else if(myisset("cancle","me"))
       {
 	$message = "Hello, \n\n".
 	  "Game ".DB_format_gameid($gameid).
-	  " has been cancled since nothing happend for a while and $myname requested it.\n";
+	  " has been canceled since nothing happend for a while and $myname requested it.\n";
 
 	$userids = DB_get_all_userid_by_gameid($gameid);
 	foreach($userids as $user)
 	  {
 	    $To = DB_get_email_by_userid($user);
-	    mymail($To,$EmailName."game ".DB_format_gameid($gameid)." cancled (timed out)",$message);
+	    mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (timed out)",$message);
 	  }
 
 	/* delete everything from the dB */
 	DB_cancel_game($me);
 
 	echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
-	  " has been cancled.<br /><br /></p>";
+	  " has been canceled.<br /><br /></p>";
       }
     else
-      echo "<p>You need to wait longer before you can cancle a game...</p>\n";
+      echo "<p>You need to wait longer before you can cancel a game...</p>\n";
   }
 /* send out a reminder */
 else if(myisset("remind","me"))
@@ -253,7 +253,7 @@ else if(myisset("remind","me"))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$INDEX\">here</a>.";
+	echo "perhaps the game has been canceled, check by login in <a href=\"$INDEX\">here</a>.";
 	output_footer();
 	DB_close();
 	exit();
@@ -307,7 +307,7 @@ else if(myisset("me"))
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
-	echo "perhaps the game has been cancled, check by login in <a href=\"$INDEX\">here</a>.";
+	echo "perhaps the game has been canceled, check by login in <a href=\"$INDEX\">here</a>.";
 	output_footer();
 	DB_close();
 	exit();
@@ -449,7 +449,7 @@ else if(myisset("me"))
 
 		output_check_for_sickness($me,$mycards);
 
-		echo "<p class=\"mycards\">your cards are: <br />\n";
+		echo "<p class=\"mycards\">Your cards are: <br />\n";
 		foreach($mycards as $card)
 		  display_card($card,$PREF["cardset"]);
 		echo "</p>\n";
@@ -1002,7 +1002,7 @@ else if(myisset("me"))
 		  echo "Your cards are: <br />\n";
 		  $mycards = DB_get_hand($me);
 		  sort($mycards);
-		  echo "<p class=\"mycards\">your cards are: <br />\n";
+		  echo "<p class=\"mycards\">Your cards are: <br />\n";
 		  foreach($mycards as $card)
 		    display_card($card,$PREF["cardset"]);
 		  echo "</p>\n";
@@ -1021,19 +1021,19 @@ else if(myisset("me"))
 	  if($who==5 || $who==50)
 	    {
 	      $message = "Hello, \n\n".
-		"Game ".DB_format_gameid($gameid)." has been cancled since nobody wanted to take the trump.\n";
+		"Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n";
 
 	      $userids = DB_get_all_userid_by_gameid($gameid);
 	      foreach($userids as $user)
 		{
 		  $To = DB_get_email_by_userid($user);
-		  mymail($To,$EmailName."game ".DB_format_gameid($gameid)." cancled (poverty not resolved)",$message);
+		  mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (poverty not resolved)",$message);
 		}
 
 	      /* delete everything from the dB */
 	      DB_cancel_game($me);
 
-	      echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been cancled.<br /><br /></p>";
+	      echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
 	      output_footer();
 	      DB_close();
 	      exit();
@@ -1663,7 +1663,7 @@ else if(myisset("me"))
 		      $message .= "   ".$r[0]."\n";
 		      $Tpoint --;
 		    }
-		  $message .= " Total Points (from Re points of view): $Tpoint\n";
+		  $message .= " Total Points (from the Re point of view): $Tpoint\n";
 		  $message .= "\n";
 
 		  /* send out final email */
@@ -2131,7 +2131,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 			 }
 		       if(time()-strtotime($r[2]) > 60*60*24*30)
 			 echo "".
-			   "<a href=\"$INDEX?cancle=1&amp;me=".$r[0]."\">Cancel?</a>".
+			   "<a href=\"$INDEX?cancel=1&amp;me=".$r[0]."\">Cancel?</a>".
 			   " (clicking here is final and can't be restored)";
 
 		     }
