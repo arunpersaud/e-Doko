@@ -313,8 +313,6 @@ else if(myisset("me"))
 	exit();
       }
 
-    output_status();
-
     if(isset($_SESSION["name"]))
       output_status($_SESSION["name"]);
 

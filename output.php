@@ -372,10 +372,10 @@ function output_status()
        $name = $_SESSION["name"];
 
        /* logout info */
-       echo "<div class=\"status\">\n";
+       echo "\n<div class=\"status\">";
        echo $name;
-       echo " <a href=\"index.php?logout=1\">logout</a>\n";
-       echo "</div>";
+       echo " <a href=\"index.php?logout=1\">logout</a>";
+       echo "</div>\n";
 
        /* last logon time */
        $myid  = DB_get_userid_by_name($name);
@@ -386,7 +386,7 @@ function output_status()
        $unixtime = strtotime($time);
        date_default_timezone_set($zone);
 
-       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>";
+       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>\n";
      };
   return;
 }
