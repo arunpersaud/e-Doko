@@ -88,6 +88,7 @@ div.table {
   width:99%;
   height:35em;
   margin:0;
+  left:0;
   padding:0;
 /*  border: 3px solid blue; */
   top: 8.2em;
@@ -100,7 +101,7 @@ div.table img.table {
   top:20%;
   height:22em;
   left:37.5%;
-  z-index:9;
+  z-indexk:9;
   display: block;
   margin:0;
   padding:0;
@@ -187,7 +188,7 @@ hr {clear:both;}
 
 /*ul.tricks li:hover div.table{ display:block; }*/
 
-ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score{
+ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
   position:absolute;
   margin:0;
   padding:0;
@@ -208,7 +209,7 @@ ul.tricks li div div.card0 span.comment{
   left:17.5%;
   width:16%;
 }
-ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score {
+ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score, .vorbehalt1 {
   position:absolute;
   margin:0;
   padding:0;
@@ -231,7 +232,7 @@ ul.tricks li div div.card1 span.comment{
   width:16%;
   text-align:center;
 }
-ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score{
+ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score, .vorbehalt2{
   position:absolute;
   margin:0;
   padding:0;
@@ -253,7 +254,7 @@ ul.tricks li div div.card2 span.comment{
   width:16%;
   text-align:center;
 }
-ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score{
+ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score, .vorbehalt3{
   position:absolute;
   margin:0;
   padding:0;
