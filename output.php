@@ -345,7 +345,7 @@ function output_footer()
 
   echo "</div>\n\n";
   echo "<div class=\"footer\">\n";
-  echo "  <p class=\"left\"> copyright 2006-2007 Arun Persaud <br />\n".
+  echo "  <p class=\"left\"> copyright 2006-2008 Arun Persaud, Lance Thornton <br />\n".
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
     "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
