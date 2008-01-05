@@ -833,7 +833,8 @@ else if(myisset("me"))
 		    {
 		      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
 		      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
-		      DB_set_player_by_gameid($gameid,$who);
+		      $userid   = DB_get_userid_by_email($To);
+		      DB_set_player_by_gameid($gameid,$userid);
 
 		      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
 			" ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
@@ -913,7 +914,8 @@ else if(myisset("me"))
 			    {
 			      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
 			      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
-			      DB_set_player_by_gameid($gameid,$who);
+			      $userid   = DB_get_userid_by_email($To);
+			      DB_set_player_by_gameid($gameid,$userid);
 
 			      $message = "Someone has poverty, it's your turn to decide, ".
 				         "if you want to take the trump. Please visit:".
