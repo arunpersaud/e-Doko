@@ -1154,6 +1154,31 @@ else if(myisset("me"))
       echo "\n<ul class=\"tricks\">\n";
       echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
 
+      /* output vorbehalte */
+      $mygametype =  DB_get_gametype_by_gameid($gameid);
+      if($mygametype != "normal") /* only show when needed */
+	{
+	  echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+	    "    <div class=\"trick\" id=\"trick0\">\n";
+	  $show = 1;
+	  for($mypos=1;$mypos<5;$mypos++)
+	    {
+	      $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
+	      if($usersick!=NULL)
+		{
+		  echo "      <div class=\"vorbehalt".($mypos-1)."\"> Vorbehalt <br />";
+		  if($show)
+		    echo " $usersick <br />";
+		  echo  " </div>\n";
+
+		  if($mygametype == $usersick)
+		    $show = 0;
+		}
+	    }
+	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	}
+
+      /* output tricks */
       while($r = mysql_fetch_array($result,MYSQL_NUM))
 	{
 	  $pos     = $r[1];
