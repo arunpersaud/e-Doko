@@ -410,20 +410,6 @@ else if(myisset("me"))
 	  }
 	else
 	  {
-	    /* move on to the next stage*/
-	    DB_set_hand_status_by_hash($me,'init');
-	  }
-      case 'init':
-	/* first check if everything went ok  in the last step
-	 * if not, send user back, if yes, check what he did
-	 */
-	if( !myisset("in") )
-	  {
-	    echo "<p class=\"message\"> You need to answer the <a href=\"$INDEX?me=$me\">question</a>.</p>";
-	    DB_set_hand_status_by_hash($me,'start');
-	  }
-	else
-	  {
 	    if($_REQUEST["in"] == "no")
 	      {
 		/* cancel the game */
@@ -439,23 +425,70 @@ else if(myisset("me"))
 
 		/* delete everything from the dB */
 		DB_cancel_game($me);
+		break;
 	      }
 	    else
 	      {
-		$mycards = DB_get_hand($me);
-		sort($mycards);
+		/* user wants to join the game */
 
-		output_check_for_sickness($me,$mycards);
+		/* move on to the next stage,
+		 * no break statement to immediately go to the next stage
+		 */
 
-		echo "<p class=\"mycards\">Your cards are: <br />\n";
-		foreach($mycards as $card)
-		  display_card($card,$PREF["cardset"]);
-		echo "</p>\n";
+		DB_set_hand_status_by_hash($me,'init');
 
-		/* move on to the next stage*/
-		DB_set_hand_status_by_hash($me,'check');
+		/* check if everyone has reached this stage, send out email */
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		$ok = 1;
+		foreach($userids as $user)
+		  {
+		    $userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+		    if($userstat!='init')
+		      {
+			/* whos turn is it? */
+			DB_set_player_by_gameid($gameid,$user);
+			$ok = 0;
+		      }
+		  };
+		if($ok)
+		  {
+		    /* all done, send out email unless this player is the startplayer */
+		    $startplayer = DB_get_startplayer_by_gameid($gameid);
+		    if($mypos == $startplayer)
+		      {
+			/* do nothing, go to next stage */
+		      }
+		    else
+		      {
+			/* email startplayer */
+			/*
+			$email       = DB_get_email_by_pos_and_gameid($startplayer,$gameid);
+			$hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
+			$who         = DB_get_userid_by_email($email);
+			DB_set_player_by_gameid($gameid,$who);
+
+			$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+			  "Use this link to play a card: ".$HOST.$INDEX."?me=".$hash."\n\n" ;
+			mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+			*/
+		      }
+		  }
 	      }
 	  }
+      case 'init':
+
+	$mycards = DB_get_hand($me);
+	sort($mycards);
+
+	output_check_for_sickness($me,$mycards);
+
+	echo "<p class=\"mycards\">Your cards are: <br />\n";
+	foreach($mycards as $card)
+	  display_card($card,$PREF["cardset"]);
+	echo "</p>\n";
+
+	/* move on to the next stage*/
+	DB_set_hand_status_by_hash($me,'check');
 	break;
 
     case 'check':
