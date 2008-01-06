@@ -2196,21 +2196,18 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		   if($r[4] != 'gameover')
 		     {
 		       echo "</td><td>\n    ";
-		       if($r[3])
+		       if($r[3]==$myid || !$r[3])
+			 echo "(it's <strong>your</strong> turn)\n";
+		       else
 			 {
-			   if($r[3]==$myid)
-			     echo "(it's <strong>your</strong> turn)\n";
-			   else
-			     {
-			       $name = DB_get_name_by_userid($r[3]);
-			       $gameid = $r[1];
-			       if(DB_get_reminder($r[3],$gameid)==0)
-				 if(time()-strtotime($r[2]) > 60*60*24*7)
-				   echo "".
-				     "<a href=\"$INDEX?remind=1&amp;me=".$r[0]."\">Send a reminder.</a>";
-			       echo "(it's $name's turn)\n";
-			     };
-			 }
+			   $name = DB_get_name_by_userid($r[3]);
+			   $gameid = $r[1];
+			   if(DB_get_reminder($r[3],$gameid)==0)
+			     if(time()-strtotime($r[2]) > 60*60*24*7)
+			       echo "".
+				 "<a href=\"$INDEX?remind=1&amp;me=".$r[0]."\">Send a reminder.</a>";
+			   echo "(it's $name's turn)\n";
+			 };
 		       if(time()-strtotime($r[2]) > 60*60*24*30)
 			 echo "".
 			   "<a href=\"$INDEX?cancel=1&amp;me=".$r[0]."\">Cancel?</a>".
