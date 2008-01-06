@@ -1885,6 +1885,11 @@ else if(myisset("me"))
 	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	    echo "  ".$r[0]." ".$r[1]."<br />\n";
 
+	  $queryresult = mysql_query("SELECT timediff(mod_date,create_date) ".
+				     " FROM Game WHERE id='$gameid'");
+	  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+	  echo "<p>This game took ".$r[0]." hours.</p>";
+
 	  echo "<div class=\"re\">\n Points Re: <br />\n";
 	  $queryresult = mysql_query("SELECT score FROM Score ".
 				     "  WHERE game_id=$gameid AND party='re'".
