@@ -50,6 +50,7 @@ function output_form_for_new_game($names)
 ?>
     <h2> Players </h2>
     <p>Please select four players (or use the randomly pre-selected names)</p>
+    <p>Remember: you need to be one of the players ;) </p>
        <form action="index.php" method="post">
 
    <div class="table">
