@@ -239,33 +239,35 @@ function output_check_want_to_play($me)
 
 function output_home_page($pre,$game,$done,$avgtime)
 {
-?>
-    <p> If you want to play a game of Doppelkopf, you found the right place ;) </p>
-<?php
-    if($pre == 0)
-      echo "<p> At the moment there are no games that are being started ";
-    else if($pre==1)
-      echo "<p> At the moment there is one games that is being started ";
-    else
-      echo "<p> At the moment there are $pre games that are being started ";
-
-    echo "and ";
-
-    if($game==0)
-      echo "zero games that are ongoing. ";
-    else if($game==1)
-      echo "one game that is ongoing. ";
-    else
-      echo "$game games that are ongoing. ";
-
-    echo "<br />\n";
-
-    if($done==0)
-      echo "No game has been completed on this server. </p>";
-    else if($done==1)
-      echo "One game has been completed on this server. </p>";
-    else
-      echo "$done games have been completed on this server. Average time of a game: $avgtime days</p>";
+  global $WIKI;
+  
+  echo"<p> If you want to play a game of Doppelkopf, you found the right place ;)".
+    " For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>";
+  
+  if($pre == 0)
+    echo "<p> At the moment there are no games that are being started ";
+  else if($pre==1)
+    echo "<p> At the moment there is one games that is being started ";
+  else
+    echo "<p> At the moment there are $pre games that are being started ";
+  
+  echo "and ";
+  
+  if($game==0)
+    echo "zero games that are ongoing. ";
+  else if($game==1)
+    echo "one game that is ongoing. ";
+  else
+    echo "$game games that are ongoing. ";
+  
+  echo "<br />\n";
+  
+  if($done==0)
+    echo "No game has been completed on this server. </p>";
+  else if($done==1)
+    echo "One game has been completed on this server. </p>";
+  else
+    echo "$done games have been completed on this server. Average time of a game: $avgtime days</p>";
 ?>
 
     <p> Please <a href="./register.php">register</a>, in case you have not done that yet  <br />

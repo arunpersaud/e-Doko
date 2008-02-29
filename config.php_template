@@ -31,6 +31,9 @@
     $INDEX = "/index.php";
     $HOST  = "http://www.example.com";
 
+    /* point this to a Wiki that explains the rules, etc (or use this one)*/
+    $WIKI  = "http://wiki.nubati.net/index.php?title=EmailDoko";
+
     /* the default timezone for you domain */
     $defaulttimezone = date_default_timezone_get();
 ?>
