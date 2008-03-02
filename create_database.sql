@@ -269,6 +269,7 @@ CREATE TABLE `User` (
   `password` varchar(32) default NULL,
   `timezone` varchar(64) default 'Europe/London',
   `last_login` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

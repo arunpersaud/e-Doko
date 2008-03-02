@@ -2248,10 +2248,18 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		     }
 		 }
 	       echo "</td></tr>\n</table>\n";
-	       $names = DB_get_all_names();
-	       echo "<h4>Registered players:</h4>\n<p>\n";
-	       echo implode(", ",$names)."\n";
-	       echo "</p>\n</div>";
+
+	       $names = DB_get_names_of_new_logins(5);
+	       echo "<h4>New Players:</h4>\n<p>\n";
+	       echo implode(", ",$names).",...\n";
+	       echo "</p>\n";
+
+	       $names = DB_get_names_of_last_logins(5);
+	       echo "<h4>Players last logged in:</h4>\n<p>\n";
+	       echo implode(", ",$names).",...\n";
+	       echo "</p>\n";
+	       
+	       echo "</div>\n";
 	     }
 	 }
        else

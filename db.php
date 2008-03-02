@@ -578,6 +578,28 @@ function DB_get_all_names()
   return $names;
 }
 
+function DB_get_names_of_last_logins($N)
+{
+  $names  = array();
+
+  $result = mysql_query("SELECT fullname FROM User ORDER BY last_login DESC LIMIT $N");
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $names[] = $r[0];
+
+  return $names;
+}
+
+function DB_get_names_of_new_logins($N)
+{
+  $names  = array();
+
+  $result = mysql_query("SELECT fullname FROM User ORDER BY create_date DESC, id DESC LIMIT $N");
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $names[] = $r[0];
+
+  return $names;
+}
+
 function DB_update_game_timestamp($gameid)
 {
   mysql_query("UPDATE Game SET mod_date = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($gameid));
