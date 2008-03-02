@@ -306,6 +306,7 @@ function output_header()
   <head>
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
+     <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
      <link rel="stylesheet" type="text/css" href="css/standard.css" />
      <script type="text/javascript">
        function hl(num) {
