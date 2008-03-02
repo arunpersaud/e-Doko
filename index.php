@@ -1743,6 +1743,38 @@ else if(myisset("me"))
 		  $message .= " Total Points (from the Re point of view): $Tpoint\n";
 		  $message .= "\n";
 
+		  $session = DB_get_session_by_gameid($gameid);
+		  $score = generate_score_table($session);
+		  /* convert html to ascii */
+		  $score = str_replace("<div class=\"scoretable\">\n<table class=\"score\">\n <tr>\n","",$score);
+		  $score = str_replace("\n","",$score);
+		  $score = str_replace(array("<tr>","</tr>","<td>","</td>"),array("","\n","","|"),$score);
+		  $score = str_replace("</table></div>\n","",$score);
+		  $score = explode("\n",$score);
+
+		  $header = array_slice($score,0,1);
+		  $header = explode("|",$header[0]);
+		  for($i=0;$i<sizeof($header);$i++)
+		    $header[$i]=str_pad($header[$i],6," ",STR_PAD_BOTH);
+		  $header = implode("|",$header);
+		  $header.= "\n------+------+------+------+------+\n";
+		  if(sizeof($score)>5) $header.=   "                ...   \n";
+
+		  if(sizeof($score)>5) $score = array_slice($score,-5,5);
+		  for($i=0;$i<sizeof($score);$i++)
+		    {
+		      $line = explode("|",$score[$i]);
+		      for($j=0;$j<sizeof($line);$j++)
+			$line[$j]=str_pad($line[$j],6," ",STR_PAD_LEFT);
+		      $score[$i] = implode("|",$line);
+		    }
+
+		  $score = implode("\n",$score);
+		  $score = $header.$score;
+		  
+		  $message .= "Score Table\n";
+		  $message .= $score;
+
 		  /* send out final email */
 		  $all = array();
 
