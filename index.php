@@ -1747,9 +1747,9 @@ else if(myisset("me"))
 		  $score = generate_score_table($session);
 		  /* convert html to ascii */
 		  $score = str_replace("<div class=\"scoretable\">\n<table class=\"score\">\n <tr>\n","",$score);
+		  $score = str_replace("</table></div>\n","",$score);
 		  $score = str_replace("\n","",$score);
 		  $score = str_replace(array("<tr>","</tr>","<td>","</td>"),array("","\n","","|"),$score);
-		  $score = str_replace("</table></div>\n","",$score);
 		  $score = explode("\n",$score);
 
 		  $header = array_slice($score,0,1);
@@ -1772,7 +1772,7 @@ else if(myisset("me"))
 		  $score = implode("\n",$score);
 		  $score = $header.$score;
 		  
-		  $message .= "Score Table\n";
+		  $message .= "Score Table:\n";
 		  $message .= $score;
 
 		  /* send out final email */
