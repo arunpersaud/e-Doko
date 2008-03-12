@@ -1179,6 +1179,16 @@ else if(myisset("me"))
 	      DB_insert_comment($comment,$playid,$myid);
 	  };
 
+      /* handle notes in case player didn't play a card, allow notes only during a game */
+      if( (!myisset("card") && $mystatus=='play')  )
+	if(myisset("note"))
+	  {
+	    $note = $_REQUEST["note"];
+
+	    if($note != "")
+	      DB_insert_note($note,$gameid,$myid);
+	  };
+
       /* get everything relevant to display the tricks */
       $result = mysql_query("SELECT Hand_Card.card_id as card,".
 			    "       Hand.position as position,".
@@ -1475,6 +1485,14 @@ else if(myisset("me"))
 		  $comment = $_REQUEST["comment"];
 		  if($comment != "")
 		    DB_insert_comment($comment,$playid,$myid);
+		};
+
+	      /* check for note */
+	      if(myisset("note"))
+		{
+		  $note = $_REQUEST["note"];
+		  if($note != "")
+		    DB_insert_note($note,$gameid,$myid);
 		};
 
 	      /* display played card */
@@ -1837,6 +1855,13 @@ else if(myisset("me"))
 
       echo "</ul>\n"; /* end ul tricks*/
 
+      echo "<div class=\"notes\"> Personal notes: <br />\n";
+      $notes = DB_get_notes_by_userid_and_gameid($myid,$gameid);
+      foreach($notes as $note)
+	echo "$note <hr \>\n";
+      echo "Insert note:<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+      echo "</div> \n";
+      
       $mycards = DB_get_hand($me);
       $mycards = mysort($mycards,$gametype);
       echo "<div class=\"mycards\">\n";
@@ -2013,7 +2038,6 @@ else if(myisset("me"))
       echo $score;
 
     echo "</div>\n";
-
 
     echo "</form>\n";
     output_footer();

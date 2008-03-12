@@ -361,6 +361,25 @@ ul.tricks li div div span.comment span{
   background-color: #eee;
 }
 
+.notes {
+  position:absolute;
+  top:27em;
+  left:0;
+  margin:1em;
+  margin-top:0em;
+  margin-left:0em;
+
+  width: 12em;
+
+  border-top:    2px solid gray;
+  border-right:  2px solid gray;
+  border-bottom: 2px solid gray;
+
+  padding:0.3em;
+
+  background-color: #efefef;
+}
+
 .user { margin-left:25%;margin-right:25%; }
 
 .over {

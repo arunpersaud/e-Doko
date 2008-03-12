@@ -63,6 +63,30 @@ UNLOCK TABLES;
 /*!40000 ALTER TABLE `Comment` ENABLE KEYS */;
 
 --
+-- Table structure for table `Notes`
+--
+
+DROP TABLE IF EXISTS `Notes`;
+CREATE TABLE `Notes` (
+  `mod_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) default NULL,
+  `game_id` int(11) default NULL,
+  `comment` text,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Notes`
+--
+
+/*!40000 ALTER TABLE `Notes` DISABLE KEYS */;
+LOCK TABLES `Notes` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Notes` ENABLE KEYS */;
+
+--
 -- Table structure for table `Game`
 --
 

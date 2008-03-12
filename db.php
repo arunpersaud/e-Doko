@@ -641,6 +641,27 @@ function DB_insert_comment($comment,$playid,$userid)
   return;
 }
 
+function DB_insert_note($comment,$gameid,$userid)
+{
+  mysql_query("INSERT INTO Notes VALUES (NULL,NULL,NULL,$userid,$gameid, ".DB_quote_smart($comment).")");
+
+  return;
+}
+
+function DB_get_notes_by_userid_and_gameid($userid,$gameid)
+{
+  $notes = array();
+
+  $result = mysql_query("SELECT comment FROM Notes WHERE user_id=".DB_quote_smart($userid) .
+			" AND game_id=".DB_quote_smart($gameid));
+
+  while($r = mysql_fetch_array($result,MYSQL_NUM))
+    $notes[] = $r[0];
+
+  return $notes;
+}
+
+
 function DB_get_gametype_by_gameid($id)
 {
   $result = mysql_query("SELECT type FROM Game WHERE id=".DB_quote_smart($id));
