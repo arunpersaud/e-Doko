@@ -155,8 +155,11 @@ else if( isset($_SESSION["name"]) )
 	   }
 
 	 /* most reminders */
-	 echo "<p>These players got the most reminders:<br />\n";
-	 $result = mysql_query("SELECT COUNT(*) as c,fullname from Reminder".
+	 echo "<p>These players got the most reminders per game:<br />\n";
+	 $result = mysql_query("SELECT COUNT(*)  /" .
+			       "      (SELECT COUNT(*) FROM Hand".
+			       "       WHERE user_id=User.id) as c,".
+			       " fullname FROM Reminder".
 			       " LEFT JOIN User ON User.id=user_id".
 			       " GROUP BY user_id".
 			       " ORDER BY c DESC LIMIT 3" );
@@ -165,22 +168,30 @@ else if( isset($_SESSION["name"]) )
 	 echo "</p>\n";
 
 	 /* fox */
-	 echo "<p>These players caught the most foxes:<br />\n";
-	 $result = mysql_query("SELECT COUNT(*) as c,fullname from Score".
+	 echo "<p>These players caught the most foxes per game:<br />\n";
+	 $result = mysql_query("SELECT COUNT(*) /" .
+			       "      (SELECT COUNT(*) FROM Hand".
+			       "       WHERE user_id=User.id) as c,".
+			       " fullname".
+			       " FROM Score".
 			       " LEFT JOIN User ON User.id=winner_id".
 			       " WHERE score='fox'".
 			       " GROUP BY winner_id".
-			       " ORDER BY c DESC LIMIT 2" );
+			       " ORDER BY c DESC LIMIT 5" );
 	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	   echo $r[1]." (".$r[0].") <br />\n";
 	 echo "</p>\n";
 
-	 echo "<p>These players lost their fox most often:<br />\n";
-	 $result = mysql_query("SELECT COUNT(*) as c,fullname from Score".
+	 echo "<p>These players lost their fox most often per game:<br />\n";
+	 $result = mysql_query("SELECT COUNT(*) /" .
+			       "      (SELECT COUNT(*) FROM Hand".
+			       "       WHERE user_id=User.id) as c,".
+			       " fullname".
+			       " FROM Score".
 			       " LEFT JOIN User ON User.id=looser_id".
 			       " WHERE score='fox'".
 			       " GROUP BY looser_id".
-			       " ORDER BY c DESC LIMIT 2" );
+			       " ORDER BY c DESC LIMIT 5" );
 	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	   echo $r[1]." (".$r[0].") <br />\n";
 	 echo "</p>\n";
