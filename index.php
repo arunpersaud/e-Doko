@@ -6,8 +6,10 @@ include_once("output.php");      /* html output only */
 include_once("db.php");          /* database only */
 include_once("functions.php");   /* the rest */
 
+/* make sure that user has set all variables in config.php */
 config_check();
 
+/* open database */
 if(DB_open()<0)
   {
     output_header();
@@ -17,13 +19,17 @@ if(DB_open()<0)
     exit();
   }
 
-/* start a session, if it is not already running */
+/* start a session, if it is not already running.
+ * This way people don't have to log in all the times. 
+ * The session variables can also be read out from different
+ * php scripts, so that the code can be easily split up across several files
+ */
 session_start();
 
 /* done major error checking, output header of HTML page */
 output_header();
 
-/* check if we want to start a new game */
+/* does the user want to log out? */
 if(myisset("logout"))
   {
     session_unset();
@@ -32,9 +38,11 @@ if(myisset("logout"))
     echo "<div class=\"message\"><span class=\"bigger\">You are now logged out!</span><br />\n".
       "(<a href=\"$INDEX\">This will take you back to the home-page</a>)</div>";
   }
+/* check if we want to start a new game */
 else if(myisset("new"))
   {
     output_status();
+    /* user need to be logged in to do this */
     if( isset($_SESSION["name"]) )
       {
 	$names = DB_get_all_names();
@@ -52,6 +60,7 @@ else if(myisset("new"))
 else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","call" ))
   {
     output_status();
+    /* user needs to be logged in */
     if( !isset($_SESSION["name"]) )
       {
 	echo "<div class=\"message\">Please <a href=\"$INDEX\">log in</a>.</div>";
@@ -61,12 +70,13 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 	/* get my name */
 	$name = $_SESSION["name"];
 
+	/* the names of the four players */
 	$PlayerA = $_REQUEST["PlayerA"];
 	$PlayerB = $_REQUEST["PlayerB"];
 	$PlayerC = $_REQUEST["PlayerC"];
 	$PlayerD = $_REQUEST["PlayerD"];
 
-	/* check if user is in the game */
+	/* the person who sets up the game has to be one of the players */
 	if(!in_array($name,array($PlayerA,$PlayerB,$PlayerC,$PlayerD)))
 	  {
 	    echo "<div class=\"message\">You need to be one of the players to start a <a href=\"$INDEX?new\">new game</a>.</div>";
@@ -74,16 +84,19 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 	    DB_close();
 	    exit();
 	  }
-
+	
+	/* what rules were selected */
 	$dullen      = $_REQUEST["dullen"];
 	$schweinchen = $_REQUEST["schweinchen"];
 	$call        = $_REQUEST["call"];
 
+	/* get the emails addresses of the players */
 	$EmailA  = DB_get_email_by_name($PlayerA);
 	$EmailB  = DB_get_email_by_name($PlayerB);
 	$EmailC  = DB_get_email_by_name($PlayerC);
 	$EmailD  = DB_get_email_by_name($PlayerD);
 
+	/* this is used to check if the player names are all ok */
 	if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
 	  {
 	    echo "couldn't find one of the names, please start a new game";
@@ -92,6 +105,7 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 	    exit();
 	  }
 
+	/* get user ids */
 	$useridA  = DB_get_userid_by_name($PlayerA);
 	$useridB  = DB_get_userid_by_name($PlayerB);
 	$useridC  = DB_get_userid_by_name($PlayerC);
@@ -103,6 +117,7 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 
 	/* create game */
 	$followup = NULL;
+	/* is this game a follow up in an already started session? */
 	if(myisset("followup") )
 	  {
 	    $followup= $_REQUEST["followup"];
@@ -131,7 +146,7 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 			  "'$ruleset','$session' ,NULL)");
 	    else
 	      {
-		/* get max session */
+		/* get max session and start a new one */
 		$max = DB_get_max_session();
 		$max++;
 		mysql_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
@@ -139,7 +154,7 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 			    "'$ruleset','$max' ,NULL)");
 	      }
 	  }
-	else
+	else /* no follow up, start a new session */
 	  {
 	    /* get ruleset information or create new one */
 	    $ruleset = DB_get_ruleset($dullen,$schweinchen,$call);
@@ -210,7 +225,8 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
       }
-  }    /* end set up a new game */
+    /* end set up a new game */
+  }    
 /* cancel a game, if nothing has happend in the last N minutes */
 else if(myisset("cancel","me"))
   {
@@ -235,7 +251,7 @@ else if(myisset("cancel","me"))
     $gameid   = DB_get_gameid_by_hash($me);
     $myname   = DB_get_name_by_hash($me);
 
-    /* check if game really is old enough */
+    /* check if game really is old enough to be canceled */
     $result = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
     $r = mysql_fetch_array($result,MYSQL_NUM);
     if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
@@ -284,13 +300,13 @@ else if(myisset("remind","me"))
     $gameid   = DB_get_gameid_by_hash($me);
     $myname   = DB_get_name_by_hash($me);
 
-    /* check if game really is old enough */
+    /* check if player hasn't done anything in a while */
     $result = mysql_query("SELECT mod_date,player,status from Game WHERE id='$gameid' " );
     $r = mysql_fetch_array($result,MYSQL_NUM);
     if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week */
       {
 	$name = DB_get_name_by_userid($r[1]);
-	$To = DB_get_email_by_userid($r[1]);
+	$To   = DB_get_email_by_userid($r[1]);
 	$userhash = DB_get_hash_from_gameid_and_userid($gameid,$r[1]);
 
 	$message = "Hello $name, \n\n".
@@ -299,6 +315,7 @@ else if(myisset("remind","me"))
 	  "Please visit this link now to continue: \n".
 	  " ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
 
+	/* make sure we don't send too  many reminders to one person */
 	if(DB_get_reminder($r[1],$gameid)>0)
 	  {
 	    echo "<p>An email has already been sent out.</p>\n";
@@ -331,7 +348,8 @@ else if(myisset("me"))
 	DB_close();
 	exit();
       }
-
+    
+    /* user might get here by clicking on the link in an email, so session might not be set */
     if(isset($_SESSION["name"]))
       output_status($_SESSION["name"]);
 
@@ -424,11 +442,13 @@ else if(myisset("me"))
       case 'start':
 	if( !myisset("in") )
 	  {
+	    /* asks the player, if he wants to join the game */
 	    output_check_want_to_play($me);
 	    break;
 	  }
 	else
 	  {
+	    /* check the result, if player wants to join, got next stage, else cancel game */
 	    if($_REQUEST["in"] == "no")
 	      {
 		/* cancel the game */
@@ -487,7 +507,7 @@ else if(myisset("me"))
 			DB_set_player_by_gameid($gameid,$who);
 
 			$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-			  "Use this link to play a card: ".$HOST.$INDEX."?me=".$hash."\n\n" ;
+			  "Use this link to go the game: ".$HOST.$INDEX."?me=".$hash."\n\n" ;
 			mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 			*/
 		      }
@@ -2060,8 +2080,10 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	 $password  = DB_get_passwd_by_name($name);
        };
 
+     /* user has forgotten his password */
      if(myisset("forgot"))
        {
+	 /* check if player is in the database */
 	 $ok = 1;
 
 	 $myid = DB_get_userid_by_email($email);
@@ -2083,6 +2105,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		 echo "The new password will be valid for one day, make sure you reset it to something else.<br />";
 		 echo "Back to the  <a href=\"$INDEX\">main page</a>.";
 
+		 /* create temporary password, use the fist 8 letters of a md5 hash */
 		 $TIME  = (string) time(); /* to avoid collisions */
 		 $hash  = md5("Anewpassword".$email.$TIME);
 		 $newpw = substr($hash,1,8);
@@ -2095,28 +2118,33 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		   " also still be valid until you set a new one\n";
 		 mymail($email,$EmailName."recovery ",$message);
 
+		 /* we save these in the database */
 		 DB_set_recovery_password($myid,md5($newpw));
 	       }
 	     else
 	       {
+		 /* make it so that people (or a robot) can request thousands of passwords within a short time
+		  * and spam a user this way */
 		 echo "Sorry you already tried 5 times during the last 24h.<br />".
 		   "You need to use one of those passwords or wait to get a new one.<br />";
 		 echo "Back to the <a href=\"$INDEX\">main page</a>.";
 	       }
 	   }
 	 else
-	   {
+	   {/* can't find user id in the database */
+	     
+	     /* no email given? */
 	     if($email=="")
 	       echo "You need to give me an email address! <br />".
 		 "Please try <a href=\"$INDEX\">again</a>.";
-	     else
+	     else /* default error message */
 	       echo "Couldn't find a player with this email! <br />".
 		 "Please contact Arun, if you think this is a mistake <br />".
 		 "or else try <a href=\"$INDEX\">again</a>.";
 	   }
        }
-     else
-     {
+   else 
+     { /* normal user page */
        /* verify password and email */
        if(strlen($password)!=32)
 	 $password = md5($password);
@@ -2128,12 +2156,14 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 
        if($ok)
 	 {
+	   /* user information is ok */
 	   $myname = DB_get_name_by_email($email);
 	   $_SESSION["name"] = $myname;
 	   output_status();
 
 	   DB_get_PREF($myid);
 
+	   /* does the user want to change some preferences? */
 	   if(myisset("setpref"))
 	     {
 	       $setpref=$_REQUEST["setpref"];
@@ -2165,6 +2195,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		   break;
 		 }
 	     }
+	   /* user wants to change his password or request a temporary one */
 	   else if(myisset("passwd"))
 	     {
 	       if( $_REQUEST["passwd"]=="ask" )
@@ -2211,6 +2242,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 
 	       display_user_menu();
 
+	       /* display all games the user has played */
 	       echo "<div class=\"user\">";
 	       echo "<h4>These are all your games:</h4>\n";
 	       echo "<p>Session: <br />\n";
@@ -2273,11 +2305,13 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 		 }
 	       echo "</td></tr>\n</table>\n";
 
+	       /* display last 5 users that have signed up to e-DoKo */
 	       $names = DB_get_names_of_new_logins(5);
 	       echo "<h4>New Players:</h4>\n<p>\n";
 	       echo implode(", ",$names).",...\n";
 	       echo "</p>\n";
 
+	       /* display last 5 users that logged on */
 	       $names = DB_get_names_of_last_logins(5);
 	       echo "<h4>Players last logged in:</h4>\n<p>\n";
 	       echo implode(", ",$names).",...\n";
@@ -2298,6 +2332,8 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 /* default login page */
  else
    {
+     /* this outputs the default home page with some extra statistics on it */
+
      $pre[0]=0;$game[0]=0;$done[0]=0;
      $r=mysql_query("SELECT COUNT(id) FROM Game GROUP BY status");
      if($r) {
