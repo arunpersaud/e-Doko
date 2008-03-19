@@ -1178,7 +1178,7 @@ else if(myisset("me"))
       if($gamestatus == 'pre')
 	{
 	  echo "<p class=\"message\"> You finished the setup, but not everyone else finished it... ".
-	       "so you need to wait for the others. Just wait for the an email... </p>";
+	       "You need to wait for the others. Just wait for an email. </p>";
 	  break; /* not sure this works... the idea is that you can
 		  * only  play a card after everyone is ready to play */
 	}
