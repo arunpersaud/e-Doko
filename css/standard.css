@@ -378,6 +378,9 @@ ul.tricks li div div span.comment span{
   padding:0.3em;
 
   background-color: #efefef;
+
+  height:10em;
+  overflow: auto;
 }
 
 .user { margin-left:25%;margin-right:25%; }
