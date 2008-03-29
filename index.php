@@ -1436,7 +1436,20 @@ else if(myisset("me"))
 		  $winner = get_winner($play,$gametype); /* returns the position */
 
 		  /* check if someone caught a fox */
-		  if(DB_get_gametype_by_gameid($gameid)!="solo")
+		  /* first check if we should account for solos at all, 
+		   * since it doesn't make sense in some games
+		   */
+		  $ok = 0; /* fox shouldn't be counted */
+		  if(DB_get_gametype_by_gameid($gameid)=="solo")
+		    {
+		      $solo = DB_get_solo_by_gameid($gameid);
+		      if($solo == "trump" || $solo == "silent")
+			$ok = 1; /* for trump solos and silent solos, foxes are ok */
+		    }
+		  else
+		    $ok = 1; /* for all other games (not solos) foxes are ok too */
+		  
+		  if($ok==1)
 		    foreach($play as $played)
 		      {
 			if ( $played['card']==19 || $played['card']==20 )
@@ -1454,8 +1467,21 @@ else if(myisset("me"))
 					    " VALUES( NULL,NULL,$gameid,'$party1',$uid1,$uid2,'fox')");
 			    }
 		      }
+		  
 		  /* check for karlchen (jack of clubs in the last trick)*/
-		  if(DB_get_gametype_by_gameid($gameid)!="solo" && $tricknr == 12)
+		  /* same as for foxes, karlchen doesn't always make sense
+		   * check what kind of game it is and set karlchen accordingly */
+		  $ok = 1; /* default: karlchen should be accounted for */
+		  if($tricknr != 12 )
+		    $ok = 0; /* Karlchen works only in the last trick */
+		  if($ok && DB_get_gametype_by_gameid($gameid)=="solo" )
+		    {
+		      $solo = DB_get_solo_by_gameid($gameid);
+		      if($solo == "trumpless" || $solo == "jack" || $solo == "queen" )
+			$ok = 0; /* no Karlchen in these solos */
+		    }
+		  
+		  if($ok)
 		    foreach($play as $played)
 		      if ( $played['card']==11 || $played['card']==12 )
 			if ($played['pos'] == $winner )
