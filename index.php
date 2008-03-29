@@ -1381,8 +1381,12 @@ else if(myisset("me"))
 
 	      $playid = DB_play_card($trickid,$handcardid,$sequence);
 
-	      /* check for schweinchen */
-	      if($GAME["schweinchen"] && ($card == 19 || $card == 20) )
+	      /* check special output for schweinchen in case: 
+	       * schweinchen is in the rules, a fox has been played and the gametype is correct
+	       */
+	      if( $GAME["schweinchen"] && 
+		  ($card == 19 || $card == 20) && 
+		  ($gametype == "normal" || $gametype == "silent"|| $gametype=="trump"))
 		{
 		  $GAME["schweinchen"]++; // count how many have been played including this one
 		  if($GAME["schweinchen"]==3 && $RULES["schweinchen"]=="second" )

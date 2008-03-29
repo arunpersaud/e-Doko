@@ -157,11 +157,12 @@ function compare_cards($a,$b,$game)
   if( $b/2 - (int)($b/2) != 0.5)
     $b--;
 
-  /* some special cases */
+  /* check for schweinchen and ten of hearts*/
   switch($game)
     {
     case "normal":
     case "silent":
+    case "trump":
       if($RULES["schweinchen"]=="both" && $GAME["schweinchen"])
 	{
 	  if($a == 19 || $a == 20 )
@@ -176,13 +177,17 @@ function compare_cards($a,$b,$game)
 	  if($b == 19 || $b == 20 )
 	    return 0;
 	};
-    case "trump":
     case "heart":
     case "spade":
     case "club":
+      /* check for ten of hearts rule */
       if($RULES["dullen"]=="secondwins")
 	if($a==1 && $b==1) /* both 10 of hearts */
 	  return 0;        /* second one wins.*/
+    case "trumpless":
+    case "jack":
+    case "queen":
+      /* no special cases here */
     }
 
   /* normal case */
