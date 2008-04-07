@@ -382,7 +382,7 @@ function output_status()
        echo "</div>\n";
 
        /* last logon time */
-       $myid  = DB_get_userid_by_name($name);
+       $myid  = DB_get_userid("name",$name);
        $zone  = DB_get_user_timezone($myid);
 
        $time     = DB_get_user_timestamp($myid);

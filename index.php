@@ -9,7 +9,7 @@ include_once("functions.php");   /* the rest */
 /* make sure that user has set all variables in config.php */
 config_check();
 
-/* open database */
+/* open the database */
 if(DB_open()<0)
   {
     output_header();
@@ -29,12 +29,20 @@ session_start();
 /* done major error checking, output header of HTML page */
 output_header();
 
+/* The rest of the file consists of handling user input.
+ * The user sends information via html GET and POST variables,
+ * the script checks if these are set via "myisset"
+ * which can check a list of variables.
+ */
+
 /* does the user want to log out? */
 if(myisset("logout"))
   {
+    /* distroy the session */
     session_unset();
     session_destroy();
     $_SESSION = array();
+    
     echo "<div class=\"message\"><span class=\"bigger\">You are now logged out!</span><br />\n".
       "(<a href=\"$INDEX\">This will take you back to the home-page</a>)</div>";
   }
@@ -42,7 +50,7 @@ if(myisset("logout"))
 else if(myisset("new"))
   {
     output_status();
-    /* user need to be logged in to do this */
+    /* user needs to be logged in to do this */
     if( isset($_SESSION["name"]) )
       {
 	$names = DB_get_all_names();
@@ -91,10 +99,10 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 	$call        = $_REQUEST["call"];
 
 	/* get the emails addresses of the players */
-	$EmailA  = DB_get_email_by_name($PlayerA);
-	$EmailB  = DB_get_email_by_name($PlayerB);
-	$EmailC  = DB_get_email_by_name($PlayerC);
-	$EmailD  = DB_get_email_by_name($PlayerD);
+	$EmailA  = DB_get_email('name',$PlayerA);
+	$EmailB  = DB_get_email('name',$PlayerB);
+	$EmailC  = DB_get_email('name',$PlayerC);
+	$EmailD  = DB_get_email('name',$PlayerD);
 
 	/* this is used to check if the player names are all ok */
 	if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
@@ -106,10 +114,10 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 	  }
 
 	/* get user ids */
-	$useridA  = DB_get_userid_by_name($PlayerA);
-	$useridB  = DB_get_userid_by_name($PlayerB);
-	$useridC  = DB_get_userid_by_name($PlayerC);
-	$useridD  = DB_get_userid_by_name($PlayerD);
+	$useridA  = DB_get_userid('name',$PlayerA);
+	$useridB  = DB_get_userid('name',$PlayerB);
+	$useridC  = DB_get_userid('name',$PlayerC);
+	$useridD  = DB_get_userid('name',$PlayerD);
 
 	/* create random numbers */
 	$randomNR       = create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD);
@@ -235,7 +243,7 @@ else if(myisset("cancel","me"))
     $me = $_REQUEST["me"];
 
     /* test for valid ID */
-    $myid = DB_get_userid_by_hash($me);
+    $myid = DB_get_userid('hash',$me);
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
@@ -249,7 +257,7 @@ else if(myisset("cancel","me"))
 
     /* get some information from the DB */
     $gameid   = DB_get_gameid_by_hash($me);
-    $myname   = DB_get_name_by_hash($me);
+    $myname   = DB_get_name('hash',$me);
 
     /* check if game really is old enough to be canceled */
     $result = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
@@ -263,7 +271,7 @@ else if(myisset("cancel","me"))
 	$userids = DB_get_all_userid_by_gameid($gameid);
 	foreach($userids as $user)
 	  {
-	    $To = DB_get_email_by_userid($user);
+	    $To = DB_get_email('userid',$user);
 	    mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (timed out)",$message);
 	  }
 
@@ -284,7 +292,7 @@ else if(myisset("remind","me"))
     $me = $_REQUEST["me"];
 
     /* test for valid ID */
-    $myid = DB_get_userid_by_hash($me);
+    $myid = DB_get_userid('hash',$me);
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
@@ -298,15 +306,15 @@ else if(myisset("remind","me"))
 
     /* get some information from the DB */
     $gameid   = DB_get_gameid_by_hash($me);
-    $myname   = DB_get_name_by_hash($me);
+    $myname   = DB_get_name('hash',$me);
 
     /* check if player hasn't done anything in a while */
     $result = mysql_query("SELECT mod_date,player,status from Game WHERE id='$gameid' " );
     $r = mysql_fetch_array($result,MYSQL_NUM);
     if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week */
       {
-	$name = DB_get_name_by_userid($r[1]);
-	$To   = DB_get_email_by_userid($r[1]);
+	$name = DB_get_name('userid',$r[1]);
+	$To   = DB_get_email('userid',$r[1]);
 	$userhash = DB_get_hash_from_gameid_and_userid($gameid,$r[1]);
 
 	$message = "Hello $name, \n\n".
@@ -339,7 +347,7 @@ else if(myisset("me"))
     $me = $_REQUEST["me"];
 
     /* test for valid ID */
-    $myid = DB_get_userid_by_hash($me);
+    $myid = DB_get_userid('hash',$me);
     if(!$myid)
       {
 	echo "Can't find you in the database, please check the url.<br />\n";
@@ -358,15 +366,14 @@ else if(myisset("me"))
 
     /* get some information from the DB */
     $gameid   = DB_get_gameid_by_hash($me);
-    $myname   = DB_get_name_by_hash($me);
+    $myname   = DB_get_name('hash',$me);
     $mystatus = DB_get_status_by_hash($me);
     $mypos    = DB_get_pos_by_hash($me);
-    $myhand   = DB_get_handid_by_hash($me);
+    $myhand   = DB_get_handid('hash',$me);
     $session  = DB_get_session_by_gameid($gameid);
 
     /* get prefs and save them */
     DB_get_PREF($myid);
-    /* end set pref */
 
     /* get rule set for this game */
     $result = mysql_query("SELECT * FROM Rulesets".
@@ -428,9 +435,8 @@ else if(myisset("me"))
     display_table();
 
     /* mystatus gets the player through the different stages of a game.
-     * start:    yes/no
-     * init:     check values from start,
-     *           check for sickness
+     * start:    does the player want to play?
+     * init:     check for sickness
      * check:    check for return values from init
      * poverty:  handle poverty, wait here until all player have reached this state
      *           display sickness and move on to game
@@ -458,7 +464,7 @@ else if(myisset("me"))
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		foreach($userids as $user)
 		  {
-		    $To = DB_get_email_by_userid($user);
+		    $To = DB_get_email('userid',$user);
 		    mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled",$message);
 		  }
 
@@ -501,9 +507,9 @@ else if(myisset("me"))
 		      {
 			/* email startplayer */
 			/*
-			$email       = DB_get_email_by_pos_and_gameid($startplayer,$gameid);
+			$email       = DB_get_email('position-gameid',$startplayer,$gameid);
 			$hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-			$who         = DB_get_userid_by_email($email);
+			$who         = DB_get_userid('email',$email);
 			DB_set_player_by_gameid($gameid,$who);
 
 			$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
@@ -631,7 +637,7 @@ else if(myisset("me"))
 
 		  foreach($userids as $user)
 		    {
-		      $To       = DB_get_email_by_userid($user);
+		      $To       = DB_get_email('userid',$user);
 		      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		      if($userhash != $me)
 			{
@@ -688,7 +694,7 @@ else if(myisset("me"))
 	  $solo    = 0;
 	  foreach($userids as $user)
 	    {
-	      $name     = DB_get_name_by_userid($user);
+	      $name     = DB_get_name('userid',$user);
 	      $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
 	      if($usersick == 'nines')
 		{
@@ -724,7 +730,7 @@ else if(myisset("me"))
 	      /* cancel game */
 	      /* TODO: should we keep statistics of this? */
 	      $message = "Hello, \n\n".
-		" the game has been canceled because ".DB_get_name_by_userid($nines).
+		" the game has been canceled because ".DB_get_name('userid',$nines).
 		" has five or more nines and nobody is playing solo.\n\n".
 		" To redeal either start a new game or, in case the game was part of a tournament, \n".
 		" go to the last game and use the link at the bottom of the page to redeal.";
@@ -732,14 +738,14 @@ else if(myisset("me"))
 	      $userids = DB_get_all_userid_by_gameid($gameid);
 	      foreach($userids as $user)
 		{
-		  $To = DB_get_email_by_userid($user);
+		  $To = DB_get_email('userid',$user);
 		  mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled",$message);
 		}
 
 	      /* delete everything from the dB */
 	      DB_cancel_game($me);
 
-	      echo "The game has been canceled because ".DB_get_name_by_userid($nines).
+	      echo "The game has been canceled because ".DB_get_name('userid',$nines).
 		" has five or more nines and nobody is playing solo.\n";
 	      output_footer();
 	      DB_close();
@@ -799,7 +805,7 @@ else if(myisset("me"))
 	       * stop when the sickness is the same as the gametype
 	       */
 
-	      $name     = DB_get_name_by_userid($user);
+	      $name     = DB_get_name('userid',$user);
 	      $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
 
 	      if($usersick)
@@ -820,7 +826,7 @@ else if(myisset("me"))
 	  /* output Schweinchen in case the rules need it */
 	  if( $gametype != "solo")
 	    if($GAME["schweinchen"] && $RULES["schweinchen"]=="both" )
-	      echo DB_get_name_by_hash($GAME["schweinchen-who"])." has Schweinchen. <br />";
+	      echo DB_get_name('hash',$GAME["schweinchen-who"])." has Schweinchen. <br />";
 
 	  echo "<br />\n";
 
@@ -903,9 +909,9 @@ else if(myisset("me"))
 
 		  if($who<=4)
 		    {
-		      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
+		      $To       = DB_get_email('position-gameid',$who,$gameid);
 		      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
-		      $userid   = DB_get_userid_by_email($To);
+		      $userid   = DB_get_userid('email',$To);
 		      DB_set_player_by_gameid($gameid,$userid);
 
 		      $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
@@ -923,7 +929,7 @@ else if(myisset("me"))
 		  $trump = $_REQUEST["trump"];
 
 		  /* get hand id for user $trump */
-		  $userhand = DB_get_handid_by_gameid_and_userid($gameid,$trump);
+		  $userhand = DB_get_handid('gameid-userid',$gameid,$trump);
 		  /* copy trump from player A to B */
 		  $result = mysql_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 
@@ -938,7 +944,7 @@ else if(myisset("me"))
 		{
 		  $trump    = $_REQUEST["trump"];
 		  $exchange = $_REQUEST["exchange"];
-		  $userhand = DB_get_handid_by_gameid_and_userid($gameid,$trump);
+		  $userhand = DB_get_handid('gameid-userid',$gameid,$trump);
 
 		  /* if exchange is set to a value>0, exchange that card back to user $trump */
 		  if($exchange >0)
@@ -984,9 +990,9 @@ else if(myisset("me"))
 			  $who = DB_get_sickness_by_gameid($gameid);
 			  if($who<=4)
 			    {
-			      $To       = DB_get_email_by_pos_and_gameid($who,$gameid);
+			      $To       = DB_get_email('position-gameid',$who,$gameid);
 			      $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
-			      $userid   = DB_get_userid_by_email($To);
+			      $userid   = DB_get_userid('email',$To);
 			      DB_set_player_by_gameid($gameid,$userid);
 
 			      $message = "Someone has poverty, it's your turn to decide, ".
@@ -1054,7 +1060,7 @@ else if(myisset("me"))
 		  echo "</div><div class=\"poverty\">\n";
 		  foreach($userids as $user)
 		    {
-		      $name     = DB_get_name_by_userid($user);
+		      $name     = DB_get_name('userid',$user);
 		      $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
 
 		      if($usersick=="poverty")
@@ -1098,7 +1104,7 @@ else if(myisset("me"))
 	      $userids = DB_get_all_userid_by_gameid($gameid);
 	      foreach($userids as $user)
 		{
-		  $To = DB_get_email_by_userid($user);
+		  $To = DB_get_email('userid',$user);
 		  mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (poverty not resolved)",$message);
 		}
 
@@ -1127,9 +1133,9 @@ else if(myisset("me"))
 
 	      /* email startplayer */
 	      $startplayer = DB_get_startplayer_by_gameid($gameid);
-	      $email       = DB_get_email_by_pos_and_gameid($startplayer,$gameid);
+	      $email       = DB_get_email('position-gameid',$startplayer,$gameid);
 	      $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-	      $who         = DB_get_userid_by_email($email);
+	      $who         = DB_get_userid('email',$email);
 	      DB_set_player_by_gameid($gameid,$who);
 
 	      if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
@@ -1343,7 +1349,7 @@ else if(myisset("me"))
       if(myisset("card") && $myturn)
 	{
 	  $card   = $_REQUEST["card"];
-	  $handid = DB_get_handid_by_hash($me);
+	  $handid = DB_get_handid('hash',$me);
 
 	  /* check if we have card and that we haven't played it yet*/
 	  /* set played in hand_card to true where hand_id and card_id*/
@@ -1415,7 +1421,7 @@ else if(myisset("me"))
 		      /* who won the trick */
 		      $play     = DB_get_cards_by_trick($trickid);
 		      $winner   = get_winner($play,$gametype); /* returns the position */
-		      $winnerid = DB_get_userid_by_gameid_and_position($gameid,$winner);
+		      $winnerid = DB_get_userid('gameid-position',$gameid,$winner);
 		      /* is tricknr <=3 */
 		      if($tricknr <=3 && $winnerid!=$whosick)
 			{
@@ -1460,8 +1466,8 @@ else if(myisset("me"))
 			  if ($played['pos']!= $winner )
 			    {
 			      /* possible caught a fox, check party */
-			      $uid1 = DB_get_userid_by_gameid_and_position($gameid,$winner);
-			      $uid2 = DB_get_userid_by_gameid_and_position($gameid,$played['pos']);
+			      $uid1 = DB_get_userid('gameid-position',$gameid,$winner);
+			      $uid2 = DB_get_userid('gameid-position',$gameid,$played['pos']);
 
 			      $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 			      $party2 = DB_get_party_by_gameid_and_userid($gameid,$uid2);
@@ -1491,7 +1497,7 @@ else if(myisset("me"))
 			if ($played['pos'] == $winner )
 			  {
 			    /* possible caught a fox, check party */
-			    $uid1   = DB_get_userid_by_gameid_and_position($gameid,$winner);
+			    $uid1   = DB_get_userid('gameid-position',$gameid,$winner);
 			    $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
 			    mysql_query("INSERT INTO Score".
@@ -1505,7 +1511,7 @@ else if(myisset("me"))
 		    }
 		  if($points > 39)
 		    {
-		      $uid1   = DB_get_userid_by_gameid_and_position($gameid,$winner);
+		      $uid1   = DB_get_userid('gameid-position',$gameid,$winner);
 		      $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
 		      mysql_query("INSERT INTO Score".
@@ -1587,8 +1593,8 @@ else if(myisset("me"))
 	      if(DB_get_game_status_by_gameid($gameid)=='play')
 		{
 		  $next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
-		  $email     = DB_get_email_by_hash($next_hash);
-		  $who       = DB_get_userid_by_email($email);
+		  $email     = DB_get_email('hash',$next_hash);
+		  $who       = DB_get_userid('email',$email);
 		  DB_set_player_by_gameid($gameid,$who);
 
 		  $message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
@@ -1847,7 +1853,7 @@ else if(myisset("me"))
 		  $all = array();
 
 		  foreach($userids as $user)
-		    $all[] = DB_get_email_by_userid($user);
+		    $all[] = DB_get_email('userid',$user);
 		  $To = implode(",",$all);
 
 		  $help = "\n\n (you can use reply all on this email to reach all the players.)\n";
@@ -1855,7 +1861,7 @@ else if(myisset("me"))
 
 		  foreach($userids as $user)
 		    {
-		      $To   = DB_get_email_by_userid($user);
+		      $To   = DB_get_email('userid',$user);
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 
 		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".
@@ -1957,7 +1963,7 @@ else if(myisset("me"))
                 {
                   echo "<br />";
 
-                  $name = DB_get_name_by_userid($user);
+                  $name = DB_get_name('userid',$user);
                   $oldcards = DB_get_all_hand($userhash);
                   $oldcards = mysort($oldcards,$gametype);
                   echo "$name's cards were: <br />\n";
@@ -2106,7 +2112,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
      else
        {
 	 $name = $_SESSION["name"];
-	 $email     = DB_get_email_by_name($name);
+	 $email     = DB_get_email('name',$name);
 	 $password  = DB_get_passwd_by_name($name);
        };
 
@@ -2116,7 +2122,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	 /* check if player is in the database */
 	 $ok = 1;
 
-	 $myid = DB_get_userid_by_email($email);
+	 $myid = DB_get_userid('email',$email);
 	 if(!$myid)
 	   $ok = 0;
 
@@ -2180,14 +2186,14 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 	 $password = md5($password);
 
        $ok  = 1;
-       $myid = DB_get_userid_by_email_and_password($email,$password);
+       $myid = DB_get_userid('email-password',$email,$password);
        if(!$myid)
 	 $ok = 0;
 
        if($ok)
 	 {
 	   /* user information is ok */
-	   $myname = DB_get_name_by_email($email);
+	   $myname = DB_get_name('email',$email);
 	   $_SESSION["name"] = $myname;
 	   output_status();
 
@@ -2318,7 +2324,7 @@ else if( myisset("email","password") || isset($_SESSION["name"]) )
 			 echo "(it's <strong>your</strong> turn)\n";
 		       else
 			 {
-			   $name = DB_get_name_by_userid($r[3]);
+			   $name = DB_get_name('userid',$r[3]);
 			   $gameid = $r[1];
 			   if(DB_get_reminder($r[3],$gameid)==0)
 			     if(time()-strtotime($r[2]) > 60*60*24*7)

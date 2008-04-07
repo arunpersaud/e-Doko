@@ -58,6 +58,9 @@ function mymail($To,$Subject,$message,$header="")
 
   if($debug)
     {
+      /* display email on screen,
+       * change txt -> html
+       */
       $message = str_replace("\n","<br />\n",$message);
       $message = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
                      "<a href=\"\\0\">\\0</a>", $message);

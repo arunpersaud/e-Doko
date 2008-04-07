@@ -26,12 +26,12 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
   {
     global $HOST,$INDEX;
     $ok=1;
-    if(DB_get_userid_by_name($_REQUEST["Rfullname"]))
+    if(DB_get_userid('name',$_REQUEST["Rfullname"]))
       {
 	echo "please chose another name<br />";
 	$ok=0;
       }
-    if(DB_get_userid_by_email($_REQUEST["Remail"]))
+    if(DB_get_userid('email',$_REQUEST["Remail"]))
       {
 	echo "this email address is already used ?!<br />";
 	$ok=0;

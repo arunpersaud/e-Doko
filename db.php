@@ -38,7 +38,6 @@ function DB_quote_smart($value)
     return $value;
 }
 
-
 function DB_test()
 {
   $result = mysql_query("SELECT * FROM User");
@@ -51,16 +50,6 @@ function DB_test()
   return;
 }
 
-function DB_get_email_by_name($name)
-{
-  $result = mysql_query("SELECT email FROM User WHERE fullname=".DB_quote_smart($name)."");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
 function DB_get_passwd_by_name($name)
 {
   $result = mysql_query("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
@@ -70,95 +59,6 @@ function DB_get_passwd_by_name($name)
     return $r[0];
   else
     return "";
-}
-
-function DB_get_email_by_userid($id)
-{
-  $result = mysql_query("SELECT email FROM User WHERE id=".DB_quote_smart($id)."");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
-
-function DB_get_email_by_pos_and_gameid($pos,$gameid)
-{
-  $result = mysql_query("SELECT email FROM User ".
-			"LEFT JOIN Hand ON User.id=Hand.user_id ".
-			"LEFT JOIN Game ON Game.id=Hand.game_id ".
-			"WHERE Game.id=".DB_quote_smart($gameid)." ".
-			"AND Hand.position=".DB_quote_smart($pos)."");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
-
-function DB_get_email_by_hash($hash)
-{
-  $result = mysql_query("SELECT User.email FROM User LEFT JOIN Hand ON Hand.user_id=User.id WHERE Hand.hash=".DB_quote_smart($hash)."");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
-
-function DB_get_userid_by_name($name)
-{
-  $result = mysql_query("SELECT id FROM User WHERE fullname=".DB_quote_smart($name));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return 0;
-}
-function DB_get_userid_by_passwd($passwd)
-{
-  $result = mysql_query("SELECT id FROM User WHERE password=".DB_quote_smart($passwd));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return 0;
-}
-function DB_get_userid_by_email($email)
-{
-  $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($email));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return 0;
-}
-function DB_get_userid_by_email_and_password($email,$password)
-{
-  $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($email)." AND password=".DB_quote_smart($password));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  /* test if a recovery password has been set */
-  if(!$r)
-    {
-      $result = mysql_query("SELECT User.id FROM User".
-			    " LEFT JOIN Recovery ON User.id=Recovery.user_id".
-			    " WHERE email=".DB_quote_smart($email).
-			    " AND Recovery.password=".DB_quote_smart($password).
-			    " AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
-      $r      = mysql_fetch_array($result,MYSQL_NUM);
-    }
-
-  if($r)
-    return $r[0];
-  else
-    return 0;
 }
 
 function DB_check_recovery_passwords($password,$email)
@@ -174,63 +74,28 @@ function DB_check_recovery_passwords($password,$email)
     return 1;
   else
     return 0;
-
 }
 
-function DB_get_handid_by_hash($hash)
+function DB_get_handid($type,$var1='',$var2='')
 {
-  $result = mysql_query("SELECT id FROM Hand WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  switch($type)
+    {
+    case 'hash':
+      $result = mysql_query("SELECT id FROM Hand WHERE hash=".DB_quote_smart($var1));
+      break;
+    case 'gameid-position':
+      $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
+			    DB_quote_smart($var1)." AND position=".
+			    DB_quote_smart($var2));
+      break;
+    case 'gameid-userid':
+      $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
+			    DB_quote_smart($var1)." AND user_id=".
+			    DB_quote_smart($var2));
+      break;
+    }
 
-  if($r)
-    return $r[0];
-  else
-    return 0;
-}
-
-function DB_get_handid_by_gameid_and_position($gameid,$pos)
-{
-  $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
-			DB_quote_smart($gameid)." AND position=".
-			DB_quote_smart($pos));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return -1;
-}
-function DB_get_userid_by_gameid_and_position($gameid,$pos)
-{
-  $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
-			DB_quote_smart($gameid)." AND position=".
-			DB_quote_smart($pos));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return -1;
-}
-
-
-function DB_get_handid_by_gameid_and_userid($gameid,$userid)
-{
-  $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
-			DB_quote_smart($gameid)." AND user_id=".
-			DB_quote_smart($userid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return -1;
-}
-
-function DB_get_userid_by_hash($hash)
-{
-  $result = mysql_query("SELECT user_id FROM Hand WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = mysql_fetch_array($result,MYSQL_NUM);
 
   if($r)
     return $r[0];
@@ -247,39 +112,6 @@ function DB_get_pos_by_hash($hash)
     return $r[0];
   else
     return 0;
-}
-
-function DB_get_name_by_hash($hash)
-{
-  $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
-
-function DB_get_name_by_email($email)
-{
-  $result = mysql_query("SELECT fullname FROM User WHERE email=".DB_quote_smart($email));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
-
-function DB_get_name_by_userid($id)
-{
-  $result = mysql_query("SELECT fullname FROM User  WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
-  if($r)
-    return $r[0];
-  else
-    return "";
 }
 
 function DB_get_status_by_hash($hash)
@@ -413,7 +245,7 @@ function DB_get_hand($me)
 {
   $cards = array();
 
-  $handid = DB_get_handid_by_hash($me);
+  $handid = DB_get_handid('hash',$me);
 
   $result = mysql_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid)." and played='false' ");
   while($r = mysql_fetch_array($result,MYSQL_NUM))
@@ -426,7 +258,7 @@ function DB_get_all_hand($me)
 {
   $cards = array();
 
-  $handid = DB_get_handid_by_hash($me);
+  $handid = DB_get_handid('hash',$me);
 
   $result = mysql_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid));
   while($r = mysql_fetch_array($result,MYSQL_NUM))
@@ -1107,6 +939,121 @@ function DB_get_card_value_by_cardid($id)
     return $r[0];
   else
     return NULL;
+}
+
+function DB_get_userid($type,$var1="",$var2="")
+{
+  /* get the userid of a user
+   * this can be done several ways, which are all handled below
+   * if a email/password combination is given and it doesn't work, we also
+   * need to check the recovery table for additional passwords
+   */
+
+  $r = NULL;
+  
+  switch($type)
+    {
+    case 'name':
+      $result = mysql_query("SELECT id FROM User WHERE fullname=".DB_quote_smart($var1));
+      break;
+    case 'hash':
+      $result = mysql_query("SELECT user_id FROM Hand WHERE hash=".DB_quote_smart($var1));
+      break;
+    case 'password':
+      $result = mysql_query("SELECT id FROM User WHERE password=".DB_quote_smart($var1));
+      break;
+    case 'email':
+      $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($var1));
+      break;
+    case 'email-password':
+      $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($var1)." AND password=".DB_quote_smart($var2));
+      $r = mysql_fetch_array($result,MYSQL_NUM);
+      /* test if a recovery password has been set */
+      if(!$r)
+	{
+	  echo "testing alternative password";
+	  $result = mysql_query("SELECT User.id FROM User".
+				" LEFT JOIN Recovery ON User.id=Recovery.user_id".
+				" WHERE email=".DB_quote_smart($var1).
+				" AND Recovery.password=".DB_quote_smart($var2).
+				" AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
+	}
+      break;
+    case 'gameid-position':
+      $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
+			    DB_quote_smart($var1)." AND position=".
+			    DB_quote_smart($var2));
+      break;
+    }
+
+  if(!$r)
+    $r = mysql_fetch_array($result,MYSQL_NUM);
+
+  if($r)
+    return $r[0];
+  else
+    return 0;
+}
+
+function DB_get_email($type,$var1='',$var2='')
+{
+  /* return the email of a user
+   * this is used for sending out emails, but also for
+   * testing the login for example
+   */
+  switch($type)
+    {
+    case 'name':
+      $result = mysql_query("SELECT email FROM User WHERE fullname=".DB_quote_smart($var1)."");
+      break;
+    case 'userid':
+      $result = mysql_query("SELECT email FROM User WHERE id=".DB_quote_smart($var1)."");
+      break;
+    case 'hash':
+      $result = mysql_query("SELECT User.email FROM User ".
+			    "LEFT JOIN Hand ON Hand.user_id=User.id ".
+			    "WHERE Hand.hash=".DB_quote_smart($var1)."");
+      break;
+    case 'position-gameid':
+      $result = mysql_query("SELECT email FROM User ".
+			    "LEFT JOIN Hand ON User.id=Hand.user_id ".
+			    "LEFT JOIN Game ON Game.id=Hand.game_id ".
+			    "WHERE Game.id=".DB_quote_smart($var2)." ".
+			    "AND Hand.position=".DB_quote_smart($var1)."");
+      break;
+    }
+
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
+function DB_get_name($type,$var1='')
+{
+  /* get the full name of a user
+   * a user can be uniquely identified several ways
+   */
+  switch($type)
+    {
+    case 'hash':
+      $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($var1));
+      break;
+    case 'email':
+      $result = mysql_query("SELECT fullname FROM User WHERE email=".DB_quote_smart($var1));
+      break;
+    case 'userid':
+      $result = mysql_query("SELECT fullname FROM User  WHERE id=".DB_quote_smart($var1));
+    }
+
+  $r = mysql_fetch_array($result,MYSQL_NUM);
+
+  if($r)
+    return $r[0];
+  else
+    return "";
 }
 
 ?>

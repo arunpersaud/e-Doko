@@ -35,7 +35,7 @@ if(myisset("logout"))
 else if( isset($_SESSION["name"]) )
    {
      $name = $_SESSION["name"];
-     $email     = DB_get_email_by_name($name);
+     $email     = DB_get_email('name',$name);
      $password  = DB_get_passwd_by_name($name);
 
      /* verify password and email */
@@ -43,7 +43,7 @@ else if( isset($_SESSION["name"]) )
        $password = md5($password);
 
      $ok  = 1;
-     $myid = DB_get_userid_by_email_and_password($email,$password);
+     $myid = DB_get_userid('email-password',$email,$password);
      if(!$myid)
        $ok = 0;
 
