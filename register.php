@@ -41,7 +41,7 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 	$r=mysql_query("INSERT INTO User VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
 		       ",".DB_quote_smart($_REQUEST["Remail"]).
 		       ",".DB_quote_smart(md5($_REQUEST["Rpassword"])).
-		       ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL)"); 
+		       ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL,NULL)"); 
 	
 	if($r)
 	  echo " Welcome to e-DoKo, you are now registered, please visit the".
