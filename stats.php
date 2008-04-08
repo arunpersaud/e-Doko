@@ -162,7 +162,7 @@ else if( isset($_SESSION["name"]) )
 			       " fullname FROM Reminder".
 			       " LEFT JOIN User ON User.id=user_id".
 			       " GROUP BY user_id".
-			       " ORDER BY c DESC LIMIT 3" );
+			       " ORDER BY c DESC LIMIT 5" );
 	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
 	   echo $r[1]." (".$r[0].") <br />\n";
 	 echo "</p>\n";
@@ -196,6 +196,20 @@ else if( isset($_SESSION["name"]) )
 	   echo $r[1]." (".$r[0].") <br />\n";
 	 echo "</p>\n";
 
+	 echo "<p>These players lost their fox least often per game:<br />\n";
+	 $result = mysql_query("SELECT COUNT(*) /" .
+			       "      (SELECT COUNT(*) FROM Hand".
+			       "       WHERE user_id=User.id) as c,".
+			       " fullname".
+			       " FROM Score".
+			       " LEFT JOIN User ON User.id=looser_id".
+			       " WHERE score='fox'".
+			       " GROUP BY looser_id".
+			       " ORDER BY c ASC LIMIT 5" );
+	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	   echo $r[1]." (".$r[0].") <br />\n";
+	 echo "</p>\n";
+
 	 /* which position wins the most tricks  */
 	 echo "<p>Which positions at the table make the most tricks:<br />\n";
 	 $result = mysql_query("SELECT COUNT(*) AS c,winner FROM Trick".
@@ -212,6 +226,31 @@ else if( isset($_SESSION["name"]) )
 	 $r = mysql_fetch_array($result,MYSQL_NUM);
 	 echo " bottom ".$r[0]." <br />\n";
 	 echo "</p>\n";
+
+	 /* most games */
+	 echo "<p>Most games played on the server:<br />\n";
+	 $result = mysql_query("SELECT COUNT(*) as c,  " .
+			       " fullname FROM Hand".
+			       " LEFT JOIN User ON User.id=user_id".
+			       " GROUP BY user_id".
+			       " ORDER BY c DESC LIMIT 7" );
+	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	   echo $r[1]." (".$r[0].") <br />\n";
+	 echo "</p>\n";
+
+	 /* most active games */
+	 echo "<p>These players are involved in this many active games:<br />\n";
+	 $result = mysql_query("SELECT COUNT(*) as c,  " .
+			       " fullname FROM Hand".
+			       " LEFT JOIN User ON User.id=user_id".
+			       " LEFT JOIN Game ON Game.id=game_id".
+			       " WHERE Game.status<>'gameover'".
+			       " GROUP BY user_id".
+			       " ORDER BY c DESC LIMIT 7" );
+	 while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	   echo $r[1]." (".$r[0].") <br />\n";
+	 echo "</p>\n";
+	 
 
 	 /*
 	  does the party win more often if they start
