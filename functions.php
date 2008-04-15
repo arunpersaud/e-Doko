@@ -317,28 +317,38 @@ function count_trump($cards)
 
   $trump = 0;
 
-  /* count each trump */
+  /* count each trump, including the foxes */
   foreach($cards as $c)
     if( (int)($c) <27)
       $trump++;
 
-  switch($RULES["schweinchen"])
-    {
-    case "none":
-      break;
-    case "second":
-    case "secondaftercall":
-      /* add one, in case the player has both foxes (schweinchen) */
-      if( in_array("19",$cards) && in_array("20",$cards) )
+  /* normally foxes don't count as trump, so we substract them here
+   * in case someone has schweinchen, one or two of them should count as trump 
+   * though, so we need to add one trump for those cases */
+  
+  /* subtract foxes */
+  if( in_array("19",$cards))
+    $trump--;
+  if( in_array("20",$cards) )
+    $trump--;
+
+  /* handle case where player has schweinchen */
+  if( in_array("19",$cards) && in_array("20",$cards) )
+    switch($RULES["schweinchen"])
+      {
+      case "both":
+	/* add two, in case the player has both foxes (schweinchen) */
 	$trump++;
-    case "both":
-      /* subtract foxes */
-      if( in_array("19",$cards))
-	$trump--;
-      if( in_array("20",$cards) )
-	$trump--;
-      break;
-    }
+	$trump++;
+	break;
+      case "second":
+      case "secondaftercall":
+	/* add one, in case the player has both foxes (schweinchen) */
+	$trump++;
+	break;
+      case "none":
+	break;
+      }
 
   return $trump;
 }
