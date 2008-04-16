@@ -65,7 +65,7 @@ else if(myisset("new"))
       }
   }
 /*check if everything is ready to set up a new game */
-else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","call" ))
+else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
   {
     output_status();
     /* user needs to be logged in */
@@ -96,7 +96,7 @@ else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen"
 	/* what rules were selected */
 	$dullen      = $_REQUEST["dullen"];
 	$schweinchen = $_REQUEST["schweinchen"];
-	$call        = $_REQUEST["call"];
+	$call        = $_REQUEST["callrule"];
 
 	/* get the emails addresses of the players */
 	$EmailA  = DB_get_email('name',$PlayerA);
@@ -1364,15 +1364,15 @@ else if(myisset("me"))
 	      DB_update_game_timestamp($gameid);
 
 	      /* check if a call was made, must do this before we set the card status to played */
-	      if(myisset("call120") && $_REQUEST["call120"] == "yes" && can_call(120,$me))
+	      if(myisset("call")  && $_REQUEST["call"]  == "120" && can_call(120,$me))
 		$result = mysql_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
-	      if(myisset("call90")  && $_REQUEST["call90"]  == "yes" && can_call(90,$me))
+	      if(myisset("call")  && $_REQUEST["call"]  == "90" && can_call(90,$me))
 		$result = mysql_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
-	      if(myisset("call60")  && $_REQUEST["call60"]  == "yes" && can_call(60,$me))
+	      if(myisset("call")  && $_REQUEST["call"]  == "60" && can_call(60,$me))
 		$result = mysql_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
-	      if(myisset("call30")  && $_REQUEST["call30"]  == "yes" && can_call(30,$me))
+	      if(myisset("call")  && $_REQUEST["call"]  == "30" && can_call(30,$me))
 		$result = mysql_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
-	      if(myisset("call0")   && $_REQUEST["call0"]   == "yes" && can_call(0,$me))
+	      if(myisset("call")  && $_REQUEST["call"]  == "0" && can_call(0,$me))
 		$result = mysql_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
 
 	      /* mark card as played */

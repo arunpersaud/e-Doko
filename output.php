@@ -38,7 +38,7 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"$playerD\" />\n";
   echo "  <input type=\"hidden\" name=\"dullen\"  value=\"".$RULES["dullen"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"schweinchen\" value=\"".$RULES["schweinchen"]."\" />\n";
-  echo "  <input type=\"hidden\" name=\"call\" value=\"".$RULES["call"]."\" />\n";
+  echo "  <input type=\"hidden\" name=\"callrule\" value=\"".$RULES["call"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
   echo "  <input type=\"submit\" value=\"keep playing\" />\n";
 
@@ -103,11 +103,11 @@ function output_form_for_new_game($names)
       </p>
       <p> Call Re/Contra, etc.:
         <ul>
-           <li><input type="radio" name="call" value="1st-own-card" checked="checked" />
+           <li><input type="radio" name="callrule" value="1st-own-card" checked="checked" />
                 Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</li>
-           <li><input type="radio" name="call" value="5th-card" />
+           <li><input type="radio" name="callrule" value="5th-card" />
                 Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</li>
-           <li><input type="radio" name="call" value="9-cards"  />
+           <li><input type="radio" name="callrule" value="9-cards"  />
                 Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</li>
         </ul>
       </p>
@@ -203,21 +203,21 @@ function output_form_calls($me)
 {
   if( can_call(120,$me) )
     echo " re/contra (120):".
-      " <input type=\"radio\" name=\"call120\" value=\"yes\" /> <br />";
+      " <input type=\"radio\" name=\"call\" value=\"120\" /> <br />";
   if( can_call(90,$me) )
     echo " 90:".
-      " <input type=\"radio\" name=\"call90\" value=\"yes\" /> <br />";
+      " <input type=\"radio\" name=\"call\" value=\"90\" /> <br />";
   if( can_call(60,$me) )
     echo " 60:".
-      " <input type=\"radio\" name=\"call60\" value=\"yes\" /> <br />";
+      " <input type=\"radio\" name=\"call\" value=\"60\" /> <br />";
   if( can_call(30,$me) )
     echo " 30:".
-      " <input type=\"radio\" name=\"call30\" value=\"yes\" /> <br />";
+      " <input type=\"radio\" name=\"call\" value=\"30\" /> <br />";
   if( can_call(0,$me) )
     echo " 0:".
-      " <input type=\"radio\" name=\"call0\" value=\"yes\" /> <br />".
+      " <input type=\"radio\" name=\"call\" value=\"0\" /> <br />".
       " no call:".
-      " <input type=\"radio\" name=\"call0\" value=\"no\" /> <br />";
+      " <input type=\"radio\" name=\"call\" value=\"no\" /> <br />";
 }
 
 
