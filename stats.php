@@ -2,9 +2,9 @@
 error_reporting(E_ALL);
 
 include_once("config.php");
-include_once("output.php");      /* html output only */
-include_once("db.php");          /* database only */
-include_once("functions.php");   /* the rest */
+include_once("./include/output.php");      /* html output only */
+include_once("./include/db.php");          /* database only */
+include_once("./include/functions.php");   /* the rest */
 
 config_check();
 

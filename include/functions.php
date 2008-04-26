@@ -1,4 +1,9 @@
 <?php
+/* make sure that we are not called from outside the scripts, 
+ * use a variable defined in config.php to check this
+ */
+if(!isset($HOST))
+  exit;
 
 function config_check()
 {
