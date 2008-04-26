@@ -1,25 +1,9 @@
 <?php
-error_reporting(E_ALL);
-
-include_once("config.php");      
-include_once("./include/output.php");      /* html output only */
-include_once("./include/db.php");          /* database only */
-include_once("./include/functions.php");   /* the rest */
-
-config_check();
-
-if(DB_open()<0)
-  {
-    output_header();
-    echo "Database error, can't connect... Please wait a while and try again. ".
-      "If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
-    output_footer(); 
-    exit(); 
-  }
-
-
-/* done major error checking, output header of HTML page */
-output_header();
+/* make sure that we are not called from outside the scripts, 
+ * use a variable defined in config.php to check this
+ */
+if(!isset($HOST))
+  exit;
 
 /* new user wants to register */
 if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
@@ -44,8 +28,16 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 		       ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL,NULL)"); 
 	
 	if($r)
-	  echo " Welcome to e-DoKo, you are now registered, please visit the".
-	    " <a href=\"".$HOST.$INDEX."\">homepage</a> to continue.";
+	  {
+	    /* Set session, so that new user doesn't need to log in */
+	    $myname = DB_get_name('email',$_REQUEST['Remail']);
+	    $_SESSION["name"] = $myname;
+	    
+	    echo "myname $myname --";
+	    
+	    echo " Welcome to e-DoKo, you are now registered, please visit the".
+	      " <a href=\"".$HOST.$INDEX."\">homepage</a> to continue.";
+	  }
 	else
 	  echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
       }
@@ -55,7 +47,7 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
    {
      echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
      ?>
-        <form action="register.php" method="post">
+        <form action="index.php?action=register" method="post">
           <fieldset>
             <legend>Register</legend>
              <table>
@@ -87,14 +79,5 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 <?php
    }
 
-output_footer();
 
-DB_close();
-
-/*
- *Local Variables: 
- *mode: php
- *mode: hs-minor
- *End:
- */
 ?>

@@ -57,6 +57,9 @@ switch($action)
     require './include/login.php'; 
     require './include/user.php';
     break;
+  case 'register':
+    require './include/register.php';
+    break;
   case 'game':
     require './include/game.php';
     break;

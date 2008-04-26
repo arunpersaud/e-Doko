@@ -275,7 +275,7 @@ function output_home_page($pre,$game,$done,$avgtime)
     echo "$done games have been completed on this server. Average time of a game: $avgtime days</p>";
 ?>
 
-    <p> Please <a href="./register.php">register</a>, in case you have not done that yet  <br />
+    <p> Please <a href="index.php?action=register">register</a>, in case you have not done that yet  <br />
         or login with you email-address or name and password here:
     </p>
         <form action="index.php?action=login" method="post">
