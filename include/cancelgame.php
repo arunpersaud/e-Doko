@@ -7,6 +7,14 @@ if(!isset($HOST))
 
 output_status();
 
+if(!myisset("me"))
+  {
+    echo "Hmm, you really shouldn't mess with the urls.<br />\n";
+    output_footer();
+    DB_close();
+    exit();
+  }
+
 $me = $_REQUEST["me"];
 
 /* test for valid ID */

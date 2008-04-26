@@ -700,7 +700,7 @@ function display_table ()
       if(!$debug)
 	echo "   $name \n";
       else
-	echo "   <a href=\"".$INDEX."?me=".$hash."\">$name</a>\n";
+	echo "   <a href=\"".$INDEX."?action=game&me=".$hash."\">$name</a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
       if($GT=="poverty" && $party=="re")
@@ -823,10 +823,10 @@ function display_user_menu()
 
   while( $r = mysql_fetch_array($result,MYSQL_NUM))
     {
-      echo "<a href=\"".$INDEX."?me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
+      echo "<a href=\"".$INDEX."?action=game&me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
 
-  echo "<hr /> <a href=\"".$INDEX."?new\">Start a new game</a>\n";
+  echo "<hr /> <a href=\"".$INDEX."?action=new\">Start a new game</a>\n";
 
   echo "<hr /> <a href=\"".$STATS."\">Statistics</a>\n";
 

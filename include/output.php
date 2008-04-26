@@ -56,7 +56,7 @@ function output_form_for_new_game($names)
     <h2> Players </h2>
     <p>Please select four players (or use the randomly pre-selected names)</p>
     <p>Remember: you need to be one of the players ;) </p>
-       <form action="index.php" method="post">
+       <form action="index.php?action=new" method="post">
 
    <div class="table">
      <img src="pics/table.png" alt="table" />
@@ -278,7 +278,7 @@ function output_home_page($pre,$game,$done,$avgtime)
     <p> Please <a href="./register.php">register</a>, in case you have not done that yet  <br />
         or login with you email-address or name and password here:
     </p>
-        <form action="index.php" method="post">
+        <form action="index.php?action=login" method="post">
           <fieldset>
             <legend>Login</legend>
              <table>
@@ -383,7 +383,7 @@ function output_status()
        /* logout info */
        echo "\n<div class=\"status\">";
        echo $name;
-       echo " <a href=\"index.php?logout=1\">logout</a>";
+       echo " <a href=\"index.php?action=logout\">logout</a>";
        echo "</div>\n";
 
        /* last logon time */

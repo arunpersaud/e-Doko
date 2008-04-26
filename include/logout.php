@@ -10,6 +10,4 @@ session_unset();
 session_destroy();
 $_SESSION = array();
     
-echo "<div class=\"message\"><span class=\"bigger\">You are now logged out!</span><br />\n".
-"(<a href=\"$INDEX\">This will take you back to the home-page</a>)</div>";
 ?>

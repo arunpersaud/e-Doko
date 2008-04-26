@@ -7,6 +7,14 @@ if(!isset($HOST))
 
 output_status();
 
+if(!myisset("me"))
+  {
+    echo "Hmm, you really shouldn't mess with the urls.<br />\n";
+    output_footer();
+    DB_close();
+    exit();
+  }
+
 $me = $_REQUEST["me"];
 
 /* test for valid ID */
@@ -39,7 +47,7 @@ if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week
       "It's your turn in game ".DB_format_gameid($gameid)." \n".
       "Actually everyone else is waiting for you for more than a week now ;)\n\n".
       "Please visit this link now to continue: \n".
-      " ".$HOST.$INDEX."?me=".$userhash."\n\n" ;
+      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 
     /* make sure we don't send too  many reminders to one person */
     if(DB_get_reminder($r[1],$gameid)>0)

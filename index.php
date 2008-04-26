@@ -31,51 +31,41 @@ output_header();
 
 /* The rest of the file consists of handling user input.
  * The user sends information via html GET and POST variables,
- * the script checks if these are set via "myisset"
- * which can check a list of variables.
+ * and the action variable tells the prog what the user wants to do
  */
+if(myisset("action"))
+  $action=$_REQUEST['action'];
+else
+  $action=""; /* so that we can use a default option below */
 
-/* does the user want to log out? */
-if(myisset("logout"))
+switch($action)
   {
-    require './include/logout.php';
-  }
-/* check if we want to start a new game */
-else if(myisset("new"))
-  {
+  case 'new':
     require './include/newgame.php';
-  }
-/*check if everything is ready to set up a new game */
-else if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
-  {
-    require './include/newgameready.php';
-  }    
-/* cancel a game, if nothing has happend in the last N minutes */
-else if(myisset("cancel","me"))
-  {
+    break;
+  case 'cancel':
     require './include/cancelgame.php';
-  }
-/* send out a reminder */
-else if(myisset("remind","me"))
-  {
+    break;
+  case 'reminder':
     require './include/reminder.php';
-  }
-/* handle request from one specific player for one game,
- * (the hash is set on a per game base) */
-else if(myisset("me"))
-  {
+    break;
+  case 'logout':
+    require './include/logout.php'; 
+    require './include/welcome.php';
+    break;
+  case 'login':
+    require './include/login.php'; 
+    require './include/user.php';
+    break;
+  case 'game':
     require './include/game.php';
- }
-/* user status page */
-else if( myisset("email","password") || isset($_SESSION["name"]) )
-   {
-     require './include/user.php';
-   }
-/* default login page */
- else
-   {
-     require './include/welcome.php';
-   }
+    break;
+  default:
+    if(isset($_SESSION["name"]))
+      require './include/user.php';
+    else
+      require './include/welcome.php';
+  }
 
 output_footer();
 

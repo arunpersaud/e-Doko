@@ -212,14 +212,14 @@ if(myisset("forgot"))
 		   }
 		 if($r[4]=='pre')
 		   {
-		     echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?me=".$r[0]."\">p </a></span> ";
+		     echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">p </a></span> ";
 
 		   }
 		 else if ($r[4]=='gameover')
-		   echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?me=".$r[0]."\">F </a></span> ";
+		   echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">F </a></span> ";
 		 else
 		   {
-		     echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?me=".$r[0]."\">P </a></span> ";
+		     echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">P </a></span> ";
 		   }
 		 if($r[4] != 'gameover')
 		   {
@@ -233,12 +233,12 @@ if(myisset("forgot"))
 			 if(DB_get_reminder($r[3],$gameid)==0)
 			   if(time()-strtotime($r[2]) > 60*60*24*7)
 			     echo "".
-			       "<a href=\"$INDEX?remind=1&amp;me=".$r[0]."\">Send a reminder.</a>";
+			       "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
 			 echo "(it's $name's turn)\n";
 		       };
 		     if(time()-strtotime($r[2]) > 60*60*24*30)
 		       echo "".
-			 "<a href=\"$INDEX?cancel=1&amp;me=".$r[0]."\">Cancel?</a>".
+			 "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".
 			 " (clicking here is final and can't be restored)";
 
 		   }
