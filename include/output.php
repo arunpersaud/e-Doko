@@ -36,6 +36,7 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 {
   global $RULES;
 
+  echo "<div class=\"message\">\n<form action=\"index.php?action=new\" method=\"post\">\n";
   echo "Do you want to continue playing?(This will start a new game, with the next person as dealer.)\n";
   echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"$playerA\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
@@ -46,7 +47,7 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   echo "  <input type=\"hidden\" name=\"callrule\" value=\"".$RULES["call"]."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
   echo "  <input type=\"submit\" value=\"keep playing\" />\n";
-
+  echo "</form>\n</div>";
   return;
 }
 
@@ -312,7 +313,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard001.css" />
      <script type="text/javascript">
        function hl(num) {
          if(document.getElementById){

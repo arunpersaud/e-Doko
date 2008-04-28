@@ -1727,12 +1727,19 @@ switch($mystatus)
 	echo "<hr />";
       }
 
-    echo "<input type=\"submit\" value=\"submit\" />\n";
+    echo "<input type=\"submit\" value=\"submit\" />\n<hr />\n";
 
+    $session = DB_get_session_by_gameid($gameid);
+    $score   = generate_score_table($session);
+
+    echo $score;
+
+    echo "</div>\n";
+
+    echo "</form>\n";
 
     if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
       {
-	echo "<hr />\n";
 
 	$session = DB_get_session_by_gameid($gameid);
 	$result  = mysql_query("SELECT id,create_date FROM Game".
@@ -1756,15 +1763,7 @@ switch($mystatus)
 	  }
       }
 
-    $session = DB_get_session_by_gameid($gameid);
-    $score = generate_score_table($session);
 
-    //  if(size_of($score)>30)
-      echo $score;
-
-    echo "</div>\n";
-
-    echo "</form>\n";
     output_footer();
     DB_close();
     exit();
