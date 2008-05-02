@@ -808,7 +808,7 @@ function display_table ()
 
 function display_user_menu()
 {
-  global $WIKI,$myid,$INDEX,$STATS;
+  global $WIKI,$myid,$INDEX;
   echo "<div class=\"usermenu\">\n".
     "<a href=\"".$INDEX."\"> Go to my user page </a>";
 
@@ -828,7 +828,7 @@ function display_user_menu()
 
   echo "<hr /> <a href=\"".$INDEX."?action=new\">Start a new game</a>\n";
 
-  echo "<hr /> <a href=\"".$STATS."\">Statistics</a>\n";
+  echo "<hr /> <a href=\"".$INDEX."?action=stats\">Statistics</a>\n";
 
   echo
     "<hr />Report bugs in the <a href=\"".$WIKI."\">wiki</a>\n";

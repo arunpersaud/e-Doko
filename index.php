@@ -1,10 +1,19 @@
 <?php
 error_reporting(E_ALL);
 
+/* start a session, if it is not already running.
+ * This way people don't have to log in all the times. 
+ * The session variables can also be read out from different
+ * php scripts, so that the code can be easily split up across several files
+ */
+session_start();
+
+
 include_once("config.php");                /* needs to be first in list, since other includes use this */
 include_once("./include/output.php");      /* html output only */
 include_once("./include/db.php");          /* database only */
 include_once("./include/functions.php");   /* the rest */
+
 
 /* make sure that user has set all variables in config.php */
 config_check();
@@ -18,13 +27,6 @@ if(DB_open()<0)
     output_footer();
     exit();
   }
-
-/* start a session, if it is not already running.
- * This way people don't have to log in all the times. 
- * The session variables can also be read out from different
- * php scripts, so that the code can be easily split up across several files
- */
-session_start();
 
 /* done major error checking, output header of HTML page */
 output_header();
@@ -62,6 +64,12 @@ switch($action)
     break;
   case 'game':
     require './include/game.php';
+    break;
+  case 'stats':
+    if(isset($_SESSION["name"]))
+      require './include/stats.php';
+    else
+      require './include/welcome.php';
     break;
   default:
     if(isset($_SESSION["name"]))

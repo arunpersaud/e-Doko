@@ -27,7 +27,10 @@
     /* used as the reply email in each email */
     $EMAIL_REPLY="";
 
-    /* this should point to your index.file and to your domain*/
+    /* this should point to your index.file and to your domain.
+     * The HOST variable is also used to test, if files are called 
+     * from within e-DoKo, so it needs to be set.
+     */
     $INDEX = "/index.php";
     $HOST  = "http://www.example.com";
 
