@@ -919,10 +919,15 @@ function DB_get_gameids_of_finished_games_by_session($session)
 {
   $ids = array ();
 
-  $queryresult = mysql_query("SELECT id FROM Game ".
-			     "  WHERE session=$session ".
-			     "   AND status='gameover' ".
-			     " ORDER BY create_date ASC");
+  if($session==0) /* return all games */
+    $queryresult = mysql_query("SELECT id FROM Game ".
+			       " WHERE status='gameover' ".
+			       " ORDER BY create_date ASC");
+  else   /* return games in a session */
+    $queryresult = mysql_query("SELECT id FROM Game ".
+			       "  WHERE session=$session ".
+			       "   AND status='gameover' ".
+			       " ORDER BY create_date ASC");
 
   $i=0;
   while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )

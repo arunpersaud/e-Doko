@@ -228,8 +228,9 @@ echo "</p>\n";
  echo $r[1]." (".$r[0].") <br />\n";
  echo " games</p>\n";
 */
-
-
+echo "<p>Points/game (you need at least 10 games to be in this statistic): <br />\n";
+generate_global_score_table();
+echo "</p>\n";
 /*
  how often is the last trick a non-trump trick
 */

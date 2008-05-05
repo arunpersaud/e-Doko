@@ -838,7 +838,6 @@ function display_user_menu()
 
 function generate_score_table($session)
 {
-
   /* get all ids */
   $gameids = DB_get_gameids_of_finished_games_by_session($session);
 
@@ -891,5 +890,66 @@ function generate_score_table($session)
 
   return $output;
 }
+
+function generate_global_score_table()
+{
+  /* get all ids */
+  $gameids = DB_get_gameids_of_finished_games_by_session(0);
+
+  if($gameids == NULL)
+    return "";
+
+  /* get player id, names... from the User table */
+  $player = array();
+  $result = mysql_query("SELECT User.id, User.fullname FROM User");
+
+  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+    $player[] = array( 'id' => $r[0], 'name'=> $r[1], 'points' => 0 ,'nr' => 0);
+
+  /* get points and generate table */
+  foreach($gameids as $gameid)
+    {
+      $re_score = DB_get_score_by_gameid($gameid);
+      /* TODO: this shouldn't loop over all players, just the 4 players that are in the game */
+      foreach($player as $key=>$pl)
+	{
+	  $party = DB_get_party_by_gameid_and_userid($gameid,$pl['id']);
+	  if($party == "re")
+	    if(DB_get_gametype_by_gameid($gameid)=="solo")
+	      $player[$key]['points'] += 3*$re_score;
+	    else
+	      $player[$key]['points'] += $re_score;
+	  else if ($party == "contra")
+	    $player[$key]['points'] -= $re_score;
+	  if($party)
+	    $player[$key]['nr']+=1;
+	}
+    }
+  
+  echo "<table>\n <tr>\n";
+  function cmp($a,$b)
+  {
+    if($a['nr']==0 ) return 1;
+    if($b['nr']==0) return 1;
+
+    $a=$a['points']/$a['nr'];
+    $b=$b['points']/$b['nr'];
+
+    if ($a == $b) 
+      return 0;
+    return ($a > $b) ? -1 : 1;
+  }
+  usort($player,"cmp");
+  foreach($player as $pl)
+    {
+      if($pl['nr']>10)
+	echo "  <tr><td>",$pl['name'],"</td><td>",round($pl['points']/$pl['nr'],3),"</td></tr>\n";
+    }
+  echo "</table>\n";
+    
+  return;
+}
+
+
 
 ?>
