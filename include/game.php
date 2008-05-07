@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -25,7 +25,7 @@ if(!$myid)
     DB_close();
     exit();
   }
-    
+
 /* user might get here by clicking on the link in an email, so session might not be set */
 if(isset($_SESSION["name"]))
   output_status($_SESSION["name"]);
@@ -1056,11 +1056,11 @@ switch($mystatus)
 
 	    $playid = DB_play_card($trickid,$handcardid,$sequence);
 
-	    /* check special output for schweinchen in case: 
+	    /* check special output for schweinchen in case:
 	     * schweinchen is in the rules, a fox has been played and the gametype is correct
 	     */
-	    if( $GAME["schweinchen"] && 
-		($card == 19 || $card == 20) && 
+	    if( $GAME["schweinchen"] &&
+		($card == 19 || $card == 20) &&
 		($gametype == "normal" || $gametype == "silent"|| $gametype=="trump"))
 	      {
 		$GAME["schweinchen"]++; // count how many have been played including this one
@@ -1115,7 +1115,7 @@ switch($mystatus)
 		$winner = get_winner($play,$gametype); /* returns the position */
 
 		/* check if someone caught a fox */
-		/* first check if we should account for solos at all, 
+		/* first check if we should account for solos at all,
 		 * since it doesn't make sense in some games
 		 */
 		$ok = 0; /* fox shouldn't be counted */
@@ -1127,7 +1127,7 @@ switch($mystatus)
 		  }
 		else
 		  $ok = 1; /* for all other games (not solos) foxes are ok too */
-		  
+
 		if($ok==1)
 		  foreach($play as $played)
 		    {
@@ -1146,7 +1146,7 @@ switch($mystatus)
 					  " VALUES( NULL,NULL,$gameid,'$party1',$uid1,$uid2,'fox')");
 			  }
 		    }
-		  
+
 		/* check for karlchen (jack of clubs in the last trick)*/
 		/* same as for foxes, karlchen doesn't always make sense
 		 * check what kind of game it is and set karlchen accordingly */
@@ -1159,7 +1159,7 @@ switch($mystatus)
 		    if($solo == "trumpless" || $solo == "jack" || $solo == "queen" )
 		      $ok = 0; /* no Karlchen in these solos */
 		  }
-		  
+
 		if($ok)
 		  foreach($play as $played)
 		    if ( $played['card']==11 || $played['card']==12 )
@@ -1347,12 +1347,19 @@ switch($mystatus)
 		$winning_party = NULL;
 
 		if($call_re == NULL && $call_contra==NULL)
-		  if($re>120)
-		    $winning_party="re";
-		  else
-		    $winning_party="contra";
+		  {
+		    /* nobody made a call, so it's easy to figure out who won */
+		    if($re>120)
+		      $winning_party="re";
+		    else
+		      $winning_party="contra";
+		  }
 		else
 		  {
+		    /* if one party makes a call, they only win, iff they make enough points
+		     * if only one party made a call, the other one wins,
+		     * if the first one didn't make it
+		     */
 		    if($call_re)
 		      {
 			$offset = 120 - $call_re;
@@ -1361,7 +1368,7 @@ switch($mystatus)
 
 			if($re > 120+$offset)
 			  $winning_party="re";
-			else if ( $call_contra == NULL )
+			else if ($call_contra == NULL )
 			  $winning_party="contra";
 		      }
 
@@ -1373,7 +1380,7 @@ switch($mystatus)
 
 			if($contra > 120+$offset)
 			  $winning_party="contra";
-			else if ( $call_contra == NULL )
+			else if ($call_re == NULL )
 			  $winning_party="re";
 		      }
 		  }
@@ -1514,7 +1521,7 @@ switch($mystatus)
 
 		  $score = implode("\n",$score);
 		  $score = $header.$score;
-		  
+
 		  $message .= "Score Table:\n";
 		  $message .= $score;
 
@@ -1586,7 +1593,7 @@ switch($mystatus)
 	echo "$note <hr \>\n";
       echo "Insert note:<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
       echo "</div> \n";
-      
+
       $mycards = DB_get_hand($me);
       $mycards = mysort($mycards,$gametype);
       echo "<div class=\"mycards\">\n";
