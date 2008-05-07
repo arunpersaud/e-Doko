@@ -45,10 +45,9 @@ $session  = DB_get_session_by_gameid($gameid);
 DB_get_PREF($myid);
 
 /* get rule set for this game */
-$result = mysql_query("SELECT * FROM Rulesets".
-		      " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
-		      " WHERE Game.id='$gameid'" );
-$r      = mysql_fetch_array($result,MYSQL_NUM);
+$r = DB_query_array("SELECT * FROM Rulesets".
+		    " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
+		    " WHERE Game.id='$gameid'" );
 
 $RULES["dullen"]      = $r[2];
 $RULES["schweinchen"] = $r[3];
@@ -600,7 +599,7 @@ switch($mystatus)
 		/* get hand id for user $trump */
 		$userhand = DB_get_handid('gameid-userid',$gameid,$trump);
 		/* copy trump from player A to B */
-		$result = mysql_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
+		$result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 
 		/* add hidden button with trump in it to get to the next point */
 		echo "</div><div class=\"poverty\">\n";
@@ -618,13 +617,12 @@ switch($mystatus)
 		/* if exchange is set to a value>0, exchange that card back to user $trump */
 		if($exchange >0)
 		  {
-		    $result = mysql_query("UPDATE Hand_Card SET hand_id='$userhand'".
-					  " WHERE hand_id='$myhand' AND card_id='$exchange'" );
+		    $result = DB_query("UPDATE Hand_Card SET hand_id='$userhand'".
+				       " WHERE hand_id='$myhand' AND card_id='$exchange'" );
 		  };
 
 		/* if number of cards == 12, set status to play for both users */
-		$result = mysql_query("SELECT COUNT(*) FROM Hand_Card  WHERE hand_id='$myhand'" );
-		$r      = mysql_fetch_array($result,MYSQL_NUM);
+		$r = DB_query_array("SELECT COUNT(*) FROM Hand_Card  WHERE hand_id='$myhand'" );
 		if(!$r)
 		  {
 		    myerror("error in poverty");
@@ -859,8 +857,7 @@ switch($mystatus)
       }
 
     /* get time from the last action of the game */
-    $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
-    $r       = mysql_fetch_array($result,MYSQL_NUM);
+    $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
     $gameend = time() - strtotime($r[0]);
 
     /* handel comments in case player didn't play a card, allow comments a week after the end of the game */
@@ -885,23 +882,23 @@ switch($mystatus)
 	};
 
     /* get everything relevant to display the tricks */
-    $result = mysql_query("SELECT Hand_Card.card_id as card,".
-			  "       Hand.position as position,".
-			  "       Play.sequence as sequence, ".
-			  "       Trick.id, ".
-			  "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>')".
-			  "                    SEPARATOR '\n' ), ".
-			  "       Play.create_date, ".
-			  "       Hand.user_id ".
-			  "FROM Trick ".
-			  "LEFT JOIN Play ON Trick.id=Play.trick_id ".
-			  "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
-			  "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
-			  "LEFT JOIN Comment ON Play.id=Comment.play_id ".
-			  "LEFT JOIN User On User.id=Comment.user_id ".
-			  "WHERE Trick.game_id='".$gameid."' ".
-			  "GROUP BY Trick.id, sequence ".
-			  "ORDER BY Trick.id, sequence  ASC");
+    $result = DB_query("SELECT Hand_Card.card_id as card,".
+		       "       Hand.position as position,".
+		       "       Play.sequence as sequence, ".
+		       "       Trick.id, ".
+		       "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>')".
+		       "                    SEPARATOR '\n' ), ".
+		       "       Play.create_date, ".
+		       "       Hand.user_id ".
+		       "FROM Trick ".
+		       "LEFT JOIN Play ON Trick.id=Play.trick_id ".
+		       "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
+		       "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
+		       "LEFT JOIN Comment ON Play.id=Comment.play_id ".
+		       "LEFT JOIN User On User.id=Comment.user_id ".
+		       "WHERE Trick.game_id='".$gameid."' ".
+		       "GROUP BY Trick.id, sequence ".
+		       "ORDER BY Trick.id, sequence  ASC");
     $trickNR   = 1;
     $lasttrick = DB_get_max_trickid($gameid);
 
@@ -938,7 +935,7 @@ switch($mystatus)
       }
 
     /* output tricks */
-    while($r = mysql_fetch_array($result,MYSQL_NUM))
+    while($r = DB_fetch_array($result))
       {
 	$pos     = $r[1];
 	$seq     = $r[2];
@@ -1022,9 +1019,8 @@ switch($mystatus)
 
 	/* check if we have card and that we haven't played it yet*/
 	/* set played in hand_card to true where hand_id and card_id*/
-	$result = mysql_query("SELECT id FROM Hand_Card WHERE played='false' and ".
+	$r = DB_query_array("SELECT id FROM Hand_Card WHERE played='false' and ".
 			      "hand_id='$handid' AND card_id=".DB_quote_smart($card));
-	$r = mysql_fetch_array($result,MYSQL_NUM);
 	$handcardid = $r[0];
 
 	if($handcardid) /* everything ok, play card  */
@@ -1034,19 +1030,19 @@ switch($mystatus)
 
 	    /* check if a call was made, must do this before we set the card status to played */
 	    if(myisset("call")  && $_REQUEST["call"]  == "120" && can_call(120,$me))
-	      $result = mysql_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
+	      $result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
 	    if(myisset("call")  && $_REQUEST["call"]  == "90" && can_call(90,$me))
-	      $result = mysql_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
+	      $result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
 	    if(myisset("call")  && $_REQUEST["call"]  == "60" && can_call(60,$me))
-	      $result = mysql_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
+	      $result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
 	    if(myisset("call")  && $_REQUEST["call"]  == "30" && can_call(30,$me))
-	      $result = mysql_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
+	      $result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
 	    if(myisset("call")  && $_REQUEST["call"]  == "0" && can_call(0,$me))
-	      $result = mysql_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
+	      $result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
 
 	    /* mark card as played */
-	    mysql_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
-			DB_quote_smart($card));
+	    DB_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
+		     DB_quote_smart($card));
 
 	    /* get trick id or start new trick */
 	    $a = DB_get_current_trickid($gameid);
@@ -1142,8 +1138,8 @@ switch($mystatus)
 			    $party2 = DB_get_party_by_gameid_and_userid($gameid,$uid2);
 
 			    if($party1 != $party2)
-			      mysql_query("INSERT INTO Score".
-					  " VALUES( NULL,NULL,$gameid,'$party1',$uid1,$uid2,'fox')");
+			      DB_query("INSERT INTO Score".
+				       " VALUES( NULL,NULL,$gameid,'$party1',$uid1,$uid2,'fox')");
 			  }
 		    }
 
@@ -1169,8 +1165,8 @@ switch($mystatus)
 			  $uid1   = DB_get_userid('gameid-position',$gameid,$winner);
 			  $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
-			  mysql_query("INSERT INTO Score".
-				      " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
+			  DB_query("INSERT INTO Score".
+				   " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
 			}
 		/* check for doppelopf (>40 points)*/
 		$points = 0;
@@ -1183,12 +1179,12 @@ switch($mystatus)
 		    $uid1   = DB_get_userid('gameid-position',$gameid,$winner);
 		    $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
-		    mysql_query("INSERT INTO Score".
-				" VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'doko')");
+		    DB_query("INSERT INTO Score".
+			     " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'doko')");
 		  }
 
 		if($winner>0)
-		  mysql_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
+		  DB_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
 		else
 		  echo "ERROR during scoring";
 
@@ -1275,31 +1271,31 @@ switch($mystatus)
 	    else /* send out final email */
 	      {
 		/* individual score */
-		$result = mysql_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand".
-				      " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				      " LEFT JOIN User ON User.id=Hand.user_id".
-				      " LEFT JOIN Play ON Trick.id=Play.trick_id".
-				      " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				      " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-				      " WHERE Hand.game_id='$gameid'".
-				      " GROUP BY User.fullname" );
+		$result = DB_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand".
+				   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				   " LEFT JOIN User ON User.id=Hand.user_id".
+				   " LEFT JOIN Play ON Trick.id=Play.trick_id".
+				   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				   " WHERE Hand.game_id='$gameid'".
+				   " GROUP BY User.fullname" );
 		$message  = "The game is over. Thanks for playing :)\n";
 		$message .= "Final score:\n";
-		while( $r = mysql_fetch_array($result,MYSQL_NUM))
+		while( $r = DB_fetch_array($result) )
 		  $message .= "   ".$r[0]."(".$r[2].") ".$r[1]."\n";
 
-		$result = mysql_query("SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
-				      " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				      " LEFT JOIN User ON User.id=Hand.user_id".
-				      " LEFT JOIN Play ON Trick.id=Play.trick_id".
-				      " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				      " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-				      " WHERE Hand.game_id='$gameid'".
-				      " GROUP BY Hand.party" );
+		$result = DB_query("SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
+				   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+				   " LEFT JOIN User ON User.id=Hand.user_id".
+				   " LEFT JOIN Play ON Trick.id=Play.trick_id".
+				   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+				   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+				   " WHERE Hand.game_id='$gameid'".
+				   " GROUP BY Hand.party" );
 		$message .= "\nTotals:\n";
 		$re     = 0;
 		$contra = 0;
-		while( $r = mysql_fetch_array($result,MYSQL_NUM))
+		while( $r = DB_fetch_array($result) )
 		  {
 		    $message .= "    ".$r[0]." ".$r[1]."\n";
 		    if($r[0] == "re")
@@ -1392,38 +1388,38 @@ switch($mystatus)
 		  {
 		    for( $p=$call_contra;$p<=120; $p+=30 )
 		      {
-			  mysql_query("INSERT INTO Score".
-				      " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'against$p')");
+			  DB_query("INSERT INTO Score".
+				   " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'against$p')");
 			}
 
 		      for( $p=$call_contra; $p<120; $p+=30)
 			{
 			  if( $re >= $p )
-			    mysql_query("INSERT INTO Score".
-					" VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
+			    DB_query("INSERT INTO Score".
+				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
 			}
 		    }
 		  if($winning_party!="re" and $call_re!=NULL)
 		    {
 		      for( $p=$call_re;$p<=120; $p+=30 )
 			{
-			  mysql_query("INSERT INTO Score".
-				      " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'against$p')");
+			  DB_query("INSERT INTO Score".
+				   " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'against$p')");
 			}
 
 		      for( $p=$call_re; $p<120; $p+=30)
 			{
 			  if( $contra>=$p )
-			    mysql_query("INSERT INTO Score".
-					" VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'made$p')");
+			    DB_query("INSERT INTO Score".
+				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'made$p')");
 			}
 		    }
 
 		  /* point in case contra won */
 		  if($winning_party=="contra")
 		    {
-		      mysql_query("INSERT INTO Score".
-				  " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
+		      DB_query("INSERT INTO Score".
+			       " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
 		    }
 
 		  /* one point each for winning and each 30 points + calls */
@@ -1436,15 +1432,15 @@ switch($mystatus)
 			    $offset = 1;
 
 			  if($re>$p-$offset)
-			    mysql_query("INSERT INTO Score".
-					" VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
+			    DB_query("INSERT INTO Score".
+				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
 			}
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
 			  if($call_re!=NULL && $call_re<$p+1)
-			    mysql_query("INSERT INTO Score".
-					" VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
+			    DB_query("INSERT INTO Score".
+				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
 			}
 		    }
 		  else if( $winning_party=="contra")
@@ -1456,15 +1452,15 @@ switch($mystatus)
 			    $offset = 1;
 
 			  if($contra>$p-$offset)
-			    mysql_query("INSERT INTO Score".
-					" VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
+			    DB_query("INSERT INTO Score".
+				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
 			}
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
 			  if($call_contra!=NULL && $call_contra<$p+1)
-			    mysql_query("INSERT INTO Score".
-					" VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
+			    DB_query("INSERT INTO Score".
+				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
 			}
 		    }
 
@@ -1473,19 +1469,19 @@ switch($mystatus)
 		  $message .= "\n";
 		  $Tpoint = 0;
 		  $message .= " Points Re: \n";
-		  $queryresult = mysql_query("SELECT score FROM Score ".
-					     "  WHERE game_id=$gameid AND party='re'".
-					     " ");
-		  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+		  $queryresult = DB_query("SELECT score FROM Score ".
+					  "  WHERE game_id=$gameid AND party='re'".
+					  " ");
+		  while($r = DB_fetch_array($queryresult) )
 		    {
 		      $message .= "   ".$r[0]."\n";
 		      $Tpoint ++;
 		    }
 		  $message .= " Points Contra: \n";
-		  $queryresult = mysql_query("SELECT score FROM Score ".
-					     "  WHERE game_id=$gameid AND party='contra'".
-					     " ");
-		  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+		  $queryresult = DB_query("SELECT score FROM Score ".
+					  "  WHERE game_id=$gameid AND party='contra'".
+					  " ");
+		  while($r = DB_fetch_array($queryresult) )
 		    {
 		      $message .= "   ".$r[0]."\n";
 		      $Tpoint --;
@@ -1568,15 +1564,15 @@ switch($mystatus)
 	  /* add pic for re/contra
 	   "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
 
-	  $result = mysql_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand".
-				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				" LEFT JOIN User ON User.id=Hand.user_id".
-				" LEFT JOIN Play ON Trick.id=Play.trick_id".
-				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-				" WHERE Hand.game_id='$gameid'".
-				" GROUP BY User.fullname" );
-	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	  $result = DB_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand".
+			     " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+			     " LEFT JOIN User ON User.id=Hand.user_id".
+			     " LEFT JOIN Play ON Trick.id=Play.trick_id".
+			     " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+			     " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+			     " WHERE Hand.game_id='$gameid'".
+			     " GROUP BY User.fullname" );
+	  while( $r = DB_fetch_array($result))
 	    echo "      <div class=\"card".($r[3]-1)."\">\n".
 	         "        <div class=\"score\">".$r[2]."<br /> ".$r[1]."</div>\n".
 	         "      </div>\n";
@@ -1662,36 +1658,36 @@ switch($mystatus)
 	}
       else
 	{
-	  $result = mysql_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
-				" LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				" LEFT JOIN User ON User.id=Hand.user_id".
-				" LEFT JOIN Play ON Trick.id=Play.trick_id".
-				" LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				" LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-				" WHERE Hand.game_id='$gameid'".
-				" GROUP BY Hand.party" );
+	  $result = DB_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
+			     " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+			     " LEFT JOIN User ON User.id=Hand.user_id".
+			     " LEFT JOIN Play ON Trick.id=Play.trick_id".
+			     " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+			     " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+			     " WHERE Hand.game_id='$gameid'".
+			     " GROUP BY Hand.party" );
 	  echo "<div class=\"total\"> Totals:<br />\n";
-	  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	  while( $r = DB_fetch_array($result))
 	    echo "  ".$r[0]." ".$r[1]."<br />\n";
 
-	  $queryresult = mysql_query("SELECT timediff(mod_date,create_date) ".
-				     " FROM Game WHERE id='$gameid'");
-	  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+	  $queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
+				  " FROM Game WHERE id='$gameid'");
+	  $r = DB_fetch_array($queryresult);
 	  echo "<p>This game took ".$r[0]." hours.</p>";
 
 	  echo "<div class=\"re\">\n Points Re: <br />\n";
-	  $queryresult = mysql_query("SELECT score FROM Score ".
-				     "  WHERE game_id=$gameid AND party='re'".
-				     " ");
-	  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+	  $queryresult = DB_query("SELECT score FROM Score ".
+				  "  WHERE game_id=$gameid AND party='re'".
+				  " ");
+	  while($r = DB_fetch_array($queryresult) )
 	    echo "   ".$r[0]."<br />\n";
 	  echo "</div>\n";
 
 	  echo "<div class=\"contra\">\n Points Contra: <br />\n";
-	  $queryresult = mysql_query("SELECT score FROM Score ".
-				     "  WHERE game_id=$gameid AND party='contra'".
-				     " ");
-	  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+	  $queryresult = DB_query("SELECT score FROM Score ".
+				  "  WHERE game_id=$gameid AND party='contra'".
+				  " ");
+	  while($r = DB_fetch_array($queryresult) )
 	    echo "   ".$r[0]."<br />\n";
 	  echo "</div>\n";
 
@@ -1724,8 +1720,7 @@ switch($mystatus)
       output_form_calls($me);
 
     /* get time from the last action of the game */
-    $result  = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
-    $r       = mysql_fetch_array($result,MYSQL_NUM);
+    $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
     $gameend = time() - strtotime($r[0]);
 
     if($gamestatus == 'play' || $gameend < 60*60*24*7)
@@ -1749,13 +1744,13 @@ switch($mystatus)
       {
 
 	$session = DB_get_session_by_gameid($gameid);
-	$result  = mysql_query("SELECT id,create_date FROM Game".
-			       " WHERE session=$session".
-			       " ORDER BY create_date DESC".
-			       " LIMIT 1");
+	$result  = DB_query("SELECT id,create_date FROM Game".
+			    " WHERE session=$session".
+			    " ORDER BY create_date DESC".
+			    " LIMIT 1");
 	$r = -1;
 	if($result)
-	  $r = mysql_fetch_array($result,MYSQL_NUM);
+	  $r = DB_fetch_array($result);
 
 	if(!$session || $gameid==$r[0])
 	  {

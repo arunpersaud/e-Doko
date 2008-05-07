@@ -665,23 +665,23 @@ function display_table ()
 {
   global $gameid, $GT, $debug,$INDEX,$defaulttimezone;
 
-  $result = mysql_query("SELECT  User.fullname as name,".
-			"        Hand.position as position, ".
-			"        User.id, ".
-			"        Hand.party as party, ".
-			"        Hand.sickness as sickness, ".
-			"        Hand.point_call, ".
-			"        User.last_login, ".
-			"        Hand.hash,       ".
-			"        User.timezone    ".
-			"FROM Hand ".
-			"LEFT JOIN User ON User.id=Hand.user_id ".
-			"WHERE Hand.game_id='".$gameid."' ".
-			"ORDER BY position ASC");
+  $result = DB_query("SELECT  User.fullname as name,".
+		     "        Hand.position as position, ".
+		     "        User.id, ".
+		     "        Hand.party as party, ".
+		     "        Hand.sickness as sickness, ".
+		     "        Hand.point_call, ".
+		     "        User.last_login, ".
+		     "        Hand.hash,       ".
+		     "        User.timezone    ".
+		     "FROM Hand ".
+		     "LEFT JOIN User ON User.id=Hand.user_id ".
+		     "WHERE Hand.game_id='".$gameid."' ".
+		     "ORDER BY position ASC");
 
   echo "<div class=\"table\">\n".
     "  <img class=\"table\" src=\"pics/table.png\" alt=\"table\" />\n";
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  while($r = DB_fetch_array($result))
     {
       $name  = $r[0];
       $pos   = $r[1];
@@ -812,16 +812,16 @@ function display_user_menu()
   echo "<div class=\"usermenu\">\n".
     "<a href=\"".$INDEX."\"> Go to my user page </a>";
 
-  $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
-			" LEFT JOIN Game On Hand.game_id=Game.id".
-			" WHERE Hand.user_id='$myid'".
-			" AND Game.player='$myid'".
-			" AND Game.status<>'gameover'".
-			" ORDER BY Game.session" );
-  if(mysql_num_rows($result))
+  $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
+		     " LEFT JOIN Game On Hand.game_id=Game.id".
+		     " WHERE Hand.user_id='$myid'".
+		     " AND Game.player='$myid'".
+		     " AND Game.status<>'gameover'".
+		     " ORDER BY Game.session" );
+  if(DB_num_rows($result))
       echo "<hr />It's your turn in these games:<br />\n";
 
-  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+  while( $r = DB_fetch_array($result))
     {
       echo "<a href=\"".$INDEX."?action=game&me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
     }
@@ -849,10 +849,10 @@ function generate_score_table($session)
 
   /* get player id, names... from the first game */
   $player = array();
-  $result = mysql_query("SELECT User.id, User.fullname from Hand".
-			" LEFT JOIN User On Hand.user_id=User.id".
-			" WHERE Hand.game_id=".$gameids[0]);
-  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT User.id, User.fullname from Hand".
+		     " LEFT JOIN User On Hand.user_id=User.id".
+		     " WHERE Hand.game_id=".$gameids[0]);
+  while( $r = DB_fetch_array($result))
     {
       $player[] = array( 'id' => $r[0], 'points' => 0 );
       $output.= "  <td> ".substr($r[1],0,2)." </td>\n";
@@ -901,9 +901,9 @@ function generate_global_score_table()
 
   /* get player id, names... from the User table */
   $player = array();
-  $result = mysql_query("SELECT User.id, User.fullname FROM User");
+  $result = DB_query("SELECT User.id, User.fullname FROM User");
 
-  while( $r = mysql_fetch_array($result,MYSQL_NUM))
+  while( $r = DB_fetch_array($result))
     $player[] = array( 'id' => $r[0], 'name'=> $r[1], 'points' => 0 ,'nr' => 0);
 
   /* get points and generate table */

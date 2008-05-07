@@ -8,16 +8,16 @@ if(!isset($HOST))
 /* this outputs the default home page with some extra statistics on it */
 
 $pre[0]=0;$game[0]=0;$done[0]=0;
-$r=mysql_query("SELECT COUNT(id) FROM Game GROUP BY status");
+$r=DB_query("SELECT COUNT(id) FROM Game GROUP BY status");
 if($r) {
-  $pre  = mysql_fetch_array($r,MYSQL_NUM);
-  $game = mysql_fetch_array($r,MYSQL_NUM);
-  $done = mysql_fetch_array($r,MYSQL_NUM);
+  $pre  = DB_fetch_array($r);
+  $game = DB_fetch_array($r);
+  $done = DB_fetch_array($r);
  }
 
-$r=mysql_query("SELECT AVG(datediff(mod_date,create_date)) FROM Game where status='gameover' ");
+$r=DB_query("SELECT AVG(datediff(mod_date,create_date)) FROM Game where status='gameover' ");
 if($r)
-  $avgage= mysql_fetch_array($r,MYSQL_NUM);
+  $avgage= DB_fetch_array($r);
  else
    $avgage[0]=0;
 

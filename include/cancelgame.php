@@ -35,8 +35,7 @@ $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
 
 /* check if game really is old enough to be canceled */
-$result = mysql_query("SELECT mod_date from Game WHERE id='$gameid' " );
-$r = mysql_fetch_array($result,MYSQL_NUM);
+$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
 if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
   {
     $message = "Hello, \n\n".

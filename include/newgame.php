@@ -90,15 +90,15 @@ else
 	      }
 	    
 	    if($session)
-	      mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
-			  "'$ruleset','$session' ,NULL)");
+	      DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
+		       "'$ruleset','$session' ,NULL)");
 	    else
 	      {
 		/* get max session and start a new one */
 		$max = DB_get_max_session();
 		$max++;
-		mysql_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
-		mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
+		DB_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
+		DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 			    "'$ruleset','$max' ,NULL)");
 	      }
 	  }
@@ -117,10 +117,10 @@ else
 	    $max = DB_get_max_session();
 	    $max++;
 	    
-	    mysql_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
-			"'$ruleset','$max' ,NULL)");
+	    DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
+		     "'$ruleset','$max' ,NULL)");
 	  }
-	$game_id = mysql_insert_id();
+	$game_id = DB_insert_id();
 	
 	/* create hash */
 	$TIME  = (string) time(); /* to avoid collisions */
@@ -130,28 +130,28 @@ else
 	$hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD.$TIME);
 	
 	/* create hands */
-	mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
-		    ", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,NULL)");
-	$hand_idA = mysql_insert_id();
-	mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridB).
-		    ", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,NULL)");
-	$hand_idB = mysql_insert_id();
-	mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridC).
-		    ", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,NULL)");
-	$hand_idC = mysql_insert_id();
-	mysql_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
-		    ", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,NULL)");
-	$hand_idD = mysql_insert_id();
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
+		 ", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,NULL)");
+	$hand_idA = DB_insert_id();
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridB).
+		 ", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,NULL)");
+	$hand_idB = DB_insert_id();
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridC).
+		 ", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,NULL)");
+	$hand_idC = DB_insert_id();
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
+		 ", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,NULL)");
+	$hand_idD = DB_insert_id();
 	
 	/* save cards */
 	for($i=0;$i<12;$i++)
-	  mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idA', '".$randomNR[$i]."', 'false')");
+	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idA', '".$randomNR[$i]."', 'false')");
 	for($i=12;$i<24;$i++)
-	  mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idB', '".$randomNR[$i]."', 'false')");
+	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idB', '".$randomNR[$i]."', 'false')");
 	for($i=24;$i<36;$i++)
-	  mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idC', '".$randomNR[$i]."', 'false')");
+	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idC', '".$randomNR[$i]."', 'false')");
 	for($i=36;$i<48;$i++)
-	  mysql_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
+	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
 	
 	/* send out email, TODO: check for error with email */
 	$message = "\n".

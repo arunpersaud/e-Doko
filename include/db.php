@@ -45,8 +45,8 @@ function DB_quote_smart($value)
 
 function DB_test()
 {
-  $result = mysql_query("SELECT * FROM User");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT * FROM User");
+  while($r = DB_fetch_array($result))
     {
       foreach($r as $thing)
 	echo "  $thing ";
@@ -55,10 +55,39 @@ function DB_test()
   return;
 }
 
+/* use Mysql in the background */
+function DB_query($query)
+{
+  return mysql_query($query);
+}
+
+function DB_fetch_array($result)
+{
+  return mysql_fetch_array($result,MYSQL_NUM);
+}
+
+function DB_insert_id()
+{
+  return mysql_insert_id();
+}
+
+function DB_num_rows($result)
+{
+  return mysql_num_rows($result);
+}
+/* end Mysql functions */
+
+function DB_query_array($query)
+{
+  $result = DB_query($query);
+  $return = DB_fetch_array($result);
+  
+  return $return;
+}
+
 function DB_get_passwd_by_name($name)
 {
-  $result = mysql_query("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
 
   if($r)
     return $r[0];
@@ -68,13 +97,11 @@ function DB_get_passwd_by_name($name)
 
 function DB_check_recovery_passwords($password,$email)
 {
-  $result = mysql_query("SELECT User.id FROM User".
-			" LEFT JOIN Recovery ON User.id=Recovery.user_id".
-			" WHERE email=".DB_quote_smart($email).
-			" AND Recovery.password=".DB_quote_smart($password).
-			" AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
+  $r = DB_query_array("SELECT User.id FROM User".
+		      " LEFT JOIN Recovery ON User.id=Recovery.user_id".
+		      " WHERE email=".DB_quote_smart($email).
+		      " AND Recovery.password=".DB_quote_smart($password).
+		      " AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
   if($r)
     return 1;
   else
@@ -86,21 +113,19 @@ function DB_get_handid($type,$var1='',$var2='')
   switch($type)
     {
     case 'hash':
-      $result = mysql_query("SELECT id FROM Hand WHERE hash=".DB_quote_smart($var1));
+      $r = DB_query_array("SELECT id FROM Hand WHERE hash=".DB_quote_smart($var1));
       break;
     case 'gameid-position':
-      $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
-			    DB_quote_smart($var1)." AND position=".
-			    DB_quote_smart($var2));
+      $r = DB_query_array("SELECT id FROM Hand WHERE game_id=".
+			  DB_quote_smart($var1)." AND position=".
+			  DB_quote_smart($var2));
       break;
     case 'gameid-userid':
-      $result = mysql_query("SELECT id FROM Hand WHERE game_id=".
-			    DB_quote_smart($var1)." AND user_id=".
-			    DB_quote_smart($var2));
+      $r = DB_query_array("SELECT id FROM Hand WHERE game_id=".
+			  DB_quote_smart($var1)." AND user_id=".
+			  DB_quote_smart($var2));
       break;
     }
-
-  $r = mysql_fetch_array($result,MYSQL_NUM);
 
   if($r)
     return $r[0];
@@ -110,8 +135,7 @@ function DB_get_handid($type,$var1='',$var2='')
 
 function DB_get_pos_by_hash($hash)
 {
-  $result = mysql_query("SELECT position FROM Hand WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r= DB_query_array("SELECT position FROM Hand WHERE hash=".DB_quote_smart($hash));
 
   if($r)
     return $r[0];
@@ -121,8 +145,7 @@ function DB_get_pos_by_hash($hash)
 
 function DB_get_status_by_hash($hash)
 {
-  $result = mysql_query("SELECT status FROM Hand WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r= DB_query_array("SELECT status FROM Hand WHERE hash=".DB_quote_smart($hash));
 
   if($r)
     return $r[0];
@@ -132,19 +155,18 @@ function DB_get_status_by_hash($hash)
 
 function DB_set_game_status_by_gameid($id,$status)
 {
-  mysql_query("UPDATE Game SET status='".$status."' WHERE id=".DB_quote_smart($id));
+  DB_query("UPDATE Game SET status='".$status."' WHERE id=".DB_quote_smart($id));
   return;
 }
 
 function DB_set_sickness_by_gameid($id,$status)
 {
-  mysql_query("UPDATE Game SET sickness='".$status."' WHERE id=".DB_quote_smart($id));
+  DB_query("UPDATE Game SET sickness='".$status."' WHERE id=".DB_quote_smart($id));
   return;
 }
 function DB_get_sickness_by_gameid($id)
 {
-  $result = mysql_query("SELECT sickness FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT sickness FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];
@@ -154,8 +176,7 @@ function DB_get_sickness_by_gameid($id)
 
 function DB_get_game_status_by_gameid($id)
 {
-  $result = mysql_query("SELECT status FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT status FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];
@@ -165,16 +186,14 @@ function DB_get_game_status_by_gameid($id)
 
 function DB_set_hand_status_by_hash($hash,$status)
 {
-  mysql_query("UPDATE Hand SET status='".$status."' WHERE hash=".DB_quote_smart($hash));
+  DB_query("UPDATE Hand SET status='".$status."' WHERE hash=".DB_quote_smart($hash));
   return;
 }
 
 function DB_get_hand_status_by_userid_and_gameid($uid,$gid)
 {
-  $result = mysql_query("SELECT status FROM Hand WHERE user_id=".DB_quote_smart($uid).
-			" AND game_id=".DB_quote_smart($gid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
+  $r = DB_query_array("SELECT status FROM Hand WHERE user_id=".DB_quote_smart($uid).
+		      " AND game_id=".DB_quote_smart($gid));
   if($r)
     return $r[0];
   else
@@ -183,10 +202,8 @@ function DB_get_hand_status_by_userid_and_gameid($uid,$gid)
 
 function DB_get_sickness_by_userid_and_gameid($uid,$gid)
 {
-  $result = mysql_query("SELECT sickness FROM Hand WHERE user_id=".DB_quote_smart($uid).
-			" AND game_id=".DB_quote_smart($gid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
+  $r = DB_query_array("SELECT sickness FROM Hand WHERE user_id=".DB_quote_smart($uid).
+		      " AND game_id=".DB_quote_smart($gid));
   if($r)
     return $r[0];
   else
@@ -195,10 +212,8 @@ function DB_get_sickness_by_userid_and_gameid($uid,$gid)
 
 function DB_get_sickness_by_pos_and_gameid($pos,$gid)
 {
-  $result = mysql_query("SELECT sickness FROM Hand WHERE position=".DB_quote_smart($pos).
-			" AND game_id=".DB_quote_smart($gid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
+  $r = DB_query_array("SELECT sickness FROM Hand WHERE position=".DB_quote_smart($pos).
+		      " AND game_id=".DB_quote_smart($gid));
   if($r)
     return $r[0];
   else
@@ -207,8 +222,7 @@ function DB_get_sickness_by_pos_and_gameid($pos,$gid)
 
 function DB_get_gameid_by_hash($hash)
 {
-  $result = mysql_query("SELECT game_id FROM Hand WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT game_id FROM Hand WHERE hash=".DB_quote_smart($hash));
 
   if($r)
     return $r[0];
@@ -224,24 +238,22 @@ function DB_cancel_game($hash)
     return;
 
   /* get the IDs of all players */
-  $result = mysql_query("SELECT id FROM Hand WHERE game_id=".DB_quote_smart($gameid));
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT id FROM Hand WHERE game_id=".DB_quote_smart($gameid));
+  while($r = DB_fetch_array($result))
     {
       $id = $r[0];
 
-      $tmp = mysql_query("SELECT id  FROM Hand_Card WHERE hand_id=".DB_quote_smart($id));
-      $tmp = mysql_fetch_array($tmp,MYSQL_NUM);
-      mysql_query("DELETE FROM Play WHERE hand_card_id=".DB_quote_smart($tmp[0]));
+      $tmp = DB_query_array("SELECT id  FROM Hand_Card WHERE hand_id=".DB_quote_smart($id));
+      DB_query("DELETE FROM Play WHERE hand_card_id=".DB_quote_smart($tmp[0]));
 
-
-      mysql_query("DELETE FROM Hand_Card WHERE hand_id=".DB_quote_smart($id));
-      mysql_query("DELETE FROM Hand WHERE id=".DB_quote_smart($id));
+      DB_query("DELETE FROM Hand_Card WHERE hand_id=".DB_quote_smart($id));
+      DB_query("DELETE FROM Hand WHERE id=".DB_quote_smart($id));
     }
 
   /* delete game */
-  mysql_query("DELETE FROM User_Game_Prefs WHERE game_id=".DB_quote_smart($gameid));
-  mysql_query("DELETE FROM Trick WHERE game_id=".DB_quote_smart($gameid));
-  mysql_query("DELETE FROM Game WHERE id=".DB_quote_smart($gameid));
+  DB_query("DELETE FROM User_Game_Prefs WHERE game_id=".DB_quote_smart($gameid));
+  DB_query("DELETE FROM Trick WHERE game_id=".DB_quote_smart($gameid));
+  DB_query("DELETE FROM Game WHERE id=".DB_quote_smart($gameid));
 
   return;
 }
@@ -252,8 +264,8 @@ function DB_get_hand($me)
 
   $handid = DB_get_handid('hash',$me);
 
-  $result = mysql_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid)." and played='false' ");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid)." and played='false' ");
+  while($r = DB_fetch_array($result))
     $cards[]=$r[0];
 
   return $cards;
@@ -265,8 +277,8 @@ function DB_get_all_hand($me)
 
   $handid = DB_get_handid('hash',$me);
 
-  $result = mysql_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid));
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT card_id FROM Hand_Card WHERE hand_id=".DB_quote_smart($handid));
+  while($r = DB_fetch_array($result))
     $cards[]=$r[0];
 
   return $cards;
@@ -277,11 +289,11 @@ function DB_get_cards_by_trick($id)
   $cards = array();
   $i     = 1;
 
-  $result = mysql_query("SELECT card_id,position FROM Play LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id ".
-			"LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
-			"WHERE trick_id=".
-			DB_quote_smart($id)." ORDER BY sequence ASC");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT card_id,position FROM Play LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id ".
+		     "LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
+		     "WHERE trick_id=".
+		     DB_quote_smart($id)." ORDER BY sequence ASC");
+  while($r = DB_fetch_array($result))
     {
       $cards[$i]=array("card"=>$r[0],"pos"=>$r[1]);
       $i++;
@@ -293,19 +305,19 @@ function DB_get_cards_by_trick($id)
 
 function DB_set_solo_by_hash($hash,$solo)
 {
-  mysql_query("UPDATE Hand SET solo=".DB_quote_smart($solo)." WHERE hash=".DB_quote_smart($hash));
+  DB_query("UPDATE Hand SET solo=".DB_quote_smart($solo)." WHERE hash=".DB_quote_smart($hash));
   return;
 }
 
 function DB_set_solo_by_gameid($id,$solo)
 {
-  mysql_query("UPDATE Game SET solo=".DB_quote_smart($solo)." WHERE id=".DB_quote_smart($id));
+  DB_query("UPDATE Game SET solo=".DB_quote_smart($solo)." WHERE id=".DB_quote_smart($id));
   return;
 }
 
 function DB_set_sickness_by_hash($hash,$sickness)
 {
-  mysql_query("UPDATE Hand SET sickness=".DB_quote_smart($sickness)." WHERE hash=".DB_quote_smart($hash));
+  DB_query("UPDATE Hand SET sickness=".DB_quote_smart($sickness)." WHERE hash=".DB_quote_smart($hash));
   return;
 }
 
@@ -315,11 +327,11 @@ function DB_get_current_trickid($gameid)
   $sequence = NULL;
   $number   = 0;
 
-  $result = mysql_query("SELECT Trick.id,MAX(Play.sequence) FROM Play ".
-			"LEFT JOIN Trick ON Play.trick_id=Trick.id ".
-			"WHERE Trick.game_id=".DB_quote_smart($gameid)." ".
-			"GROUP BY Trick.id");
-  while( $r = mysql_fetch_array($result,MYSQL_NUM) )
+  $result = DB_query("SELECT Trick.id,MAX(Play.sequence) FROM Play ".
+		     "LEFT JOIN Trick ON Play.trick_id=Trick.id ".
+		     "WHERE Trick.game_id=".DB_quote_smart($gameid)." ".
+		     "GROUP BY Trick.id");
+  while( $r = DB_fetch_array($result) )
     {
       $trickid  = $r[0];
       $sequence = $r[1];
@@ -328,8 +340,8 @@ function DB_get_current_trickid($gameid)
 
   if(!$sequence || $sequence==4)
     {
-      mysql_query("INSERT INTO Trick VALUES (NULL,NULL,NULL, ".DB_quote_smart($gameid).",NULL)");
-      $trickid  = mysql_insert_id();
+      DB_query("INSERT INTO Trick VALUES (NULL,NULL,NULL, ".DB_quote_smart($gameid).",NULL)");
+      $trickid  = DB_insert_id();
       $sequence = 1;
       $number++;
     }
@@ -343,18 +355,17 @@ function DB_get_current_trickid($gameid)
 
 function DB_get_max_trickid($gameid)
 {
-  $result = mysql_query("SELECT MAX(id) FROM Trick WHERE game_id=".DB_quote_smart($gameid));
-  $r = mysql_fetch_array($result,MYSQL_NUM) ;
+  $r = DB_query_array("SELECT MAX(id) FROM Trick WHERE game_id=".DB_quote_smart($gameid));
 
   return ($r?$r[0]:NULL);
 }
 
 function DB_play_card($trickid,$handcardid,$sequence)
 {
-  mysql_query("INSERT INTO Play VALUES(NULL,NULL,NULL,".DB_quote_smart($trickid).
-	      ",".DB_quote_smart($handcardid).",".DB_quote_smart($sequence).")");
+  DB_query("INSERT INTO Play VALUES(NULL,NULL,NULL,".DB_quote_smart($trickid).
+	   ",".DB_quote_smart($handcardid).",".DB_quote_smart($sequence).")");
 
-  $playid = mysql_insert_id();
+  $playid = DB_insert_id();
   return $playid;
 }
 
@@ -362,9 +373,9 @@ function DB_get_all_names_by_gameid($id)
 {
   $names = array();
 
-  $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE game_id=".
-			DB_quote_smart($id)." ORDER BY position ASC");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE game_id=".
+		     DB_quote_smart($id)." ORDER BY position ASC");
+  while($r = DB_fetch_array($result))
     $names[] = $r[0];
 
   return $names;
@@ -374,9 +385,9 @@ function DB_get_all_userid_by_gameid($id)
 {
   $names = array();
 
-  $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
-			DB_quote_smart($id)." ORDER BY position ");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT user_id FROM Hand WHERE game_id=".
+		     DB_quote_smart($id)." ORDER BY position ");
+  while($r = DB_fetch_array($result))
     $names[] = $r[0];
 
   return $names;
@@ -384,8 +395,7 @@ function DB_get_all_userid_by_gameid($id)
 
 function DB_get_hash_from_game_and_pos($id,$pos)
 {
-  $result = mysql_query("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and position=".DB_quote_smart($pos));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and position=".DB_quote_smart($pos));
 
   if($r)
     return $r[0];
@@ -395,8 +405,7 @@ function DB_get_hash_from_game_and_pos($id,$pos)
 
 function DB_get_hash_from_gameid_and_userid($id,$user)
 {
-  $result = mysql_query("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and user_id=".DB_quote_smart($user));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($id)." and user_id=".DB_quote_smart($user));
 
   if($r)
     return $r[0];
@@ -408,8 +417,8 @@ function DB_get_all_names()
 {
   $names  = array();
 
-  $result = mysql_query("SELECT fullname FROM User");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT fullname FROM User");
+  while($r = DB_fetch_array($result))
     $names[] = $r[0];
 
   return $names;
@@ -419,8 +428,8 @@ function DB_get_names_of_last_logins($N)
 {
   $names  = array();
 
-  $result = mysql_query("SELECT fullname FROM User ORDER BY last_login DESC LIMIT $N");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT fullname FROM User ORDER BY last_login DESC LIMIT $N");
+  while($r = DB_fetch_array($result))
     $names[] = $r[0];
 
   return $names;
@@ -430,8 +439,8 @@ function DB_get_names_of_new_logins($N)
 {
   $names  = array();
 
-  $result = mysql_query("SELECT fullname FROM User ORDER BY create_date DESC, id DESC LIMIT $N");
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT fullname FROM User ORDER BY create_date DESC, id DESC LIMIT $N");
+  while($r = DB_fetch_array($result))
     $names[] = $r[0];
 
   return $names;
@@ -439,21 +448,20 @@ function DB_get_names_of_new_logins($N)
 
 function DB_update_game_timestamp($gameid)
 {
-  mysql_query("UPDATE Game SET mod_date = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($gameid));
+  DB_query("UPDATE Game SET mod_date = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($gameid));
   return;
 }
 
 
 function DB_update_user_timestamp($userid)
 {
-  mysql_query("UPDATE User SET last_login = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($userid));
+  DB_query("UPDATE User SET last_login = CURRENT_TIMESTAMP WHERE id=".DB_quote_smart($userid));
   return;
 }
 
 function DB_get_user_timestamp($userid)
 {
-  $result = mysql_query("SELECT last_login FROM User WHERE id=".DB_quote_smart($userid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT last_login FROM User WHERE id=".DB_quote_smart($userid));
 
   if($r)
     return $r[0];
@@ -462,8 +470,7 @@ function DB_get_user_timestamp($userid)
 }
 function DB_get_user_timezone($userid)
 {
-  $result = mysql_query("SELECT timezone FROM User WHERE id=".DB_quote_smart($userid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT timezone FROM User WHERE id=".DB_quote_smart($userid));
 
   if($r)
     return $r[0];
@@ -473,14 +480,14 @@ function DB_get_user_timezone($userid)
 
 function DB_insert_comment($comment,$playid,$userid)
 {
-  mysql_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid, ".DB_quote_smart($comment).")");
+  DB_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid, ".DB_quote_smart($comment).")");
 
   return;
 }
 
 function DB_insert_note($comment,$gameid,$userid)
 {
-  mysql_query("INSERT INTO Notes VALUES (NULL,NULL,NULL,$userid,$gameid, ".DB_quote_smart($comment).")");
+  DB_query("INSERT INTO Notes VALUES (NULL,NULL,NULL,$userid,$gameid, ".DB_quote_smart($comment).")");
 
   return;
 }
@@ -489,10 +496,10 @@ function DB_get_notes_by_userid_and_gameid($userid,$gameid)
 {
   $notes = array();
 
-  $result = mysql_query("SELECT comment FROM Notes WHERE user_id=".DB_quote_smart($userid) .
-			" AND game_id=".DB_quote_smart($gameid));
+  $result = DB_query("SELECT comment FROM Notes WHERE user_id=".DB_quote_smart($userid) .
+		     " AND game_id=".DB_quote_smart($gameid));
 
-  while($r = mysql_fetch_array($result,MYSQL_NUM))
+  while($r = DB_fetch_array($result))
     $notes[] = $r[0];
 
   return $notes;
@@ -501,8 +508,7 @@ function DB_get_notes_by_userid_and_gameid($userid,$gameid)
 
 function DB_get_gametype_by_gameid($id)
 {
-  $result = mysql_query("SELECT type FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT type FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0]."";
@@ -512,14 +518,13 @@ function DB_get_gametype_by_gameid($id)
 
 function DB_set_gametype_by_gameid($id,$p)
 {
-  mysql_query("UPDATE Game SET type='".$p."' WHERE id=".DB_quote_smart($id));
+  DB_query("UPDATE Game SET type='".$p."' WHERE id=".DB_quote_smart($id));
   return;
 }
 
 function DB_get_solo_by_gameid($id)
 {
-  $result = mysql_query("SELECT solo FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT solo FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0]."";
@@ -530,8 +535,7 @@ function DB_get_solo_by_gameid($id)
 
 function DB_get_startplayer_by_gameid($id)
 {
-  $result = mysql_query("SELECT startplayer FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT startplayer FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];
@@ -541,14 +545,13 @@ function DB_get_startplayer_by_gameid($id)
 
 function DB_set_startplayer_by_gameid($id,$p)
 {
-  mysql_query("UPDATE Game SET startplayer='".$p."' WHERE id=".DB_quote_smart($id));
+  DB_query("UPDATE Game SET startplayer='".$p."' WHERE id=".DB_quote_smart($id));
   return;
 }
 
 function DB_get_player_by_gameid($id)
 {
-  $result = mysql_query("SELECT player FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT player FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];
@@ -557,7 +560,7 @@ function DB_get_player_by_gameid($id)
 }
 function DB_set_player_by_gameid($id,$p)
 {
-  mysql_query("UPDATE Game SET player='".DB_quote_smart($p)."' WHERE id=".DB_quote_smart($id));
+  DB_query("UPDATE Game SET player='".DB_quote_smart($p)."' WHERE id=".DB_quote_smart($id));
   return;
 }
 
@@ -565,8 +568,7 @@ function DB_set_player_by_gameid($id,$p)
 
 function DB_get_ruleset_by_gameid($id)
 {
-  $result = mysql_query("SELECT ruleset FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT ruleset FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];
@@ -576,8 +578,7 @@ function DB_get_ruleset_by_gameid($id)
 
 function DB_get_session_by_gameid($id)
 {
-  $result = mysql_query("SELECT session FROM Game WHERE id=".DB_quote_smart($id));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT session FROM Game WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];
@@ -587,8 +588,7 @@ function DB_get_session_by_gameid($id)
 
 function DB_get_max_session()
 {
-  $result = mysql_query("SELECT MAX(session) FROM Game");
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT MAX(session) FROM Game");
 
   if($r)
     return $r[0];
@@ -600,12 +600,12 @@ function DB_get_hashes_by_session($session,$user)
 {
   $r = array();
 
-  $result = mysql_query("SELECT Hand.hash FROM Hand".
-			" LEFT JOIN Game ON Game.id=Hand.game_id ".
-			" WHERE Game.session=".DB_quote_smart($session).
-			" AND Hand.user_id=".DB_quote_smart($user).
-			" ORDER BY Game.create_date ASC");
-  while($t = mysql_fetch_array($result,MYSQL_NUM))
+  $result = DB_query("SELECT Hand.hash FROM Hand".
+		     " LEFT JOIN Game ON Game.id=Hand.game_id ".
+		     " WHERE Game.session=".DB_quote_smart($session).
+		     " AND Hand.user_id=".DB_quote_smart($user).
+		     " ORDER BY Game.create_date ASC");
+  while($t = DB_fetch_array($result))
     $r[] = $t[0];
 
   return $r;
@@ -615,25 +615,25 @@ function DB_get_ruleset($dullen,$schweinchen,$call)
 {
   $r = array();
 
-  $result = mysql_query("SELECT id FROM Rulesets WHERE".
-			" dullen=".DB_quote_smart($dullen)." AND ".
-			" call=".DB_quote_smart($call)." AND ".
-			" schweinchen=".DB_quote_smart($schweinchen));
+  $result = DB_query("SELECT id FROM Rulesets WHERE".
+		     " dullen=".DB_quote_smart($dullen)." AND ".
+		     " call=".DB_quote_smart($call)." AND ".
+		     " schweinchen=".DB_quote_smart($schweinchen));
   if($result)
-    $r    = mysql_fetch_array($result,MYSQL_NUM);
+    $r    = DB_fetch_array($result);
 
   if($r)
     return $r[0]; /* found ruleset */
   else
     {
       /* create new one */
-      $result = mysql_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
-			    DB_quote_smart($dullen).",".
-			    DB_quote_smart($schweinchen).",".
-			    DB_quote_smart($call).
-			    ", NULL)");
+      $result = DB_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
+			 DB_quote_smart($dullen).",".
+			 DB_quote_smart($schweinchen).",".
+			 DB_quote_smart($call).
+			 ", NULL)");
       if($result)
-	return mysql_insert_id();
+	return DB_insert_id();
     };
 
   return -1; /* something went wrong */
@@ -641,8 +641,7 @@ function DB_get_ruleset($dullen,$schweinchen,$call)
 
 function DB_get_party_by_hash($hash)
 {
-  $result = mysql_query("SELECT party FROM Hand WHERE hash=".DB_quote_smart($hash));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT party FROM Hand WHERE hash=".DB_quote_smart($hash));
 
   if($r)
     return $r[0];
@@ -652,11 +651,9 @@ function DB_get_party_by_hash($hash)
 
 function DB_get_party_by_gameid_and_userid($gameid,$userid)
 {
-  $result = mysql_query("SELECT party FROM Hand".
-			" WHERE game_id=".DB_quote_smart($gameid).
-			"  AND user_id=".DB_quote_smart($userid));
-  $r      = mysql_fetch_array($result,MYSQL_NUM);
-
+  $r = DB_query_array("SELECT party FROM Hand".
+		      " WHERE game_id=".DB_quote_smart($gameid).
+		      "  AND user_id=".DB_quote_smart($userid));
   if($r)
     return $r[0];
   else
@@ -665,7 +662,7 @@ function DB_get_party_by_gameid_and_userid($gameid,$userid)
 
 function DB_set_party_by_hash($hash,$party)
 {
-  mysql_query("UPDATE Hand SET party=".DB_quote_smart($party)." WHERE hash=".DB_quote_smart($hash));
+  DB_query("UPDATE Hand SET party=".DB_quote_smart($party)." WHERE hash=".DB_quote_smart($hash));
   return;
 }
 
@@ -674,9 +671,8 @@ function DB_get_PREF($myid)
   global $PREF;
 
   /* Cardset */
-  $result = mysql_query("SELECT value from User_Prefs".
-			" WHERE user_id='$myid' AND pref_key='cardset'" );
-  $r = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT value from User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='cardset'" );
   if($r)
     {
       if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
@@ -688,9 +684,8 @@ function DB_get_PREF($myid)
     $PREF["cardset"]="english";
 
   /* Email */
-  $result = mysql_query("SELECT value FROM User_Prefs".
-			" WHERE user_id='$myid' AND pref_key='email'" );
-  $r = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='email'" );
   if($r)
     {
       if($r[0]=="emailaddict")
@@ -706,10 +701,9 @@ function DB_get_PREF($myid)
 
 function DB_get_email_pref_by_hash($hash)
 {
-  $result = mysql_query("SELECT value FROM Hand".
-			" LEFT JOIN User_Prefs ON Hand.user_id=User_Prefs.user_id".
-			" WHERE hash='$hash' AND pref_key='email'" );
-  $r = mysql_fetch_array($result,MYSQL_NUM);
+  $r = EB_query_array("SELECT value FROM Hand".
+		      " LEFT JOIN User_Prefs ON Hand.user_id=User_Prefs.user_id".
+		      " WHERE hash='$hash' AND pref_key='email'" );
   if($r)
     {
       if($r[0]=="emailaddict")
@@ -723,9 +717,8 @@ function DB_get_email_pref_by_hash($hash)
 
 function DB_get_email_pref_by_uid($uid)
 {
-  $result = mysql_query("SELECT value FROM User_Prefs ".
-			" WHERE user_id='$uid' AND pref_key='email'" );
-  $r = mysql_fetch_array($result,MYSQL_NUM);
+  $r = DB_query_array("SELECT value FROM User_Prefs ".
+		      " WHERE user_id='$uid' AND pref_key='email'" );
   if($r)
     {
       if($r[0]=="emailaddict")
@@ -739,16 +732,13 @@ function DB_get_email_pref_by_uid($uid)
 
 function DB_get_unused_randomnumbers($userstr)
 {
-  $queryresult = mysql_query(" SELECT randomnumbers FROM Game".
-			     "   WHERE randomnumbers NOT IN".
-			     "           (SELECT randomnumbers FROM Game".
-			     "                LEFT JOIN Hand ON Game.id=Hand.game_id".
-			     "                WHERE user_id IN  (". $userstr .")".
-			     "                GROUP BY randomnumbers".
-			     "           )");
-
-
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  $r = DB_query_array(" SELECT randomnumbers FROM Game".
+		      "   WHERE randomnumbers NOT IN".
+		      "           (SELECT randomnumbers FROM Game".
+		      "                LEFT JOIN Hand ON Game.id=Hand.game_id".
+		      "                WHERE user_id IN  (". $userstr .")".
+		      "                GROUP BY randomnumbers".
+		      "           )");
   if($r)
     return $r[0];
   else
@@ -757,12 +747,10 @@ function DB_get_unused_randomnumbers($userstr)
 
 function DB_get_number_of_passwords_recovery($user)
 {
-  $queryresult = mysql_query("SELECT COUNT(*) FROM Recovery ".
-			     "  WHERE user_id=$user ".
-			     "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
-			     "  GROUP BY user_id " );
-
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  $r = DB_query_array("SELECT COUNT(*) FROM Recovery ".
+		      "  WHERE user_id=$user ".
+		      "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
+		      "  GROUP BY user_id " );
   if($r)
     return $r[0];
   else
@@ -771,17 +759,15 @@ function DB_get_number_of_passwords_recovery($user)
 
 function DB_set_recovery_password($user,$newpw)
 {
-  mysql_query("INSERT INTO Recovery VALUES(NULL,".DB_quote_smart($user).
-	      ",".DB_quote_smart($newpw).",NULL)");
-
+  DB_query("INSERT INTO Recovery VALUES(NULL,".DB_quote_smart($user).
+	   ",".DB_quote_smart($newpw).",NULL)");
   return;
 }
 
 function DB_get_card_name($card)
 {
-  $queryresult = mysql_query("SELECT strength,suite FROM Card WHERE id='$card'");
+  $r = DB_query_array("SELECT strength,suite FROM Card WHERE id='$card'");
 
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
   if($r)
     return $r[0]." of ".$r[1];
   else
@@ -794,9 +780,8 @@ function DB_get_current_playid($gameid)
 
   if(!$trick) return NULL;
 
-  $queryresult = mysql_query("SELECT id FROM Play WHERE trick_id='$trick' ORDER BY create_date DESC LIMIT 1");
+  $r = DB_query_array("SELECT id FROM Play WHERE trick_id='$trick' ORDER BY create_date DESC LIMIT 1");
 
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
   if($r)
     return $r[0];
 
@@ -805,9 +790,8 @@ function DB_get_current_playid($gameid)
 
 function DB_get_call_by_hash($hash)
 {
-  $queryresult = mysql_query("SELECT point_call FROM Hand WHERE hash='$hash'");
+  $r = DB_query_array("SELECT point_call FROM Hand WHERE hash='$hash'");
 
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
   if($r)
     return $r[0];
 
@@ -820,9 +804,8 @@ function DB_get_partner_call_by_hash($hash)
 
   if($partner)
     {
-      $queryresult = mysql_query("SELECT point_call FROM Hand WHERE hash='$partner'");
+      $r = DB_query_array("SELECT point_call FROM Hand WHERE hash='$partner'");
 
-      $r = mysql_fetch_array($queryresult,MYSQL_NUM);
       if($r)
 	return $r[0];
     }
@@ -835,9 +818,8 @@ function DB_get_partner_hash_by_hash($hash)
   $gameid = DB_get_gameid_by_hash($hash);
   $party  = DB_get_party_by_hash($hash);
 
-  $queryresult = mysql_query("SELECT hash FROM Hand WHERE game_id='$gameid' AND party='$party' AND hash<>'$hash'");
+  $r = DB_query_array("SELECT hash FROM Hand WHERE game_id='$gameid' AND party='$party' AND hash<>'$hash'");
 
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
   if($r)
     return $r[0];
 
@@ -849,24 +831,20 @@ function DB_format_gameid($gameid)
   $session = DB_get_session_by_gameid($gameid);
 
   /* get number of game */
-  $result = mysql_query("SELECT COUNT(*),create_date FROM Game".
-			" WHERE session='$session' ".
-			" AND TIMEDIFF(create_date, (SELECT create_date FROM Game WHERE id='$gameid'))<=0 ".
-			" GROUP by session");
-  $r = mysql_fetch_array($result,MYSQL_NUM);
-
+  $r = DB_query_array("SELECT COUNT(*),create_date FROM Game".
+		      " WHERE session='$session' ".
+		      " AND TIMEDIFF(create_date, (SELECT create_date FROM Game WHERE id='$gameid'))<=0 ".
+		      " GROUP by session");
   return $session.".".$r[0];
 }
 
 function DB_get_reminder($user,$gameid)
 {
-  $queryresult = mysql_query("SELECT COUNT(*) FROM Reminder ".
-			     "  WHERE user_id=$user ".
-			     "  AND game_id=$gameid ".
-			     "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
-			     "  GROUP BY user_id " );
-
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  $r = DB_query_array("SELECT COUNT(*) FROM Reminder ".
+		      "  WHERE user_id=$user ".
+		      "  AND game_id=$gameid ".
+		      "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
+		      "  GROUP BY user_id " );
   if($r)
     return $r[0];
   else
@@ -875,19 +853,17 @@ function DB_get_reminder($user,$gameid)
 
 function DB_set_reminder($user,$gameid)
 {
-  mysql_query("INSERT INTO Reminder ".
-	      "  VALUES(NULL, ".DB_quote_smart($user).", ".DB_quote_smart($gameid).
-              ", NULL) ");
+  DB_query("INSERT INTO Reminder ".
+	   "  VALUES(NULL, ".DB_quote_smart($user).", ".DB_quote_smart($gameid).
+	   ", NULL) ");
   return 0;
 }
 
 function DB_is_session_active($session)
 {
-  $queryresult = mysql_query("SELECT COUNT(*) FROM Game ".
-			     "  WHERE session=$session ".
-			     "  AND status<>'gameover' ");
-
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
+  $r = DB_query_array("SELECT COUNT(*) FROM Game ".
+		      "  WHERE session=$session ".
+		      "  AND status<>'gameover' ");
   if($r)
     return $r[0];
   else
@@ -897,14 +873,13 @@ function DB_is_session_active($session)
 function DB_get_score_by_gameid($gameid)
 {
   /* returns the points of a game from the point of the re parth (<0 if they lost) */
-  $queryresult = mysql_query("SELECT COUNT(*),party FROM Score ".
-			     "  WHERE game_id=$gameid ".
-			     "  GROUP BY party ");
-
+  $queryresult = DB_query("SELECT COUNT(*),party FROM Score ".
+			  "  WHERE game_id=$gameid ".
+			  "  GROUP BY party ");
   $re     = 0;
   $contra = 0;
 
-  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+  while($r = DB_fetch_array($queryresult) )
     {
       if($r[1] == "re")
 	$re += $r[0];
@@ -920,17 +895,17 @@ function DB_get_gameids_of_finished_games_by_session($session)
   $ids = array ();
 
   if($session==0) /* return all games */
-    $queryresult = mysql_query("SELECT id FROM Game ".
-			       " WHERE status='gameover' ".
-			       " ORDER BY create_date ASC");
+    $queryresult = DB_query("SELECT id FROM Game ".
+			    " WHERE status='gameover' ".
+			    " ORDER BY create_date ASC");
   else   /* return games in a session */
-    $queryresult = mysql_query("SELECT id FROM Game ".
-			       "  WHERE session=$session ".
-			       "   AND status='gameover' ".
-			       " ORDER BY create_date ASC");
+    $queryresult = DB_query("SELECT id FROM Game ".
+			    "  WHERE session=$session ".
+			    "   AND status='gameover' ".
+			    " ORDER BY create_date ASC");
 
   $i=0;
-  while($r = mysql_fetch_array($queryresult,MYSQL_NUM) )
+  while($r = DB_fetch_array($queryresult) )
     {
       $ids[$i] = $r[0];
       $i++;
@@ -941,10 +916,9 @@ function DB_get_gameids_of_finished_games_by_session($session)
 
 function DB_get_card_value_by_cardid($id)
 {
-  $queryresult = mysql_query("SELECT points FROM Card ".
-			     "  WHERE id=$id ");
+  $r = DB_query_array("SELECT points FROM Card ".
+		      "  WHERE id=$id ");
 
-  $r = mysql_fetch_array($queryresult,MYSQL_NUM);
   if($r)
     return $r[0];
   else
@@ -964,40 +938,40 @@ function DB_get_userid($type,$var1="",$var2="")
   switch($type)
     {
     case 'name':
-      $result = mysql_query("SELECT id FROM User WHERE fullname=".DB_quote_smart($var1));
+      $result = DB_query("SELECT id FROM User WHERE fullname=".DB_quote_smart($var1));
       break;
     case 'hash':
-      $result = mysql_query("SELECT user_id FROM Hand WHERE hash=".DB_quote_smart($var1));
+      $result = DB_query("SELECT user_id FROM Hand WHERE hash=".DB_quote_smart($var1));
       break;
     case 'password':
-      $result = mysql_query("SELECT id FROM User WHERE password=".DB_quote_smart($var1));
+      $result = DB_query("SELECT id FROM User WHERE password=".DB_quote_smart($var1));
       break;
     case 'email':
-      $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($var1));
+      $result = DB_query("SELECT id FROM User WHERE email=".DB_quote_smart($var1));
       break;
     case 'email-password':
-      $result = mysql_query("SELECT id FROM User WHERE email=".DB_quote_smart($var1)." AND password=".DB_quote_smart($var2));
-      $r = mysql_fetch_array($result,MYSQL_NUM);
+      $result = DB_query("SELECT id FROM User WHERE email=".DB_quote_smart($var1)." AND password=".DB_quote_smart($var2));
+      $r = DB_fetch_array($result);
       /* test if a recovery password has been set */
       if(!$r)
 	{
 	  echo "testing alternative password";
-	  $result = mysql_query("SELECT User.id FROM User".
-				" LEFT JOIN Recovery ON User.id=Recovery.user_id".
-				" WHERE email=".DB_quote_smart($var1).
-				" AND Recovery.password=".DB_quote_smart($var2).
-				" AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
+	  $result = DB_query("SELECT User.id FROM User".
+			     " LEFT JOIN Recovery ON User.id=Recovery.user_id".
+			     " WHERE email=".DB_quote_smart($var1).
+			     " AND Recovery.password=".DB_quote_smart($var2).
+			     " AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
 	}
       break;
     case 'gameid-position':
-      $result = mysql_query("SELECT user_id FROM Hand WHERE game_id=".
-			    DB_quote_smart($var1)." AND position=".
-			    DB_quote_smart($var2));
+      $result = DB_query("SELECT user_id FROM Hand WHERE game_id=".
+			 DB_quote_smart($var1)." AND position=".
+			 DB_quote_smart($var2));
       break;
     }
 
   if(!$r)
-    $r = mysql_fetch_array($result,MYSQL_NUM);
+    $r = DB_fetch_array($result);
 
   if($r)
     return $r[0];
@@ -1014,26 +988,26 @@ function DB_get_email($type,$var1='',$var2='')
   switch($type)
     {
     case 'name':
-      $result = mysql_query("SELECT email FROM User WHERE fullname=".DB_quote_smart($var1)."");
+      $result = DB_query("SELECT email FROM User WHERE fullname=".DB_quote_smart($var1)."");
       break;
     case 'userid':
-      $result = mysql_query("SELECT email FROM User WHERE id=".DB_quote_smart($var1)."");
+      $result = DB_query("SELECT email FROM User WHERE id=".DB_quote_smart($var1)."");
       break;
     case 'hash':
-      $result = mysql_query("SELECT User.email FROM User ".
-			    "LEFT JOIN Hand ON Hand.user_id=User.id ".
-			    "WHERE Hand.hash=".DB_quote_smart($var1)."");
+      $result = DB_query("SELECT User.email FROM User ".
+			 "LEFT JOIN Hand ON Hand.user_id=User.id ".
+			 "WHERE Hand.hash=".DB_quote_smart($var1)."");
       break;
     case 'position-gameid':
-      $result = mysql_query("SELECT email FROM User ".
-			    "LEFT JOIN Hand ON User.id=Hand.user_id ".
-			    "LEFT JOIN Game ON Game.id=Hand.game_id ".
-			    "WHERE Game.id=".DB_quote_smart($var2)." ".
-			    "AND Hand.position=".DB_quote_smart($var1)."");
+      $result = DB_query("SELECT email FROM User ".
+			 "LEFT JOIN Hand ON User.id=Hand.user_id ".
+			 "LEFT JOIN Game ON Game.id=Hand.game_id ".
+			 "WHERE Game.id=".DB_quote_smart($var2)." ".
+			 "AND Hand.position=".DB_quote_smart($var1)."");
       break;
     }
-
-  $r = mysql_fetch_array($result,MYSQL_NUM);
+  
+  $r = DB_fetch_array($result);
 
   if($r)
     return $r[0];
@@ -1049,16 +1023,14 @@ function DB_get_name($type,$var1='')
   switch($type)
     {
     case 'hash':
-      $result = mysql_query("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($var1));
+      $r = DB_query_array("SELECT fullname FROM Hand LEFT JOIN User ON Hand.user_id=User.id WHERE hash=".DB_quote_smart($var1));
       break;
     case 'email':
-      $result = mysql_query("SELECT fullname FROM User WHERE email=".DB_quote_smart($var1));
+      $r = DB_query_array("SELECT fullname FROM User WHERE email=".DB_quote_smart($var1));
       break;
     case 'userid':
-      $result = mysql_query("SELECT fullname FROM User  WHERE id=".DB_quote_smart($var1));
+      $r = DB_query_array("SELECT fullname FROM User  WHERE id=".DB_quote_smart($var1));
     }
-
-  $r = mysql_fetch_array($result,MYSQL_NUM);
 
   if($r)
     return $r[0];

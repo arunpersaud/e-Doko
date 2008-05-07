@@ -35,8 +35,7 @@ $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
 
 /* check if player hasn't done anything in a while */
-$result = mysql_query("SELECT mod_date,player,status from Game WHERE id='$gameid' " );
-$r = mysql_fetch_array($result,MYSQL_NUM);
+$r = DB_query_array("SELECT mod_date,player,status from Game WHERE id='$gameid' " );
 if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week */
   {
     $name = DB_get_name('userid',$r[1]);

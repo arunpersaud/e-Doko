@@ -111,26 +111,26 @@ if(myisset("forgot"))
 	       {
 	       case "germancards":
 	       case "englishcards":
-		 $result = mysql_query("SELECT * from User_Prefs".
-				       " WHERE user_id='$myid' AND pref_key='cardset'" );
-		 if( mysql_fetch_array($result,MYSQL_NUM))
-		   $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
-					 " WHERE user_id='$myid' AND pref_key='cardset'" );
+		 $result = DB_query("SELECT * from User_Prefs".
+				    " WHERE user_id='$myid' AND pref_key='cardset'" );
+		 if( DB_fetch_array($result))
+		   $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
+				      " WHERE user_id='$myid' AND pref_key='cardset'" );
 		 else
-		   $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','cardset',".
-					 DB_quote_smart($setpref).")");
+		   $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','cardset',".
+				      DB_quote_smart($setpref).")");
 		 echo "Ok, changed you preferences for the cards.\n";
 		 break;
 	       case "emailaddict":
 	       case "emailnonaddict":
-		 $result = mysql_query("SELECT * from User_Prefs".
-				       " WHERE user_id='$myid' AND pref_key='email'" );
-		 if( mysql_fetch_array($result,MYSQL_NUM))
-		   $result = mysql_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
-					 " WHERE user_id='$myid' AND pref_key='email'" );
+		 $result = DB_query("SELECT * from User_Prefs".
+				    " WHERE user_id='$myid' AND pref_key='email'" );
+		 if( DB_fetch_array($result))
+		   $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
+				      " WHERE user_id='$myid' AND pref_key='email'" );
 		 else
-		   $result = mysql_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','email',".
-					 DB_quote_smart($setpref).")");
+		   $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','email',".
+				      DB_quote_smart($setpref).")");
 		 echo "Ok, changed you preferences for sending out emails.\n";
 		 break;
 	       }
@@ -166,8 +166,8 @@ if(myisset("forgot"))
 		     break;
 		   case '1':
 		     echo "Changed the password.<br />";
-		     mysql_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
-				 "' WHERE id=".DB_quote_smart($myid));
+		     DB_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
+			      "' WHERE id=".DB_quote_smart($myid));
 		     break;
 		   }
 		 /* set password */
@@ -192,13 +192,13 @@ if(myisset("forgot"))
 	     echo "</p>\n";
 
 	     $output = array();
-	     $result = mysql_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
-				   " LEFT JOIN Game ON Game.id=Hand.game_id".
-				   " WHERE user_id='$myid'".
-				   " ORDER BY Game.session,Game.create_date" );
+	     $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
+				" LEFT JOIN Game ON Game.id=Hand.game_id".
+				" WHERE user_id='$myid'".
+				" ORDER BY Game.session,Game.create_date" );
 	     $gamenrold = -1;
 	     echo "<table>\n <tr><td>\n";
-	     while( $r = mysql_fetch_array($result,MYSQL_NUM))
+	     while( $r = DB_fetch_array($result))
 	       {
 		 $game = DB_format_gameid($r[1]);
 		 $gamenr = (int) $game;
