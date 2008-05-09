@@ -14,7 +14,7 @@ if(!$myid)
 
 output_status();
 
-DB_get_PREF($myid);
+$PREF = DB_get_PREF($myid);
 
 DB_update_user_timestamp($myid);
 

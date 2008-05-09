@@ -101,7 +101,7 @@ if(myisset("forgot"))
 	 $_SESSION["name"] = $myname;
 	 output_status();
     
-	 DB_get_PREF($myid);
+	 $PREF = DB_get_PREF($myid);
     
 	 /* does the user want to change some preferences? */
 	 if(myisset("setpref"))

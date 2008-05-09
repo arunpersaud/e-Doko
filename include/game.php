@@ -5,6 +5,7 @@
 if(!isset($HOST))
   exit;
 
+/* calling game.php only makes sense when we give it a hash for a game */
 if(!myisset("me"))
   {
     echo "Hmm, you really shouldn't mess with the urls.<br />\n";
@@ -12,10 +13,9 @@ if(!myisset("me"))
     DB_close();
     exit();
   }
-
 $me = $_REQUEST["me"];
 
-/* test for valid ID */
+/* Ok, got a hash, but is it valid? */
 $myid = DB_get_userid('hash',$me);
 if(!$myid)
   {
@@ -30,7 +30,7 @@ if(!$myid)
 if(isset($_SESSION["name"]))
   output_status($_SESSION["name"]);
 
-/* the user had done something, update the timestamp */
+/* the user has done something, update the timestamp */
 DB_update_user_timestamp($myid);
 
 /* get some information from the DB */
@@ -41,17 +41,11 @@ $mypos    = DB_get_pos_by_hash($me);
 $myhand   = DB_get_handid('hash',$me);
 $session  = DB_get_session_by_gameid($gameid);
 
-/* get prefs and save them */
-DB_get_PREF($myid);
+/* get prefs and save them in a variable*/
+$PREF = DB_get_PREF($myid);
 
 /* get rule set for this game */
-$r = DB_query_array("SELECT * FROM Rulesets".
-		    " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
-		    " WHERE Game.id='$gameid'" );
-
-$RULES["dullen"]      = $r[2];
-$RULES["schweinchen"] = $r[3];
-$RULES["call"]        = $r[4];
+$RULES = DB_get_RULES($gameid);
 
 /* get some infos about the game */
 $gametype   = DB_get_gametype_by_gameid($gameid);
@@ -189,59 +183,52 @@ switch($mystatus)
 	  }
       }
   case 'init':
-
+    /* here we ask the player if he is sick */
     $mycards = DB_get_hand($me);
     sort($mycards);
-
-    output_check_for_sickness($me,$mycards);
-
-    echo "<p class=\"mycards\">Your cards are: <br />\n";
-    foreach($mycards as $card)
-      display_card($card,$PREF["cardset"]);
-    echo "</p>\n";
-
-    /* move on to the next stage*/
-    DB_set_hand_status_by_hash($me,'check');
-    break;
-
-  case 'check':
-    /* ok, user is in the game, saw his cards and selected his vorbehalt
-     * so first we check what he selected
-     */
+    
     if(!myisset("solo","wedding","poverty","nines") )
       {
-	/* all these variables have a pre-selected default,
-	 * so we should never get here,
-	 * unless a user tries to cheat ;)
-	 * can also happen if user reloads the page!
-	 */
-	echo "<p class=\"message\"> You need to answer the <a href=\"$INDEX?action=game&me=$me&in=yes\">questions</a>.</p>";
-	DB_set_hand_status_by_hash($me,'init');
+	output_check_for_sickness($me,$mycards);
+
+	echo "<p class=\"mycards\">Your cards are: <br />\n";
+	foreach($mycards as $card)
+	  display_card($card,$PREF["cardset"]);
+	echo "</p>\n";
+
+	break;
       }
     else
       {
-	/* check if someone selected more than one vorbehalt */
-	$Nvorbehalt = 0;
-	if($_REQUEST["solo"]!="No")       $Nvorbehalt++;
-	if($_REQUEST["wedding"] == "yes") $Nvorbehalt++;
-	if($_REQUEST["poverty"] == "yes") $Nvorbehalt++;
-	if($_REQUEST["nines"] == "yes")   $Nvorbehalt++;
+	/* check if someone selected more than one sickness */
+	$Nsickness = 0;
+	if($_REQUEST["solo"]!="No")       $Nsickness++;
+	if($_REQUEST["wedding"] == "yes") $Nsickness++;
+	if($_REQUEST["poverty"] == "yes") $Nsickness++;
+	if($_REQUEST["nines"] == "yes")   $Nsickness++;
 
-	if($Nvorbehalt>1)
+	if($Nsickness>1)
 	  {
-	    echo "<p class=\"message\"> You selected more than one vorbehalt, please go back ".
+	    echo "<p class=\"message\"> You selected more than one sickness, please go back ".
 	      "and answer the <a href=\"$INDEX?action=game&me=$me&in=yes\">question</a> again.</p>";
-	    DB_set_hand_status_by_hash($me,'init');
+
+	    echo "<p class=\"mycards\">Your cards are: <br />\n";
+	    foreach($mycards as $card)
+	      display_card($card,$PREF["cardset"]);
+	    echo "</p>\n";
+
+	    break;
 	  }
 	else
 	  {
+	    /* everything is ok, save what user said and proceed */
 	    echo "<p class=\"message\">Processing what you selected in the last step...";
 
 	    /* check if this sickness needs to be handled first */
 	    $gametype    = DB_get_gametype_by_gameid($gameid);
-	    $startplayer = DB_get_startplayer_by_gameid($gameid);
+	    $startplayer = DB_get_startplayer_by_gameid($gameid); /* need this to check which solo goes first */
 
-	    if( $_REQUEST["solo"]!="No")
+	    if( $_REQUEST["solo"]!="No" )
 	      {
 		/* user wants to play a solo */
 
@@ -280,45 +267,18 @@ switch($mystatus)
 		  " is playing solo, this game will be canceled.<br />\n";
 		DB_set_sickness_by_hash($me,"nines");
 	      }
-
-	    echo " Ok, done with checking, please go to the <a href=\"$INDEX?action=game&me=$me\">next step of the setup</a>.</p>";
-
+	    
+	    echo "</p>\n";
+	    
 	    /* move on to the next stage*/
 	    DB_set_hand_status_by_hash($me,'poverty');
-
-	    /* check if everyone has reached this stage, send out email */
-	    $userids = DB_get_all_userid_by_gameid($gameid);
-	    $ok = 1;
-	    foreach($userids as $user)
-	      {
-		$userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
-		if($userstat!='poverty' && $userstat!='play')
-		  {
-		    $ok = 0;
-		    DB_set_player_by_gameid($gameid,$user);
-		  }
-	      };
-	    if($ok)
-	      {
-		/* reset player = everyone has to do something now */
-		DB_set_player_by_gameid($gameid,NULL);
-
-		foreach($userids as $user)
-		  {
-		    $To       = DB_get_email('userid',$user);
-		    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-		    if($userhash != $me)
-		      {
-			$message = "Everyone finish the questionary in game ".DB_format_gameid($gameid).", ".
-			  "please visit this link now to continue: \n".
-			  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-			mymail($To,$EmailName." finished setup in game ".DB_format_gameid($gameid),$message);
-		      }
-		  };
-	      };
 	  };
       };
-    break;
+
+  case 'check':
+    /* hmm, by reorganizing things a bit, this stage is empty at the moment */
+    /* move on to the next stage, but user shouldn't get here anymore anyway */
+    DB_set_hand_status_by_hash($me,'poverty');
 
   case 'poverty':
     /* here we need to check if there is a solo or some other form of sickness.

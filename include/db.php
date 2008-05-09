@@ -668,8 +668,6 @@ function DB_set_party_by_hash($hash,$party)
 
 function DB_get_PREF($myid)
 {
-  global $PREF;
-
   /* Cardset */
   $r = DB_query_array("SELECT value from User_Prefs".
 		      " WHERE user_id='$myid' AND pref_key='cardset'" );
@@ -696,7 +694,20 @@ function DB_get_PREF($myid)
   else
     $PREF["email"]="emailnonaddict";
 
-  return;
+  return $PREF;
+}
+
+function DB_get_RULES($gameid)
+{
+  $r = DB_query_array("SELECT * FROM Rulesets".
+		      " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
+		      " WHERE Game.id='$gameid'" );
+  
+  $RULES["dullen"]      = $r[2];
+  $RULES["schweinchen"] = $r[3];
+  $RULES["call"]        = $r[4];
+  
+  return $RULES;
 }
 
 function DB_get_email_pref_by_hash($hash)
