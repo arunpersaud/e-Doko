@@ -701,7 +701,7 @@ function DB_get_PREF($myid)
 
 function DB_get_email_pref_by_hash($hash)
 {
-  $r = EB_query_array("SELECT value FROM Hand".
+  $r = DB_query_array("SELECT value FROM Hand".
 		      " LEFT JOIN User_Prefs ON Hand.user_id=User_Prefs.user_id".
 		      " WHERE hash='$hash' AND pref_key='email'" );
   if($r)
