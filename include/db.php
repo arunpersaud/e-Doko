@@ -95,6 +95,16 @@ function DB_get_passwd_by_name($name)
     return "";
 }
 
+function DB_get_passwd_by_userid($id)
+{
+  $r = DB_query_array("SELECT password FROM User WHERE id=".DB_quote_smart($id)."");
+
+  if($r)
+    return $r[0];
+  else
+    return "";
+}
+
 function DB_check_recovery_passwords($password,$email)
 {
   $r = DB_query_array("SELECT User.id FROM User".
@@ -673,7 +683,8 @@ function DB_get_PREF($myid)
 		      " WHERE user_id='$myid' AND pref_key='cardset'" );
   if($r)
     {
-      if($r[0]=="germancards" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) /* licence only valid until then */
+      /* licence only valid until then */
+      if($r[0]=="altenburg" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) 
 	$PREF["cardset"]="altenburg";
       else
 	$PREF["cardset"]="english";

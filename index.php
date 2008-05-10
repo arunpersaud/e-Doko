@@ -62,6 +62,9 @@ switch($action)
   case 'register':
     require './include/register.php';
     break;
+  case 'prefs':
+    require './include/preferences.php';
+    break;
   case 'game':
     require './include/game.php';
     break;

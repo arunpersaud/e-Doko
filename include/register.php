@@ -63,13 +63,9 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
               </tr><tr>
 	       <td><label for="Rtimezone">Timezone:</label></td>
                <td>
-		  <select id="Rtimezone" name="Rtimezone" size="1">
-                     <option value="Europe/London">Berlin</option>
-                     <option value="Europe/Berlin">Berlin</option>
-                     <option value="America/Vancouver">Berkeley</option>
-                     <option value="Pacific/Auckland">Wellington</option>
-		  </select>
-	         (If your timezone is not listed, just select whatever you want and email the admin your correct time zone.)
+<?php
+               output_select_timezone("Rtimezone");
+?>
 	       </td>
               </tr><tr>
                <td colspan="2"> <input type="submit" value="register" /></td>

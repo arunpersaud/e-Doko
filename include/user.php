@@ -84,7 +84,6 @@ if(myisset("forgot"))
  else 
    { /* normal user page */
 
-
      /* verify password and email */
      if(strlen($password)!=32)
        $password = md5($password);
@@ -103,162 +102,86 @@ if(myisset("forgot"))
     
 	 $PREF = DB_get_PREF($myid);
     
-	 /* does the user want to change some preferences? */
-	 if(myisset("setpref"))
+	 DB_update_user_timestamp($myid);
+	 
+	 display_user_menu();
+	 
+	 /* display all games the user has played */
+	 echo "<div class=\"user\">";
+	 echo "<h4>These are all your games:</h4>\n";
+	 echo "<p>Session: <br />\n";
+	 echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
+	 echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
+	 echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
+	 echo "</p>\n";
+	 
+	 $output = array();
+	 $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
+			    " LEFT JOIN Game ON Game.id=Hand.game_id".
+			    " WHERE user_id='$myid'".
+			    " ORDER BY Game.session,Game.create_date" );
+	 $gamenrold = -1;
+	 echo "<table>\n <tr><td>\n";
+	 while( $r = DB_fetch_array($result))
 	   {
-	     $setpref=$_REQUEST["setpref"];
-	     switch($setpref)
+	     $game = DB_format_gameid($r[1]);
+	     $gamenr = (int) $game;
+	     if($gamenrold < $gamenr)
 	       {
-	       case "germancards":
-	       case "englishcards":
-		 $result = DB_query("SELECT * from User_Prefs".
-				    " WHERE user_id='$myid' AND pref_key='cardset'" );
-		 if( DB_fetch_array($result))
-		   $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
-				      " WHERE user_id='$myid' AND pref_key='cardset'" );
+		 if($gamenrold!=-1)
+		   echo "</td></tr>\n <tr> <td>$gamenr:</td><td> ";
 		 else
-		   $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','cardset',".
-				      DB_quote_smart($setpref).")");
-		 echo "Ok, changed you preferences for the cards.\n";
-		 break;
-	       case "emailaddict":
-	       case "emailnonaddict":
-		 $result = DB_query("SELECT * from User_Prefs".
-				    " WHERE user_id='$myid' AND pref_key='email'" );
-		 if( DB_fetch_array($result))
-		   $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($setpref).
-				      " WHERE user_id='$myid' AND pref_key='email'" );
-		 else
-		   $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','email',".
-				      DB_quote_smart($setpref).")");
-		 echo "Ok, changed you preferences for sending out emails.\n";
-		 break;
+		   echo "$gamenr:</td><td> ";
+		 $gamenrold = $gamenr;
 	       }
-	   }
-	 /* user wants to change his password or request a temporary one */
-	 else if(myisset("passwd"))
-	   {
-	     if( $_REQUEST["passwd"]=="ask" )
+	     if($r[4]=='pre')
 	       {
-		 /* reset password form*/
-		 output_password_recovery($email,$password);
+		 echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">p </a></span> ";
+		 
 	       }
-	     else if($_REQUEST["passwd"]=="set")
+	     else if ($r[4]=='gameover')
+	       echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">F </a></span> ";
+	     else
 	       {
-		 /* reset password */
-		 $ok = 1;
-
-		 /* check if old password matches */
-		 $oldpasswd = md5($_REQUEST["password0"]);
-		 if(!( ($password == $oldpasswd) || DB_check_recovery_passwords($oldpasswd,$email) ))
-		   $ok = -1;
-		 /* check if new passwords are types the same twice */
-		 if($_REQUEST["password1"] != $_REQUEST["password2"] )
-		   $ok = -2;
-
-		 switch($ok)
-		   {
-		   case '-2':
-		     echo "The new passwords don't match. <br />";
-		     break;
-		   case '-1':
-		     echo "The old password is not correct. <br />";
-		     break;
-		   case '1':
-		     echo "Changed the password.<br />";
-		     DB_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
-			      "' WHERE id=".DB_quote_smart($myid));
-		     break;
-		   }
-		 /* set password */
+		 echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">P </a></span> ";
 	       }
-	   }
-	 else /* output default user page */
-	   {
-	     /* display links to settings */
-	     output_user_settings();
-
-	     DB_update_user_timestamp($myid);
-
-	     display_user_menu();
-
-	     /* display all games the user has played */
-	     echo "<div class=\"user\">";
-	     echo "<h4>These are all your games:</h4>\n";
-	     echo "<p>Session: <br />\n";
-	     echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
-	     echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
-	     echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
-	     echo "</p>\n";
-
-	     $output = array();
-	     $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
-				" LEFT JOIN Game ON Game.id=Hand.game_id".
-				" WHERE user_id='$myid'".
-				" ORDER BY Game.session,Game.create_date" );
-	     $gamenrold = -1;
-	     echo "<table>\n <tr><td>\n";
-	     while( $r = DB_fetch_array($result))
+	     if($r[4] != 'gameover')
 	       {
-		 $game = DB_format_gameid($r[1]);
-		 $gamenr = (int) $game;
-		 if($gamenrold < $gamenr)
-		   {
-		     if($gamenrold!=-1)
-		       echo "</td></tr>\n <tr> <td>$gamenr:</td><td> ";
-		     else
-		       echo "$gamenr:</td><td> ";
-		     $gamenrold = $gamenr;
-		   }
-		 if($r[4]=='pre')
-		   {
-		     echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">p </a></span> ";
-
-		   }
-		 else if ($r[4]=='gameover')
-		   echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">F </a></span> ";
+		 echo "</td><td>\n    ";
+		 if($r[3]==$myid || !$r[3])
+		   echo "(it's <strong>your</strong> turn)\n";
 		 else
 		   {
-		     echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">P </a></span> ";
-		   }
-		 if($r[4] != 'gameover')
-		   {
-		     echo "</td><td>\n    ";
-		     if($r[3]==$myid || !$r[3])
-		       echo "(it's <strong>your</strong> turn)\n";
-		     else
-		       {
-			 $name = DB_get_name('userid',$r[3]);
-			 $gameid = $r[1];
-			 if(DB_get_reminder($r[3],$gameid)==0)
-			   if(time()-strtotime($r[2]) > 60*60*24*7)
-			     echo "".
-			       "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
-			 echo "(it's $name's turn)\n";
-		       };
-		     if(time()-strtotime($r[2]) > 60*60*24*30)
-		       echo "".
-			 "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".
-			 " (clicking here is final and can't be restored)";
-
-		   }
+		     $name = DB_get_name('userid',$r[3]);
+		     $gameid = $r[1];
+		     if(DB_get_reminder($r[3],$gameid)==0)
+		       if(time()-strtotime($r[2]) > 60*60*24*7)
+			 echo "".
+			   "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
+		     echo "(it's $name's turn)\n";
+		   };
+		 if(time()-strtotime($r[2]) > 60*60*24*30)
+		   echo "".
+		     "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".
+		     " (clicking here is final and can't be restored)";
+		 
 	       }
-	     echo "</td></tr>\n</table>\n";
-
-	     /* display last 5 users that have signed up to e-DoKo */
-	     $names = DB_get_names_of_new_logins(5);
-	     echo "<h4>New Players:</h4>\n<p>\n";
-	     echo implode(", ",$names).",...\n";
-	     echo "</p>\n";
-
-	     /* display last 5 users that logged on */
-	     $names = DB_get_names_of_last_logins(5);
-	     echo "<h4>Players last logged in:</h4>\n<p>\n";
-	     echo implode(", ",$names).",...\n";
-	     echo "</p>\n";
-	       
-	     echo "</div>\n";
 	   }
+	 echo "</td></tr>\n</table>\n";
+	 
+	 /* display last 5 users that have signed up to e-DoKo */
+	 $names = DB_get_names_of_new_logins(5);
+	 echo "<h4>New Players:</h4>\n<p>\n";
+	 echo implode(", ",$names).",...\n";
+	 echo "</p>\n";
+	 
+	 /* display last 5 users that logged on */
+	 $names = DB_get_names_of_last_logins(5);
+	 echo "<h4>Players last logged in:</h4>\n<p>\n";
+	 echo implode(", ",$names).",...\n";
+	 echo "</p>\n";
+	 
+	 echo "</div>\n";
        }
      else
        {

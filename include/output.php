@@ -7,31 +7,6 @@ if(!isset($HOST))
 
 /* functions which only ouput html  */
 
-function output_user_settings()
-{
-  global $PREF;
-
-  echo "<div class=\"useroptions\">\n";
-  echo "<h4> Settings </h4>\n";
-  echo "<a href=\"index.php?passwd=ask\">Change password</a><br />";
-
-  echo "<h5> Card set </h5>\n";
-  if( $PREF["cardset"] == "english" )
-    echo "<a href=\"index.php?setpref=germancards\">Change to German cards</a><br />";
-  else
-    echo "<a href=\"index.php?setpref=englishcards\">Change to English cards</a> <br />";
-
-  echo "<h5> Email </h5>\n";
-  if( $PREF["email"] == "emailaddict" )
-    echo "<a href=\"index.php?setpref=emailnonaddict\">Change to non-addicted mode (emails for each move)</a><br />";
-  else
-    echo "<a href=\"index.php?setpref=emailaddict\">Change to addicted mode (minimal amount of emails)</a> <br />";
-
-  echo "</div>\n";
-
-  return;
-}
-
 function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 {
   global $RULES;
@@ -341,6 +316,28 @@ function output_status()
      };
   return;
 }
+
+function output_select_timezone($name,$timezone="")
+{
+  $Tzone = array ( "Europe/London"     => "London",
+		   "Europe/Berlin"     => "Berlin",
+		   "America/Vancouver" => "Berkeley",
+		   "Pacific/Auckland"  => "Wellington" );
+
+  echo "  <select id=\"$name\" name=\"$name\" size=\"1\">\n";
+
+  foreach($Tzone as $zone=>$city)
+    {
+      if($timezone==$zone)
+	echo "   <option value=\"$zone\" selected=\"selected\">$city</option>\n";
+      else
+	echo "   <option value=\"$zone\">$city</option>\n";
+    }
+  echo "  </select>\n";
+
+  return;
+}
+
 
 
 function output_password_recovery($email,$password)

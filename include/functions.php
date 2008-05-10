@@ -828,6 +828,8 @@ function display_user_menu()
 
   echo "<hr /> <a href=\"".$INDEX."?action=new\">Start a new game</a>\n";
 
+  echo "<hr /> <a href=\"".$INDEX."?action=prefs\">Change settings</a>\n";
+
   echo "<hr /> <a href=\"".$INDEX."?action=stats\">Statistics</a>\n";
 
   echo
