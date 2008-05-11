@@ -192,7 +192,7 @@ switch($mystatus)
     echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
     echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
       "    <div class=\"trick\" id=\"trick0\">\n";
-    
+
     for($pos=1;$pos<5;$pos++)
       {
 	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
@@ -203,7 +203,7 @@ switch($mystatus)
 	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
 	else
 	  if($usersick!=NULL && $pos<=$mypos ) /* only show this for people sitting before the player */
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n"; 
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
 	  else if($usersick==NULL && $pos<=$mypos)
 	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
       }
@@ -214,10 +214,10 @@ switch($mystatus)
       {
 	output_check_for_sickness($me,$mycards);
 
-	echo "<p class=\"mycards\">Your cards are: <br />\n";
+	echo "<div class=\"mycards\">Your cards are: <br />\n";
 	foreach($mycards as $card)
 	  display_card($card,$PREF["cardset"]);
-	echo "</p>\n";
+	echo "</div>\n";
 
 	break;
       }
@@ -235,10 +235,10 @@ switch($mystatus)
 	    echo "<p class=\"message\"> You selected more than one sickness, please go back ".
 	      "and answer the <a href=\"$INDEX?action=game&me=$me&in=yes\">question</a> again.</p>";
 
-	    echo "<p class=\"mycards\">Your cards are: <br />\n";
+	    echo "<div class=\"mycards\">Your cards are: <br />\n";
 	    foreach($mycards as $card)
 	      display_card($card,$PREF["cardset"]);
-	    echo "</p>\n";
+	    echo "</div>\n";
 
 	    break;
 	  }
@@ -290,25 +290,49 @@ switch($mystatus)
 		  " is playing solo, this game will be canceled.<br />\n";
 		DB_set_sickness_by_hash($me,"nines");
 	      }
-	    
+
 	    echo "</p>\n";
-	    
+
 	    /* move on to the next stage*/
 	    DB_set_hand_status_by_hash($me,'check');
 	  };
       };
 
   case 'check':
-    /* hmm, by reorganizing things a bit, this stage is empty at the moment */
-    /* move on to the next stage, but user shouldn't get here anymore anyway */
-    DB_set_hand_status_by_hash($me,'poverty');
-
-  case 'poverty':
-    /* here we need to check if there is a solo or some other form of sickness.
-     * If so, which one is the most important one
-     * set that one in the Game table
-     * tell people about it.
+    /* here we check what all players said and figure out what game we are playing
+     * this can therefore only be handled once all players finished the last stage
      */
+
+    /* only need to redisplay the cards when the user reloads the page and lands directly here */
+    if($mystatus=='check')
+      {
+	$mycards = DB_get_hand($me);
+	sort($mycards);
+
+	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+	echo "\n<ul class=\"tricks\">\n";
+	echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
+	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+	  "    <div class=\"trick\" id=\"trick0\">\n";
+
+	for($pos=1;$pos<5;$pos++)
+	  {
+	    $usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
+	    $userid     = DB_get_userid('gameid-position',$gameid,$pos);
+	    $userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
+
+	    if($userstatus=='start' || $userstatus=='init')
+	      echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
+	    else
+	      if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
+		echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
+	      else
+		echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
+	  }
+	echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
+	/* end displaying sickness */
+      }
+
     echo "<div class=\"message\">\n";
     echo "<p> Checking if someone else selected solo, nines, wedding or poverty.</p>";
 
@@ -318,27 +342,46 @@ switch($mystatus)
     foreach($userids as $user)
       {
 	$userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
-	if($userstat!='poverty' && $userstat!='play')
-	  $ok = 0;
+	if($userstat!='check')
+	  {
+	    $ok = 0;
+	    DB_set_player_by_gameid($gameid,$user);
+	  }
       };
 
     if(!$ok)
       {
-	echo "This step can only be handled after everyone finished the last step. ".
+	echo "<p>This step can only be handled after everyone finished the last step. ".
 	  "Seems like this is not the case, so you need to wait a bit... ".
 	  "you will get an email once that is the case, please use the link in ".
-	  "that email to continue the game.<br />";
+	  "that email to continue the game.</p></div>";
+
+	/* display cards, if player was just at the init-phase he will still see the cards from there
+	 * we can put this one here, since the last player to finish the init state won't get here and
+	 * will still see his card anyway from the init-phase
+	 */
+	if($mystatus=='check')
+	  {
+	    /* show cards */
+	    echo "<div class=\"mycards\">Your cards are: <br />\n";
+	    foreach($mycards as $card)
+	      display_card($card,$PREF["cardset"]);
+	    echo "</div>\n";
+	  }
+	break;
       }
     else
       {
-	echo "Everyone has finished checking their cards, let's see what they said...<br />";
+	/* Ok, everyone finished the init-phase, time to figure out what game we
+	 * are playing, in case there are any solos this already
+	 * will have the correct information in it */
 
-	/* check what kind of game we are playing,  in case there are any solos this already
-	 *will have the correct information in it */
+	echo "<p> Ok, everyone is done... figuring out what kind of game we are playing.</p>";
+
 	$gametype    = DB_get_gametype_by_gameid($gameid);
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
 
-	/* check for different sickness and just output a general info */
+	/* check for sickness */
 	$nines   = 0;
 	$poverty = 0;
 	$wedding = 0;
@@ -350,28 +393,17 @@ switch($mystatus)
 	    if($usersick == 'nines')
 	      {
 		$nines = $user;
-		echo "$name has a Vorbehalt. <br />";
-		break;
+		break; /* no need to check for other poverties, since only solo can win and that is already set */
 	      }
 	    else if($usersick == 'poverty')
-	      {
-		$poverty++;
-		echo "$name has a Vorbehalt. <br />";
-	      }
+	      $poverty++;
 	    else if($usersick == 'wedding')
-	      {
-		$wedding=$user;
-		echo "$name has a Vorbehalt. <br />"  ;
-	      }
+	      $wedding=$user;
 	    else if($usersick == 'solo')
-	      {
-		$solo++;
-		echo "$name has a Vorbehalt. <br />"  ;
-	      }
+	      $solo++;
 	  }
 
 	/* now check which sickness comes first and set the gametype to it */
-
 	if($gametype == "solo")
 	  {
 	    /* do nothing */
@@ -442,372 +474,402 @@ switch($mystatus)
 	    DB_set_sickness_by_gameid($gameid,'-1'); /* wedding not resolved yet */
 	    $gametype = "wedding";
 	  };
+	/* now the gametype is set correctly in the database */
+	echo "<p> Got it :)</p>";
 
-	echo "<br />\n";
-
-	/* now the gametype is set correctly (shouldn't matter that this is calculated for every user)
-	 * output what kind of game we have */
-
-	$poverty = 0;
-	foreach($userids as $user)
+	/* loop over all players, set re/contra if possible and start the game if possible */
+	$userids = DB_get_all_userid_by_gameid($gameid);
+	foreach($userids as $userid)
 	  {
-	    /* userids are sorted by position...
-	     * so output whatever the first one has, then whatever the next one has
-	     * stop when the sickness is the same as the gametype
-	     */
+	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$userid);
 
-	    $name     = DB_get_name('userid',$user);
-	    $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
-
-	    if($usersick)
-	      echo "$name has $usersick. <br />"; /*TODO: perhaps save this in a string and store in Game? */
-
-	    if($usersick=="poverty")
-	      $poverty++;
-	    if($usersick == "wedding" && $gametype =="wedding")
-	      break;
-	    if($usersick == "poverty" && $gametype =="poverty")
-	      break;
-	    if($usersick == "poverty" && $gametype =="dpoverty" && $poverty==2)
-	      break;
-	    if($usersick == "solo" && $gametype =="solo")
-	      break;
-	  };
-
-	/* output Schweinchen in case the rules need it */
-	if( $gametype != "solo")
-	  if($GAME["schweinchen"] && $RULES["schweinchen"]=="both" )
-	    echo DB_get_name('hash',$GAME["schweinchen-who"])." has Schweinchen. <br />";
-
-	echo "<br />\n";
-
-	/* finished the setup, set re/contra parties if possible, go to next stage unless there is a case of poverty*/
-	switch($gametype)
-	  {
-	  case "solo":
-	    /* are we the solo player? set us to re, else set us to contra */
-	    $pos = DB_get_pos_by_hash($me);
-	    if($pos == $startplayer)
-	      DB_set_party_by_hash($me,"re");
-	    else
-	      DB_set_party_by_hash($me,"contra");
-	    DB_set_hand_status_by_hash($me,'play');
-	    break;
-
-	  case "wedding":
-	    /* set person with the wedding to re, do the rest during the game */
-	    $usersick = DB_get_sickness_by_userid_and_gameid($myid,$gameid);
-	    if($usersick == "wedding")
-	      DB_set_party_by_hash($me,"re");
-	    else
-	      DB_set_party_by_hash($me,"contra");
-
-	    echo "Whoever will make the first trick will be on the re team. <br />\n";
-	    echo " Ok, the game can start now, please finish <a href=\"$INDEX?action=game&me=$me\">the setup</a>.<br />";
-	    DB_set_hand_status_by_hash($me,'play');
-	    break;
-
-	  case "normal":
-	    $hand = DB_get_all_hand($me);
-
-	    if(in_array('3',$hand)||in_array('4',$hand))
-	      DB_set_party_by_hash($me,"re");
-	    else
-	      DB_set_party_by_hash($me,"contra");
-	    DB_set_hand_status_by_hash($me,'play');
-	    break;
-	  case "poverty":
-	  case "dpoverty":
-	    /* check if poverty resolved (e.g. DB.Game who set to NULL)
-	     *   yes? =>trump was taken, start game; break;
-	     */
-	    $who = DB_get_sickness_by_gameid($gameid);
-	    if($who<0)
-	      { /* trump has been taken */
-		DB_set_hand_status_by_hash($me,'play');
-		break;
-	      };
-
-	    if($who>9) /*= two people still have trump on the table*/
-	      $add = 10;
-	    else
-	      $add = 1;
-
-	    /* check if we are being asked now
-	     *    no? display wait message, e.g. player X is asked at the moment
-	     */
-	    $usersick = DB_get_sickness_by_userid_and_gameid($myid,$gameid);
-	    if(myisset("trump") && $_REQUEST["trump"]=="no" && ($who==$mypos || $who==$mypos*10))
+	    switch($gametype)
 	      {
-		/* user doesn't want to take trump */
-		/* set next player who needs to be asked */
-		$firstsick  = (string) DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
-		$secondsick = (string) DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
-
-		if($firstsick=="poverty")
-		  {
-		    if($secondsick=="poverty")
-		      DB_set_sickness_by_gameid($gameid,$who+$add*3);
-		    else
-		      DB_set_sickness_by_gameid($gameid,$who+$add*2);
-		  }
+	      case "solo":
+		/* are we the solo player? set us to re, else set us to contra */
+		$pos = DB_get_pos_by_hash($userhash);
+		if($pos == $startplayer)
+		  DB_set_party_by_hash($userhash,"re");
 		else
-		  DB_set_sickness_by_gameid($gameid,$who+$add);
+		  DB_set_party_by_hash($userhash,"contra");
+		DB_set_hand_status_by_hash($userhash,'play');
+		break;
 
-		/* email next player */
+	      case "wedding":
+		/* set person with the wedding to re, do the rest during the game */
+		$usersick = DB_get_sickness_by_userid_and_gameid($userid,$gameid);
+		if($usersick == "wedding")
+		  DB_set_party_by_hash($userhash,"re");
+		else
+		  DB_set_party_by_hash($userhash,"contra");
+
+		DB_set_hand_status_by_hash($userhash,'play');
+		break;
+
+	      case "normal":
+		$hand = DB_get_all_hand($userhash);
+
+		if(in_array('3',$hand)||in_array('4',$hand))
+		  DB_set_party_by_hash($userhash,"re");
+		else
+		  DB_set_party_by_hash($userhash,"contra");
+		DB_set_hand_status_by_hash($userhash,'play');
+		break;
+	      case "poverty":
+	      case "dpoverty":
+		/* set person with poverty to play status */
+		$usersick = DB_get_sickness_by_userid_and_gameid($userid,$gameid);
+		if($usersick == "poverty")
+		  DB_set_hand_status_by_hash($userhash,'play');
+
+		/* set status of first player to be asked to poverty */
 		$who = DB_get_sickness_by_gameid($gameid);
-		if($who>9) $who = $who/10;
-
-		if($who<=4)
-		  {
-		    $To       = DB_get_email('position-gameid',$who,$gameid);
-		    $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
-		    $userid   = DB_get_userid('email',$To);
-		    DB_set_player_by_gameid($gameid,$userid);
-
-		    $message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-		    mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
-		  }
-
-		/* this user is done */
-		DB_set_hand_status_by_hash($me,'play');
-		break;
+		if($who > 6) $who= $who/10; /* in case we have dpoverty */
+		$whoid = DB_get_userid('gameid-position',$gameid,$who);
+		if($whoid==$userid)
+		  DB_set_hand_status_by_hash($userhash,'poverty');
 	      }
-	    else if(myisset("trump") && !myisset("exchange") && $_REQUEST["trump"]>0 && ($who==$mypos || $who==$mypos*10))
-	      {
-		/* user wants to take trump */
-		$trump = $_REQUEST["trump"];
-
-		/* get hand id for user $trump */
-		$userhand = DB_get_handid('gameid-userid',$gameid,$trump);
-		/* copy trump from player A to B */
-		$result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
-
-		/* add hidden button with trump in it to get to the next point */
-		echo "</div><div class=\"poverty\">\n";
-		echo "  <input type=\"hidden\" name=\"exchange\" value=\"-1\" />\n";
-		echo "  <input type=\"hidden\" name=\"trump\" value=\"".$trump."\" />\n";
-		echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select cards to give back\" />\n";
-		echo "</div><div>\n";
-	      }
-	    else if(myisset("trump","exchange") && $_REQUEST["trump"]>0 && ($who==$mypos || $who==$mypos*10))
-	      {
-		$trump    = $_REQUEST["trump"];
-		$exchange = $_REQUEST["exchange"];
-		$userhand = DB_get_handid('gameid-userid',$gameid,$trump);
-
-		/* if exchange is set to a value>0, exchange that card back to user $trump */
-		if($exchange >0)
-		  {
-		    $result = DB_query("UPDATE Hand_Card SET hand_id='$userhand'".
-				       " WHERE hand_id='$myhand' AND card_id='$exchange'" );
-		  };
-
-		/* if number of cards == 12, set status to play for both users */
-		$r = DB_query_array("SELECT COUNT(*) FROM Hand_Card  WHERE hand_id='$myhand'" );
-		if(!$r)
-		  {
-		    myerror("error in poverty");
-		    die();
-		  };
-		if($r[0]==12)
-		  {
-		    if($gametype=="poverty" || $who<9)
-		      {
-			DB_set_sickness_by_gameid($gameid,-1); /* done with poverty */
-		      }
-		    else /* reduce poverty count by one, that is go to single digits $who */
-		      {
-			$add = 1;
-			$who = $who/10;
-
-			/* whom to ask next */
-			$firstsick  = DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
-			$secondsick = DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
-
-			if($firstsick!="poverty")
-			  DB_set_sickness_by_gameid($gameid,$who+$add);
-			else
-			  {
-			    if($secondsick!="poverty")
-			      DB_set_sickness_by_gameid($gameid,$who+$add*2);
-			    else
-			      DB_set_sickness_by_gameid($gameid,$who+$add*3);
-			  };
-
-			/* email next player */
-			$who = DB_get_sickness_by_gameid($gameid);
-			if($who<=4)
-			  {
-			    $To       = DB_get_email('position-gameid',$who,$gameid);
-			    $userhash = DB_get_hash_from_game_and_pos($gameid,$who);
-			    $userid   = DB_get_userid('email',$To);
-			    DB_set_player_by_gameid($gameid,$userid);
-
-			    $message = "Someone has poverty, it's your turn to decide, ".
-			      "if you want to take the trump. Please visit:".
-			      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-			    mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
-			  }
-		      }
-
-		    /* this user is done */
-		    DB_set_hand_status_by_hash($me,'play');
-		    /* and so is his partner */
-		    $hash = DB_get_hash_from_gameid_and_userid($gameid,$trump);
-		    DB_set_hand_status_by_hash($hash,'play');
-
-		    /* set party to re, unless we had dpoverty, in that case check if we need to set re/contra*/
-		    $re_set = 0;
-		    foreach($userids as $user)
-		      {
-			$userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-			$party    = DB_get_party_by_hash($userhash);
-			if($party=="re")
-			  $re_set = 1;
-		      }
-		    if($re_set)
-		      {
-			DB_set_party_by_hash($me,"contra");
-			DB_set_party_by_hash($hash,"contra");
-		      }
-		    else
-		      {
-			foreach($userids as $user)
-			  {
-			    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-			    if($userhash==$hash||$userhash==$me)
-			      DB_set_party_by_hash($userhash,"re");
-			    else
-			      DB_set_party_by_hash($userhash,"contra");
-			  }
-		      }
-
-
-		    break;
-		  }
-		else
-		  {
-		    /* else show all trump, have lowest card pre-selected, have hidden setting for */
-		    echo "</div><div class=\"poverty\"> you need to get rid of a few cards</div>\n";
-
-		    set_gametype($gametype); /* this sets the $CARDS variable */
-		    $mycards = DB_get_hand($me);
-		    $mycards = mysort($mycards,$gametype);
-
-		    $type="exchange";
-		    echo "<div class=\"mycards\">Your cards are: <br />\n";
-		    foreach($mycards as $card)
-		      display_link_card($card,$PREF["cardset"],$type);
-		    echo "  <input type=\"hidden\" name=\"trump\" value=\"".$trump."\" />\n";
-		    echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select one card to give back\" />\n";
-		    echo "</div><div>\n";
-		  }
-	      }
-	    else if($who == $mypos || $who == $mypos*10)
-	      {
-		echo "</div><div class=\"poverty\">\n";
-		foreach($userids as $user)
-		  {
-		    $name     = DB_get_name('userid',$user);
-		    $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
-
-		    if($usersick=="poverty")
-		      {
-			$hash    = DB_get_hash_from_gameid_and_userid($gameid,$user);
-			$cards   = DB_get_hand($hash);
-			$nrtrump = count_trump($cards);
-			/* count trump */
-			if($nrtrump<4)
-			  echo "Player $name has $nrtrump trump. Do you want to take them?".
-			    "<a href=\"index.php?action=game&me=$me&amp;trump=$user\">yes</a> <br />\n";
-		      }
-		  }
-		echo "<a href=\"index.php?action=game&me=$me&amp;trump=no\">No,way I take those trump...</a> <br />\n";
-		echo "</div><div>\n";
-
-		echo "Your cards are: <br />\n";
-		$mycards = DB_get_hand($me);
-		sort($mycards);
-		echo "<p class=\"mycards\">Your cards are: <br />\n";
-		foreach($mycards as $card)
-		  display_card($card,$PREF["cardset"]);
-		echo "</p>\n";
-	      }
-	    else
-	      {
-		$mysick = DB_get_sickness_by_userid_and_gameid($myid,$gameid);
-		if($mysick=="poverty")
-		  echo "The others are asked if they want to take your trump, you have to wait (you'll get an email).";
-		else
-		  echo "it's not your turn yet to decide if you want to take the trump or not.";
-	      }
-	  };
-	/* check if no one wanted to take trump, in that case the gamesickness would be set to 5 or 50 */
-	$who = DB_get_sickness_by_gameid($gameid);
-	if($who==5 || $who==50)
-	  {
-	    $message = "Hello, \n\n".
-	      "Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n";
-
-	    $userids = DB_get_all_userid_by_gameid($gameid);
-	    foreach($userids as $user)
-	      {
-		$To = DB_get_email('userid',$user);
-		mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (poverty not resolved)",$message);
-	      }
-
-	    /* delete everything from the dB */
-	    DB_cancel_game($me);
-
-	    echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
-	    output_footer();
-	    DB_close();
-	    exit();
 	  }
 
-	/* check if all players are ready to play */
-	$ok = 1;
-	foreach($userids as $user)
-	  if(DB_get_hand_status_by_userid_and_gameid($user,$gameid)!='play')
-	    {
-	      $ok = 0;
-	      DB_set_player_by_gameid($gameid,$user);
-	    }
-
-	if($ok)
+	/* send out email to first player or poverty person*/
+	if($gametype!="poverty" && $gametype!="dpoverty")
 	  {
-	    /* only set this after all poverty, etc. are handled*/
-	    DB_set_game_status_by_gameid($gameid,'play');
-
-	    /* email startplayer */
 	    $startplayer = DB_get_startplayer_by_gameid($gameid);
 	    $email       = DB_get_email('position-gameid',$startplayer,$gameid);
 	    $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
 	    $who         = DB_get_userid('email',$email);
 	    DB_set_player_by_gameid($gameid,$who);
 
-	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
+	    if($hash!=$me)
 	      {
-		/* email startplayer) */
-		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+		if(DB_get_email_pref_by_hash($hash)!="emailaddict")
+		  {
+		    /* email startplayer */
+		    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		    mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+		  }
 	      }
 	    else
-	      echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />";
+	      echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />\n";
 	  }
 	else
-	  echo "\n <br />";
+	  {
+	    /* set status of first player to be asked to poverty */
+	    $who   = DB_get_sickness_by_gameid($gameid);
+	    if($who > 6) $who= $who/10; /* in case we have dpoverty */
+
+	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
+	    if($whoid==$myid)
+	      echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />\n";
+	    else
+	      {
+		$email   = DB_get_email('position-gameid',$who,$gameid);
+		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
+		DB_set_player_by_gameid($gameid,$whoid);
+
+		if(DB_get_email_pref_by_hash($hash)!="emailaddict")
+		  {
+		    /* email player for poverty */
+		    $message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
+		    mymail($email,$EmailName."Poverty (game ".DB_format_gameid($gameid).") ",$message);
+		  }
+	      }
+	  }
+	echo "</div>\n";
+	break;
       }
-    echo "</div>\n";
+  case 'poverty':
+    /* user only gets here in a poverty game, several things have to be handled here:
+     * A) ask, if user wants to take trump
+     *      yes-> take trump,
+     *            poverty: set re/contra
+     *            dpoverty: first time: set re, send email to second player
+     *                      second time: set contra
+     *            set status to play in case 0 trump
+     *      no -> set status to play,
+     *            ask next player or cancle the game if no more players
+     * B) user took trump and has too many cards (e.g. count(cards)>12 and re/contra set)
+     *         ask to give cards back, set status to play, once player has 12 cards
+     *
+     * it is easier to check B) first
+     */
+
+    /* output pre game in case user reloads */
+
+
+    set_gametype($gametype); /* this sets the $CARDS variable */
+    $myparty = DB_get_party_by_hash($me);
+
+    /* the following is part B) of whats needs to be done)
+    /*    check if user wants to give cards back */
+    if(myisset("exchange"))
+      {
+	$exchange    = $_REQUEST['exchange'];
+	$partnerhash = DB_get_partner_hash_by_hash($me);
+	$partnerid   = DB_get_userid('hash',$partnerhash);
+	$partnerhand = DB_get_handid('gameid-userid',$gameid,$partnerid);
+
+	/* if exchange is set to a value>0, exchange that card back to the partner */
+	if($exchange >0)
+	  {
+	    $result = DB_query("UPDATE Hand_Card SET hand_id='$partnerhand'".
+			       " WHERE hand_id='$myhand' AND card_id=".DB_quote_smart($exchange));
+	  };
+      }
+    /* update hand */
+    $mycards = DB_get_hand($me);
+    $mycards = mysort($mycards,$gametype);
+
+    /* check if user need to give more cards back */
+    if( ($myparty=='re' || $myparty=='contra') && count($mycards)>12)
+      {
+	echo "<div class=\"poverty\"> you need to get rid of a few cards</div>\n";
+
+	$type="exchange";
+	echo "<div class=\"mycards\">Your cards are: <br />\n";
+	foreach($mycards as $card)
+	  display_link_card($card,$PREF["cardset"],$type);
+	echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select card to give back\" />\n";
+	echo "</div>\n";
+      }
+    else if( ($myparty=='re' || $myparty=='contra') && count($mycards)==12)
+      {
+	/* user is done, ready to play */
+	DB_set_hand_status_by_hash($me,'play');
+	/* TODO if resolved; email start player, set startplayer */
+      }
+
+    /* the following is part A) of what needs to be done */
+    if(!myisset("trump"))
+      {
+	if(!$myparty)
+	  {
+	    echo "<div class=\"poverty\">\n";
+	    $userids = DB_get_all_userid_by_gameid($gameid);
+	    foreach($userids as $user)
+	      {
+		$name      = DB_get_name('userid',$user);
+		$usersick  = DB_get_sickness_by_userid_and_gameid($user,$gameid);
+		$userhash  = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		$userparty = DB_get_party_by_hash($userhash);
+
+		if($usersick=="poverty" && !$userparty)
+		  {
+		    $hash    = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		    $cards   = DB_get_hand($hash);
+		    /* count trump */
+		    $nrtrump = 0;
+		    foreach($cards as $card)
+		      if($card<27) $nrtrump++;
+		    echo "Player $name has $nrtrump trump. Do you want to take them?".
+		      "<a href=\"index.php?action=game&me=$me&amp;trump=$user\">yes</a> <br />\n";
+		  }
+	      }
+	    echo "<a href=\"index.php?action=game&me=$me&amp;trump=no\">No,way I take those trump...</a> <br />\n";
+	    echo "</div><div>\n";
+
+	    echo "<div class=\"mycards\">Your cards are: <br />\n";
+	    foreach($mycards as $card)
+	      display_card($card,$PREF["cardset"]);
+	    echo "</div></div>\n";
+	  }
+	break;
+      }
+    else
+      {
+	$trump = $_REQUEST['trump'];
+
+	if($trump=="no")
+	  {
+	    /* user doesn't want to take trump */
+	    DB_set_hand_status_by_hash($me,'play');
+
+	    /* set next player who needs to be asked and email him*/
+	    $firstsick  = (string) DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
+	    $secondsick = (string) DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
+
+	    /* don't ask people who have poverty */
+	    $next=1;
+	    if($firstsick=="poverty")
+	      {
+		if($secondsick=="poverty")
+		  $next=3;
+		else
+		  $next=2;
+	      }
+	    if($gametype=="dpoverty")
+	      {
+		$next=999; /* need to cancel for sure, since both would need to take the trump */
+	      }
+
+	    /* no more people to ask, need to cancel the game */
+	    if($mypos+$next>4)
+	      {
+		$message = "Hello, \n\n".
+		  "Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n";
+
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		foreach($userids as $user)
+		  {
+		    $To = DB_get_email('userid',$user);
+		    mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (poverty not resolved)",$message);
+		  }
+
+		/* delete everything from the dB */
+		DB_cancel_game($me);
+
+		echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
+		output_footer();
+		DB_close();
+		exit();
+	      }
+	    else
+	      {
+		/* email next player, set his status to poverty */
+		$To       = DB_get_email('position-gameid',$mypos+$next,$gameid);
+		$userhash = DB_get_hash_from_game_and_pos($gameid,$mypos+$next);
+		$userid   = DB_get_userid('email',$To);
+
+		DB_set_player_by_gameid($gameid,$userid);
+		DB_set_hand_status_by_hash($userhash,'poverty');
+
+		$message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
+		mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
+	      }
+	  }
+	else
+	  {
+	    /* player wants to take trump, change cards */
+
+	    /* user wants to take trump */
+	    $trump = $_REQUEST["trump"];
+	    $userhand = DB_get_handid('gameid-userid',$gameid,$trump);
+	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$trump);
+
+	    /* copy trump from player A to B */
+	    $result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
+
+	    $mycards = DB_get_hand($me);
+
+	    /* set re/contra */
+	    if($gametype=='poverty')
+	      {
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		foreach($userids as $user)
+		  {
+		    $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		    if($hash==$userhash||$hash==$me)
+		      DB_set_party_by_hash($hash,"re");
+		    else
+		      DB_set_party_by_hash($hash,"contra");
+		  }
+		/* check if we are done, if so, send everyone into the 'play' phase */
+		if(count($mycards)==12)
+		  {
+		    foreach($userids as $user)
+		      {
+			$hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+			DB_set_hand_status_by_hash($hash,'play');
+		      }
+		  }
+	      }
+	    else /*dpoverty*/
+	      {
+		/* has the re party already been set?*/
+		$re_set=0;
+		$userids = DB_get_all_userid_by_gameid($gameid);
+		foreach($userids as $user)
+		  {
+		    $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		    $party = DB_get_party_by_hash($hash);
+		    if($party=='re')
+		      $re_set=1;
+		  }
+		if($re_set)
+		  {
+		    DB_set_party_by_hash($me,'contra');
+		    DB_set_party_by_hash($userhash,'contra');
+		  }
+		else
+		  {
+		    DB_set_party_by_hash($me,'re');
+		    DB_set_party_by_hash($userhash,'re');
+
+		    /* send out email to second non-poverty player */
+		    $firstsick  = (string) DB_get_sickness_by_pos_and_gameid($mypos+1,$gameid);
+		    $secondsick = (string) DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
+
+		    $next=1;
+		    if($firstsick=="poverty")
+		      if($secondsick=="poverty")
+			$next=3;
+		      else
+			$next=2;
+
+		    if($mypos+$next>4)
+		      echo "<div class=\"message\">Error in poverty, please contact the Admin</div>\n";
+
+		    $To       = DB_get_email('position-gameid',$mypos+$next,$gameid);
+		    $userhash = DB_get_hash_from_game_and_pos($gameid,$mypos+$next);
+		    $userid   = DB_get_userid('email',$To);
+
+		    DB_set_player_by_gameid($gameid,$userid);
+		    DB_set_hand_status_by_hash($userhash,'poverty');
+
+		    $message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
+		    mymail($To,$EmailName." double poverty (game ".DB_format_gameid($gameid).")",$message);
+
+
+		  }
+	      }
+	    echo "<div class=\"message\"> Please, <a href=\"$INDEX?action=game&me=$me\">continue</a> here.</div>\n";
+	  }
+      }
+    echo "</div>";
     break;
+
   case 'play':
   case 'gameover':
     /* both entries here,  so that the tricks are visible for both.
      * in case of 'play' there is a break later that skips the last part
      */
+
+    /* check if all players are ready to play */
+    $ok = 1;
+    $userids = DB_get_all_userid_by_gameid($gameid);
+    foreach($userids as $user)
+      {
+	$userstatus = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+	if($userstatus !='play')
+	{
+	  $ok = 0;
+	  DB_set_player_by_gameid($gameid,$user);
+	}
+      }
+    if($ok)
+      {
+	/* only set this after all poverty, etc. are handled*/
+	DB_set_game_status_by_gameid($gameid,'play');
+
+	/* email startplayer */
+	$startplayer = DB_get_startplayer_by_gameid($gameid);
+	$email       = DB_get_email('position-gameid',$startplayer,$gameid);
+	$hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
+	$who         = DB_get_userid('email',$email);
+	DB_set_player_by_gameid($gameid,$who);
+
+	if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
+	  {
+	    /* email startplayer) */
+	    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+	      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+	    mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+	  }
+      }
 
     /* figure out what kind of game we are playing,
      * set the global variables $CARDS["trump"],$CARDS["diamonds"],$CARDS["hearts"],
@@ -835,6 +897,15 @@ switch($mystatus)
       {
 	echo "<p class=\"message\"> You finished the setup, but not everyone else finished it... ".
 	  "You need to wait for the others. Just wait for an email. </p>";
+
+	$mycards = DB_get_hand($me);
+	$mycards = mysort($mycards,$gametype);
+
+	echo "<div class=\"mycards\">Your cards are: <br />\n";
+	foreach($mycards as $card)
+	  display_card($card,$PREF["cardset"]);
+	echo "</div>\n";
+
 	break; /* not sure this works... the idea is that you can
 		* only  play a card after everyone is ready to play */
       }
@@ -843,7 +914,7 @@ switch($mystatus)
     $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
     $gameend = time() - strtotime($r[0]);
 
-    /* handel comments in case player didn't play a card, allow comments a week after the end of the game */
+    /* handle comments in case player didn't play a card, allow comments a week after the end of the game */
     if( (!myisset("card") && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
       if(myisset("comment"))
 	{

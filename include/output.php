@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -228,7 +228,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard001.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard002.css" />
      <script type="text/javascript">
        function hl(num) {
          if(document.getElementById){

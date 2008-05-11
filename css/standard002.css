@@ -38,7 +38,7 @@
  position: absolute;
  background-color: #fff;
  width: 20%;
- top:22em;
+ top:19em;
  left:40%;
  right:40%;
  text-align: center;
@@ -61,12 +61,6 @@
  z-index:15;
 }
 
-.poverty {
-  top:32em;
-  z-index:15;
-  background-color:#fff;
-}
-
 .rules {
 margin-top:20em;
 }
@@ -86,7 +80,7 @@ margin-top:20em;
 /* display the table and the names */
 div.table {
   position:absolute;
-  width:99%;
+  width:100%;
   height:35em;
   margin:0;
   left:0;
@@ -198,7 +192,7 @@ ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
   left:37.5%;
   right:56x.5%;
   width:6%;
-  z-index:9;
+  z-index:30;
 }
 ul.tricks li div div.card0 span.comment{
   position:absolute;
@@ -220,7 +214,7 @@ ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score, .vorbehalt1 {
   right:47%;
   width:6%;
   text-align:center;
-  z-index:9;
+  z-index:30;
 }
 ul.tricks li div div.card1 span.comment{
   position:absolute;
@@ -242,7 +236,7 @@ ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score, .vorbehalt2{
   right:37.5%;
   left:56x.5%;
   width:6%;
-  z-index:9;
+  z-index:30;
 }
 ul.tricks li div div.card2 span.comment{
   position:absolute;
@@ -265,7 +259,7 @@ ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score, .vorbehalt3{
   right:47%;
   width:6%;
   text-align:center;
-  z-index:9;
+  z-index:30;
 }
 ul.tricks li div div.card3 span.comment{
   position:absolute;
