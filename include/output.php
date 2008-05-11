@@ -29,13 +29,11 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 function output_form_for_new_game($names)
 {
 ?>
-    <h2> Players </h2>
-    <p>Please select four players (or use the randomly pre-selected names)</p>
-    <p>Remember: you need to be one of the players ;) </p>
-       <form action="index.php?action=new" method="post">
+  <form action="index.php?action=new" method="post">
+    <h2> Select players (Remember: you need to be one of the players) </h2>
 
    <div class="table">
-     <img src="pics/table.png" alt="table" />
+     <img class="table" src="pics/table.png" alt="table" />
 <?php
     /* ask for player names */
     $i=0;
@@ -46,7 +44,7 @@ function output_form_for_new_game($names)
       $rand = $names[$randkey];
       echo  "<div class=\"table".$i."\">\n";
       $i++;
-      echo "    Name:  \n  <select name=\"$player\" size=\"1\" />  \n";
+      echo "    <select name=\"$player\" size=\"1\" />  \n";
       foreach($names as $name)
 	{
 	  if($name==$rand)
@@ -60,6 +58,7 @@ function output_form_for_new_game($names)
     }
 ?>
     </div>
+
    <h2 class="rules"> Rules </h2>
       <p> Some areas are grayed out which means that the rule is not implemented yet and therefore cannot be selected </p>
       <p> Ten of hearts:
