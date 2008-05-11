@@ -243,7 +243,7 @@ function output_header()
        function high_last(){
 	 if(document.getElementById){
 	   var i;
-	   for(i=13;i>0;i--) {
+	   for(i=13;i>=0;i--) {
 	     if(document.getElementById("trick"+i))
 	       {
 		 hl(i);

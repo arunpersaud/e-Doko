@@ -186,7 +186,30 @@ switch($mystatus)
     /* here we ask the player if he is sick */
     $mycards = DB_get_hand($me);
     sort($mycards);
+
+    /* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+    echo "\n<ul class=\"tricks\">\n";
+    echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
+    echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+      "    <div class=\"trick\" id=\"trick0\">\n";
     
+    for($pos=1;$pos<5;$pos++)
+      {
+	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
+	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
+	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
+
+	if($userstatus=='start' || $userstatus=='init')
+	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
+	else
+	  if($usersick!=NULL && $pos<=$mypos ) /* only show this for people sitting before the player */
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n"; 
+	  else if($usersick==NULL && $pos<=$mypos)
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
+      }
+    echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
+    /* end displaying sickness */
+
     if(!myisset("solo","wedding","poverty","nines") )
       {
 	output_check_for_sickness($me,$mycards);
@@ -271,7 +294,7 @@ switch($mystatus)
 	    echo "</p>\n";
 	    
 	    /* move on to the next stage*/
-	    DB_set_hand_status_by_hash($me,'poverty');
+	    DB_set_hand_status_by_hash($me,'check');
 	  };
       };
 
