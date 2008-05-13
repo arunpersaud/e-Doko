@@ -664,6 +664,7 @@ function can_call($what,$hash)
 function display_table ()
 {
   global $gameid, $GT, $debug,$INDEX,$defaulttimezone;
+  global $RULES,$GAME,$gametype;
 
   $result = DB_query("SELECT  User.fullname as name,".
 		     "        Hand.position as position, ".
