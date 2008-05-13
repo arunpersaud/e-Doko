@@ -838,39 +838,45 @@ switch($mystatus)
      * in case of 'play' there is a break later that skips the last part
      */
 
-    /* check if all players are ready to play */
-    $ok = 1;
-    $userids = DB_get_all_userid_by_gameid($gameid);
-    foreach($userids as $user)
+    /* check if all players are ready to play,
+     * if so, send out email to the startplayer
+     * only need to do this if the game hasn't started yet 
+     */
+    $gamestatus = DB_get_game_status_by_gameid($gameid);
+    if($gamestatus == 'pre')
       {
-	$userstatus = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
-	if($userstatus !='play')
-	{
-	  $ok = 0;
-	  DB_set_player_by_gameid($gameid,$user);
-	}
-      }
-    if($ok)
-      {
-	/* only set this after all poverty, etc. are handled*/
-	DB_set_game_status_by_gameid($gameid,'play');
-
-	/* email startplayer */
-	$startplayer = DB_get_startplayer_by_gameid($gameid);
-	$email       = DB_get_email('position-gameid',$startplayer,$gameid);
-	$hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-	$who         = DB_get_userid('email',$email);
-	DB_set_player_by_gameid($gameid,$who);
-
-	if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
+	$ok = 1;
+	$userids = DB_get_all_userid_by_gameid($gameid);
+	foreach($userids as $user)
 	  {
-	    /* email startplayer) */
-	    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-	      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-	    mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+	    $userstatus = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+	    if($userstatus !='play' && $userstatus!='gameover')
+	      {
+		$ok = 0;
+		DB_set_player_by_gameid($gameid,$user);
+	      }
+	  }
+	if($ok)
+	  {
+	    /* only set this after all poverty, etc. are handled*/
+	    DB_set_game_status_by_gameid($gameid,'play');
+	    
+	    /* email startplayer */
+	    $startplayer = DB_get_startplayer_by_gameid($gameid);
+	    $email       = DB_get_email('position-gameid',$startplayer,$gameid);
+	    $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
+	    $who         = DB_get_userid('email',$email);
+	    DB_set_player_by_gameid($gameid,$who);
+	    
+	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
+	      {
+		/* email startplayer) */
+		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+	      }
 	  }
       }
-
     /* figure out what kind of game we are playing,
      * set the global variables $CARDS["trump"],$CARDS["diamonds"],$CARDS["hearts"],
      * $CARDS["clubs"],$CARDS["spades"],$CARDS["foxes"]
@@ -889,7 +895,7 @@ switch($mystatus)
 
     set_gametype($gametype); /* this sets the $CARDS variable */
 
-    /* get some infos about the game */
+    /* get some infos about the game, need to reset this, since it might have changed */
     $gamestatus = DB_get_game_status_by_gameid($gameid);
 
     /* has the game started? No, then just wait here...*/
