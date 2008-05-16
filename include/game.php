@@ -530,6 +530,25 @@ switch($mystatus)
 		  DB_set_hand_status_by_hash($userhash,'poverty');
 	      }
 	  }
+	/* check for silent solo, set game type to solo in this case */
+	$gametype = DB_get_gametype_by_gameid($gameid);
+	$userids  = DB_get_all_userid_by_gameid($gameid);
+	foreach($userids as $userid)
+	  {
+	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$userid);
+
+	    if($gametype=='normal')
+	      {
+		$userhand = DB_get_all_hand($userhash);
+		if(check_wedding($userhand))
+		  {
+		    /* normal game type and player has both queens -> silent solo */
+		    /* keep startplayer, just set gametype to silent solo */
+		    DB_set_gametype_by_gameid($gameid,"solo");
+		    DB_set_solo_by_gameid($gameid,'silent');
+		  }
+	      }
+	  }
 
 	/* send out email to first player or poverty person*/
 	if($gametype!="poverty" && $gametype!="dpoverty")
@@ -840,7 +859,7 @@ switch($mystatus)
 
     /* check if all players are ready to play,
      * if so, send out email to the startplayer
-     * only need to do this if the game hasn't started yet 
+     * only need to do this if the game hasn't started yet
      */
     $gamestatus = DB_get_game_status_by_gameid($gameid);
     if($gamestatus == 'pre')
@@ -860,14 +879,14 @@ switch($mystatus)
 	  {
 	    /* only set this after all poverty, etc. are handled*/
 	    DB_set_game_status_by_gameid($gameid,'play');
-	    
+
 	    /* email startplayer */
 	    $startplayer = DB_get_startplayer_by_gameid($gameid);
 	    $email       = DB_get_email('position-gameid',$startplayer,$gameid);
 	    $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
 	    $who         = DB_get_userid('email',$email);
 	    DB_set_player_by_gameid($gameid,$who);
-	    
+
 	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
 	      {
 		/* email startplayer) */
@@ -888,7 +907,10 @@ switch($mystatus)
     if($gametype=="solo")
       {
 	$gametype = DB_get_solo_by_gameid($gameid);
-	$GT       = $gametype." ".$GT;
+	if($gametype=='silent')
+	  $GT = 'normal';
+	else
+	  $GT = $gametype." ".$GT;
       }
     else
       $gametype = "normal";
@@ -972,7 +994,7 @@ switch($mystatus)
 
     /* output vorbehalte */
     $mygametype =  DB_get_gametype_by_gameid($gameid);
-    if($mygametype != "normal") /* only show when needed */
+    if($mygametype != 'normal' && $mygametype != 'silent') /* only show when needed */
       {
 	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
 	  "    <div class=\"trick\" id=\"trick0\">\n";
@@ -1178,7 +1200,7 @@ switch($mystatus)
 		if(DB_get_gametype_by_gameid($gameid)=="solo")
 		  {
 		    $solo = DB_get_solo_by_gameid($gameid);
-		    if($solo == "trump" || $solo == "silent")
+		    if($solo == 'trump' || $solo == 'silent')
 		      $ok = 1; /* for trump solos and silent solos, foxes are ok */
 		  }
 		else
@@ -1819,8 +1841,15 @@ switch($mystatus)
 	    $type  = DB_get_gametype_by_gameid($gameid);
 
 	    if($type=="solo")
-	      output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
-	    else
+	      {
+		$solo = DB_get_solo_by_gameid($gameid);
+
+		if($solo!='silent') /* repeat game with same first player */
+		  output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
+		else /* rotate normally */
+		  output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+	      }
+	    else /* rotate normally */
 	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	  }
       }
