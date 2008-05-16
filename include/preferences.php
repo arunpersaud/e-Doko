@@ -116,13 +116,13 @@ echo "    <tr><td>Notification:          </td><td>";
 echo "  <select id=\"notify\" name=\"notify\" size=\"1\">\n";
       if($PREF['email']=="emailaddict")
 	{
-	  echo "   <option value=\"emailaddict\" selected=\"selected\">lots of emails</option>\n";
-	  echo "   <option value=\"emailnonaddict\">less emails</option>\n";
+	  echo "   <option value=\"emailaddict\" selected=\"selected\">less emails</option>\n";
+	  echo "   <option value=\"emailnonaddict\">lots of emails</option>\n";
 	}
       else
 	{
-	  echo "   <option value=\"emailaddict\">lots of email</option>\n";
-	  echo "   <option value=\"emailnonaddict\" selected=\"selected\">less email</option>\n";
+	  echo "   <option value=\"emailaddict\">less email</option>\n";
+	  echo "   <option value=\"emailnonaddict\" selected=\"selected\">lots of email</option>\n";
 	}
   echo "  </select>\n";
 if($changed_notify) echo "changed";
