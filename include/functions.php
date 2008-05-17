@@ -171,14 +171,14 @@ function compare_cards($a,$b,$game)
     case "normal":
     case "silent":
     case "trump":
-      if($RULES["schweinchen"]=="both" && $GAME["schweinchen"])
+      if($RULES['schweinchen']=='both' && $GAME['schweinchen-who'])
 	{
 	  if($a == 19 || $a == 20 )
 	    return 1;
 	  if($b == 19 || $b == 20 )
 	    return 0;
 	};
-      if($RULES["schweinchen"]=="second" && $GAME["schweinchen"]==3)
+      if($RULES['schweinchen']=='second' && $GAME['schweinchen-second'])
 	{
 	  if($a == 19 || $a == 20 )
 	    return 1;
@@ -705,7 +705,7 @@ function display_table ()
 
       /* add hints for poverty, wedding, solo, etc */
       if( $gametype != "solo")
-	if($GAME["schweinchen"] && $RULES["schweinchen"]=="both" && $GAME["schweinchen-who"]==$hash)
+	if( $RULES["schweinchen"]=="both" && $GAME["schweinchen-who"]==$hash )
 	  echo " Schweinchen. <br />";
 
       if($GT=="poverty" && $party=="re")

@@ -57,18 +57,35 @@ if($gametype=="solo")
     $GT  = $gametype." ".$GT;
   }
 
-/* does anyone have both foxes */
-$GAME["schweinchen"]=0;
-for($i=1;$i<5;$i++)
-  {
-    $hash  = DB_get_hash_from_game_and_pos($gameid,$i);
-    $cards = DB_get_all_hand($hash);
-    if( in_array("19",$cards) && in_array("20",$cards) )
-      {
-	$GAME["schweinchen"]=1;
-	$GAME["schweinchen-who"]=$hash;
-      }
-  };
+/* do we need to worry about Schweinchen? 
+ * check gametype and rules
+ * if yes, figure out if someone actually has Schweinchen  
+ * save information in $GAME
+ */
+$ok=0;
+if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' )
+  if( in_array($RULES['schweinchen'],array('both','second','secondaftercall')) )
+     $ok=1;
+
+if($ok)     
+{
+  /* need to check for Schweinchen */
+  for($i=1;$i<5;$i++)
+    {
+      $hash  = DB_get_hash_from_game_and_pos($gameid,$i);
+      $cards = DB_get_all_hand($hash);
+      if( in_array("19",$cards) && in_array("20",$cards) )
+	$GAME['schweinchen-who']=$hash;
+    };
+  $GAME['schweinchen-first']  = 0; /* to keep track if they have been played already */
+  $GAME['schweinchen-second'] = 0;
+}
+else
+{
+  /* no need to check for Schweinchen */
+  $GAME['schweinchen-who']=NULL;
+}
+/* end check for Schweinchen */
 
 /* put everyting in a form */
 echo "<form action=\"index.php?action=game&me=$me\" method=\"post\">\n";
@@ -1026,8 +1043,11 @@ switch($mystatus)
 	$user    = $r[6];
 
 	/* check if first schweinchen has been played */
-	if( $GAME["schweinchen"] && ($r[0] == 19 || $r[0] == 20) )
-	  $GAME["schweinchen"]++;
+	if( $GAME['schweinchen-who'] && ($r[0] == 19 || $r[0] == 20) )
+	  if(!$GAME['schweinchen-first'])
+	    $GAME['schweinchen-first'] = 1; /* playing the first fox */
+	  else
+	    $GAME['schweinchen-second'] = 1; /* this must be the second fox */
 
 	/* save card to be able to find the winner of the trick later */
 	$play[$seq] = array("card"=>$r[0],"pos"=>$pos);
@@ -1134,20 +1154,22 @@ switch($mystatus)
 
 	    $playid = DB_play_card($trickid,$handcardid,$sequence);
 
-	    /* check special output for schweinchen in case:
-	     * schweinchen is in the rules, a fox has been played and the gametype is correct
+	    /* check special output for schweinchen in case in case a fox is being played
+	     * check for correct rules, etc. has already been done
 	     */
-	    if( $GAME["schweinchen"] &&
-		($card == 19 || $card == 20) &&
-		($gametype == "normal" || $gametype == "silent"|| $gametype=="trump"))
+	    if( $GAME["schweinchen-who"] && ($card == 19 || $card == 20) )
 	      {
-		$GAME["schweinchen"]++; // count how many have been played including this one
-		if($GAME["schweinchen"]==3 && $RULES["schweinchen"]=="second" )
+		if(!$GAME['schweinchen-first'])
+		  $GAME['schweinchen-first'] = 1; /* playing the first fox */
+		else
+		  $GAME['schweinchen-second'] = 1; /* this must be the second fox */
+
+		if($GAME['schweinchen-second']==1 && $RULES['schweinchen']=='second' )
 		  DB_insert_comment("Schweinchen! ",$playid,$myid);
-		if($RULES["schweinchen"]=="both" )
+		if($RULES['schweinchen']=='both' )
 		  DB_insert_comment("Schweinchen! ",$playid,$myid);
 		if ($debug)
-		  echo "schweinchen = ".$GAME["schweinchen"]." ---<br />";
+		  echo "schweinchen = ".$GAME["schweinchen-who"]." ---<br />";
 	      }
 
 	    /* if sequence == 4 check who one in case of wedding */
