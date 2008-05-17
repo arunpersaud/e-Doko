@@ -572,7 +572,7 @@ function sort_comp($a,$b)
 
   $ALL = array();
   $ALL = array_merge($CARDS["trump"],$CARDS["diamonds"],$CARDS["clubs"],
-		     $CARDS["hearts"],$CARDS["spades"],$CARDS["diamonds"]);
+		     $CARDS["hearts"],$CARDS["spades"]);
 
   return pos_array($a,$ALL)-pos_array($b,$ALL);
 }
