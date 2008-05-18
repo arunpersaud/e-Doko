@@ -57,9 +57,9 @@ if($gametype=="solo")
     $GT  = $gametype." ".$GT;
   }
 
-/* do we need to worry about Schweinchen? 
+/* do we need to worry about Schweinchen?
  * check gametype and rules
- * if yes, figure out if someone actually has Schweinchen  
+ * if yes, figure out if someone actually has Schweinchen
  * save information in $GAME
  */
 $ok=0;
@@ -67,7 +67,7 @@ if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' )
   if( in_array($RULES['schweinchen'],array('both','second','secondaftercall')) )
      $ok=1;
 
-if($ok)     
+if($ok)
 {
   /* need to check for Schweinchen */
   for($i=1;$i<5;$i++)
@@ -1164,10 +1164,11 @@ switch($mystatus)
 		else
 		  $GAME['schweinchen-second'] = 1; /* this must be the second fox */
 
-		if($GAME['schweinchen-second']==1 && $RULES['schweinchen']=='second' )
-		  DB_insert_comment("Schweinchen! ",$playid,$myid);
-		if($RULES['schweinchen']=='both' )
-		  DB_insert_comment("Schweinchen! ",$playid,$myid);
+		if( ($GAME['schweinchen-second']==1 && $RULES['schweinchen']=='second') || $RULES['schweinchen']=='both')
+		  {
+		    DB_insert_comment("Schweinchen! ",$playid,$myid);
+		    $commentSchweinchen = "Schweinchen! ";
+		  }
 		if ($debug)
 		  echo "schweinchen = ".$GAME["schweinchen-who"]." ---<br />";
 	      }
@@ -1310,6 +1311,8 @@ switch($mystatus)
 		$comment = $_REQUEST["comment"];
 		if($comment != "")
 		  DB_insert_comment($comment,$playid,$myid);
+		if($commentSchweinchen)
+		  $comment = $commentSchweinchen . $comment;
 	      };
 
 	    /* check for note */
