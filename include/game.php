@@ -63,9 +63,18 @@ if($gametype=="solo")
  * save information in $GAME
  */
 $ok=0;
-if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' )
-  if( in_array($RULES['schweinchen'],array('both','second','secondaftercall')) )
-     $ok=1;
+if( $gamestatus == 'pre' )
+  {
+    /* always need to use Schweinchen to figure out for example who has poverty */
+    $ok=1;
+  }
+else
+  {
+    /* in a game Schweinchen is not valid in all types of games */
+    if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' )
+      if( in_array($RULES['schweinchen'],array('both','second','secondaftercall')) )
+	$ok=1;
+  }
 
 if($ok)
 {
