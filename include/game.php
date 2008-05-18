@@ -1129,6 +1129,7 @@ switch($mystatus)
       {
 	$card   = $_REQUEST["card"];
 	$handid = DB_get_handid('hash',$me);
+	$commentSchweinchen =""; /* used to add a comment when Schweinchen is being played */
 
 	/* check if we have card and that we haven't played it yet*/
 	/* set played in hand_card to true where hand_id and card_id*/
