@@ -1,3 +1,23 @@
+/* reset CSS (taken from blueprint and modified a bit) */
+
+html, body, div, span,
+h1, h2, h3, h4, h5, h6, p,
+a,img,  dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+}
+table { border-collapse: separate; border-spacing: 0; }
+caption, th, td { text-align: left; font-weight: normal; }
+table, td, th { vertical-align: middle; }
+
+/*  end reset */
+
+h1, h2, h3, h4, h5, h6, p {margin: 2px; padding: 1px;}
+
 .header {
   background-color: white;
   text-align:       center;
@@ -62,7 +82,7 @@
 }
 
 .rules {
-margin-top:20em;
+  margin-top:24em;
 }
 
 
@@ -175,7 +195,7 @@ ul.tricks li div.trick img.arrow {
   height:16em;
   left:42%;
   right:42%;
-  top:9em;
+  top:11em;
   z-index:8;
 }
 
@@ -188,9 +208,9 @@ ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 40%;
+  top: 45%;
   left:37.5%;
-  right:56x.5%;
+  right:56.5%;
   width:6%;
   z-index:30;
 }
@@ -209,7 +229,7 @@ ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score, .vorbehalt1 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 20%;
+  top: 25%;
   left:47%;
   right:47%;
   width:6%;
@@ -232,7 +252,7 @@ ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score, .vorbehalt2{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 40%;
+  top: 45%;
   right:37.5%;
   left:56x.5%;
   width:6%;
@@ -243,7 +263,7 @@ ul.tricks li div div.card2 span.comment{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 80%;
+  top: 85%;
   left:66.5%;
   right:17.5%;
   width:16%;
@@ -254,7 +274,7 @@ ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score, .vorbehalt3{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  bottom: 20%;
+  bottom: 15%;
   left:47%;
   right:47%;
   width:6%;
@@ -266,7 +286,7 @@ ul.tricks li div div.card3 span.comment{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 80%;
+  top: 85%;
   right:66.5%;
   left:17.5%;
   width:16%;

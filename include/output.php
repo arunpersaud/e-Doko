@@ -228,7 +228,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard002.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard003.css" />
      <script type="text/javascript">
        function hl(num) {
          if(document.getElementById){
