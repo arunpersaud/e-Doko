@@ -96,6 +96,8 @@ else
 }
 /* end check for Schweinchen */
 
+set_gametype($gametype); /* this sets the $CARDS variable */
+
 /* put everyting in a form */
 echo "<form action=\"index.php?action=game&me=$me\" method=\"post\">\n";
 
@@ -211,7 +213,7 @@ switch($mystatus)
   case 'init':
     /* here we ask the player if he is sick */
     $mycards = DB_get_hand($me);
-    sort($mycards);
+    $mycards = mysort($mycards,$gametype);
 
     /* output sickness of other playes, in case the already selected and are sitting in front of the current player */
     echo "\n<ul class=\"tricks\">\n";
@@ -333,7 +335,7 @@ switch($mystatus)
     if($mystatus=='check')
       {
 	$mycards = DB_get_hand($me);
-	sort($mycards);
+	$mycards = mysort($mycards,$gametype);
 
 	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
 	echo "\n<ul class=\"tricks\">\n";
@@ -1722,7 +1724,10 @@ switch($mystatus)
 
 	  foreach($mycards as $card)
 	    {
-	      if($followsuit && !same_type($card,$firstcard))
+	      if( ($followsuit && !same_type($card,$firstcard)) ||
+		  ( (int)($card)==19 && ($RULES['schweinchen']=='second'||$RULES['schweinchen']=='secondaftercall')
+		    && $GAME['schweinchen-who']==$me && !$GAME['schweinchen-first'] )
+		  )
 		display_card($card,$PREF["cardset"]);
 	      else
 		display_link_card($card,$PREF["cardset"]);

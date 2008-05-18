@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -328,9 +328,9 @@ function count_trump($cards)
       $trump++;
 
   /* normally foxes don't count as trump, so we substract them here
-   * in case someone has schweinchen, one or two of them should count as trump 
+   * in case someone has schweinchen, one or two of them should count as trump
    * though, so we need to add one trump for those cases */
-  
+
   /* subtract foxes */
   if( in_array("19",$cards))
     $trump--;
@@ -466,6 +466,7 @@ function set_gametype($gametype)
 {
   global $CARDS;
   global $RULES;
+  global $GAME;
 
   switch($gametype)
     {
@@ -487,6 +488,38 @@ function set_gametype($gametype)
 	  $CARDS["trump"]    = array('3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 				     '17','18','19','20','21','22','23','24','25','26');
 	  $CARDS["hearts"]   = array('43','44','1','2','45','46','47','48');
+	}
+      /* do we need to reorder for Schweinchen? need to search for it because of special case for dullen above*/
+      if($RULES['schweinchen']=='both'&& $GAME['schweinchen-who'])
+	{
+	  /* find the fox and put them at the top of the stack */
+	  foreach(array('19','20') as $fox)
+	    {
+	      /* search for fox */
+	      $trump = $CARDS['trump'];
+	      $key = array_keys($trump, $fox);
+
+	      /* reorder */
+	      $foxa = array();
+	      $foxa[]=$trump[$key[0]];
+	      unset($trump[$key[0]]);
+	      $trump = array_merge($foxa,$trump);
+	      $CARDS['trump'] = $trump;
+	    }
+	}
+      else if( ($RULES['schweinchen']=='second' || $RULES['schweinchen']=='secondaftercall')
+	       && $GAME['schweinchen-who'])
+	{
+	  /* find the fox and put them at the top of the stack */
+	  $trump = $CARDS['trump'];
+	  $key = array_keys($trump, '19');
+
+	  /* reorder */
+	  $foxa = array();
+	  $foxa[]=$trump[$key[0]];
+	  unset($trump[$key[0]]);
+	  $trump = array_merge($foxa,$trump);
+	  $CARDS['trump'] = $trump;
 	}
       break;
     case "queen":
@@ -932,7 +965,7 @@ function generate_global_score_table()
 	    $player[$key]['nr']+=1;
 	}
     }
-  
+
   echo "<table>\n <tr>\n";
   function cmp($a,$b)
   {
@@ -942,7 +975,7 @@ function generate_global_score_table()
     $a=$a['points']/$a['nr'];
     $b=$b['points']/$b['nr'];
 
-    if ($a == $b) 
+    if ($a == $b)
       return 0;
     return ($a > $b) ? -1 : 1;
   }
@@ -953,7 +986,7 @@ function generate_global_score_table()
 	echo "  <tr><td>",$pl['name'],"</td><td>",round($pl['points']/$pl['nr'],3),"</td></tr>\n";
     }
   echo "</table>\n";
-    
+
   return;
 }
 
