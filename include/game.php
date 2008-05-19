@@ -26,6 +26,8 @@ if(!$myid)
     exit();
   }
 
+global $GAME,$RULES,$CARDS;
+
 /* user might get here by clicking on the link in an email, so session might not be set */
 if(isset($_SESSION["name"]))
   output_status($_SESSION["name"]);
@@ -76,6 +78,11 @@ else
 	$ok=1;
   }
 
+/* these are the defaults */
+$GAME['schweinchen-who']    = NULL;
+$GAME['schweinchen-first']  = NULL;
+$GAME['schweinchen-second'] = NULL;
+
 if($ok)
 {
   /* need to check for Schweinchen */
@@ -88,11 +95,6 @@ if($ok)
     };
   $GAME['schweinchen-first']  = 0; /* to keep track if they have been played already */
   $GAME['schweinchen-second'] = 0;
-}
-else
-{
-  /* no need to check for Schweinchen */
-  $GAME['schweinchen-who']=NULL;
 }
 /* end check for Schweinchen */
 
