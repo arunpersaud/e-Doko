@@ -98,7 +98,11 @@ if($ok)
 }
 /* end check for Schweinchen */
 
-set_gametype($gametype); /* this sets the $CARDS variable */
+/* set the $CARDS variable, needed for sorting the cards
+ * we set it to normal so that the pre-game phase is handled ok
+ * and later set it to the correct game type that is played
+ */
+set_gametype('normal');
 
 /* put everyting in a form */
 echo "<form action=\"index.php?action=game&me=$me\" method=\"post\">\n";
