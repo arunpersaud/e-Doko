@@ -1,11 +1,10 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
   exit;
 
-output_status();
 /* user needs to be logged in to do this */
 if(! isset($_SESSION["name"]) )
   {
@@ -13,17 +12,35 @@ if(! isset($_SESSION["name"]) )
   }
 else
   {
-    if( myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
+    $name  = $_SESSION["name"];
+    $email = DB_get_email('name',$name);
+
+    $myid = DB_get_userid('email',$email);
+    if(!$myid)
+      return;
+
+    DB_update_user_timestamp($myid);
+    output_status();
+
+    if( !myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
+      {
+	$names = DB_get_all_names();
+	echo "<div class=\"user\">\n";
+	output_form_for_new_game($names);
+	echo "</div>\n";
+        display_user_menu();
+      }
+    else
       {
 	/* get my name */
 	$name = $_SESSION["name"];
-	
+
 	/* the names of the four players */
 	$PlayerA = $_REQUEST["PlayerA"];
 	$PlayerB = $_REQUEST["PlayerB"];
 	$PlayerC = $_REQUEST["PlayerC"];
 	$PlayerD = $_REQUEST["PlayerD"];
-	
+
 	/* the person who sets up the game has to be one of the players */
 	if(!in_array($name,array($PlayerA,$PlayerB,$PlayerC,$PlayerD)))
 	  {
@@ -32,18 +49,18 @@ else
 	    DB_close();
 	    exit();
 	  }
-	
+
 	/* what rules were selected */
 	$dullen      = $_REQUEST["dullen"];
 	$schweinchen = $_REQUEST["schweinchen"];
 	$call        = $_REQUEST["callrule"];
-	
+
 	/* get the emails addresses of the players */
 	$EmailA  = DB_get_email('name',$PlayerA);
 	$EmailB  = DB_get_email('name',$PlayerB);
 	$EmailC  = DB_get_email('name',$PlayerC);
 	$EmailD  = DB_get_email('name',$PlayerD);
-	
+
 	/* this is used to check if the player names are all ok */
 	if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
 	  {
@@ -52,17 +69,17 @@ else
 	    DB_close();
 	    exit();
 	  }
-	
+
 	/* get user ids */
 	$useridA  = DB_get_userid('name',$PlayerA);
 	$useridB  = DB_get_userid('name',$PlayerB);
 	$useridC  = DB_get_userid('name',$PlayerC);
 	$useridD  = DB_get_userid('name',$PlayerD);
-	
+
 	/* create random numbers */
 	$randomNR       = create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD);
 	$randomNRstring = join(":",$randomNR);
-	
+
 	/* create game */
 	$followup = NULL;
 	/* is this game a follow up in an already started session? */
@@ -72,7 +89,7 @@ else
 	    $session = DB_get_session_by_gameid($followup);
 	    $ruleset = DB_get_ruleset_by_gameid($followup); /* just copy ruleset from old game,
 							     this way no manipulation is possible */
-	    
+
 	    /* check if there is a game in pre or play mode, in that case do nothing */
 	    if( DB_is_session_active($session) > 0 )
 	      {
@@ -88,7 +105,7 @@ else
 		DB_close();
 		exit();
 	      }
-	    
+
 	    if($session)
 	      DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 		       "'$ruleset','$session' ,NULL)");
@@ -116,19 +133,19 @@ else
 	    /* get max session */
 	    $max = DB_get_max_session();
 	    $max++;
-	    
+
 	    DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
 		     "'$ruleset','$max' ,NULL)");
 	  }
 	$game_id = DB_insert_id();
-	
+
 	/* create hash */
 	$TIME  = (string) time(); /* to avoid collisions */
 	$hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA.$TIME);
 	$hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB.$TIME);
 	$hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC.$TIME);
 	$hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD.$TIME);
-	
+
 	/* create hands */
 	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
 		 ", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,NULL)");
@@ -142,7 +159,7 @@ else
 	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
 		 ", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,NULL)");
 	$hand_idD = DB_insert_id();
-	
+
 	/* save cards */
 	for($i=0;$i<12;$i++)
 	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idA', '".$randomNR[$i]."', 'false')");
@@ -152,7 +169,7 @@ else
 	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idC', '".$randomNR[$i]."', 'false')");
 	for($i=36;$i<48;$i++)
 	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
-	
+
 	/* send out email, TODO: check for error with email */
 	$message = "\n".
 	  "you are invited to play a game of DoKo (that is to debug the program ;).\n".
@@ -165,21 +182,14 @@ else
 	  "$PlayerD\n\n".
 	  "If you want to join this game, please follow this link:\n\n".
 	  "".$HOST.$INDEX."?action=game&me=";
-	
+
 	mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
 	mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
 	mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
 	mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
-	
+
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
-      }
-    else
-      {
-	$names = DB_get_all_names();
-	echo "<div class=\"user\">\n";
-	output_form_for_new_game($names);
-	echo "</div>\n";
-	display_user_menu();
+        display_user_menu();
       }
   }
 
