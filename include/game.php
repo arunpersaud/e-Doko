@@ -189,6 +189,7 @@ switch($mystatus)
 		    /* whos turn is it? */
 		    DB_set_player_by_gameid($gameid,$user);
 		    $ok = 0;
+		    break;
 		  }
 	      };
 	    if($ok)
@@ -380,6 +381,7 @@ switch($mystatus)
 	  {
 	    $ok = 0;
 	    DB_set_player_by_gameid($gameid,$user);
+	    break;
 	  }
       };
 
@@ -907,6 +909,7 @@ switch($mystatus)
 	      {
 		$ok = 0;
 		DB_set_player_by_gameid($gameid,$user);
+		break;
 	      }
 	  }
 	if($ok)
