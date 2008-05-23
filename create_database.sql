@@ -238,7 +238,7 @@ CREATE TABLE `Score` (
   `party` enum('re','contra') default NULL ,
   `winner_id` int(11) default NULL ,
   `looser_id` int(11) default NULL ,
-  `score` enum('120', 'call120','against120','90','call90','against90','made90'
+  `score` enum('120', 'call120','against120','90','call90','against90','made90',
           '60','call60','against60','made60','30','call30','against30','made30',
           '0','call0','against0','made0',
           'fox','karlchen','dulle','doko','againstqueens') default NULL,
