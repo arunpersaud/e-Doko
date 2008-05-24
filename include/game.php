@@ -642,6 +642,7 @@ switch($mystatus)
      *            poverty: set re/contra
      *            dpoverty: first time: set re, send email to second player
      *                      second time: set contra
+     *            poverty: set status of other players to 'play'
      *            set status to play in case 0 trump
      *      no -> set status to play,
      *            ask next player or cancle the game if no more players
@@ -673,6 +674,7 @@ switch($mystatus)
 			       " WHERE hand_id='$myhand' AND card_id=".DB_quote_smart($exchange));
 	  };
       }
+
     /* update hand */
     $mycards = DB_get_hand($me);
     $mycards = mysort($mycards,$gametype);
@@ -693,7 +695,26 @@ switch($mystatus)
       {
 	/* user is done, ready to play */
 	DB_set_hand_status_by_hash($me,'play');
-	/* TODO if resolved; email start player, set startplayer */
+
+	/* email start player */
+	$startplayer = DB_get_startplayer_by_gameid($gameid);
+	$email       = DB_get_email('position-gameid',$startplayer,$gameid);
+	$hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
+	$who         = DB_get_userid('email',$email);
+	DB_set_player_by_gameid($gameid,$who);
+
+	if($hash!=$me)
+	  {
+	    if(DB_get_email_pref_by_hash($hash)!="emailaddict")
+	      {
+		/* email startplayer */
+		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+	      }
+	  }
+	else
+	  echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />\n";
       }
 
     /* the following is part A) of what needs to be done */
@@ -807,6 +828,7 @@ switch($mystatus)
 	    /* copy trump from player A to B */
 	    $result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
 
+	    /* reload cards */
 	    $mycards = DB_get_hand($me);
 
 	    /* set re/contra */
@@ -817,18 +839,19 @@ switch($mystatus)
 		  {
 		    $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		    if($hash==$userhash||$hash==$me)
-		      DB_set_party_by_hash($hash,"re");
+		      {
+			DB_set_party_by_hash($hash,"re");
+		      }
 		    else
-		      DB_set_party_by_hash($hash,"contra");
+		      {
+			DB_set_party_by_hash($hash,"contra");
+			DB_set_hand_status_by_hash($hash,'play'); /* the contra party is ready to play */
+		      }
 		  }
-		/* check if we are done, if so, send everyone into the 'play' phase */
+		/* check if we are done (in case of no trump handed over), if so, go to 'play' phase right away*/
 		if(count($mycards)==12)
 		  {
-		    foreach($userids as $user)
-		      {
-			$hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-			DB_set_hand_status_by_hash($hash,'play');
-		      }
+		    DB_set_hand_status_by_hash($me,'play');
 		  }
 	      }
 	    else /*dpoverty*/
