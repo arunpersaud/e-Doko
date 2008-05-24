@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -12,10 +12,11 @@ if(!$myid)
   return;
 
 /* track what got changed */
-$changed_notify	  = 0;
-$changed_password = 0;
-$changed_cards	  = 0;
-$changed_timezone = 0;
+$changed_notify	   = 0;
+$changed_password  = 0;
+$changed_cards	   = 0;
+$changed_timezone  = 0;
+$changed_autosetup = 0;
 
 output_status();
 display_user_menu();
@@ -74,6 +75,25 @@ if(myisset("notify"))
       }
   }
 
+if(myisset("autosetup"))
+  {
+    $autosetup = $_REQUEST['autosetup'];
+    if($autosetup != $PREF['autosetup'])
+      {
+	/* check if we already have an entry for the user, if so change it, if not create new one */
+	$result = DB_query("SELECT * from User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='autosetup'" );
+	if( DB_fetch_array($result))
+	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($autosetup).
+			     " WHERE user_id='$myid' AND pref_key='autosetup'" );
+	else
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','autosetup',".
+			     DB_quote_smart($autosetup).")");
+	$changed_autosetup=1;
+      }
+  }
+
+
 if(myisset("password0") &&  $_REQUEST["password0"]!="" )
   {
     $changed_password = 1;
@@ -87,7 +107,7 @@ if(myisset("password0") &&  $_REQUEST["password0"]!="" )
     /* check if new passwords are types the same twice */
     if($_REQUEST["password1"] != $_REQUEST["password2"] )
       $changed_password = -2;
-    
+
     if($changed_password==1)
       {
 	DB_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
@@ -126,7 +146,23 @@ echo "  <select id=\"notify\" name=\"notify\" size=\"1\">\n";
 	}
   echo "  </select>\n";
 if($changed_notify) echo "changed";
-echo " </td></tr>\n";    
+echo " </td></tr>\n";
+echo "    <tr><td>Autosetup:          </td><td>";
+
+echo "  <select id=\"autosetup\" name=\"autosetup\" size=\"1\">\n";
+      if($PREF['autosetup']=="yes")
+	{
+	  echo "   <option value=\"yes\" selected=\"selected\">accept every game</option>\n";
+	  echo "   <option value=\"no\">ask for games</option>\n";
+	}
+      else
+	{
+	  echo "   <option value=\"yes\">accept every game</option>\n";
+	  echo "   <option value=\"no\" selected=\"selected\">ask for games</option>\n";
+	}
+  echo "  </select>\n";
+if($changed_autosetup) echo "changed";
+echo " </td></tr>\n";
 echo "    <tr><td>Card set:              </td><td>";
 
 echo "  <select id=\"cards\" name=\"cards\" size=\"1\">\n";
@@ -142,7 +178,7 @@ echo "  <select id=\"cards\" name=\"cards\" size=\"1\">\n";
 	}
   echo "  </select>\n";
 if($changed_cards) echo "changed";
-echo " </td></tr>\n";    
+echo " </td></tr>\n";
 echo "    <tr><td>Password(old):         </td><td>",
   "<input type=\"password\" id=\"password0\" name=\"password0\" size=\"20\" maxlength=\"30\" />";
 switch($changed_password)
@@ -168,7 +204,7 @@ echo "    <tr><td><input type=\"submit\" class=\"submitbutton\" name=\"passwd\" 
   "<td></td></tr>\n";
 echo "    </table>\n";
 echo "  </form>\n";
-echo "</div>\n";    
+echo "</div>\n";
 
 output_footer();
 DB_close();

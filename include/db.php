@@ -705,6 +705,19 @@ function DB_get_PREF($myid)
   else
     $PREF["email"]="emailnonaddict";
 
+  /* Autosetup */
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='autosetup'" );
+  if($r)
+    {
+      if($r[0]=='yes')
+	$PREF['autosetup']='yes';
+      else
+	$PREF['autosetup']='no';
+    }
+  else
+    $PREF['autosetup']='no';
+
   return $PREF;
 }
 

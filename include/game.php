@@ -142,7 +142,11 @@ display_table();
 switch($mystatus)
   {
   case 'start':
-    if( !myisset("in") )
+    /* don't ask if user has autosetup set to yest */
+    $skip = 0;
+    if($PREF['autosetup']=='yes') $skip = 1;
+
+    if( !myisset("in") && !$skip)
       {
 	/* asks the player, if he wants to join the game */
 	output_check_want_to_play($me);
@@ -151,7 +155,7 @@ switch($mystatus)
     else
       {
 	/* check the result, if player wants to join, got next stage, else cancel game */
-	if($_REQUEST["in"] == "no")
+	if($_REQUEST["in"] == "no" && !$skip)
 	  {
 	    /* cancel the game */
 	    $message = "Hello, \n\n".
