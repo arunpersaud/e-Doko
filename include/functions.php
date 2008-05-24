@@ -847,8 +847,7 @@ function display_table ()
 function display_user_menu()
 {
   global $WIKI,$myid,$INDEX;
-  echo "<div class=\"usermenu\">\n".
-    "<a href=\"".$INDEX."\"> Go to my user page </a>";
+  echo "<div class=\"usermenu\">\n";
 
   $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
@@ -857,21 +856,20 @@ function display_user_menu()
 		     " AND Game.status<>'gameover'".
 		     " ORDER BY Game.session" );
   if(DB_num_rows($result))
-      echo "<hr />It's your turn in these games:<br />\n";
+      echo "It's your turn in these games:<br />\n";
 
+  $i=0;
   while( $r = DB_fetch_array($result))
     {
+      $i++;
       echo "<a href=\"".$INDEX."?action=game&me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
+      if($i>4)
+	{
+	  echo "...<br />\n";
+	  break;
+	}
     }
 
-  echo "<hr /> <a href=\"".$INDEX."?action=new\">Start a new game</a>\n";
-
-  echo "<hr /> <a href=\"".$INDEX."?action=prefs\">Change settings</a>\n";
-
-  echo "<hr /> <a href=\"".$INDEX."?action=stats\">Statistics</a>\n";
-
-  echo
-    "<hr />Report bugs in the <a href=\"".$WIKI."\">wiki</a>\n";
   echo  "</div>\n";
   return;
 }

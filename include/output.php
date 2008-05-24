@@ -291,15 +291,20 @@ function output_footer()
 
 function output_status()
 {
-  global $defaulttimezone;
+  global $defaulttimezone,$INDEX,$WIKI;
    if(isset($_SESSION["name"]))
      {
        $name = $_SESSION["name"];
 
        /* logout info */
-       echo "\n<div class=\"status\">";
-       echo $name;
-       echo " <a href=\"index.php?action=logout\">logout</a>";
+       echo "\n<div class=\"status\">\n";
+       echo $name,"\n";
+       echo " | <a href=\"".$INDEX."\"> mypage </a>\n";
+       echo " | <a href=\"".$INDEX."?action=prefs\">settings</a>\n";
+       echo " | <a href=\"".$INDEX."?action=new\">new game</a>\n";
+       echo " | <a href=\"".$INDEX."?action=stats\">statistics</a>\n";
+       echo " | <a href=\"".$WIKI."\">wiki</a>\n";
+       echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">logout</a>\n";
        echo "</div>\n";
 
        /* last logon time */
