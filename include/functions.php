@@ -847,7 +847,6 @@ function display_table ()
 function display_user_menu()
 {
   global $WIKI,$myid,$INDEX;
-  echo "<div class=\"usermenu\">\n";
 
   $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
@@ -861,6 +860,9 @@ function display_user_menu()
   $i=0;
   while( $r = DB_fetch_array($result))
     {
+      if($i==0)
+	echo "<div class=\"usermenu\">\n";
+
       $i++;
       echo "<a href=\"".$INDEX."?action=game&me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
       if($i>4)
@@ -870,7 +872,8 @@ function display_user_menu()
 	}
     }
 
-  echo  "</div>\n";
+  if($i)
+    echo  "</div>\n";
   return;
 }
 
