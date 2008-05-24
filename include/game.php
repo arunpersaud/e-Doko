@@ -310,7 +310,7 @@ switch($mystatus)
 	      }
 	    else if($_REQUEST["wedding"] == "yes")
 	      {
-		/* TODO: add silent solo somewhere*/
+		/* silent solo is set further down */
 		echo "Ok, you don't want to play a silent solo...wedding was chosen.<br />\n";
 		DB_set_sickness_by_hash($me,"wedding");
 	      }
