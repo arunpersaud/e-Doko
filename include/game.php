@@ -744,10 +744,10 @@ switch($mystatus)
 		    foreach($cards as $card)
 		      if($card<27) $nrtrump++;
 		    echo "Player $name has $nrtrump trump. Do you want to take them?".
-		      "<a href=\"index.php?action=game&me=$me&amp;trump=$user\">yes</a> <br />\n";
+		      "<a href=\"index.php?action=game&me=$me&amp;trump=$user\">Yes</a> <br />\n";
 		  }
 	      }
-	    echo "<a href=\"index.php?action=game&me=$me&amp;trump=no\">No,way I take those trump...</a> <br />\n";
+	    echo "<a href=\"index.php?action=game&me=$me&amp;trump=no\">No way</a> <br />\n";
 	    echo "</div><div>\n";
 
 	    echo "<div class=\"mycards\">Your cards are: <br />\n";
