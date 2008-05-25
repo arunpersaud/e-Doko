@@ -1735,8 +1735,8 @@ switch($mystatus)
 	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
 	}
 
-
-      echo "</ul>\n"; /* end ul tricks*/
+      echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">prev</a></li>\n";
+      echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n</ul>\n"; /* end ul tricks*/
 
       echo "<div class=\"notes\"> Personal notes: <br />\n";
       $notes = DB_get_notes_by_userid_and_gameid($myid,$gameid);

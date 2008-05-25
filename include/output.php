@@ -230,6 +230,7 @@ function output_header()
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
      <link rel="stylesheet" type="text/css" href="css/standard003.css" />
      <script type="text/javascript">
+       var current=0;
        function hl(num) {
          if(document.getElementById){
 	   var i;
@@ -238,6 +239,7 @@ function output_header()
 	       document.getElementById("trick"+i).style.display = 'none';
 	   }
 	   document.getElementById("trick"+num).style.display = 'block';
+	   current=num;
 	 }
        }
        function high_last(){
@@ -247,11 +249,22 @@ function output_header()
 	     if(document.getElementById("trick"+i))
 	       {
 		 hl(i);
+		 current=i;
 		 break;
 	       }
 	   }
 	 }
        }
+       function hl_next()
+	 {
+	   if(document.getElementById("trick"+(current+1)))
+	     hl(current+1);
+	 }
+       function hl_prev()
+	 {
+	   if(document.getElementById("trick"+(current-1)))
+	     hl(current-1);
+	 }
      </script>
   </head>
 <body onload="high_last();">
