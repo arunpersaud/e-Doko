@@ -96,6 +96,48 @@ function output_form_for_new_game($names)
 <?php
 }
 
+function output_table($data,$class="")
+{
+  if($class!="")
+    $HTML  = "\n<table class=\"$class\">\n";
+  else
+    $HTML  = "\n<table>\n";
+ 
+  $i=0;
+  
+  foreach($data as $record)
+    {
+      if(!$i)
+	$HTML .= "  <thead>\n  <tr>\n";
+      else
+	{
+	  if($i==1) $HTML .= "  <tbody>\n";
+	  if($i % 2)
+	    $HTML .= "  <tr class=\"odd\">   ";
+	  else
+	    $HTML .= "  <tr class=\"even\">  ";
+	}
+      foreach($record as $point)
+	{
+	  if($i)
+	    $HTML .= "    <td>$point</td> ";
+	  else
+	    $HTML .= "    <th>$point</th> ";
+	}
+
+      if(!$i)
+	$HTML .= "  </tr>\n  </thead>\n";
+      else
+	{
+	  $HTML .= "  </tr>\n";
+	}
+      $i++;
+    }
+  $HTML .= "  </tbody>\n</table>\n";
+
+  return $HTML;
+}
+
 function display_card($card,$dir="english")
 {
   /* cards are only availabl for the odd values, e.g. 1.png, 3.png, ...
@@ -228,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard003.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard004.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {

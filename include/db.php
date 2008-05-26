@@ -85,6 +85,17 @@ function DB_query_array($query)
   return $return;
 }
 
+function DB_query_array_all($query)
+{
+  $result = array();
+  
+  $queryresult  = DB_query($query);
+  while($row = DB_fetch_array($queryresult))
+    $result[] = $row;
+
+  return $result;
+}
+
 function DB_get_passwd_by_name($name)
 {
   $r = DB_query_array("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
