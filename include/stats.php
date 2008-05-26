@@ -21,7 +21,7 @@ DB_update_user_timestamp($myid);
 display_user_menu();
 
 /* start statistics*/
-echo "<div class=\"user\">\n";
+echo "<div class=\"user wide\">\n";
 
 /* always: if player logged in: add link to cards  */
 
@@ -74,25 +74,21 @@ if($r)
 
 
 /* number of solos */
-echo "<p>These kind of games have been played this often: <br />";
 $result = DB_query_array_all("SELECT type,COUNT(*) as c from Game".
 			     " WHERE status='gameover'".
 			     " GROUP BY type".
 			     " ORDER BY c DESC");
 array_unshift($result,array("Type","Frequency"));
-echo output_table($result,"stats");
-echo " </p>\n";
+echo output_table($result,"Game types","stats");
 
 /* break up solos in types */
-echo "<p>These kind of solos have been played this often: <br />";
 $result = DB_query_array_all("SELECT solo,COUNT(*) as c from Game".
 			     " WHERE status='gameover'".
 			     " AND type='solo'".
 			     " GROUP BY solo".
 			     " ORDER BY c DESC");
 array_unshift($result,array("Type","Frequency"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Kind of solos","stats");
 
 /*
  2 top user mit maximaler quote an solo (min 10 games)
@@ -106,19 +102,15 @@ echo "</p>\n";
  select id,type,solo,status from game where id in (select id from game where randomnumbers in (select randomnumbers from game where id=27));
  
 */
-echo "<p>Most extra points (doko, fox, karlchen) in a single game:<br />\n";
 $result = DB_query_array_all("SELECT fullname,COUNT(*) as c FROM Score".
 			     " LEFT JOIN User ON User.id=winner_id" .
 			     " WHERE score IN ('fox','doko','karlchen')".
 			     " GROUP BY game_id,fullname".
 			     " ORDER BY c DESC LIMIT 3" );
 array_unshift($result,array("Name","Points"));
-echo output_table($result,"stats");
-echo "</p>\n";
-
+echo output_table($result,"Most extra points in a single game","stats");
 
 /* most reminders */
-echo "<p>These players got the most reminders per game:<br />\n";
 $result = DB_query_array_all("SELECT fullname, COUNT(*)  /" .
 			     "      (SELECT COUNT(*) FROM Hand".
 			     "       WHERE user_id=User.id) as c".
@@ -127,11 +119,9 @@ $result = DB_query_array_all("SELECT fullname, COUNT(*)  /" .
 			     " GROUP BY user_id".
 			     " ORDER BY c DESC LIMIT 5" );
 array_unshift($result,array("Name","Reminders"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Most reminders per game","stats");
 
 /* fox */
-echo "<p>These players caught the most foxes per game:<br />\n";
 $result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
 			     "      (SELECT COUNT(*) FROM Hand".
 			     "       WHERE user_id=User.id) as c".
@@ -141,10 +131,8 @@ $result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
 			     " GROUP BY winner_id".
 			     " ORDER BY c DESC LIMIT 5" );
 array_unshift($result,array("Name","Number of foxes caught"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Most caught foxes","stats");
 
-echo "<p>These players lost their fox most often per game:<br />\n";
 $result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
 			     "      (SELECT COUNT(*) FROM Hand".
 			     "       WHERE user_id=User.id) as c".
@@ -154,10 +142,8 @@ $result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
 			     " GROUP BY looser_id".
 			     " ORDER BY c DESC LIMIT 5" );
 array_unshift($result,array("Name","Number of foxes lost"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Lost foxes (most)","stats");
 
-echo "<p>These players lost their fox least often per game:<br />\n";
 $result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
 			     "      (SELECT COUNT(*) FROM Hand".
 			     "       WHERE user_id=User.id) as c".
@@ -167,11 +153,9 @@ $result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
 			     " GROUP BY looser_id".
 			     " ORDER BY c ASC LIMIT 5" );
 array_unshift($result,array("Name","Number of foxes lost"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Lost foxes (least)","stats");
 
 /* which position wins the most tricks  */
-echo "<p>Which positions at the table make the most tricks:<br />\n";
 $result = DB_query_array_all("SELECT CASE winner ".
 			     "   WHEN 1 THEN 'left' ".
 			     "   WHEN 2 THEN 'top' ".
@@ -181,24 +165,19 @@ $result = DB_query_array_all("SELECT CASE winner ".
 			     " GROUP BY winner ".
 			     " HAVING LENGTH(winner)>0  ".
 			     " ORDER BY winner ASC " );
-
 array_unshift($result,array("Position","Number of tricks"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Tricks at the table","stats");
 
 /* most games */
-echo "<p>Most games played on the server:<br />\n";
 $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
-		   " FROM Hand".
-		   " LEFT JOIN User ON User.id=user_id".
-		   " GROUP BY user_id".
-		   " ORDER BY c DESC LIMIT 7" );
+			     " FROM Hand".
+			     " LEFT JOIN User ON User.id=user_id".
+			     " GROUP BY user_id".
+			     " ORDER BY c DESC LIMIT 7" );
 array_unshift($result,array("Name","Number of games"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Most games","stats");
 
 /* most active games */
-echo "<p>These players are involved in this many active games:<br />\n";
 $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
 		   " FROM Hand".
 		   " LEFT JOIN User ON User.id=user_id".
@@ -207,9 +186,7 @@ $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
 		   " GROUP BY user_id".
 		   " ORDER BY c DESC LIMIT 7" );
 array_unshift($result,array("Name","Number of active games"));
-echo output_table($result,"stats");
-echo "</p>\n";
-
+echo output_table($result,"Active games","stats");
 
 /*
  does the party win more often if they start
@@ -224,11 +201,10 @@ echo "</p>\n";
  echo $r[1]." (".$r[0].") <br />\n";
  echo " games</p>\n";
 */
-echo "<p>Points/game (you need at least 10 games to be in this statistic): <br />\n";
 $result = generate_global_score_table();
 array_unshift($result,array("Name","Average score per game"));
-echo output_table($result,"stats");
-echo "</p>\n";
+echo output_table($result,"Points per game","stats");
+
 /*
  how often is the last trick a non-trump trick
 */

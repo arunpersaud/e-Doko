@@ -96,7 +96,7 @@ function output_form_for_new_game($names)
 <?php
 }
 
-function output_table($data,$class="")
+function output_table($data,$caption="",$class="")
 {
   if($class!="")
     $HTML  = "\n<table class=\"$class\">\n";
@@ -105,6 +105,9 @@ function output_table($data,$class="")
  
   $i=0;
   
+  if($caption!="")
+    $HTML .= "  <caption> $caption </caption>\n";
+
   foreach($data as $record)
     {
       if(!$i)
@@ -270,7 +273,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard004.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard005.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {

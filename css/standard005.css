@@ -399,6 +399,7 @@ ul.tricks li div div span.comment span{
 }
 
 .user { margin-left:25%;margin-right:25%; }
+.wide { margin-left:5%;margin-right:5%; }
 
 .over {
   text-align:center;
@@ -460,9 +461,17 @@ table.score {
   font-size:larger;
 }
 
+caption { 
+  text-align: center;
+  margin: 0.5em;
+  padding: 0.5em;
+  padding-bottom: 0em;
+  margin-bottom: 0;
+ }
 table.stats { margin: 0.5em 1em; 
   border: solid 0.2em #aeaeae;
   -moz-border-radius: 0.5em ;
+  float: left;
 }
 table.stats tr.odd  { background-color:#aeaeae; }
 table.stats tr.even { background-color:#eaeaea; }
