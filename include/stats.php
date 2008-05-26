@@ -44,23 +44,23 @@ echo " games.</p>\n";
 
 /* number of solos */
 echo "<p>These kind of games have been played this often: <br />";
-$result = DB_query("SELECT COUNT(*) as c,type from Game".
-		   " WHERE status='gameover'".
-		   " GROUP BY type".
-		   " ORDER BY c DESC");
-while( $r = DB_fetch_array($result))
-  echo "".$r[1]." (".$r[0].") <br />";
+$result = DB_query_array_all("SELECT type,COUNT(*) as c from Game".
+			     " WHERE status='gameover'".
+			     " GROUP BY type".
+			     " ORDER BY c DESC");
+array_unshift($result,array("Type","Frequency"));
+echo output_table($result,"stats");
 echo " </p>\n";
 
 /* break up solos in types */
 echo "<p>These kind of solos have been played this often: <br />";
-$result = DB_query("SELECT COUNT(*) as c,solo from Game".
-		   " WHERE status='gameover'".
-		   " AND type='solo'".
-		   " GROUP BY solo".
-		   " ORDER BY c DESC");
-while( $r = DB_fetch_array($result))
-  echo "".$r[1]." (".$r[0].")<br />";
+$result = DB_query_array_all("SELECT solo,COUNT(*) as c from Game".
+			     " WHERE status='gameover'".
+			     " AND type='solo'".
+			     " GROUP BY solo".
+			     " ORDER BY c DESC");
+array_unshift($result,array("Type","Frequency"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 /*
@@ -76,13 +76,13 @@ echo "</p>\n";
  
 */
 echo "<p>Most extra points (doko, fox, karlchen) in a single game:<br />\n";
-$result = DB_query("SELECT COUNT(*) as c,fullname FROM Score".
-		   " LEFT JOIN User ON User.id=winner_id" .
-		   " WHERE score IN ('fox','doko','karlchen')".
-		   " GROUP BY game_id,fullname".
-		   " ORDER BY c DESC LIMIT 3" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+$result = DB_query_array_all("SELECT fullname,COUNT(*) as c FROM Score".
+			     " LEFT JOIN User ON User.id=winner_id" .
+			     " WHERE score IN ('fox','doko','karlchen')".
+			     " GROUP BY game_id,fullname".
+			     " ORDER BY c DESC LIMIT 3" );
+array_unshift($result,array("Name","Points"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 /* longest and shortest game */
@@ -118,58 +118,55 @@ if($r)
 
 /* most reminders */
 echo "<p>These players got the most reminders per game:<br />\n";
-$result = DB_query("SELECT COUNT(*)  /" .
-		   "      (SELECT COUNT(*) FROM Hand".
-		   "       WHERE user_id=User.id) as c,".
-		   " fullname FROM Reminder".
-		   " LEFT JOIN User ON User.id=user_id".
-		   " GROUP BY user_id".
-		   " ORDER BY c DESC LIMIT 5" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+$result = DB_query_array_all("SELECT fullname, COUNT(*)  /" .
+			     "      (SELECT COUNT(*) FROM Hand".
+			     "       WHERE user_id=User.id) as c".
+			     " FROM Reminder".
+			     " LEFT JOIN User ON User.id=user_id".
+			     " GROUP BY user_id".
+			     " ORDER BY c DESC LIMIT 5" );
+array_unshift($result,array("Name","Reminders"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 /* fox */
 echo "<p>These players caught the most foxes per game:<br />\n";
-$result = DB_query("SELECT COUNT(*) /" .
-		   "      (SELECT COUNT(*) FROM Hand".
-		   "       WHERE user_id=User.id) as c,".
-		   " fullname".
-		   " FROM Score".
-		   " LEFT JOIN User ON User.id=winner_id".
-		   " WHERE score='fox'".
-		   " GROUP BY winner_id".
-		   " ORDER BY c DESC LIMIT 5" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+$result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
+			     "      (SELECT COUNT(*) FROM Hand".
+			     "       WHERE user_id=User.id) as c".
+			     " FROM Score".
+			     " LEFT JOIN User ON User.id=winner_id".
+			     " WHERE score='fox'".
+			     " GROUP BY winner_id".
+			     " ORDER BY c DESC LIMIT 5" );
+array_unshift($result,array("Name","Number of foxes caught"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 echo "<p>These players lost their fox most often per game:<br />\n";
-$result = DB_query("SELECT COUNT(*) /" .
-		   "      (SELECT COUNT(*) FROM Hand".
-		   "       WHERE user_id=User.id) as c,".
-		   " fullname".
-		   " FROM Score".
-		   " LEFT JOIN User ON User.id=looser_id".
-		   " WHERE score='fox'".
-		   " GROUP BY looser_id".
-		   " ORDER BY c DESC LIMIT 5" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+$result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
+			     "      (SELECT COUNT(*) FROM Hand".
+			     "       WHERE user_id=User.id) as c".
+			     " FROM Score".
+			     " LEFT JOIN User ON User.id=looser_id".
+			     " WHERE score='fox'".
+			     " GROUP BY looser_id".
+			     " ORDER BY c DESC LIMIT 5" );
+array_unshift($result,array("Name","Number of foxes lost"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 echo "<p>These players lost their fox least often per game:<br />\n";
-$result = DB_query("SELECT COUNT(*) /" .
-		   "      (SELECT COUNT(*) FROM Hand".
-		   "       WHERE user_id=User.id) as c,".
-		   " fullname".
-		   " FROM Score".
-		   " LEFT JOIN User ON User.id=looser_id".
-		   " WHERE score='fox'".
-		   " GROUP BY looser_id".
-		   " ORDER BY c ASC LIMIT 5" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+$result = DB_query_array_all("SELECT fullname, COUNT(*) /" .
+			     "      (SELECT COUNT(*) FROM Hand".
+			     "       WHERE user_id=User.id) as c".
+			     " FROM Score".
+			     " LEFT JOIN User ON User.id=looser_id".
+			     " WHERE score='fox'".
+			     " GROUP BY looser_id".
+			     " ORDER BY c ASC LIMIT 5" );
+array_unshift($result,array("Name","Number of foxes lost"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 /* which position wins the most tricks  */
@@ -191,26 +188,26 @@ echo "</p>\n";
 
 /* most games */
 echo "<p>Most games played on the server:<br />\n";
-$result = DB_query("SELECT COUNT(*) as c,  " .
-		   " fullname FROM Hand".
+$result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
+		   " FROM Hand".
 		   " LEFT JOIN User ON User.id=user_id".
 		   " GROUP BY user_id".
 		   " ORDER BY c DESC LIMIT 7" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+array_unshift($result,array("Name","Number of games"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 /* most active games */
 echo "<p>These players are involved in this many active games:<br />\n";
-$result = DB_query("SELECT COUNT(*) as c,  " .
-		   " fullname FROM Hand".
+$result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
+		   " FROM Hand".
 		   " LEFT JOIN User ON User.id=user_id".
 		   " LEFT JOIN Game ON Game.id=game_id".
 		   " WHERE Game.status<>'gameover'".
 		   " GROUP BY user_id".
 		   " ORDER BY c DESC LIMIT 7" );
-while( $r = DB_fetch_array($result))
-  echo $r[1]." (".$r[0].") <br />\n";
+array_unshift($result,array("Name","Number of active games"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 

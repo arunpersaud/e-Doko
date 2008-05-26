@@ -460,19 +460,19 @@ table.score {
   font-size:larger;
 }
 
-table { margin: 0.5em 1em; 
+table.stats { margin: 0.5em 1em; 
   border: solid 0.2em #aeaeae;
   -moz-border-radius: 0.5em ;
 }
-tr.odd  { background-color:#aeaeae; }
-tr.even { background-color:#eaeaea; }
-td,th { 
+table.stats tr.odd  { background-color:#aeaeae; }
+table.stats tr.even { background-color:#eaeaea; }
+table.stats td, table.stats th { 
   margin-left:  0.2em;
   margin-right: 0.2em;
   padding-left:  0.2em;
   padding-right: 0.2em;
   border-right: solid 0.1em black;
 }
-tr td:last-child, tr th:last-child { border-right: solid 0 black; }
+table.stats  tr td:last-child, table.stats  tr th:last-child { border-right: solid 0 black; }
 
-th { border-bottom: solid 0.2em black }
+table.stats th { border-bottom: solid 0.2em black }
