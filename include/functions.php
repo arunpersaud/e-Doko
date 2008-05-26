@@ -934,6 +934,8 @@ function generate_score_table($session)
 
 function generate_global_score_table()
 {
+  $return = array();
+
   /* get all ids */
   $gameids = DB_get_gameids_of_finished_games_by_session(0);
 
@@ -967,7 +969,6 @@ function generate_global_score_table()
 	}
     }
 
-  echo "<table>\n <tr>\n";
   function cmp($a,$b)
   {
     if($a['nr']==0 ) return 1;
@@ -981,14 +982,15 @@ function generate_global_score_table()
     return ($a > $b) ? -1 : 1;
   }
   usort($player,"cmp");
+
   foreach($player as $pl)
     {
+      /* limit to players with at least 10 games */
       if($pl['nr']>10)
-	echo "  <tr><td>",$pl['name'],"</td><td>",round($pl['points']/$pl['nr'],3),"</td></tr>\n";
+	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3) );
     }
-  echo "</table>\n";
 
-  return;
+  return $return;
 }
 
 

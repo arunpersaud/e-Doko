@@ -41,6 +41,37 @@ while( $r = DB_fetch_array($result))
   echo $r[0];
 echo " games.</p>\n";
 
+/* longest and shortest game */
+$r=DB_query("SELECT timediff(mod_date,create_date) ,session,id".
+	    " FROM Game WHERE status='gameover'".
+	    " ORDER BY time_to_sec(timediff(mod_date,create_date)) ASC LIMIT 1");
+
+if($r)
+  {
+    $short= DB_fetch_array($r);
+    $names = DB_get_all_names_by_gameid($short[2]);
+    echo "<p> The shortest game took only ".$short[0]." hours and was played by  ".join(", ",$names).".<br />\n";
+  }
+
+$r=DB_query("SELECT datediff(mod_date,create_date) ,session,id".
+	    " FROM Game WHERE status='gameover'".
+	    " ORDER BY time_to_sec(timediff(mod_date,create_date)) DESC LIMIT 1");
+if($r)
+  {
+    $long= DB_fetch_array($r);
+    echo "The longest game took ".$long[0]." days.</p>\n";
+  }
+
+$r=DB_query("SELECT COUNT(*) as c, session, id FROM Game ".
+	    " GROUP BY session ORDER BY c DESC LIMIT 1");
+if($r)
+  {
+    $long  = DB_fetch_array($r);
+    $names = DB_get_all_names_by_gameid($long[2]);
+    echo "The longest session is session ".$long[1]." with ".$long[0].
+      " games played by ".join(", ",$names).".</p>\n";
+  }
+
 
 /* number of solos */
 echo "<p>These kind of games have been played this often: <br />";
@@ -85,36 +116,6 @@ array_unshift($result,array("Name","Points"));
 echo output_table($result,"stats");
 echo "</p>\n";
 
-/* longest and shortest game */
-$r=DB_query("SELECT timediff(mod_date,create_date) ,session,id".
-	    " FROM Game WHERE status='gameover'".
-	    " ORDER BY time_to_sec(timediff(mod_date,create_date)) ASC LIMIT 1");
-
-if($r)
-  {
-    $short= DB_fetch_array($r);
-    $names = DB_get_all_names_by_gameid($short[2]);
-    echo "<p> The shortest game took only ".$short[0]." hours and was played by  ".join(", ",$names).".<br />\n";
-  }
-
-$r=DB_query("SELECT datediff(mod_date,create_date) ,session,id".
-	    " FROM Game WHERE status='gameover'".
-	    " ORDER BY time_to_sec(timediff(mod_date,create_date)) DESC LIMIT 1");
-if($r)
-  {
-    $long= DB_fetch_array($r);
-    echo "The longest game took ".$long[0]." days.</p>\n";
-  }
-
-$r=DB_query("SELECT COUNT(*) as c, session, id FROM Game ".
-	    " GROUP BY session ORDER BY c DESC LIMIT 1");
-if($r)
-  {
-    $long  = DB_fetch_array($r);
-    $names = DB_get_all_names_by_gameid($long[2]);
-    echo "The longest session is session ".$long[1]." with ".$long[0].
-      " games played by ".join(", ",$names).".</p>\n";
-  }
 
 /* most reminders */
 echo "<p>These players got the most reminders per game:<br />\n";
@@ -171,19 +172,18 @@ echo "</p>\n";
 
 /* which position wins the most tricks  */
 echo "<p>Which positions at the table make the most tricks:<br />\n";
-$result = DB_query("SELECT COUNT(*) AS c,winner FROM Trick".
-		   " GROUP BY winner".
-		   " ORDER BY winner ASC " );
-$r = DB_fetch_array($result);
-if($r[1]==NULL) /* ongoing games, no winner yet */
-  $r = DB_fetch_array($result);
-echo " left ".$r[0]." <br />\n";
-$r = DB_fetch_array($result);
-echo " top ".$r[0]." <br />\n";
-$r = DB_fetch_array($result);
-echo " right ".$r[0]." <br />\n";
-$r = DB_fetch_array($result);
-echo " bottom ".$r[0]." <br />\n";
+$result = DB_query_array_all("SELECT CASE winner ".
+			     "   WHEN 1 THEN 'left' ".
+			     "   WHEN 2 THEN 'top' ".
+			     "   WHEN 3 THEN 'right' ".
+			     "   WHEN 4 THEN 'bottom' END,".
+			     " COUNT(*) AS c FROM Trick".
+			     " GROUP BY winner ".
+			     " HAVING LENGTH(winner)>0  ".
+			     " ORDER BY winner ASC " );
+
+array_unshift($result,array("Position","Number of tricks"));
+echo output_table($result,"stats");
 echo "</p>\n";
 
 /* most games */
@@ -225,7 +225,9 @@ echo "</p>\n";
  echo " games</p>\n";
 */
 echo "<p>Points/game (you need at least 10 games to be in this statistic): <br />\n";
-generate_global_score_table();
+$result = generate_global_score_table();
+array_unshift($result,array("Name","Average score per game"));
+echo output_table($result,"stats");
 echo "</p>\n";
 /*
  how often is the last trick a non-trump trick
