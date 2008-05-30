@@ -105,7 +105,7 @@ if($ok)
 set_gametype('normal');
 
 /* put everyting in a form */
-echo "<form action=\"index.php?action=game&me=$me\" method=\"post\">\n";
+echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 
 /* output game */
 
@@ -121,7 +121,7 @@ if($session)
 	if($hash == $me)
 	  echo "$i \n";
 	else
-	  echo "<a href=\"".$INDEX."?action=game&me=".$hash."\">$i</a> \n";
+	  echo "<a href=\"".$INDEX."?action=game&amp;me=".$hash."\">$i</a> \n";
 	$i++;
       }
     echo "</div>\n";
@@ -272,7 +272,7 @@ switch($mystatus)
 	if($Nsickness>1)
 	  {
 	    echo "<p class=\"message\"> You selected more than one sickness, please go back ".
-	      "and answer the <a href=\"$INDEX?action=game&me=$me&in=yes\">question</a> again.</p>";
+	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.</p>";
 
 	    echo "<div class=\"mycards\">Your cards are: <br />\n";
 	    foreach($mycards as $card)
@@ -605,12 +605,12 @@ switch($mystatus)
 		  {
 		    /* email startplayer */
 		    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
 		    mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 		  }
 	      }
 	    else
-	      echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />\n";
+	      echo " Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
 	  }
 	else
 	  {
@@ -620,7 +620,7 @@ switch($mystatus)
 
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
-	      echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />\n";
+	      echo " Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
 	    else
 	      {
 		$email   = DB_get_email('position-gameid',$who,$gameid);
@@ -631,7 +631,7 @@ switch($mystatus)
 		  {
 		    /* email player for poverty */
 		    $message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
+		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$whohash."\n\n" ;
 		    mymail($email,$EmailName."Poverty (game ".DB_format_gameid($gameid).") ",$message);
 		  }
 	      }
@@ -713,12 +713,12 @@ switch($mystatus)
 	      {
 		/* email startplayer */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
 		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 	      }
 	  }
 	else
-	  echo " Please, <a href=\"$INDEX?action=game&me=$me\">start</a> the game.<br />\n";
+	  echo " Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
       }
 
     /* the following is part A) of what needs to be done */
@@ -744,10 +744,10 @@ switch($mystatus)
 		    foreach($cards as $card)
 		      if($card<27) $nrtrump++;
 		    echo "Player $name has $nrtrump trump. Do you want to take them?".
-		      "<a href=\"index.php?action=game&me=$me&amp;trump=$user\">Yes</a> <br />\n";
+		      "<a href=\"index.php?action=game&amp;me=$me&amp;trump=$user\">Yes</a> <br />\n";
 		  }
 	      }
-	    echo "<a href=\"index.php?action=game&me=$me&amp;trump=no\">No way</a> <br />\n";
+	    echo "<a href=\"index.php?action=game&amp;me=$me&amp;trump=no\">No way</a> <br />\n";
 	    echo "</div><div>\n";
 
 	    echo "<div class=\"mycards\">Your cards are: <br />\n";
@@ -816,7 +816,7 @@ switch($mystatus)
 		DB_set_hand_status_by_hash($userhash,'poverty');
 
 		$message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
+		  " ".$HOST.$INDEX."?action=game&amp;me=".$userhash."\n\n" ;
 		mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
 	      }
 	  }
@@ -902,13 +902,13 @@ switch($mystatus)
 		    DB_set_hand_status_by_hash($userhash,'poverty');
 
 		    $message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
+		      " ".$HOST.$INDEX."?action=game&amp;me=".$userhash."\n\n" ;
 		    mymail($To,$EmailName." double poverty (game ".DB_format_gameid($gameid).")",$message);
 
 
 		  }
 	      }
-	    echo "<div class=\"message\"> Please, <a href=\"$INDEX?action=game&me=$me\">continue</a> here.</div>\n";
+	    echo "<div class=\"message\"> Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
 	  }
       }
     echo "</div>";
@@ -955,7 +955,7 @@ switch($mystatus)
 	      {
 		/* email startplayer) */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
 		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 	      }
 	  }
@@ -1419,7 +1419,7 @@ switch($mystatus)
 
 		$message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		  "It's your turn  now.\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$next_hash."\n\n" ;
 		if( DB_get_email_pref_by_uid($who)!="emailaddict" )
 		  mymail($email,$EmailName."a card has been played in game ".DB_format_gameid($gameid),$message);
 	      }
@@ -1692,7 +1692,7 @@ switch($mystatus)
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 
 		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".
-			$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+			$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
 		      if( DB_get_email_pref_by_uid($user) != "emailaddict" )
 			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
 		    }
@@ -1741,7 +1741,7 @@ switch($mystatus)
       echo "<div class=\"notes\"> Personal notes: <br />\n";
       $notes = DB_get_notes_by_userid_and_gameid($myid,$gameid);
       foreach($notes as $note)
-	echo "$note <hr \>\n";
+	echo "$note <hr />\n";
       echo "Insert note:<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
       echo "</div> \n";
 
