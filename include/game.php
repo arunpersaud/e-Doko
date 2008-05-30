@@ -155,7 +155,7 @@ switch($mystatus)
     else
       {
 	/* check the result, if player wants to join, got next stage, else cancel game */
-	if($_REQUEST["in"] == "no" && !$skip)
+	if(!$skip && $_REQUEST["in"] == "no" )
 	  {
 	    /* cancel the game */
 	    $message = "Hello, \n\n".
