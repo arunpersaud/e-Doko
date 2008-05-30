@@ -42,55 +42,52 @@ function output_form_for_new_game($names)
       srand((float) microtime() * 10000000);
       $randkey = array_rand($names);
       $rand = $names[$randkey];
-      echo  "<div class=\"table".$i."\">\n";
+      echo  "     <div class=\"table".$i."\">\n";
       $i++;
-      echo "    <select name=\"$player\" size=\"1\" />  \n";
+      echo "       <select name=\"$player\" size=\"1\">  \n";
       foreach($names as $name)
 	{
 	  if($name==$rand)
 	    {
-	      echo "     <option selected=\"selected\">$name</option>\n";
+	      echo "         <option selected=\"selected\">$name</option>\n";
 	    }
 	  else
-	    echo "     <option>$name</option>\n";
+	    echo "         <option>$name</option>\n";
 	}
-      echo "  </select>\n</div>\n";
+      echo "       </select>\n     </div>\n";
     }
 ?>
     </div>
 
    <h2 class="rules"> Rules </h2>
       <p> Some areas are grayed out which means that the rule is not implemented yet and therefore cannot be selected </p>
-      <p> Ten of hearts:
-         <ul>
-         <li> <input type="radio" name="dullen" value="none" /> just normal non-trump  </li>
-         <li> <input type="radio" name="dullen" value="firstwins" /> first ten of hearts wins the trick </li>
-         <li> <input type="radio" name="dullen" value="secondwins" checked="checked" /> second ten of hearts wins the trick </li>
-         </ul>
-      </p>
-      <p> Schweinchen (both foxes), only in normal games or silent solos:
-        <ul>
+      <p> Ten of hearts: </p>
+      <ul>
+        <li> <input type="radio" name="dullen" value="none" /> just normal non-trump  </li>
+        <li> <input type="radio" name="dullen" value="firstwins" /> first ten of hearts wins the trick </li>
+        <li> <input type="radio" name="dullen" value="secondwins" checked="checked" /> second ten of hearts wins the trick </li>
+      </ul>
+      <p> Schweinchen (both foxes), only in normal games or silent solos: </p>
+      <ul>
         <li> <input type="radio" name="schweinchen" value="none" checked="checked" /> none </li>
         <li> <input type="radio" name="schweinchen" value="both" />
               both become highest trump (automatic call at beginning of the game)
         </li>
         <li> <input type="radio" name="schweinchen" value="second" />
-              first one normal, second one becomes highest (call during the game) </li>
+             first one normal, second one becomes highest (call during the game) </li>
         <li> <input type="radio" name="schweinchen" value="secondaftercall"  disabled="disabled" />
-      second one become highest only in case re/contra was announced (not working yet)
+             second one become highest only in case re/contra was announced (not working yet)
         </li>
-        </ul>
-      </p>
-      <p> Call Re/Contra, etc.:
-        <ul>
-           <li><input type="radio" name="callrule" value="1st-own-card" checked="checked" />
-                Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</li>
-           <li><input type="radio" name="callrule" value="5th-card" />
-                Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</li>
-           <li><input type="radio" name="callrule" value="9-cards"  />
-                Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</li>
-        </ul>
-      </p>
+      </ul>
+      <p> Call Re/Contra, etc.: </p>
+      <ul>
+         <li><input type="radio" name="callrule" value="1st-own-card" checked="checked" />
+              Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</li>
+         <li><input type="radio" name="callrule" value="5th-card" />
+              Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</li>
+         <li><input type="radio" name="callrule" value="9-cards"  />
+              Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</li>
+      </ul>
    <input type="submit" value="start game" />
  </form>
 <?php

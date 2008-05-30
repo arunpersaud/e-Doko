@@ -68,7 +68,7 @@ if($r)
   {
     $long  = DB_fetch_array($r);
     $names = DB_get_all_names_by_gameid($long[2]);
-    echo "The longest session is session ".$long[1]." with ".$long[0].
+    echo "<p>The longest session is session ".$long[1]." with ".$long[0].
       " games played by ".join(", ",$names).".</p>\n";
   }
 

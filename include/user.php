@@ -136,14 +136,14 @@ if(myisset("forgot"))
 	       }
 	     if($r[4]=='pre')
 	       {
-		 echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">p </a></span> ";
+		 echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span> ";
 		 
 	       }
 	     else if ($r[4]=='gameover')
-	       echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">F </a></span> ";
+	       echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span> ";
 	     else
 	       {
-		 echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&me=".$r[0]."\">P </a></span> ";
+		 echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span> ";
 	       }
 	     if($r[4] != 'gameover')
 	       {
