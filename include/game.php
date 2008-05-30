@@ -1708,7 +1708,7 @@ switch($mystatus)
 	  echo "please wait until it's your turn! <br />\n";
 	}
 
-      if($seq!=4 && $trickNR>1)
+      if($seq!=4 && $trickNR>=1)
 	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
 
       /* display points in case game is over */
