@@ -734,7 +734,7 @@ function display_table ()
       if(!$debug)
 	echo "   $name \n";
       else
-	echo "   <a href=\"".$INDEX."?action=game&me=".$hash."\">$name</a>\n";
+	echo "   <a href=\"".$INDEX."?action=game&amp;me=".$hash."\">$name</a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
       if( $gametype != "solo")
