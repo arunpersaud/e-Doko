@@ -214,7 +214,7 @@ switch($mystatus)
 		     DB_set_player_by_gameid($gameid,$who);
 
 		     $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		     "Use this link to go the game: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		     "Use this link to go the game: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
 		     mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 		    */
 		  }
@@ -1045,7 +1045,7 @@ switch($mystatus)
 		       "WHERE Trick.game_id='".$gameid."' ".
 		       "GROUP BY Trick.id, sequence ".
 		       "ORDER BY Trick.id, sequence  ASC");
-    $trickNR   = 1;
+    $trickNR   = 0;
     $lasttrick = DB_get_max_trickid($gameid);
 
     $play = array(); /* needed to calculate winner later  */
@@ -1061,7 +1061,7 @@ switch($mystatus)
     if($mygametype != 'normal' && $mygametype != 'silent') /* only show when needed */
       {
 	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	  "    <div class=\"trick\" id=\"trick0\">\n";
+	     "    <div class=\"trick\" id=\"trick0\">\n";
 	$show = 1;
 	for($mypos=1;$mypos<5;$mypos++)
 	  {
@@ -1088,6 +1088,10 @@ switch($mystatus)
 	$trick   = $r[3];
 	$comment = $r[4];
 	$user    = $r[6];
+
+	/* count number of tricks */
+	if($seq==1)
+	  $trickNR++;
 
 	/* check if first schweinchen has been played */
 	if( $GAME['schweinchen-who'] && ($r[0] == 19 || $r[0] == 20) )
@@ -1136,7 +1140,6 @@ switch($mystatus)
 	/* end of trick? */
 	if($seq==4)
 	  {
-	    $trickNR++;
 	    echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
 	  }
       }
@@ -1736,7 +1739,8 @@ switch($mystatus)
 	}
 
       echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">prev</a></li>\n";
-      echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n</ul>\n"; /* end ul tricks*/
+      echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n";
+      echo "</ul>\n"; /* end ul tricks*/
 
       echo "<div class=\"notes\"> Personal notes: <br />\n";
       $notes = DB_get_notes_by_userid_and_gameid($myid,$gameid);
