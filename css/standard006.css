@@ -337,10 +337,53 @@ ul.tricks li div div span.comment span{
   border-bottom:1px solid black;
   text-align:center;
 }
-
-.gameinfo, .useroptions {
+div.session div.sessionrules { 
+  width:19em;
+  float:left ;
+  text-align: left;
+}
+div.session div.sessionscore { 
+  width:19em;
+  float:right ;
+  text-align: right;
+}
+div.session div.sessionrules div{
+  display:none;
+  background-color: white;
+  border: 1px solid black;
   position:absolute;
-  top:10em;
+  z-index: 30;
+  padding:0.5em;
+}
+div.session div.sessionrules:hover div{
+  display:block;
+}
+div.session div.sessionscore div{
+  position:absolute;
+  width:12em;
+  right:0em;
+  display:none;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 30;
+}
+div.session div.sessionscore:hover div{
+  display:block;
+}
+
+.scoretable{
+  height:20em;
+  overflow: auto;
+}
+table.score {
+  margin:0.5em;
+  width:10em;
+  border-collapse:collapse;
+}
+
+.gameinfo {
+  position:absolute;
+  top:27em;
   right:0em;
   margin:1em;
   margin-top:0em;
@@ -354,7 +397,7 @@ ul.tricks li div div span.comment span{
 
   padding:0.3em;
 
-  background-color: #eee;
+  background-color: #efefef;
 }
 
 .usermenu {
@@ -448,15 +491,6 @@ div span img.button {
   background-color: #15de26;
 }
 
-.scoretable{
-  height:10em;
-  overflow: auto;
-}
-table.score {
-  width:10em;
-  border-collapse:collapse;
-}
-
 .bigger {
   font-size:larger;
 }
@@ -485,3 +519,4 @@ table.stats td, table.stats th {
 table.stats  tr td:last-child, table.stats  tr th:last-child { border-right: solid 0 black; }
 
 table.stats th { border-bottom: solid 0.2em black }
+

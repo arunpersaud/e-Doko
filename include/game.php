@@ -112,18 +112,28 @@ echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 /* output extra division in case this game is part of a session */
 if($session)
   {
-    echo "<div class=\"session\">\n".
-      "This game is part of session $session: \n";
+    echo "<div class=\"session\">\n";
+    echo "  <div class=\"sessionrules\">Rules (+icons fur rules) \n";
+    echo "    <div>\n";
+    echo "       10ofhearts : ".$RULES["dullen"]      ."<br />\n";
+    echo "       schweinchen: ".$RULES["schweinchen"] ."<br />\n";
+    echo "       call:        ".$RULES["call"]        ."<br />\n";
+    echo "    </div>\n  </div>\n";
+    echo "  <div class=\"sessionscore\">Score \n";
+    $score   = generate_score_table($session);
+    echo format_score_table_html($score,$myid);
+    echo "  </div>\n";
     $hashes = DB_get_hashes_by_session($session,$myid);
     $i = 1;
     foreach($hashes as $hash)
       {
-	if($hash == $me)
-	  echo "$i \n";
-	else
-	  echo "<a href=\"".$INDEX."?action=game&amp;me=".$hash."\">$i</a> \n";
-	$i++;
+        if($hash == $me)
+	  $j=$i;
+        $i++;
+	$lasthash=$hash;
       }
+    $i--;
+    echo "This is game number $j of <a href=\"".$INDEX."?action=game&amp;me=$lasthash\">$i</a> in session $session.";
     echo "</div>\n";
   }
 
@@ -1649,35 +1659,9 @@ switch($mystatus)
 
 		  $session = DB_get_session_by_gameid($gameid);
 		  $score = generate_score_table($session);
-		  /* convert html to ascii */
-		  $score = str_replace("<div class=\"scoretable\">\n<table class=\"score\">\n <tr>\n","",$score);
-		  $score = str_replace("</table></div>\n","",$score);
-		  $score = str_replace("\n","",$score);
-		  $score = str_replace(array("<tr>","</tr>","<td>","</td>"),array("","\n","","|"),$score);
-		  $score = explode("\n",$score);
-
-		  $header = array_slice($score,0,1);
-		  $header = explode("|",$header[0]);
-		  for($i=0;$i<sizeof($header);$i++)
-		    $header[$i]=str_pad($header[$i],6," ",STR_PAD_BOTH);
-		  $header = implode("|",$header);
-		  $header.= "\n------+------+------+------+------+\n";
-		  if(sizeof($score)>5) $header.=   "                ...   \n";
-
-		  if(sizeof($score)>5) $score = array_slice($score,-5,5);
-		  for($i=0;$i<sizeof($score);$i++)
-		    {
-		      $line = explode("|",$score[$i]);
-		      for($j=0;$j<sizeof($line);$j++)
-			$line[$j]=str_pad($line[$j],6," ",STR_PAD_LEFT);
-		      $score[$i] = implode("|",$line);
-		    }
-
-		  $score = implode("\n",$score);
-		  $score = $header.$score;
 
 		  $message .= "Score Table:\n";
-		  $message .= $score;
+		  $message .= format_score_table_ascii($score);
 
 		  /* send out final email */
 		  $all = array();
@@ -1746,7 +1730,7 @@ switch($mystatus)
       $notes = DB_get_notes_by_userid_and_gameid($myid,$gameid);
       foreach($notes as $note)
 	echo "$note <hr />\n";
-      echo "Insert note:<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+      echo "<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
       echo "</div> \n";
 
       $mycards = DB_get_hand($me);
@@ -1869,15 +1853,6 @@ switch($mystatus)
       /* display rule set for this game */
     echo "<div class=\"gameinfo\">\n";
 
-    if($gamestatus != 'pre')
-      echo " Gametype: $GT <br />\n";
-
-    echo "Rules: <br />\n";
-    echo "10ofhearts : ".$RULES["dullen"]      ."<br />\n";
-    echo "schweinchen: ".$RULES["schweinchen"] ."<br />\n";
-    echo "call:        ".$RULES["call"]        ."<br />\n";
-
-    echo "<hr />\n";
     if($gamestatus == 'play' )
       output_form_calls($me);
 
@@ -1888,15 +1863,9 @@ switch($mystatus)
     if($gamestatus == 'play' || $gameend < 60*60*24*7)
       {
 	echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
-	echo "<hr />";
       }
 
-    echo "<input type=\"submit\" value=\"submit\" />\n<hr />\n";
-
-    $session = DB_get_session_by_gameid($gameid);
-    $score   = generate_score_table($session);
-
-    echo $score;
+    echo "<input type=\"submit\" value=\"submit\" />\n";
 
     echo "</div>\n";
 

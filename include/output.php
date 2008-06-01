@@ -99,9 +99,9 @@ function output_table($data,$caption="",$class="")
     $HTML  = "\n<table class=\"$class\">\n";
   else
     $HTML  = "\n<table>\n";
- 
+
   $i=0;
-  
+
   if($caption!="")
     $HTML .= "  <caption> $caption </caption>\n";
 
@@ -270,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard005.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard006.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {
@@ -396,8 +396,6 @@ function output_select_timezone($name,$timezone="")
 
   return;
 }
-
-
 
 function output_password_recovery($email,$password)
 {

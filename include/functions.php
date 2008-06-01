@@ -863,7 +863,7 @@ function display_user_menu()
 	  echo "<div class=\"usermenu\">\n";
 	  echo "It's your turn in these games:<br />\n";
 	}
-      
+
       $i++;
       echo "<a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
       if($i>4)
@@ -880,14 +880,20 @@ function display_user_menu()
 
 function generate_score_table($session)
 {
+  /* returns an array with N entries
+   * $score[$i]["gameid"]   = gameid
+   * $score[$i]["players"] = array (id=>total points)
+   * $score[$i]["points"]   = points for this game
+   * $score[$i]["solo"]     = 1 or 0
+   */
+  $score = array();
+  $i=0;
+
   /* get all ids */
   $gameids = DB_get_gameids_of_finished_games_by_session($session);
 
   if($gameids == NULL)
-    return "";
-
-  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <tr>\n";
-
+    return $score;
 
   /* get player id, names... from the first game */
   $player = array();
@@ -895,42 +901,32 @@ function generate_score_table($session)
 		     " LEFT JOIN User On Hand.user_id=User.id".
 		     " WHERE Hand.game_id=".$gameids[0]);
   while( $r = DB_fetch_array($result))
-    {
-      $player[] = array( 'id' => $r[0], 'points' => 0 );
-      $output.= "  <td> ".substr($r[1],0,2)." </td>\n";
-    }
-  $output.="  <td>P</td>\n </tr>\n";
+    $player[$r[0]] = 0;
 
   /* get points and generate table */
   foreach($gameids as $gameid)
     {
-      $output.=" <tr>\n";
-
       $re_score = DB_get_score_by_gameid($gameid);
-      foreach($player as $key=>$pl)
+      foreach($player as $id=>$points)
 	{
-	  $party = DB_get_party_by_gameid_and_userid($gameid,$pl['id']);
+	  $party = DB_get_party_by_gameid_and_userid($gameid,$id);
 	  if($party == "re")
 	    if(DB_get_gametype_by_gameid($gameid)=="solo")
-	      $player[$key]['points'] += 3*$re_score;
+	      $player[$id] += 3*$re_score;
 	    else
-	      $player[$key]['points'] += $re_score;
+	      $player[$id] += $re_score;
 	  else if ($party == "contra")
-	    $player[$key]['points'] -= $re_score;
-
-	  $output.="  <td>".$player[$key]['points']."</td>\n";
+	    $player[$id] -= $re_score;
 	}
-      $output.="  <td>".abs($re_score);
+      $score[$i]['gameid']  = $gameid ;
+      $score[$i]['players'] = $player;
+      $score[$i]['points']  = abs($re_score);
+      $score[$i]['solo']    = (DB_get_gametype_by_gameid($gameid)=="solo");
 
-      /* check for solo */
-      if(DB_get_gametype_by_gameid($gameid)=="solo")
-	$output.= " S";
-      $output.="</td>\n </tr>\n";
+      $i++;
     }
 
-  $output.="</table></div>\n";
-
-  return $output;
+  return $score;
 }
 
 function generate_global_score_table()
@@ -992,6 +988,87 @@ function generate_global_score_table()
     }
 
   return $return;
+}
+
+function format_score_table_ascii($score)
+{
+  $output="";
+  if(sizeof($score)==0)
+    return "";
+
+  //  if(sizeof($score)>5) $header.=   "                ...   \n";
+
+  /* output header */
+  foreach($score[0]['players'] as $id=>$points)
+    {
+      $name = DB_get_name('userid',$id); /*TODO*/
+      $output.= "  ".substr($name,0,2)."  |";
+    }
+  $output.="  P   |\n ";
+  $output.= "------+------+------+------+------+\n";
+
+  $max = sizeof($score);
+  $i=0;
+
+  if($i<$max-6) $output.="       ...\n";
+
+  foreach($score as $game)
+    {
+      $i++;
+      if($i-1<$max-6) continue;
+      foreach($game['players'] as $id=>$points)
+	$output.=str_pad($points,6," ",STR_PAD_LEFT)."|";
+      $output.=str_pad($game['points'],4," ",STR_PAD_LEFT);
+
+      /* check for solo */
+      if($game['solo'])
+	$output.= " S|";
+      else
+	$output.= "  |";
+
+      $output.="\n";
+    }
+  return $output;
+}
+
+function format_score_table_html($score,$userid)
+{
+  global $INDEX;
+
+  if(sizeof($score)==0)
+    return "";
+
+  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <thead><tr>\n";
+
+  /* output header */
+  $output.= "  <th> Nr </th>";
+  foreach($score[0]['players'] as $id=>$points)
+    {
+      $name = DB_get_name('userid',$id); /*TODO*/
+      $output.= "<th> ".substr($name,0,2)." </th>";
+    }
+  $output.="<th>P</th>\n </tr>\n</thead>\n<tbody>\n";
+
+  $i=0;
+  foreach($score as $game)
+    {
+      $i++;
+      $output.=" <tr>";
+      $userhash = DB_get_hash_from_gameid_and_userid($game['gameid'],$userid);
+      $output.="  <td> <a href=\"".$INDEX."?action=game&amp;me=".$userhash."\">$i</a></td>";
+      foreach($game['players'] as $id=>$points)
+	$output.="<td>".$points."</td>";
+      $output.="<td>".$game['points'];
+
+      /* check for solo */
+      if($game['solo'])
+	$output.= " S";
+      $output.="</td></tr>\n";
+    }
+
+  $output.="</tbody>\n</table></div>\n";
+
+  return $output;
 }
 
 
