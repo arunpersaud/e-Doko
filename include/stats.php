@@ -177,6 +177,20 @@ $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
 array_unshift($result,array("Name","Number of games"));
 echo output_table($result,"Most games","stats");
 
+/* most solos */
+$result = DB_query_array_all("SELECT fullname as fname,".
+			     "       COUNT(*), ".
+			     "       COUNT(*)/(SELECT COUNT(*) FROM Hand LEFT JOIN User ON User.id=Hand.user_id WHERE fullname=fname) as c ".
+			     " FROM Game ".
+			     " LEFT JOIN Hand ON Hand.position=startplayer AND Game.id=Hand.game_id ".
+			     " LEFT JOIN User ON User.id=Hand.user_id ".
+			     " WHERE type='solo' AND Game.solo<>'silent' AND Game.status='gameover' ".
+			     " GROUP BY user_id ".
+			     " ORDER BY c DESC;");
+array_unshift($result,array("Name","Number of solos","Solos/game"));
+echo output_table($result,"Most solos","stats");
+
+
 /* most active games */
 $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
 		   " FROM Hand".
