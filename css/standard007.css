@@ -152,6 +152,7 @@ div.table div.table3 {
 
 ul.tricks {
   position:relative;
+  zoom:1; /* fixes an IE6 issue and hopefully doesn't mess up anything else */
   list-style:none;
   margin:3px;
   padding:0;
