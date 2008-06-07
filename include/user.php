@@ -129,25 +129,21 @@ if(myisset("forgot"))
 	     if($gamenrold < $gamenr)
 	       {
 		 if($gamenrold!=-1)
-		   echo "</td></tr>\n <tr> <td>$gamenr:</td><td> ";
+		   echo "</td></tr>\n <tr> <td>$gamenr:</td>\n";
 		 else
-		   echo "$gamenr:</td><td> ";
+		   echo "$gamenr:</td>\n";
 		 $gamenrold = $gamenr;
+		 echo "<td class=\"usergames\">\n";
 	       }
 	     if($r[4]=='pre')
-	       {
-		 echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span> ";
-		 
-	       }
+	       echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span> ";
 	     else if ($r[4]=='gameover')
 	       echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span> ";
 	     else
-	       {
-		 echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span> ";
-	       }
+	       echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span> ";
 	     if($r[4] != 'gameover')
 	       {
-		 echo "</td><td>\n    ";
+		 echo "</td>\n<td>\n    ";
 		 if($r[3]==$myid || !$r[3])
 		   echo "(it's <strong>your</strong> turn)\n";
 		 else

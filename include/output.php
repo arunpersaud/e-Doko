@@ -270,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard007.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard008.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {

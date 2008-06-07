@@ -442,7 +442,8 @@ table.score {
   overflow: auto;
 }
 
-.user { margin-left:25%;margin-right:25%; }
+.user { margin-left:25%;margin-right:5%; }
+.user td.usergames { width:50%; }
 .wide { margin-left:5%;margin-right:5%; }
 
 .over {
