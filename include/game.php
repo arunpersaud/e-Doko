@@ -224,7 +224,7 @@ switch($mystatus)
 		     DB_set_player_by_gameid($gameid,$who);
 
 		     $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		     "Use this link to go the game: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
+		     "Use this link to go the game: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		     mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 		    */
 		  }
@@ -615,7 +615,7 @@ switch($mystatus)
 		  {
 		    /* email startplayer */
 		    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
+		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		    mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 		  }
 	      }
@@ -641,7 +641,7 @@ switch($mystatus)
 		  {
 		    /* email player for poverty */
 		    $message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$whohash."\n\n" ;
+		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
 		    mymail($email,$EmailName."Poverty (game ".DB_format_gameid($gameid).") ",$message);
 		  }
 	      }
@@ -723,7 +723,7 @@ switch($mystatus)
 	      {
 		/* email startplayer */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 	      }
 	  }
@@ -912,7 +912,7 @@ switch($mystatus)
 		    DB_set_hand_status_by_hash($userhash,'poverty');
 
 		    $message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-		      " ".$HOST.$INDEX."?action=game&amp;me=".$userhash."\n\n" ;
+		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 		    mymail($To,$EmailName." double poverty (game ".DB_format_gameid($gameid).")",$message);
 
 
@@ -965,7 +965,7 @@ switch($mystatus)
 	      {
 		/* email startplayer) */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		mymail($email,$EmailName."ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
 	      }
 	  }
@@ -1432,7 +1432,7 @@ switch($mystatus)
 
 		$message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		  "It's your turn  now.\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&amp;me=".$next_hash."\n\n" ;
+		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
 		if( DB_get_email_pref_by_uid($who)!="emailaddict" )
 		  mymail($email,$EmailName."a card has been played in game ".DB_format_gameid($gameid),$message);
 	      }
@@ -1679,7 +1679,7 @@ switch($mystatus)
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 
 		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".
-			$HOST.$INDEX."?action=game&amp;me=".$hash."\n\n" ;
+			$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		      if( DB_get_email_pref_by_uid($user) != "emailaddict" )
 			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
 		    }
