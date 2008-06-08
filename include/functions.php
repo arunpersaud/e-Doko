@@ -1041,7 +1041,7 @@ function format_score_table_html($score,$userid)
   $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <thead><tr>\n";
 
   /* output header */
-  $output.= "  <th> Nr </th>";
+  $output.= "  <th> No </th>";
   foreach($score[0]['players'] as $id=>$points)
     {
       $name = DB_get_name('userid',$id); /*TODO*/
