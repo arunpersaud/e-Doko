@@ -851,7 +851,7 @@ function display_user_menu()
   $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
 		     " WHERE Hand.user_id='$myid'".
-		     " AND Game.player='$myid'".
+		     " AND ( Game.player='$myid' OR ISNULL(Game.player) )".
 		     " AND Game.status<>'gameover'".
 		     " ORDER BY Game.session" );
 
