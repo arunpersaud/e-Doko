@@ -118,6 +118,18 @@ if( $mystatus!='gameover'  )
 };
 output_user_notes($myid,$gameid,$mystatus);
 
+/* handle calls */
+if(myisset("call")  && $_REQUEST["call"]  == "120" && can_call(120,$me))
+  $result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
+if(myisset("call")  && $_REQUEST["call"]  == "90" && can_call(90,$me))
+  $result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
+if(myisset("call")  && $_REQUEST["call"]  == "60" && can_call(60,$me))
+  $result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
+if(myisset("call")  && $_REQUEST["call"]  == "30" && can_call(30,$me))
+  $result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
+if(myisset("call")  && $_REQUEST["call"]  == "0" && can_call(0,$me))
+  $result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
+
 /* output extra division in case this game is part of a session */
 if($session)
   {
@@ -1189,18 +1201,6 @@ switch($mystatus)
 	  {
 	    /* update Game timestamp */
 	    DB_update_game_timestamp($gameid);
-
-	    /* check if a call was made, must do this before we set the card status to played */
-	    if(myisset("call")  && $_REQUEST["call"]  == "120" && can_call(120,$me))
-	      $result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
-	    if(myisset("call")  && $_REQUEST["call"]  == "90" && can_call(90,$me))
-	      $result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
-	    if(myisset("call")  && $_REQUEST["call"]  == "60" && can_call(60,$me))
-	      $result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
-	    if(myisset("call")  && $_REQUEST["call"]  == "30" && can_call(30,$me))
-	      $result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
-	    if(myisset("call")  && $_REQUEST["call"]  == "0" && can_call(0,$me))
-	      $result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
 
 	    /* mark card as played */
 	    DB_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
