@@ -107,7 +107,16 @@ set_gametype('normal');
 /* put everyting in a form */
 echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 
-/* output game */
+/* handle user notes (only possible while game is running)*/
+if( $mystatus!='gameover'  )
+  if(myisset("note"))
+{
+  $note = $_REQUEST['note'];
+  
+  if($note != "")
+    DB_insert_note($note,$gameid,$myid);
+};
+output_user_notes($myid,$gameid,$mystatus);
 
 /* output extra division in case this game is part of a session */
 if($session)
@@ -1027,16 +1036,6 @@ switch($mystatus)
 	    DB_insert_comment($comment,$playid,$myid);
 	};
 
-    /* handle notes in case player didn't play a card, allow notes only during a game */
-    if( (!myisset("card") && $mystatus=='play')  )
-      if(myisset("note"))
-	{
-	  $note = $_REQUEST["note"];
-
-	  if($note != "")
-	    DB_insert_note($note,$gameid,$myid);
-	};
-
     /* get everything relevant to display the tricks */
     $result = DB_query("SELECT Hand_Card.card_id as card,".
 		       "       Hand.position as position,".
@@ -1726,13 +1725,6 @@ switch($mystatus)
       echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n";
       echo "</ul>\n"; /* end ul tricks*/
 
-      echo "<div class=\"notes\"> Personal notes: <br />\n";
-      $notes = DB_get_notes_by_userid_and_gameid($myid,$gameid);
-      foreach($notes as $note)
-	echo "$note <hr />\n";
-      echo "<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
-      echo "</div> \n";
-
       $mycards = DB_get_hand($me);
       $mycards = mysort($mycards,$gametype);
       echo "<div class=\"mycards\">\n";
@@ -1902,7 +1894,6 @@ switch($mystatus)
 	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	  }
       }
-
 
     output_footer();
     DB_close();

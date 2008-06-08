@@ -440,6 +440,7 @@ table.score {
 
   height:10em;
   overflow: auto;
+  z-index:50;
 }
 
 .user { margin-left:25%;margin-right:5%; }

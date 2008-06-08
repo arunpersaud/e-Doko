@@ -428,4 +428,18 @@ function output_password_recovery($email,$password)
 
 <?php
 }
+
+function output_user_notes($userid,$gameid,$userstatus)
+{
+  echo "<div class=\"notes\"> Personal notes: <br />\n";
+  $notes = DB_get_notes_by_userid_and_gameid($userid,$gameid);
+  foreach($notes as $note)
+    echo "$note <hr />\n";
+  if($userstatus!='gameover')
+    echo "<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+  echo "</div> \n";
+
+  return;
+}
+    
 ?>
