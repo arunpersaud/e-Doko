@@ -1071,6 +1071,30 @@ function format_score_table_html($score,$userid)
   return $output;
 }
 
+function createCache($content, $cacheFile) 
+{
+  $fp = fopen($cacheFile,"w");
+  if($fp)
+    {
+      fwrite($fp,$content);
+      fclose($fp);
+    }
+  else
+    echo "WARNING: couldn't create cache file";
+
+  return;
+}
+
+function getCache($cacheFile, $expireTime) 
+{
+  if( file_exists($cacheFile) && 
+      filemtime($cacheFile )>( time() - $expireTime ) ) 
+    {
+      return file_get_contents($cacheFile);
+    }
+
+  return false;
+}
 
 
 ?>
