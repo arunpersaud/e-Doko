@@ -227,6 +227,9 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
  how often is the last trick a non-trump trick
   */
   
+  /* needs this so that all tables are within the div and don't float around */
+  echo "<p style=\"clear:both;\">&nbsp;</p>\n";
+
   echo "</div>\n"; /* end output */
 
   /* write file to cache */

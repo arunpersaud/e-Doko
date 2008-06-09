@@ -27,8 +27,12 @@ $game	= $game[0];
 $done	= $done[0];
 $avgage	= $avgage[0];
 
-echo "<p> If you want to play a game of Doppelkopf, you found the right place ;)".
-" For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>";
+echo "<div class=\"login\">\n";
+
+echo "<p> If you want to play a game of Doppelkopf, you found the right place ;)</p>".
+"<p> For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>".
+"<h4>Some statistics:</h4>";
+
 
 if($pre == 0)
   echo "<p> At the moment there are no games that are being started ";
@@ -56,25 +60,29 @@ if($done==0)
    echo "$done games have been completed on this server. Average time of a game: $avgage days</p>";
 ?>
 
-<p> Please <a href="index.php?action=register">register</a>, in case you have not done that yet  <br />
+  <h4> Login/Register:</h4>
+  <p> 
+  Please <a href="index.php?action=register">register</a>, in case you have not done that yet  <br />
   or login with you email-address or name and password here:
   </p>
+
   <form action="index.php?action=login" method="post">
   <fieldset>
-  <legend>Login</legend>
   <table>
   <tr>
-  <td><label for="email">Email:</label></td>
-  <td><input type="text" id="email" name="email" size="20" maxlength="30" /> </td>
-  </tr><tr>
-  <td><label for="password">Password:</label></td>
-  <td><input type="password" id="password" name="password" size="20" maxlength="30" /></td>
-  </tr><tr>
-  <td> <input type="submit" class="submitbutton" name="login" value="login" /></td>
-  <td> <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" /></td>
+    <td><label for="email">Email:</label></td>
+    <td><input type="text" class="submitbutton" id="email" name="email" size="20" maxlength="30" /> </td>
+  </tr>
+  <tr>
+    <td><label for="password">Password:</label></td>
+    <td><input type="password" class="submitbutton" id="password" name="password" size="20" maxlength="30" /></td>
+  </tr>
+  <tr class="center">
+    <td> <input type="submit" class="submitbutton" name="login" value="login" /></td>
+    <td> <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" /></td>
   </tr>
   </table>
   </fieldset>
   </form>
   
-  
+</div>  

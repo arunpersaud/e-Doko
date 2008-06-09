@@ -270,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard008.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard009.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {
@@ -329,7 +329,7 @@ function output_footer()
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
     "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
- echo "  <p class=\"right\"> See the latest changes <a href=\"http://nubati.net/cgi-bin/gitweb.cgi?p=e-DoKo.git;a=summary\">\n".
+ echo " <p class=\"right\"> See the latest changes <a href=\"http://nubati.net/cgi-bin/gitweb.cgi?p=e-DoKo.git;a=summary\">\n".
     "  via git </a> <br />or download the source via <br />\n'git clone http://nubati.net/git/e-DoKo.git' <br />\n".
     "  <a href=\"http://www.dreamhost.com/green.cgi\">\n".
     "  <img  border=\"0\" alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
@@ -371,7 +371,7 @@ function output_status()
        $unixtime = strtotime($time);
        date_default_timezone_set($zone);
 
-       echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>\n";
+       echo "<div class=\"lastlogin\"><span>last login: ".date("r",$unixtime)."</span></div>\n";
      }
    else
      {

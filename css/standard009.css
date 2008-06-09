@@ -18,38 +18,52 @@ table, td, th { vertical-align: middle; }
 
 h1, h2, h3, h4, h5, h6, p {margin: 2px; padding: 1px;}
 
+body { background-color: #ddd; }
+
 .header {
   background-color: white;
   text-align:       center;
   height:           4em;
+  padding-top: 1.5em;
+  margin-left: 3em;
+  margin-right: 3em;
   border-bottom:    3px solid gray;
 }
 
 .lastlogin {
   position:absolute;
-  font-size:smaller;
   top:0;
-  left:0;
+  left:3em;
+}
+.lastlogin span {   
+  font-size:smaller;
 }
 
 .main {
+  background-color: white;
+  margin-left: 3em;
+  margin-right: 3em;
   min-height: 40em;
 }
 
 .footer {
+  background-color: #fff;
   margin:0;
-  margin-top:0.3em;
+  margin-left: 3em;
+  margin-right: 3em;
   padding:0;
-  border-top: 2px solid #444;
-  font-size:smaller;
+  border-top: 2px solid gray;
   clear:both;
+  height: 8em;
 }
-.footer .right { float:right; }
-.footer .left  { float:left; }
+.footer .right { float:right;   font-size:smaller;
+}
+.footer .left  { float:left;  font-size:smaller;
+ }
 
 .status {
   position:absolute;
-  right:1em;
+  right:4em;
   top:0.1em;
   font-size: smaller;
 }
@@ -116,7 +130,7 @@ div.table img.table {
   top:20%;
   height:22em;
   left:37.5%;
-  z-indexk:9;
+  z-index:5;
   display: block;
   margin:0;
   padding:0;
@@ -138,7 +152,7 @@ div.table div.table0 {
   right:62.5%;
 }
 div.table div.table1 {
-  top:5%;
+  top:7.5%;
   left:43.75%;
 }
 div.table div.table2 {
@@ -196,7 +210,7 @@ ul.tricks li div.trick img.arrow {
   height:16em;
   left:42%;
   right:42%;
-  top:11em;
+  top:10em;
   z-index:8;
 }
 
@@ -209,7 +223,7 @@ ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 45%;
+  top: 40%;
   left:37.5%;
   right:56.5%;
   width:6%;
@@ -230,7 +244,7 @@ ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score, .vorbehalt1 {
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 25%;
+  top: 22%;
   left:47%;
   right:47%;
   width:6%;
@@ -253,7 +267,7 @@ ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score, .vorbehalt2{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 45%;
+  top: 40%;
   right:37.5%;
   left:56x.5%;
   width:6%;
@@ -275,7 +289,7 @@ ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score, .vorbehalt3{
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  bottom: 15%;
+  bottom: 20%;
   left:47%;
   right:47%;
   width:6%;
@@ -307,8 +321,10 @@ ul.tricks li div div span.comment span{
   margin:0;
   margin-top:34.5em;
   padding:0;
-  border:1px solid red;
-  background-color:yellow;
+  border-top:       2px solid gray;
+/* border-bottom:    2px solid green;*/
+  background-color: #faffc7;
+  text-align:center;
 }
 
 .mycards img {
@@ -362,7 +378,7 @@ div.session div.sessionrules:hover div{
 div.session div.sessionscore div{
   position:absolute;
   width:12em;
-  right:0em;
+  right:3em;
   display:none;
   background-color: white;
   border: 1px solid black;
@@ -388,32 +404,27 @@ table.score {
   right:0em;
   margin:1em;
   margin-top:0em;
-  margin-right:0em;
+  margin-right:3em;
 
   width:12em;
 
-  border-top:    2px solid gray;
-  border-left:   2px solid gray;
-  border-bottom: 2px solid gray;
-
   padding:0.3em;
 
+  border:    2px solid gray;
   background-color: #efefef;
 }
 
 .usermenu {
   position:absolute;
   top:10em;
-  left:0;
+  left:3em;
   margin:1em;
   margin-top:0em;
   margin-left:0em;
 
   width: 12em;
 
-  border-top:    2px solid gray;
-  border-right:  2px solid gray;
-  border-bottom: 2px solid gray;
+  border:    2px solid gray;
 
   padding:0.3em;
 
@@ -426,13 +437,11 @@ table.score {
   left:0;
   margin:1em;
   margin-top:0em;
-  margin-left:0em;
+  margin-left:3em;
 
   width: 12em;
 
-  border-top:    2px solid gray;
-  border-right:  2px solid gray;
-  border-bottom: 2px solid gray;
+  border:    2px solid gray;
 
   padding:0.3em;
 
@@ -453,6 +462,8 @@ table.score {
 }
 
 .submitbutton {
+  padding: 0.2em;
+  padding-bottom: 0.3em;
   border:0;
   background-color: #efe;
 }
@@ -523,3 +534,53 @@ table.stats  tr td:last-child, table.stats  tr th:last-child { border-right: sol
 
 table.stats th { border-bottom: solid 0.2em black }
 
+.login { 
+  text-align:center;
+  padding-top: 1em;
+}
+
+.login p, { 
+  padding: 0.1em;
+  padding-bottom: 0.15em;
+}
+.login h4 { 
+  padding: 0.3em;
+  padding-bottom: 0.45em;
+}
+
+.login form{ 
+  width: 20em; 
+  margin: 0.5em auto;
+  padding: 0.5em;
+  padding-bottom: 1.5em;
+  text-align: center;
+}
+
+.login legend, .login label{ 
+  padding: 0.5em;
+  padding-bottom: 0.75em;
+}
+
+.login input{ 
+  margin: 0.5em;
+  margin-bottom: 0.75em;
+}
+
+.login fieldset { 
+  border: 2px solid black; 
+  padding: 0.5em;
+  padding-bottom: 0.75em;
+  background-color: #eee; 
+}
+
+.login .submitbutton {
+  background-color: #fff; 
+}
+
+.login .submitbutton:hover {
+  background-color: #aaa; 
+}
+
+.login tr.center td{ 
+  text-align: center;
+}
