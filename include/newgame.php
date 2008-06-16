@@ -20,7 +20,6 @@ else
       return;
 
     DB_update_user_timestamp($myid);
-    output_status();
 
     if( !myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
       {
@@ -45,9 +44,7 @@ else
 	if(!in_array($name,array($PlayerA,$PlayerB,$PlayerC,$PlayerD)))
 	  {
 	    echo "<div class=\"message\">You need to be one of the players to start a <a href=\"$INDEX?action=new\">new game</a>.</div>";
-	    output_footer();
-	    DB_close();
-	    exit();
+	    return;
 	  }
 
 	/* what rules were selected */
@@ -65,9 +62,7 @@ else
 	if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
 	  {
 	    echo "couldn't find one of the names, please start a new game";
-	    output_footer();
-	    DB_close();
-	    exit();
+	    return;
 	  }
 
 	/* get user ids */
@@ -94,16 +89,12 @@ else
 	    if( DB_is_session_active($session) > 0 )
 	      {
 		echo "<p class=\"message\"> There is already a game going on in session $session, you can't start a new one</p>";
-		output_footer();
-		DB_close();
-		exit();
+		return;
 	      }
 	    else if ( DB_is_session_active($session) < 0 )
 	      {
 		echo "<p class=\"message\"> ERROR: status of session $session couldn't be determined.</p>";
-		output_footer();
-		DB_close();
-		exit();
+		return;
 	      }
 
 	    if($session)
@@ -126,9 +117,7 @@ else
 	    if($ruleset <0)
 	      {
 		myerror("Error defining ruleset: $ruleset");
-		output_footer();
-		DB_close();
-		exit();
+		return;
 	      };
 	    /* get max session */
 	    $max = DB_get_max_session();

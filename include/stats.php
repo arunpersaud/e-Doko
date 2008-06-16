@@ -12,8 +12,6 @@ $myid = DB_get_userid('email',$email);
 if(!$myid)
   return;
 
-output_status();
-
 $PREF = DB_get_PREF($myid);
 
 DB_update_user_timestamp($myid);

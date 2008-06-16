@@ -9,9 +9,7 @@ if(!isset($HOST))
 if(!myisset("me"))
   {
     echo "Hmm, you really shouldn't mess with the urls.<br />\n";
-    output_footer();
-    DB_close();
-    exit();
+    return;
   }
 $me = $_REQUEST["me"];
 
@@ -21,16 +19,10 @@ if(!$myid)
   {
     echo "Can't find you in the database, please check the url.<br />\n";
     echo "perhaps the game has been canceled, check by login in <a href=\"$INDEX\">here</a>.";
-    output_footer();
-    DB_close();
-    exit();
+    return;
   }
 
 global $GAME,$RULES,$CARDS;
-
-/* user might get here by clicking on the link in an email, so session might not be set */
-if(isset($_SESSION["name"]))
-  output_status($_SESSION["name"]);
 
 /* the user has done something, update the timestamp */
 DB_update_user_timestamp($myid);
@@ -501,9 +493,7 @@ switch($mystatus)
 
 	    echo "The game has been canceled because ".DB_get_name('userid',$nines).
 	      " has five or more nines and nobody is playing solo.\n";
-	    output_footer();
-	    DB_close();
-	    exit();
+	    return;
 	  }
 	else if($poverty==1) /* one person has poverty */
 	  {
@@ -832,9 +822,7 @@ switch($mystatus)
 		DB_cancel_game($me);
 
 		echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
-		output_footer();
-		DB_close();
-		exit();
+		return;
 	      }
 	    else
 	      {
@@ -1894,8 +1882,4 @@ switch($mystatus)
 	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	  }
       }
-
-    output_footer();
-    DB_close();
-    exit();
 ?>

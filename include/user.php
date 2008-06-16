@@ -6,17 +6,17 @@ if(!isset($HOST))
   exit;
 
 /* test id and password, should really be done in one step */
-if(!isset($_SESSION["name"]))
+if(!isset($_SESSION["name"])) 
   {
     $email     = $_REQUEST["email"];
     $password  = $_REQUEST["password"];
   }
- else
-   {
-     $name = $_SESSION["name"];
-     $email     = DB_get_email('name',$name);
-     $password  = DB_get_passwd_by_name($name);
-   };
+else
+  {
+    $name = $_SESSION["name"];
+    $email     = DB_get_email('name',$name);
+    $password  = DB_get_passwd_by_name($name);
+  };
 
 /* user has forgotten his password */
 if(myisset("forgot"))
@@ -81,111 +81,103 @@ if(myisset("forgot"))
 	    "or else try <a href=\"$INDEX\">again</a>.";
       }
   }
- else 
-   { /* normal user page */
-
-     /* verify password and email */
-     if(strlen($password)!=32)
-       $password = md5($password);
-
-     $ok  = 1;
-     $myid = DB_get_userid('email-password',$email,$password);
-     if(!$myid)
-       $ok = 0;
-
-     if($ok)
-       {
-	 /* user information is ok */
-	 $myname = DB_get_name('email',$email);
-	 $_SESSION["name"] = $myname;
-	 output_status();
+else 
+  { /* normal user page */
     
-	 $PREF = DB_get_PREF($myid);
+    /* verify password and email */
+    if(strlen($password)!=32)
+      $password = md5($password);
     
-	 DB_update_user_timestamp($myid);
-	 
-	 display_user_menu();
-	 
-	 /* display all games the user has played */
-	 echo "<div class=\"user\">";
-	 echo "<h4>These are all your games:</h4>\n";
-	 echo "<p>Session: <br />\n";
-	 echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
-	 echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
-	 echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
-	 echo "</p>\n";
-	 
-	 $output = array();
-	 $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
-			    " LEFT JOIN Game ON Game.id=Hand.game_id".
-			    " WHERE user_id='$myid'".
-			    " ORDER BY Game.session,Game.create_date" );
-	 $gamenrold = -1;
-	 echo "<table>\n <tr><td>\n";
-	 while( $r = DB_fetch_array($result))
-	   {
-	     $game = DB_format_gameid($r[1]);
-	     $gamenr = (int) $game;
-	     if($gamenrold < $gamenr)
-	       {
-		 if($gamenrold!=-1)
-		   echo "</td></tr>\n <tr> <td>$gamenr:</td>\n";
-		 else
-		   echo "$gamenr:</td>\n";
-		 $gamenrold = $gamenr;
-		 echo "<td class=\"usergames\">\n";
-	       }
-	     if($r[4]=='pre')
-	       echo "\n   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span> ";
-	     else if ($r[4]=='gameover')
-	       echo "\n   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span> ";
-	     else
-	       echo "\n   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span> ";
-	     if($r[4] != 'gameover')
-	       {
-		 echo "</td>\n<td>\n    ";
-		 if($r[3]==$myid || !$r[3])
-		   echo "(it's <strong>your</strong> turn)\n";
-		 else
-		   {
-		     $name = DB_get_name('userid',$r[3]);
-		     $gameid = $r[1];
-		     if(DB_get_reminder($r[3],$gameid)==0)
-		       if(time()-strtotime($r[2]) > 60*60*24*7)
-			 echo "".
-			   "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
-		     echo "(it's $name's turn)\n";
-		   };
-		 if(time()-strtotime($r[2]) > 60*60*24*30)
-		   echo "".
-		     "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".
-		     " (clicking here is final and can't be restored)";
-		 
-	       }
-	   }
-	 echo "</td></tr>\n</table>\n";
-	 
-	 /* display last 5 users that have signed up to e-DoKo */
-	 $names = DB_get_names_of_new_logins(5);
-	 echo "<h4>New Players:</h4>\n<p>\n";
-	 echo implode(", ",$names).",...\n";
-	 echo "</p>\n";
-	 
-	 /* display last 5 users that logged on */
-	 $names = DB_get_names_of_last_logins(5);
-	 echo "<h4>Players last logged in:</h4>\n<p>\n";
-	 echo implode(", ",$names).",...\n";
-	 echo "</p>\n";
-	 
-	 echo "</div>\n";
-       }
-     else
-       {
-	 echo "<div class=\"message\">Sorry email and password don't match. Please <a href=\"$INDEX\">try again</a>. </div>";
-       }
-   };
-output_footer();
-DB_close();
-exit();
-
+    $ok  = 1;
+    $myid = DB_get_userid('email-password',$email,$password);
+    if(!$myid)
+      $ok = 0;
+    
+    if($ok)
+      {
+	/* user information is ok */
+	$myname = DB_get_name('email',$email);
+	$_SESSION["name"] = $myname;
+	
+	$PREF = DB_get_PREF($myid);
+	
+	DB_update_user_timestamp($myid);
+	
+	display_user_menu();
+	
+	/* display all games the user has played */
+	echo "<div class=\"user\">";
+	echo "<h4>These are all your games:</h4>\n";
+	echo "<p>Session: <br />\n";
+	echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
+	echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
+	echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
+	echo "</p>\n";
+	
+	$output = array();
+	$result = DB_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
+			   " LEFT JOIN Game ON Game.id=Hand.game_id".
+			   " WHERE user_id='$myid'".
+			   " ORDER BY Game.session,Game.create_date" );
+	$gamenrold = -1;
+	echo "<table>\n <tr><td>\n";
+	while( $r = DB_fetch_array($result))
+	  {
+	    $game = DB_format_gameid($r[1]);
+	    $gamenr = (int) $game;
+	    if($gamenrold < $gamenr)
+	      {
+		if($gamenrold!=-1)
+		  echo "</td></tr>\n <tr> <td>$gamenr:</td>\n";
+		else
+		  echo "$gamenr:</td>\n";
+		$gamenrold = $gamenr;
+		echo "<td class=\"usergames\">\n";
+	      }
+	    if($r[4]=='pre')
+	      echo "   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span>\n";
+	    else if ($r[4]=='gameover')
+	      echo "   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span>\n";
+	    else
+	      echo "   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span>\n";
+	    if($r[4] != 'gameover')
+	      {
+		echo "</td>\n<td>\n    ";
+		if($r[3]==$myid || !$r[3])
+		  echo "(it's <strong>your</strong> turn)\n";
+		else
+		  {
+		    $name = DB_get_name('userid',$r[3]);
+		    $gameid = $r[1];
+		    if(DB_get_reminder($r[3],$gameid)==0)
+		      if(time()-strtotime($r[2]) > 60*60*24*7)
+			echo "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
+		    echo "(it's $name's turn)\n";
+		  };
+		if(time()-strtotime($r[2]) > 60*60*24*30)
+		  echo "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".
+		    " (clicking here is final and can't be restored)";
+	      }
+	  }
+	echo "</td></tr>\n</table>\n";
+	
+	/* display last 5 users that have signed up to e-DoKo */
+	$names = DB_get_names_of_new_logins(5);
+	echo "<h4>New Players:</h4>\n<p>\n";
+	echo implode(", ",$names).",...\n";
+	echo "</p>\n";
+	
+	/* display last 5 users that logged on */
+	$names = DB_get_names_of_last_logins(5);
+	echo "<h4>Players last logged in:</h4>\n<p>\n";
+	echo implode(", ",$names).",...\n";
+	echo "</p>\n";
+	
+	echo "</div>\n";
+      }
+    else
+      {
+	echo "<div class=\"message\">Sorry email and password don't match. Please <a href=\"$INDEX\">try again</a>. </div>";
+      }
+  };
 ?>
