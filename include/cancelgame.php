@@ -10,9 +10,7 @@ output_status();
 if(!myisset("me"))
   {
     echo "Hmm, you really shouldn't mess with the urls.<br />\n";
-    output_footer();
-    DB_close();
-    exit();
+    return;
   }
 
 $me = $_REQUEST["me"];
@@ -23,9 +21,7 @@ if(!$myid)
   {
     echo "Can't find you in the database, please check the url.<br />\n";
     echo "perhaps the game has been canceled, check by login in <a href=\"$INDEX\">here</a>.";
-    output_footer();
-    DB_close();
-    exit();
+    return;
   }
 
 DB_update_user_timestamp($myid);

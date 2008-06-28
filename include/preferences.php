@@ -18,7 +18,6 @@ $changed_cards	   = 0;
 $changed_timezone  = 0;
 $changed_autosetup = 0;
 
-output_status();
 display_user_menu();
 
 /* get old infos */
@@ -206,8 +205,5 @@ echo "    </table>\n";
 echo "  </form>\n";
 echo "</div>\n";
 
-output_footer();
-DB_close();
-exit();
-
+return;
 ?>

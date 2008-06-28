@@ -372,7 +372,13 @@ function output_status()
        date_default_timezone_set($zone);
 
        echo "<div class=\"lastlogin\">last login: ".date("r",$unixtime)."</div>\n";
-     };
+     }
+   else
+     {
+       echo "\n<div class=\"status\">\n";
+       echo "<a href=\"".$INDEX."\">login</a>\n";
+       echo "</div>\n";
+     }
   return;
 }
 

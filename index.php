@@ -8,12 +8,10 @@ error_reporting(E_ALL);
  */
 session_start();
 
-
 include_once("config.php");                /* needs to be first in list, since other includes use this */
 include_once("./include/output.php");      /* html output only */
 include_once("./include/db.php");          /* database only */
 include_once("./include/functions.php");   /* the rest */
-
 
 /* make sure that user has set all variables in config.php */
 config_check();
@@ -28,7 +26,7 @@ if(DB_open()<0)
     exit();
   }
 
-/* done major error checking, output header of HTML page */
+/* done major error checking, output5B header of HTML page */
 output_header();
 
 /* The rest of the file consists of handling user input.
@@ -80,6 +78,11 @@ switch($action)
     else
       require './include/welcome.php';
   }
+
+/* ask for login or display login info, needs to go at the end, so that we have the
+ * session-variable already set.
+ */
+output_status();
 
 output_footer();
 
