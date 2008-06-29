@@ -1363,14 +1363,6 @@ switch($mystatus)
 		  $comment = $commentSchweinchen . $comment;
 	      };
 
-	    /* check for note */
-	    if(myisset('note'))
-	      {
-		$note = $_REQUEST['note'];
-		if($note != '')
-		  DB_insert_note($note,$gameid,$myid);
-	      };
-
 	    /* display played card */
 	    $pos = DB_get_pos_by_hash($me);
 	    if($sequence==1)
