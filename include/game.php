@@ -249,31 +249,31 @@ switch($mystatus)
     $mycards = DB_get_hand($me);
     $mycards = mysort($mycards,$gametype);
 
-    /* output sickness of other playes, in case the already selected and are sitting in front of the current player */
-    echo "\n<ul class=\"tricks\">\n";
-    echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
-    echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-      "    <div class=\"trick\" id=\"trick0\">\n";
-
-    for($pos=1;$pos<5;$pos++)
-      {
-	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
-	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
-	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
-
-	if($userstatus=='start' || $userstatus=='init')
-	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
-	else
-	  if($usersick!=NULL && $pos<=$mypos ) /* only show this for people sitting before the player */
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
-	  else if($usersick==NULL && $pos<=$mypos)
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
-      }
-    echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
-    /* end displaying sickness */
-
     if(!myisset('solo','wedding','poverty','nines') )
       {
+	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+	echo "\n<ul class=\"tricks\">\n";
+	echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
+	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+	  "    <div class=\"trick\" id=\"trick0\">\n";
+
+	for($pos=1;$pos<5;$pos++)
+	  {
+	    $usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
+	    $userid     = DB_get_userid('gameid-position',$gameid,$pos);
+	    $userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
+
+	    if($userstatus=='start' || $userstatus=='init')
+	      echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
+	    else
+	      if($usersick!=NULL && $pos<=$mypos ) /* only show this for people sitting before the player */
+		echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
+	      else if($usersick==NULL && $pos<=$mypos)
+		echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
+	  }
+	echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
+	/* end displaying sickness */
+
 	output_check_for_sickness($me,$mycards);
 
 	echo "<div class=\"mycards\">Your cards are: <br />\n";
@@ -365,35 +365,31 @@ switch($mystatus)
      * this can therefore only be handled once all players finished the last stage
      */
 
-    /* only need to redisplay the cards when the user reloads the page and lands directly here */
-    if($mystatus=='check')
+    $mycards = DB_get_hand($me);
+    $mycards = mysort($mycards,$gametype);
+
+    /* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+    echo "\n<ul class=\"tricks\">\n";
+    echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
+    echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+      "    <div class=\"trick\" id=\"trick0\">\n";
+
+    for($pos=1;$pos<5;$pos++)
       {
-	$mycards = DB_get_hand($me);
-	$mycards = mysort($mycards,$gametype);
+	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
+	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
+	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 
-	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
-	echo "\n<ul class=\"tricks\">\n";
-	echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
-	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	  "    <div class=\"trick\" id=\"trick0\">\n";
-
-	for($pos=1;$pos<5;$pos++)
-	  {
-	    $usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
-	    $userid     = DB_get_userid('gameid-position',$gameid,$pos);
-	    $userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
-
-	    if($userstatus=='start' || $userstatus=='init')
-	      echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
-	    else
-	      if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
-		echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
-	      else
-		echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
-	  }
-	echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
-	/* end displaying sickness */
+	if($userstatus=='start' || $userstatus=='init')
+	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
+	else
+	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
+	  else
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
       }
+    echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
+    /* end displaying sickness */
 
     echo "<div class=\"message\">\n";
     echo "<p> Checking if someone else selected solo, nines, wedding or poverty.</p>";
@@ -1380,6 +1376,8 @@ switch($mystatus)
 	      echo "\n        <span class=\"comment\"> ".$comment."</span>\n";
 	    echo "      </div>\n";
 
+	    echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+
 	    /*check if we still have cards left, else set status to gameover */
 	    if(sizeof(DB_get_hand($me))==0)
 	      {
@@ -1662,216 +1660,215 @@ switch($mystatus)
 		      if( DB_get_email_pref_by_uid($user) != 'emailaddict' )
 			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
 		    }
-		}
-	    }
-	  else
-	    {
-	      echo "can't find that card?! <br />\n";
-	    }
-	}
-      else if(myisset('card') && !$myturn )
-	{
-	  echo "please wait until it's your turn! <br />\n";
-	}
-
-      if($seq!=4 && $trickNR>=1)
-	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
-
-      /* display points in case game is over */
-      if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
-	{
-	  echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">Score</a>\n".
-	    "    <div class=\"trick\" id=\"trick13\">\n";
-	  /* add pic for re/contra
-	   "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
-
-	  $result = DB_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand".
-			     " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-			     " LEFT JOIN User ON User.id=Hand.user_id".
-			     " LEFT JOIN Play ON Trick.id=Play.trick_id".
-			     " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-			     " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-			     " WHERE Hand.game_id='$gameid'".
-			     " GROUP BY User.fullname" );
-	  while( $r = DB_fetch_array($result))
-	    echo "      <div class=\"card".($r[3]-1)."\">\n".
-	         "        <div class=\"score\">".$r[2]."<br /> ".$r[1]."</div>\n".
-	         "      </div>\n";
-
-	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
-	}
-
-      echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">prev</a></li>\n";
-      echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n";
-      echo "</ul>\n"; /* end ul tricks*/
-
-      $mycards = DB_get_hand($me);
-      $mycards = mysort($mycards,$gametype);
-      echo "<div class=\"mycards\">\n";
-
-      if($myturn && !myisset('card') && $mystatus=='play' )
-	{
-	  echo "Hello ".$myname.", it's your turn!  <br />\n";
-	  echo "Your cards are: <br />\n";
-
-	  /* do we have to follow suite? */
-	  $followsuit = 0;
-	  if(have_suit($mycards,$firstcard))
-	    $followsuit = 1;
-
-	  foreach($mycards as $card)
-	    {
-	      if( ($followsuit && !same_type($card,$firstcard)) ||
-		  ( (int)($card)==19 && ($RULES['schweinchen']=='second'||$RULES['schweinchen']=='secondaftercall')
-		    && $GAME['schweinchen-who']==$me && !$GAME['schweinchen-first'] )
-		  )
-		display_card($card,$PREF['cardset']);
-	      else
-		display_link_card($card,$PREF['cardset']);
-	    }
-	}
-      else if($mystatus=='play' )
-	{
-	  echo "Your cards are: <br />\n";
-	  foreach($mycards as $card)
-	    display_card($card,$PREF['cardset']);
-	}
-      else if($mystatus=='gameover')
-	{
-	  $oldcards = DB_get_all_hand($me);
-	  $oldcards = mysort($oldcards,$gametype);
-	  echo "Your cards were: <br />\n";
-	  foreach($oldcards as $card)
-	    display_card($card,$PREF['cardset']);
-
-	  $userids = DB_get_all_userid_by_gameid($gameid);
-          foreach($userids as $user)
-            {
-              $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-
-              if($userhash!=$me)
-                {
-                  echo "<br />";
-
-                  $name = DB_get_name('userid',$user);
-                  $oldcards = DB_get_all_hand($userhash);
-                  $oldcards = mysort($oldcards,$gametype);
-                  echo "$name's cards were: <br />\n";
-                  foreach($oldcards as $card)
-                    display_card($card,$PREF['cardset']);
-                }
-            };
-	}
-      echo "</div>\n";
-
-      /* if the game is over do some extra stuff, therefore exit the swtich statement if we are still playing*/
-      if($mystatus=='play')
-	break;
-
-      /* the following happens only when the gamestatus is 'gameover' */
-      /* check if game is over, display results */
-      if(DB_get_game_status_by_gameid($gameid)=='play')
-	{
-	  echo "The game is over for you.. other people still need to play though";
-	}
-      else
-	{
-	  $result = DB_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
-			     " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-			     " LEFT JOIN User ON User.id=Hand.user_id".
-			     " LEFT JOIN Play ON Trick.id=Play.trick_id".
-			     " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-			     " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-			     " WHERE Hand.game_id='$gameid'".
-			     " GROUP BY Hand.party" );
-	  echo "<div class=\"total\"> Totals:<br />\n";
-	  while( $r = DB_fetch_array($result))
-	    echo "  ".$r[0]." ".$r[1]."<br />\n";
-
-	  $queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
-				  " FROM Game WHERE id='$gameid'");
-	  $r = DB_fetch_array($queryresult);
-	  echo "<p>This game took ".$r[0]." hours.</p>";
-
-	  echo "<div class=\"re\">\n Points Re: <br />\n";
-	  $queryresult = DB_query("SELECT score FROM Score ".
-				  "  WHERE game_id=$gameid AND party='re'".
-				  " ");
-	  while($r = DB_fetch_array($queryresult) )
-	    echo "   ".$r[0]."<br />\n";
-	  echo "</div>\n";
-
-	  echo "<div class=\"contra\">\n Points Contra: <br />\n";
-	  $queryresult = DB_query("SELECT score FROM Score ".
-				  "  WHERE game_id=$gameid AND party='contra'".
-				  " ");
-	  while($r = DB_fetch_array($queryresult) )
-	    echo "   ".$r[0]."<br />\n";
-	  echo "</div>\n";
-
-	  echo "</div>\n";
-
-
-	}
-      break;
-    default:
-      myerror("error in testing the status");
-    }
-    /* output left menu */
-    display_user_menu();
-
-    /* output right menu */
-
-      /* display rule set for this game */
-    echo "<div class=\"gameinfo\">\n";
-
-    if($gamestatus == 'play' )
-      output_form_calls($me);
-
-    /* get time from the last action of the game */
-    $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
-    $gameend = time() - strtotime($r[0]);
-
-    if($gamestatus == 'play' || $gameend < 60*60*24*7)
+	      }
+	  }
+	else
+	  {
+	    echo "can't find that card?! <br />\n";
+	  }
+      }
+    else if(myisset('card') && !$myturn )
       {
-	echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+	echo "please wait until it's your turn! <br />\n";
       }
 
-    echo "<input type=\"submit\" value=\"submit\" />\n";
+    if($seq!=4 && $trickNR>=1 && !(myisset('card') && $myturn) )
+      echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
 
-    echo "</div>\n";
-
-    echo "</form>\n";
-
+    /* display points in case game is over */
     if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
       {
+	echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">Score</a>\n".
+	  "    <div class=\"trick\" id=\"trick13\">\n";
+	/* add pic for re/contra
+	 "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
 
-	$session = DB_get_session_by_gameid($gameid);
-	$result  = DB_query("SELECT id,create_date FROM Game".
-			    " WHERE session=$session".
-			    " ORDER BY create_date DESC".
-			    " LIMIT 1");
-	$r = -1;
-	if($result)
-	  $r = DB_fetch_array($result);
+	$result = DB_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand".
+			   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+			   " LEFT JOIN User ON User.id=Hand.user_id".
+			   " LEFT JOIN Play ON Trick.id=Play.trick_id".
+			   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+			   " WHERE Hand.game_id='$gameid'".
+			   " GROUP BY User.fullname" );
+	while( $r = DB_fetch_array($result))
+	  echo "      <div class=\"card".($r[3]-1)."\">\n".
+	    "        <div class=\"score\">".$r[2]."<br /> ".$r[1]."</div>\n".
+	    "      </div>\n";
 
-	if(!$session || $gameid==$r[0])
+	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+      }
+
+    echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">prev</a></li>\n";
+    echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n";
+    echo "</ul>\n"; /* end ul tricks*/
+
+    $mycards = DB_get_hand($me);
+    $mycards = mysort($mycards,$gametype);
+    echo "<div class=\"mycards\">\n";
+
+    if($myturn && !myisset('card') && $mystatus=='play' )
+      {
+	echo "Hello ".$myname.", it's your turn!  <br />\n";
+	echo "Your cards are: <br />\n";
+
+	/* do we have to follow suite? */
+	$followsuit = 0;
+	if(have_suit($mycards,$firstcard))
+	  $followsuit = 1;
+
+	foreach($mycards as $card)
 	  {
-	    /* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
-	    $names = DB_get_all_names_by_gameid($gameid);
-	    $type  = DB_get_gametype_by_gameid($gameid);
+	    if( ($followsuit && !same_type($card,$firstcard)) ||
+		( (int)($card)==19 && ($RULES['schweinchen']=='second'||$RULES['schweinchen']=='secondaftercall')
+		  && $GAME['schweinchen-who']==$me && !$GAME['schweinchen-first'] )
+		)
+	      display_card($card,$PREF['cardset']);
+	    else
+	      display_link_card($card,$PREF['cardset']);
+	  }
+      }
+    else if($mystatus=='play' )
+      {
+	echo "Your cards are: <br />\n";
+	foreach($mycards as $card)
+	  display_card($card,$PREF['cardset']);
+      }
+    else if($mystatus=='gameover')
+      {
+	$oldcards = DB_get_all_hand($me);
+	$oldcards = mysort($oldcards,$gametype);
+	echo "Your cards were: <br />\n";
+	foreach($oldcards as $card)
+	  display_card($card,$PREF['cardset']);
 
-	    if($type=='solo')
+	$userids = DB_get_all_userid_by_gameid($gameid);
+	foreach($userids as $user)
+	  {
+	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+
+	    if($userhash!=$me)
 	      {
-		$solo = DB_get_solo_by_gameid($gameid);
+		echo "<br />";
 
-		if($solo!='silent') /* repeat game with same first player */
-		  output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
-		else /* rotate normally */
-		  output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
+		$name = DB_get_name('userid',$user);
+		$oldcards = DB_get_all_hand($userhash);
+		$oldcards = mysort($oldcards,$gametype);
+		echo "$name's cards were: <br />\n";
+		foreach($oldcards as $card)
+		  display_card($card,$PREF['cardset']);
 	      }
+	  };
+      }
+    echo "</div>\n";
+
+    /* if the game is over do some extra stuff, therefore exit the swtich statement if we are still playing*/
+    if($mystatus=='play')
+      break;
+
+    /* the following happens only when the gamestatus is 'gameover' */
+    /* check if game is over, display results */
+    if(DB_get_game_status_by_gameid($gameid)=='play')
+      {
+	echo "The game is over for you.. other people still need to play though";
+      }
+    else
+      {
+	$result = DB_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
+			   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+			   " LEFT JOIN User ON User.id=Hand.user_id".
+			   " LEFT JOIN Play ON Trick.id=Play.trick_id".
+			   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+			   " WHERE Hand.game_id='$gameid'".
+			   " GROUP BY Hand.party" );
+	echo "<div class=\"total\"> Totals:<br />\n";
+	while( $r = DB_fetch_array($result))
+	  echo "  ".$r[0]." ".$r[1]."<br />\n";
+
+	$queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
+				" FROM Game WHERE id='$gameid'");
+	$r = DB_fetch_array($queryresult);
+	echo "<p>This game took ".$r[0]." hours.</p>";
+
+	echo "<div class=\"re\">\n Points Re: <br />\n";
+	$queryresult = DB_query("SELECT score FROM Score ".
+				"  WHERE game_id=$gameid AND party='re'".
+				" ");
+	while($r = DB_fetch_array($queryresult) )
+	  echo "   ".$r[0]."<br />\n";
+	echo "</div>\n";
+
+	echo "<div class=\"contra\">\n Points Contra: <br />\n";
+	$queryresult = DB_query("SELECT score FROM Score ".
+				"  WHERE game_id=$gameid AND party='contra'".
+				" ");
+	while($r = DB_fetch_array($queryresult) )
+	  echo "   ".$r[0]."<br />\n";
+	echo "</div>\n";
+
+	echo "</div>\n";
+
+
+      }
+    break;
+  default:
+    myerror("error in testing the status");
+  }
+/* output left menu */
+display_user_menu();
+
+/* output right menu */
+
+/* display rule set for this game */
+echo "<div class=\"gameinfo\">\n";
+
+if($gamestatus == 'play' )
+  output_form_calls($me);
+
+/* get time from the last action of the game */
+$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
+$gameend = time() - strtotime($r[0]);
+
+if($gamestatus == 'play' || $gameend < 60*60*24*7)
+  {
+    echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+  }
+
+echo "<input type=\"submit\" value=\"submit\" />\n";
+
+echo "</div>\n";
+
+echo "</form>\n";
+
+if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
+  {
+    $session = DB_get_session_by_gameid($gameid);
+    $result  = DB_query("SELECT id,create_date FROM Game".
+			" WHERE session=$session".
+			" ORDER BY create_date DESC".
+			" LIMIT 1");
+    $r = -1;
+    if($result)
+      $r = DB_fetch_array($result);
+
+    if(!$session || $gameid==$r[0])
+      {
+	/* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
+	$names = DB_get_all_names_by_gameid($gameid);
+	$type  = DB_get_gametype_by_gameid($gameid);
+
+	if($type=='solo')
+	  {
+	    $solo = DB_get_solo_by_gameid($gameid);
+
+	    if($solo!='silent') /* repeat game with same first player */
+	      output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
 	    else /* rotate normally */
 	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	  }
+	else /* rotate normally */
+	  output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
       }
+  }
 ?>
