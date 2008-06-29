@@ -6,12 +6,12 @@ if(!isset($HOST))
   exit;
 
 /* calling game.php only makes sense when we give it a hash for a game */
-if(!myisset("me"))
+if(!myisset('me'))
   {
     echo "Hmm, you really shouldn't mess with the urls.<br />\n";
     return;
   }
-$me = $_REQUEST["me"];
+$me = $_REQUEST['me'];
 
 /* Ok, got a hash, but is it valid? */
 $myid = DB_get_userid('hash',$me);
@@ -45,10 +45,10 @@ $RULES = DB_get_RULES($gameid);
 $gametype   = DB_get_gametype_by_gameid($gameid);
 $gamestatus = DB_get_game_status_by_gameid($gameid);
 $GT         = $gametype;
-if($gametype=="solo")
+if($gametype=='solo')
   {
     $gametype = DB_get_solo_by_gameid($gameid);
-    $GT  = $gametype." ".$GT;
+    $GT  = $gametype.' '.$GT;
   }
 
 /* do we need to worry about Schweinchen?
@@ -82,7 +82,7 @@ if($ok)
     {
       $hash  = DB_get_hash_from_game_and_pos($gameid,$i);
       $cards = DB_get_all_hand($hash);
-      if( in_array("19",$cards) && in_array("20",$cards) )
+      if( in_array('19',$cards) && in_array('20',$cards) )
 	$GAME['schweinchen-who']=$hash;
     };
   $GAME['schweinchen-first']  = 0; /* to keep track if they have been played already */
@@ -101,25 +101,25 @@ echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 
 /* handle user notes (only possible while game is running)*/
 if( $mystatus!='gameover'  )
-  if(myisset("note"))
-{
-  $note = $_REQUEST['note'];
-  
-  if($note != "")
-    DB_insert_note($note,$gameid,$myid);
-};
+  if(myisset('note'))
+    {
+      $note = $_REQUEST['note'];
+
+      if($note != '')
+	DB_insert_note($note,$gameid,$myid);
+    };
 output_user_notes($myid,$gameid,$mystatus);
 
 /* handle calls */
-if(myisset("call")  && $_REQUEST["call"]  == "120" && can_call(120,$me))
+if(myisset('call')  && $_REQUEST['call']  == '120' && can_call(120,$me))
   $result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
-if(myisset("call")  && $_REQUEST["call"]  == "90" && can_call(90,$me))
+if(myisset('call')  && $_REQUEST['call']  == '90' && can_call(90,$me))
   $result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
-if(myisset("call")  && $_REQUEST["call"]  == "60" && can_call(60,$me))
+if(myisset('call')  && $_REQUEST['call']  == '60' && can_call(60,$me))
   $result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
-if(myisset("call")  && $_REQUEST["call"]  == "30" && can_call(30,$me))
+if(myisset('call')  && $_REQUEST['call']  == '30' && can_call(30,$me))
   $result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
-if(myisset("call")  && $_REQUEST["call"]  == "0" && can_call(0,$me))
+if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
   $result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
 
 /* output extra division in case this game is part of a session */
@@ -128,9 +128,9 @@ if($session)
     echo "<div class=\"session\">\n";
     echo "  <div class=\"sessionrules\">Rules (+icons fur rules) \n";
     echo "    <div>\n";
-    echo "       10ofhearts : ".$RULES["dullen"]      ."<br />\n";
-    echo "       schweinchen: ".$RULES["schweinchen"] ."<br />\n";
-    echo "       call:        ".$RULES["call"]        ."<br />\n";
+    echo "       10ofhearts : {$RULES['dullen']}      <br />\n";
+    echo "       schweinchen: {$RULES['schweinchen']} <br />\n";
+    echo "       call:        {$RULES['call']}        <br />\n";
     echo "    </div>\n  </div>\n";
     echo "  <div class=\"sessionscore\">Score \n";
     $score   = generate_score_table($session);
@@ -146,7 +146,7 @@ if($session)
 	$lasthash=$hash;
       }
     $i--;
-    echo "This is game number $j of <a href=\"".$INDEX."?action=game&amp;me=$lasthash\">$i</a> in session $session.";
+    echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.";
     echo "</div>\n";
   }
 
@@ -169,7 +169,7 @@ switch($mystatus)
     $skip = 0;
     if($PREF['autosetup']=='yes') $skip = 1;
 
-    if( !myisset("in") && !$skip)
+    if( !myisset('in') && !$skip)
       {
 	/* asks the player, if he wants to join the game */
 	output_check_want_to_play($me);
@@ -178,7 +178,7 @@ switch($mystatus)
     else
       {
 	/* check the result, if player wants to join, got next stage, else cancel game */
-	if(!$skip && $_REQUEST["in"] == "no" )
+	if(!$skip && $_REQUEST['in'] == 'no' )
 	  {
 	    /* cancel the game */
 	    $message = "Hello, \n\n".
@@ -188,7 +188,7 @@ switch($mystatus)
 	    foreach($userids as $user)
 	      {
 		$To = DB_get_email('userid',$user);
-		mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled",$message);
+		mymail($To,"$EmailName game ".DB_format_gameid($gameid)." canceled",$message);
 	      }
 
 	    /* delete everything from the dB */
@@ -272,13 +272,13 @@ switch($mystatus)
     echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
     /* end displaying sickness */
 
-    if(!myisset("solo","wedding","poverty","nines") )
+    if(!myisset('solo','wedding','poverty','nines') )
       {
 	output_check_for_sickness($me,$mycards);
 
 	echo "<div class=\"mycards\">Your cards are: <br />\n";
 	foreach($mycards as $card)
-	  display_card($card,$PREF["cardset"]);
+	  display_card($card,$PREF['cardset']);
 	echo "</div>\n";
 
 	break;
@@ -287,10 +287,10 @@ switch($mystatus)
       {
 	/* check if someone selected more than one sickness */
 	$Nsickness = 0;
-	if($_REQUEST["solo"]!="No")       $Nsickness++;
-	if($_REQUEST["wedding"] == "yes") $Nsickness++;
-	if($_REQUEST["poverty"] == "yes") $Nsickness++;
-	if($_REQUEST["nines"] == "yes")   $Nsickness++;
+	if($_REQUEST['solo']!='No')       $Nsickness++;
+	if($_REQUEST['wedding'] == 'yes') $Nsickness++;
+	if($_REQUEST['poverty'] == 'yes') $Nsickness++;
+	if($_REQUEST['nines'] == 'yes')   $Nsickness++;
 
 	if($Nsickness>1)
 	  {
@@ -299,7 +299,7 @@ switch($mystatus)
 
 	    echo "<div class=\"mycards\">Your cards are: <br />\n";
 	    foreach($mycards as $card)
-	      display_card($card,$PREF["cardset"]);
+	      display_card($card,$PREF['cardset']);
 	    echo "</div>\n";
 
 	    break;
@@ -313,44 +313,44 @@ switch($mystatus)
 	    $gametype    = DB_get_gametype_by_gameid($gameid);
 	    $startplayer = DB_get_startplayer_by_gameid($gameid); /* need this to check which solo goes first */
 
-	    if( $_REQUEST["solo"]!="No" )
+	    if( $_REQUEST['solo']!='No' )
 	      {
 		/* user wants to play a solo */
 
 		/* store the info in the user's hand info */
-		DB_set_solo_by_hash($me,$_REQUEST["solo"]);
-		DB_set_sickness_by_hash($me,"solo");
+		DB_set_solo_by_hash($me,$_REQUEST['solo']);
+		DB_set_sickness_by_hash($me,'solo');
 
-		echo "<br />Seems like you want to play a ".$_REQUEST["solo"]." solo. Got it.<br />\n";
+		echo "<br />Seems like you want to play a {$_REQUEST['solo']} solo. Got it.<br />\n";
 
-		if($gametype == "solo" && $startplayer<$mypos)
+		if($gametype == 'solo' && $startplayer<$mypos)
 		  {}/* do nothing, since someone else already is playing solo */
 		else
 		  {
 		    /* this solo comes first
 		     * store info in game table
 		     */
-		    DB_set_gametype_by_gameid($gameid,"solo");
+		    DB_set_gametype_by_gameid($gameid,'solo');
 		    DB_set_startplayer_by_gameid($gameid,$mypos);
-		    DB_set_solo_by_gameid($gameid,$_REQUEST["solo"]);
+		    DB_set_solo_by_gameid($gameid,$_REQUEST['solo']);
 		  };
 	      }
-	    else if($_REQUEST["wedding"] == "yes")
+	    else if($_REQUEST['wedding'] == 'yes')
 	      {
 		/* silent solo is set further down */
 		echo "Ok, you don't want to play a silent solo...wedding was chosen.<br />\n";
-		DB_set_sickness_by_hash($me,"wedding");
+		DB_set_sickness_by_hash($me,'wedding');
 	      }
-	    else if($_REQUEST["poverty"] == "yes")
+	    else if($_REQUEST['poverty'] == 'yes')
 	      {
 		echo "Don't think you can win with just a few trump...? ok, poverty chosen <br />\n";
-		DB_set_sickness_by_hash($me,"poverty");
+		DB_set_sickness_by_hash($me,'poverty');
 	      }
-	    else if($_REQUEST["nines"] == "yes")
+	    else if($_REQUEST['nines'] == 'yes')
 	      {
 		echo "What? You just don't want to play a game because you have a few nines? Well, if no one".
 		  " is playing solo, this game will be canceled.<br />\n";
-		DB_set_sickness_by_hash($me,"nines");
+		DB_set_sickness_by_hash($me,'nines');
 	      }
 
 	    echo "</p>\n";
@@ -428,7 +428,7 @@ switch($mystatus)
 	    /* show cards */
 	    echo "<div class=\"mycards\">Your cards are: <br />\n";
 	    foreach($mycards as $card)
-	      display_card($card,$PREF["cardset"]);
+	      display_card($card,$PREF['cardset']);
 	    echo "</div>\n";
 	  }
 	break;
@@ -467,7 +467,7 @@ switch($mystatus)
 	  }
 
 	/* now check which sickness comes first and set the gametype to it */
-	if($gametype == "solo")
+	if($gametype == 'solo')
 	  {
 	    /* do nothing */
 	  }
@@ -485,7 +485,7 @@ switch($mystatus)
 	    foreach($userids as $user)
 	      {
 		$To = DB_get_email('userid',$user);
-		mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled",$message);
+		mymail($To,"$EmailName game ".DB_format_gameid($gameid)." canceled",$message);
 	      }
 
 	    /* delete everything from the dB */
@@ -497,13 +497,13 @@ switch($mystatus)
 	  }
 	else if($poverty==1) /* one person has poverty */
 	  {
-	    DB_set_gametype_by_gameid($gameid,"poverty");
-	    $gametype = "poverty";
+	    DB_set_gametype_by_gameid($gameid,'poverty');
+	    $gametype = 'poverty';
 	    $who      = DB_get_sickness_by_gameid($gameid);
 	    if(!$who)
 	      {
 		$firstsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
-		if($firstsick == "poverty")
+		if($firstsick == 'poverty')
 		  DB_set_sickness_by_gameid($gameid,2); /* who needs to be asked first */
 		else
 		  DB_set_sickness_by_gameid($gameid,1); /* who needs to be asked first */
@@ -511,16 +511,16 @@ switch($mystatus)
 	  }
 	else if($poverty==2) /* two people have poverty */
 	  {
-	    DB_set_gametype_by_gameid($gameid,"dpoverty");
-	    $gametype = "dpoverty";
+	    DB_set_gametype_by_gameid($gameid,'dpoverty');
+	    $gametype = 'dpoverty';
 	    $who      = DB_get_sickness_by_gameid($gameid);
 	    if(!$who)
 	      {
 		$firstsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
-		if($firstsick == "poverty")
+		if($firstsick == 'poverty')
 		  {
 		    $seconsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
-		    if($secondsick == "poverty")
+		    if($secondsick == 'poverty')
 		      DB_set_sickness_by_gameid($gameid,30); /* who needs to be asked first */
 		    else
 		      DB_set_sickness_by_gameid($gameid,20); /* who needs to be asked first */
@@ -531,9 +531,9 @@ switch($mystatus)
 	  }
 	else if($wedding> 0)
 	  {
-	    DB_set_gametype_by_gameid($gameid,"wedding");
+	    DB_set_gametype_by_gameid($gameid,'wedding');
 	    DB_set_sickness_by_gameid($gameid,'-1'); /* wedding not resolved yet */
-	    $gametype = "wedding";
+	    $gametype = 'wedding';
 	  };
 	/* now the gametype is set correctly in the database */
 	echo "<p> Got it :)</p>";
@@ -546,41 +546,41 @@ switch($mystatus)
 
 	    switch($gametype)
 	      {
-	      case "solo":
+	      case 'solo':
 		/* are we the solo player? set us to re, else set us to contra */
 		$pos = DB_get_pos_by_hash($userhash);
 		if($pos == $startplayer)
-		  DB_set_party_by_hash($userhash,"re");
+		  DB_set_party_by_hash($userhash,'re');
 		else
-		  DB_set_party_by_hash($userhash,"contra");
+		  DB_set_party_by_hash($userhash,'contra');
 		DB_set_hand_status_by_hash($userhash,'play');
 		break;
 
-	      case "wedding":
+	      case 'wedding':
 		/* set person with the wedding to re, do the rest during the game */
 		$usersick = DB_get_sickness_by_userid_and_gameid($userid,$gameid);
-		if($usersick == "wedding")
-		  DB_set_party_by_hash($userhash,"re");
+		if($usersick == 'wedding')
+		  DB_set_party_by_hash($userhash,'re');
 		else
-		  DB_set_party_by_hash($userhash,"contra");
+		  DB_set_party_by_hash($userhash,'contra');
 
 		DB_set_hand_status_by_hash($userhash,'play');
 		break;
 
-	      case "normal":
+	      case 'normal':
 		$hand = DB_get_all_hand($userhash);
 
 		if(in_array('3',$hand)||in_array('4',$hand))
-		  DB_set_party_by_hash($userhash,"re");
+		  DB_set_party_by_hash($userhash,'re');
 		else
-		  DB_set_party_by_hash($userhash,"contra");
+		  DB_set_party_by_hash($userhash,'contra');
 		DB_set_hand_status_by_hash($userhash,'play');
 		break;
-	      case "poverty":
-	      case "dpoverty":
+	      case 'poverty':
+	      case 'dpoverty':
 		/* set person with poverty to play status */
 		$usersick = DB_get_sickness_by_userid_and_gameid($userid,$gameid);
-		if($usersick == "poverty")
+		if($usersick == 'poverty')
 		  DB_set_hand_status_by_hash($userhash,'play');
 
 		/* set status of first player to be asked to poverty */
@@ -605,14 +605,14 @@ switch($mystatus)
 		  {
 		    /* normal game type and player has both queens -> silent solo */
 		    /* keep startplayer, just set gametype to silent solo */
-		    DB_set_gametype_by_gameid($gameid,"solo");
+		    DB_set_gametype_by_gameid($gameid,'solo');
 		    DB_set_solo_by_gameid($gameid,'silent');
 		  }
 	      }
 	  }
 
 	/* send out email to first player or poverty person*/
-	if($gametype!="poverty" && $gametype!="dpoverty")
+	if($gametype!='poverty' && $gametype!='dpoverty')
 	  {
 	    $startplayer = DB_get_startplayer_by_gameid($gameid);
 	    $email       = DB_get_email('position-gameid',$startplayer,$gameid);
@@ -622,7 +622,7 @@ switch($mystatus)
 
 	    if($hash!=$me)
 	      {
-		if(DB_get_email_pref_by_hash($hash)!="emailaddict")
+		if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 		  {
 		    /* email startplayer */
 		    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
@@ -648,7 +648,7 @@ switch($mystatus)
 		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
 		DB_set_player_by_gameid($gameid,$whoid);
 
-		if(DB_get_email_pref_by_hash($hash)!="emailaddict")
+		if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 		  {
 		    /* email player for poverty */
 		    $message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
@@ -685,7 +685,7 @@ switch($mystatus)
 
     /* the following is part B) of whats needs to be done)
     /*    check if user wants to give cards back */
-    if(myisset("exchange"))
+    if(myisset('exchange'))
       {
 	$exchange    = $_REQUEST['exchange'];
 	$partnerhash = DB_get_partner_hash_by_hash($me);
@@ -709,10 +709,10 @@ switch($mystatus)
       {
 	echo "<div class=\"poverty\"> you need to get rid of a few cards</div>\n";
 
-	$type="exchange";
+	$type='exchange';
 	echo "<div class=\"mycards\">Your cards are: <br />\n";
 	foreach($mycards as $card)
-	  display_link_card($card,$PREF["cardset"],$type);
+	  display_link_card($card,$PREF['cardset'],$type);
 	echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select card to give back\" />\n";
 	echo "</div>\n";
       }
@@ -730,7 +730,7 @@ switch($mystatus)
 
 	if($hash!=$me)
 	  {
-	    if(DB_get_email_pref_by_hash($hash)!="emailaddict")
+	    if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
@@ -743,7 +743,7 @@ switch($mystatus)
       }
 
     /* the following is part A) of what needs to be done */
-    if(!myisset("trump"))
+    if(!myisset('trump'))
       {
 	if(!$myparty)
 	  {
@@ -756,7 +756,7 @@ switch($mystatus)
 		$userhash  = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		$userparty = DB_get_party_by_hash($userhash);
 
-		if($usersick=="poverty" && !$userparty)
+		if($usersick=='poverty' && !$userparty)
 		  {
 		    $hash    = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		    $cards   = DB_get_hand($hash);
@@ -773,7 +773,7 @@ switch($mystatus)
 
 	    echo "<div class=\"mycards\">Your cards are: <br />\n";
 	    foreach($mycards as $card)
-	      display_card($card,$PREF["cardset"]);
+	      display_card($card,$PREF['cardset']);
 	    echo "</div></div>\n";
 	  }
 	break;
@@ -782,7 +782,7 @@ switch($mystatus)
       {
 	$trump = $_REQUEST['trump'];
 
-	if($trump=="no")
+	if($trump=='no')
 	  {
 	    /* user doesn't want to take trump */
 	    DB_set_hand_status_by_hash($me,'play');
@@ -793,14 +793,14 @@ switch($mystatus)
 
 	    /* don't ask people who have poverty */
 	    $next=1;
-	    if($firstsick=="poverty")
+	    if($firstsick=='poverty')
 	      {
-		if($secondsick=="poverty")
+		if($secondsick=='poverty')
 		  $next=3;
 		else
 		  $next=2;
 	      }
-	    if($gametype=="dpoverty")
+	    if($gametype=='dpoverty')
 	      {
 		$next=999; /* need to cancel for sure, since both would need to take the trump */
 	      }
@@ -844,7 +844,7 @@ switch($mystatus)
 	    /* player wants to take trump, change cards */
 
 	    /* user wants to take trump */
-	    $trump = $_REQUEST["trump"];
+	    $trump = $_REQUEST['trump'];
 	    $userhand = DB_get_handid('gameid-userid',$gameid,$trump);
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$trump);
 
@@ -863,11 +863,11 @@ switch($mystatus)
 		    $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		    if($hash==$userhash||$hash==$me)
 		      {
-			DB_set_party_by_hash($hash,"re");
+			DB_set_party_by_hash($hash,'re');
 		      }
 		    else
 		      {
-			DB_set_party_by_hash($hash,"contra");
+			DB_set_party_by_hash($hash,'contra');
 			DB_set_hand_status_by_hash($hash,'play'); /* the contra party is ready to play */
 		      }
 		  }
@@ -904,8 +904,8 @@ switch($mystatus)
 		    $secondsick = (string) DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
 
 		    $next=1;
-		    if($firstsick=="poverty")
-		      if($secondsick=="poverty")
+		    if($firstsick=='poverty')
+		      if($secondsick=='poverty')
 			$next=3;
 		      else
 			$next=2;
@@ -970,7 +970,7 @@ switch($mystatus)
 	    $who         = DB_get_userid('email',$email);
 	    DB_set_player_by_gameid($gameid,$who);
 
-	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!="emailaddict")
+	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer) */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
@@ -980,23 +980,23 @@ switch($mystatus)
 	  }
       }
     /* figure out what kind of game we are playing,
-     * set the global variables $CARDS["trump"],$CARDS["diamonds"],$CARDS["hearts"],
-     * $CARDS["clubs"],$CARDS["spades"],$CARDS["foxes"]
+     * set the global variables $CARDS['trump'],$CARDS['diamonds'],$CARDS['hearts'],
+     * $CARDS['clubs'],$CARDS['spades'],$CARDS['foxes']
      * accordingly
      */
 
     $gametype = DB_get_gametype_by_gameid($gameid);
     $GT       = $gametype;
-    if($gametype=="solo")
+    if($gametype=='solo')
       {
 	$gametype = DB_get_solo_by_gameid($gameid);
 	if($gametype=='silent')
 	  $GT = 'normal';
 	else
-	  $GT = $gametype." ".$GT;
+	  $GT = $gametype.' '.$GT;
       }
     else
-      $gametype = "normal";
+      $gametype = 'normal';
 
     set_gametype($gametype); /* this sets the $CARDS variable */
 
@@ -1014,7 +1014,7 @@ switch($mystatus)
 
 	echo "<div class=\"mycards\">Your cards are: <br />\n";
 	foreach($mycards as $card)
-	  display_card($card,$PREF["cardset"]);
+	  display_card($card,$PREF['cardset']);
 	echo "</div>\n";
 
 	break; /* not sure this works... the idea is that you can
@@ -1026,13 +1026,13 @@ switch($mystatus)
     $gameend = time() - strtotime($r[0]);
 
     /* handle comments in case player didn't play a card, allow comments a week after the end of the game */
-    if( (!myisset("card") && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
-      if(myisset("comment"))
+    if( (!myisset('card') && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
+      if(myisset('comment'))
 	{
-	  $comment = $_REQUEST["comment"];
+	  $comment = $_REQUEST['comment'];
 	  $playid = DB_get_current_playid($gameid);
 
-	  if($comment != "")
+	  if($comment != '')
 	    DB_insert_comment($comment,$playid,$myid);
 	};
 
@@ -1060,7 +1060,7 @@ switch($mystatus)
     $play = array(); /* needed to calculate winner later  */
     $seq  = 1;
     $pos  = DB_get_startplayer_by_gameid($gameid)-1;
-    $firstcard = ""; /* first card in a trick */
+    $firstcard = ''; /* first card in a trick */
 
     echo "\n<ul class=\"tricks\">\n";
     echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
@@ -1110,7 +1110,7 @@ switch($mystatus)
 	    $GAME['schweinchen-second'] = 1; /* this must be the second fox */
 
 	/* save card to be able to find the winner of the trick later */
-	$play[$seq] = array("card"=>$r[0],"pos"=>$pos);
+	$play[$seq] = array('card'=>$r[0],'pos'=>$pos);
 
 	if($seq==1)
 	  {
@@ -1138,11 +1138,11 @@ switch($mystatus)
 	echo "      <div class=\"card".($pos-1)."\">\n";
 
 	/* display comments */
-	if($comment!="")
+	if($comment!='')
 	  echo "        <span class=\"comment\">".$comment."</span>\n";
 
-	echo "        ";
-	display_card($r[0],$PREF["cardset"]);
+	echo '        ';
+	display_card($r[0],$PREF['cardset']);
 
 	echo "      </div>\n"; /* end div card */
 
@@ -1158,7 +1158,7 @@ switch($mystatus)
       {
 	$winner    = get_winner($play,$gametype); /* returns the position */
 	$next      = $winner;
-	$firstcard = ""; /* new trick, no first card */
+	$firstcard = ''; /* new trick, no first card */
       }
     else
       {
@@ -1173,11 +1173,11 @@ switch($mystatus)
       $myturn = 0;
 
     /* do we want to play a card? */
-    if(myisset("card") && $myturn)
+    if(myisset('card') && $myturn)
       {
-	$card   = $_REQUEST["card"];
+	$card   = $_REQUEST['card'];
 	$handid = DB_get_handid('hash',$me);
-	$commentSchweinchen =""; /* used to add a comment when Schweinchen is being played */
+	$commentSchweinchen =''; /* used to add a comment when Schweinchen is being played */
 
 	/* check if we have card and that we haven't played it yet*/
 	/* set played in hand_card to true where hand_id and card_id*/
@@ -1205,7 +1205,7 @@ switch($mystatus)
 	    /* check special output for schweinchen in case in case a fox is being played
 	     * check for correct rules, etc. has already been done
 	     */
-	    if( $GAME["schweinchen-who"] && ($card == 19 || $card == 20) )
+	    if( $GAME['schweinchen-who'] && ($card == 19 || $card == 20) )
 	      {
 		if(!$GAME['schweinchen-first'])
 		  $GAME['schweinchen-first'] = 1; /* playing the first fox */
@@ -1214,15 +1214,15 @@ switch($mystatus)
 
 		if( ($GAME['schweinchen-second']==1 && $RULES['schweinchen']=='second') || $RULES['schweinchen']=='both')
 		  {
-		    DB_insert_comment("Schweinchen! ",$playid,$myid);
-		    $commentSchweinchen = "Schweinchen! ";
+		    DB_insert_comment('Schweinchen! ',$playid,$myid);
+		    $commentSchweinchen = 'Schweinchen! ';
 		  }
 		if ($debug)
-		  echo "schweinchen = ".$GAME["schweinchen-who"]." ---<br />";
+		  echo 'schweinchen = '.$GAME['schweinchen-who'].' ---<br />';
 	      }
 
 	    /* if sequence == 4 check who one in case of wedding */
-	    if($sequence == 4 && $GT == "wedding")
+	    if($sequence == 4 && $GT == 'wedding')
 	      {
 		/* is wedding resolve */
 		$resolved = DB_get_sickness_by_gameid($gameid);
@@ -1233,7 +1233,7 @@ switch($mystatus)
 		    foreach($userids as $user)
 		      {
 			$usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
-			if($usersick == "wedding")
+			if($usersick == 'wedding')
 			  $whosick = $user;
 		      }
 		    /* who won the trick */
@@ -1247,7 +1247,7 @@ switch($mystatus)
 			$resolved = DB_set_sickness_by_gameid($gameid,$tricknr);
 			/* set partner */
 			$whash = DB_get_hash_from_gameid_and_userid($gameid,$winnerid);
-			DB_set_party_by_hash($whash,"re");
+			DB_set_party_by_hash($whash,'re');
 		      }
 		    if($tricknr == 3 && $winnerid==$whosick)
 		      {
@@ -1268,7 +1268,7 @@ switch($mystatus)
 		 * since it doesn't make sense in some games
 		 */
 		$ok = 0; /* fox shouldn't be counted */
-		if(DB_get_gametype_by_gameid($gameid)=="solo")
+		if(DB_get_gametype_by_gameid($gameid)=='solo')
 		  {
 		    $solo = DB_get_solo_by_gameid($gameid);
 		    if($solo == 'trump' || $solo == 'silent')
@@ -1302,10 +1302,10 @@ switch($mystatus)
 		$ok = 1; /* default: karlchen should be accounted for */
 		if($tricknr != 12 )
 		  $ok = 0; /* Karlchen works only in the last trick */
-		if($ok && DB_get_gametype_by_gameid($gameid)=="solo" )
+		if($ok && DB_get_gametype_by_gameid($gameid)=='solo' )
 		  {
 		    $solo = DB_get_solo_by_gameid($gameid);
-		    if($solo == "trumpless" || $solo == "jack" || $solo == "queen" )
+		    if($solo == 'trumpless' || $solo == 'jack' || $solo == 'queen' )
 		      $ok = 0; /* no Karlchen in these solos */
 		  }
 
@@ -1354,20 +1354,20 @@ switch($mystatus)
 	    if($next==5) $next=1;
 
 	    /* check for coment */
-	    if(myisset("comment"))
+	    if(myisset('comment'))
 	      {
-		$comment = $_REQUEST["comment"];
-		if($comment != "")
+		$comment = $_REQUEST['comment'];
+		if($comment != '')
 		  DB_insert_comment($comment,$playid,$myid);
 		if($commentSchweinchen)
 		  $comment = $commentSchweinchen . $comment;
 	      };
 
 	    /* check for note */
-	    if(myisset("note"))
+	    if(myisset('note'))
 	      {
-		$note = $_REQUEST["note"];
-		if($note != "")
+		$note = $_REQUEST['note'];
+		if($note != '')
 		  DB_insert_note($note,$gameid,$myid);
 	      };
 
@@ -1383,8 +1383,8 @@ switch($mystatus)
 	    echo "      <div class=\"card".($pos-1)."\">\n        ";
 
 	    /* display comments */
-	    display_card($card,$PREF["cardset"]);
-	    if($comment!="")
+	    display_card($card,$PREF['cardset']);
+	    if($comment!='')
 	      echo "\n        <span class=\"comment\"> ".$comment."</span>\n";
 	    echo "      </div>\n";
 
@@ -1407,7 +1407,7 @@ switch($mystatus)
 		$done=0;
 
 	    if($done)
-	      DB_set_game_status_by_gameid($gameid,"gameover");
+	      DB_set_game_status_by_gameid($gameid,'gameover');
 
 	    /* email next player, if game is still running */
 	    if(DB_get_game_status_by_gameid($gameid)=='play')
@@ -1420,7 +1420,7 @@ switch($mystatus)
 		$message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		  "It's your turn  now.\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
-		if( DB_get_email_pref_by_uid($who)!="emailaddict" )
+		if( DB_get_email_pref_by_uid($who)!='emailaddict' )
 		  mymail($email,$EmailName."a card has been played in game ".DB_format_gameid($gameid),$message);
 	      }
 	    else /* send out final email */
@@ -1453,9 +1453,9 @@ switch($mystatus)
 		while( $r = DB_fetch_array($result) )
 		  {
 		    $message .= "    ".$r[0]." ".$r[1]."\n";
-		    if($r[0] == "re")
+		    if($r[0] == 're')
 		      $re = $r[1];
-		    else if($r[0] == "contra")
+		    else if($r[0] == 'contra')
 		      $contra = $r[1];
 		  }
 
@@ -1477,14 +1477,14 @@ switch($mystatus)
 		      {
 			$call = (int) $call;
 
-			if($party=="re")
+			if($party=='re')
 			  {
 			    if($call_re==NULL)
 			      $call_re = $call;
 			    else if( $call < $call_re)
 			      $call_re = $call;
 			  }
-			else if($party=="contra")
+			else if($party=='contra')
 			  {
 			    if($call_contra==NULL)
 			      $call_contra = $call;
@@ -1501,9 +1501,9 @@ switch($mystatus)
 		  {
 		    /* nobody made a call, so it's easy to figure out who won */
 		    if($re>120)
-		      $winning_party="re";
+		      $winning_party='re';
 		    else
-		      $winning_party="contra";
+		      $winning_party='contra';
 		  }
 		else
 		  {
@@ -1518,9 +1518,9 @@ switch($mystatus)
 			  $offset--; /* since we use a > in the next equation */
 
 			if($re > 120+$offset)
-			  $winning_party="re";
+			  $winning_party='re';
 			else if ($call_contra == NULL )
-			  $winning_party="contra";
+			  $winning_party='contra';
 		      }
 
 		    if($call_contra)
@@ -1530,16 +1530,16 @@ switch($mystatus)
 			  $offset--; /* since we use a > in the next equation */
 
 			if($contra > 120+$offset)
-			  $winning_party="contra";
+			  $winning_party='contra';
 			else if ($call_re == NULL )
-			  $winning_party="re";
+			  $winning_party='re';
 		      }
 		  }
 
 		/* one point for each call of the other party in case the other party didn't win
 		 * and one point each in case the party made more than points than one of the calls
 		 */
-		if($winning_party!="contra" && $call_contra!=NULL)
+		if($winning_party!='contra' && $call_contra!=NULL)
 		  {
 		    for( $p=$call_contra;$p<=120; $p+=30 )
 		      {
@@ -1554,7 +1554,7 @@ switch($mystatus)
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
 			}
 		    }
-		  if($winning_party!="re" and $call_re!=NULL)
+		  if($winning_party!='re' and $call_re!=NULL)
 		    {
 		      for( $p=$call_re;$p<=120; $p+=30 )
 			{
@@ -1571,14 +1571,14 @@ switch($mystatus)
 		    }
 
 		  /* point in case contra won */
-		  if($winning_party=="contra")
+		  if($winning_party=='contra')
 		    {
 		      DB_query("INSERT INTO Score".
 			       " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
 		    }
 
 		  /* one point each for winning and each 30 points + calls */
-		  if($winning_party=="re")
+		  if($winning_party=='re')
 		    {
 		      foreach(array(120,150,180,210,240) as $p)
 			{
@@ -1598,7 +1598,7 @@ switch($mystatus)
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
 			}
 		    }
-		  else if( $winning_party=="contra")
+		  else if( $winning_party=='contra')
 		    {
 		      foreach(array(120,150,180,210,240) as $p)
 			{
@@ -1667,7 +1667,7 @@ switch($mystatus)
 
 		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".
 			$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		      if( DB_get_email_pref_by_uid($user) != "emailaddict" )
+		      if( DB_get_email_pref_by_uid($user) != 'emailaddict' )
 			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
 		    }
 		}
@@ -1677,7 +1677,7 @@ switch($mystatus)
 	      echo "can't find that card?! <br />\n";
 	    }
 	}
-      else if(myisset("card") && !$myturn )
+      else if(myisset('card') && !$myturn )
 	{
 	  echo "please wait until it's your turn! <br />\n";
 	}
@@ -1717,7 +1717,7 @@ switch($mystatus)
       $mycards = mysort($mycards,$gametype);
       echo "<div class=\"mycards\">\n";
 
-      if($myturn && !myisset("card") && $mystatus=='play' )
+      if($myturn && !myisset('card') && $mystatus=='play' )
 	{
 	  echo "Hello ".$myname.", it's your turn!  <br />\n";
 	  echo "Your cards are: <br />\n";
@@ -1733,16 +1733,16 @@ switch($mystatus)
 		  ( (int)($card)==19 && ($RULES['schweinchen']=='second'||$RULES['schweinchen']=='secondaftercall')
 		    && $GAME['schweinchen-who']==$me && !$GAME['schweinchen-first'] )
 		  )
-		display_card($card,$PREF["cardset"]);
+		display_card($card,$PREF['cardset']);
 	      else
-		display_link_card($card,$PREF["cardset"]);
+		display_link_card($card,$PREF['cardset']);
 	    }
 	}
       else if($mystatus=='play' )
 	{
 	  echo "Your cards are: <br />\n";
 	  foreach($mycards as $card)
-	    display_card($card,$PREF["cardset"]);
+	    display_card($card,$PREF['cardset']);
 	}
       else if($mystatus=='gameover')
 	{
@@ -1750,7 +1750,7 @@ switch($mystatus)
 	  $oldcards = mysort($oldcards,$gametype);
 	  echo "Your cards were: <br />\n";
 	  foreach($oldcards as $card)
-	    display_card($card,$PREF["cardset"]);
+	    display_card($card,$PREF['cardset']);
 
 	  $userids = DB_get_all_userid_by_gameid($gameid);
           foreach($userids as $user)
@@ -1766,7 +1766,7 @@ switch($mystatus)
                   $oldcards = mysort($oldcards,$gametype);
                   echo "$name's cards were: <br />\n";
                   foreach($oldcards as $card)
-                    display_card($card,$PREF["cardset"]);
+                    display_card($card,$PREF['cardset']);
                 }
             };
 	}
@@ -1869,7 +1869,7 @@ switch($mystatus)
 	    $names = DB_get_all_names_by_gameid($gameid);
 	    $type  = DB_get_gametype_by_gameid($gameid);
 
-	    if($type=="solo")
+	    if($type=='solo')
 	      {
 		$solo = DB_get_solo_by_gameid($gameid);
 
