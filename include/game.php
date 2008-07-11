@@ -126,7 +126,7 @@ if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
 if($session)
   {
     echo "<div class=\"session\">\n";
-    echo "  <div class=\"sessionrules\">Rules (+icons fur rules) \n";
+    echo "  <div class=\"sessionrules\">Rules (+icons for rules) \n";
     echo "    <div>\n";
     echo "       10ofhearts : {$RULES['dullen']}      <br />\n";
     echo "       schweinchen: {$RULES['schweinchen']} <br />\n";
