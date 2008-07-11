@@ -126,26 +126,26 @@ else
 	    DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
 		     "'$ruleset','$max' ,NULL)");
 	  }
-	$game_id = DB_insert_id();
+	$gameid = DB_insert_id();
 
 	/* create hash */
 	$TIME  = (string) time(); /* to avoid collisions */
-	$hashA = md5("AGameOfDoko".$game_id.$PlayerA.$EmailA.$TIME);
-	$hashB = md5("AGameOfDoko".$game_id.$PlayerB.$EmailB.$TIME);
-	$hashC = md5("AGameOfDoko".$game_id.$PlayerC.$EmailC.$TIME);
-	$hashD = md5("AGameOfDoko".$game_id.$PlayerD.$EmailD.$TIME);
+	$hashA = md5("AGameOfDoko".$gameid.$PlayerA.$EmailA.$TIME);
+	$hashB = md5("AGameOfDoko".$gameid.$PlayerB.$EmailB.$TIME);
+	$hashC = md5("AGameOfDoko".$gameid.$PlayerC.$EmailC.$TIME);
+	$hashD = md5("AGameOfDoko".$gameid.$PlayerD.$EmailD.$TIME);
 
 	/* create hands */
-	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridA).
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($gameid).",".DB_quote_smart($useridA).
 		 ", ".DB_quote_smart($hashA).", 'start','1',NULL,NULL,NULL,NULL)");
 	$hand_idA = DB_insert_id();
-	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridB).
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($gameid).",".DB_quote_smart($useridB).
 		 ", ".DB_quote_smart($hashB).", 'start','2',NULL,NULL,NULL,NULL)");
 	$hand_idB = DB_insert_id();
-	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridC).
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($gameid).",".DB_quote_smart($useridC).
 		 ", ".DB_quote_smart($hashC).", 'start','3',NULL,NULL,NULL,NULL)");
 	$hand_idC = DB_insert_id();
-	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($game_id).",".DB_quote_smart($useridD).
+	DB_query("INSERT INTO Hand VALUES (NULL,".DB_quote_smart($gameid).",".DB_quote_smart($useridD).
 		 ", ".DB_quote_smart($hashD).", 'start','4',NULL,NULL,NULL,NULL)");
 	$hand_idD = DB_insert_id();
 
@@ -172,10 +172,14 @@ else
 	  "If you want to join this game, please follow this link:\n\n".
 	  "".$HOST.$INDEX."?action=game&me=";
 
-	mymail($EmailA,"You are invited to a game of DoKo","Hello $PlayerA,\n".$message.$hashA);
-	mymail($EmailB,"You are invited to a game of DoKo","Hello $PlayerB,\n".$message.$hashB);
-	mymail($EmailC,"You are invited to a game of DoKo","Hello $PlayerC,\n".$message.$hashC);
-	mymail($EmailD,"You are invited to a game of DoKo","Hello $PlayerD,\n".$message.$hashD);
+	mymail($EmailA,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
+	       "Hello $PlayerA,\n".$message.$hashA);
+	mymail($EmailB,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
+	       "Hello $PlayerB,\n".$message.$hashB);
+	mymail($EmailC,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
+	       "Hello $PlayerC,\n".$message.$hashC);
+	mymail($EmailD,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
+	       "Hello $PlayerD,\n".$message.$hashD);
 
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
         display_user_menu();
