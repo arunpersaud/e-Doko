@@ -201,6 +201,32 @@ UNLOCK TABLES;
 /*!40000 ALTER TABLE `Hand_Card` ENABLE KEYS */;
 
 --
+-- Table structure for table `Card_Exchange`
+--
+
+DROP TABLE IF EXISTS `Card_Exchange`;
+CREATE TABLE `Card_Exchange` (
+  `id` int(11) NOT NULL auto_increment,
+  `orig_hand_id` int(11) NOT NULL default '0',
+  `new_hand_id` int(11) NOT NULL default '0',
+  `card_id` int(11) NOT NULL default '0',
+  UNIQUE KEY `id` (`id`),
+  KEY `orig_hand_id` (`orig_hand_id`),
+  KEY `new_hand_id` (`new_hand_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Hand_Card`
+--
+
+
+/*!40000 ALTER TABLE `Hand_Card` DISABLE KEYS */;
+LOCK TABLES `Hand_Card` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Hand_Card` ENABLE KEYS */;
+
+
+--
 -- Table structure for table `Play`
 --
 

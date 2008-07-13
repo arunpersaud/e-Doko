@@ -214,6 +214,8 @@ ul.tricks li div.trick img.arrow {
   z-index:8;
 }
 
+#trick0 img { float:left; width: 3em; }
+
 hr {clear:both;}
 
 /*ul.tricks li:hover div.table{ display:block; }*/
@@ -228,6 +230,12 @@ ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
   right:56.5%;
   width:6%;
   z-index:30;
+}
+.vorbehalt0 {
+  left:37.5%;
+  right:57.5%;
+  width:10%;
+  text-align:left;
 }
 ul.tricks li div div.card0 span.comment{
   position:absolute;
@@ -251,6 +259,12 @@ ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score, .vorbehalt1 {
   text-align:center;
   z-index:30;
 }
+.vorbehalt1{
+  left:45%;
+  right:45%;
+  width:10%;
+  z-index:30;
+}
 ul.tricks li div div.card1 span.comment{
   position:absolute;
   margin:0;
@@ -269,9 +283,15 @@ ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score, .vorbehalt2{
   /*border: 1px solid red;*/
   top: 40%;
   right:37.5%;
-  left:56x.5%;
+  left:56.5%;
   width:6%;
   z-index:30;
+}
+.vorbehalt2{
+  left:auto;
+  right:38%;
+  width:10%;
+  text-align:right;
 }
 ul.tricks li div div.card2 span.comment{
   position:absolute;
@@ -295,6 +315,12 @@ ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score, .vorbehalt3{
   width:6%;
   text-align:center;
   z-index:30;
+}
+.vorbehalt3{
+  left:45%;
+  right:45%;
+  width:10%;
+  text-align:center;
 }
 ul.tricks li div div.card3 span.comment{
   position:absolute;

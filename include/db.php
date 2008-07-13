@@ -1084,4 +1084,24 @@ function DB_get_name($type,$var1='')
     return "";
 }
 
+function DB_add_exchanged_card($card,$old_hand_id,$new_hand_id)
+{
+  DB_query("INSERT INTO Card_Exchange VALUES (NULL,$new_hand_id,$old_hand_id,$card)");
+  return;
+}
+
+function DB_get_exchanged_cards($hash)
+{
+  $cards = array();
+
+  $handid = DB_get_handid('hash',$hash);
+
+  $result = DB_query("SELECT card_id FROM Card_Exchange WHERE orig_hand_id=".DB_quote_smart($handid));
+  while($r = DB_fetch_array($result))
+    $cards[]=$r[0];
+
+  return $cards;
+}
+
+
 ?>

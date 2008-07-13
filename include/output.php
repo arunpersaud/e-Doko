@@ -143,7 +143,7 @@ function display_card($card,$dir="english")
   /* cards are only availabl for the odd values, e.g. 1.png, 3.png, ...
    * convert even cards to the matching odd value */
 
-  if( $card/2 - (int)($card/2) == 0.5)
+  if( $card/2 - (int)($card/2) == 0.5 || $card == 0)
     echo "<img src=\"cards/".$dir."/".$card.".png\"  alt=\"".DB_get_card_name($card)."\" />\n";
   else
     echo "<img src=\"cards/".$dir."/".($card-1).".png\"  alt=\"".DB_get_card_name($card-1)."\" />\n";
@@ -270,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard009.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard010.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {

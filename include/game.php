@@ -693,6 +693,7 @@ switch($mystatus)
 	  {
 	    $result = DB_query("UPDATE Hand_Card SET hand_id='$partnerhand'".
 			       " WHERE hand_id='$myhand' AND card_id=".DB_quote_smart($exchange));
+	    DB_add_exchanged_card(DB_quote_smart($exchange),$myhand,$partnerhand);
 	  };
       }
 
@@ -843,6 +844,12 @@ switch($mystatus)
 	    $trump = $_REQUEST['trump'];
 	    $userhand = DB_get_handid('gameid-userid',$gameid,$trump);
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$trump);
+
+	    /* remember which cards were handed over*/
+	    $partnerhand = DB_get_all_hand($userhash);
+	    foreach ($partnerhand as $card)
+	      if($card<27)
+		DB_add_exchanged_card($card,$userhand,$myhand);
 
 	    /* copy trump from player A to B */
 	    $result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
@@ -1067,15 +1074,87 @@ switch($mystatus)
       {
 	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
 	     "    <div class=\"trick\" id=\"trick0\">\n";
+	/* get information so show the cards that have been handed over in a poverty game */
+	$partnerpos1 = 0;
+	$povertypos1 = 0;
+	$partnerpos2 = 0;
+	$povertypos2 = 0;
+	if($mygametype == 'poverty' || $mygametype=='dpoverty')
+	  {
+	    /* who has poverty */
+	    for($mypos=1;$mypos<5;$mypos++)
+	      {
+		$usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
+		if($usersick == 'poverty')
+		  if($povertypos1)
+		    $povertypos2 = $mypos;
+		  else
+		    $povertypos1 = $mypos;
+	      }
+	    /* get hash and cards for all */
+	    $povertyhash1 = DB_get_hash_from_game_and_pos($gameid,$povertypos1);
+	    $partnerhash1 = DB_get_partner_hash_by_hash($povertyhash1);
+
+	    $povertycards1 = DB_get_exchanged_cards($povertyhash1);
+	    $partnercards1 = DB_get_exchanged_cards($partnerhash1);
+
+	    $partnerpos1 = DB_get_pos_by_hash($partnerhash1);
+	    if($povertypos2)
+	      {
+		$povertyhash2 = DB_get_hash_from_game_and_pos($gameid,$povertypos2);
+		$partnerhash2 = DB_get_partner_hash_by_hash($povertyhash2);
+
+		$povertycards2 = DB_get_exchanged_cards($povertyhash2);
+		$partnercards2 = DB_get_exchanged_cards($partnerhash2);
+
+		$partnerpos2 = DB_get_pos_by_hash($partnerhash2);
+	      }
+	  }
+
 	$show = 1;
 	for($mypos=1;$mypos<5;$mypos++)
 	  {
 	    $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
-	    if($usersick!=NULL)
+	    if($usersick!=NULL ||
+	       $mypos==$povertypos1 || $mypos==$partnerpos1 ||
+	       $mypos==$povertypos2 || $mypos==$partnerpos2 )
 	      {
 		echo "      <div class=\"vorbehalt".($mypos-1)."\"> Vorbehalt <br />";
 		if($show)
 		  echo " $usersick <br />";
+		if($mypos==$partnerpos1)
+		  {
+		    foreach($partnercards1 as $card)
+		      if($povertyhash1 == $me || $partnerhash1 == $me || $mystatus=='gameover')
+			display_card($card,$PREF['cardset']);
+		      else
+			display_card(0,$PREF['cardset']);
+		  }
+		else if($mypos==$povertypos1)
+		  {
+		    foreach($povertycards1 as $card)
+		      if($povertyhash1 == $me || $partnerhash1 == $me || $mystatus=='gameover')
+			display_card($card,$PREF['cardset']);
+		      else
+			display_card(0,$PREF['cardset']);
+		  }
+		else if($mypos==$povertypos2)
+		  {
+		    foreach($povertycards2 as $card)
+		      if($povertyhash2 == $me || $partnerhash2 == $me || $mystatus=='gameover')
+			display_card($card,$PREF['cardset']);
+		      else
+			display_card(0,$PREF['cardset']);
+		  }
+		else if($mypos==$partnerpos2)
+		  {
+		    foreach($partnercards2 as $card)
+		      if($povertyhash2 == $me || $partnerhash2 == $me || $mystatus=='gameover')
+			display_card($card,$PREF['cardset']);
+		      else
+			display_card(0,$PREF['cardset']);
+		  }
+
 		echo  " </div>\n";
 
 		if($mygametype == $usersick)
