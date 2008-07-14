@@ -276,7 +276,7 @@ function output_header()
        function hl(num) {
          if(document.getElementById){
 	   var i;
-	   for(i=1;i<14;i++){
+	   for(i=0;i<14;i++){
 	     if(document.getElementById("trick"+i))
 	       document.getElementById("trick"+i).style.display = 'none';
 	   }
