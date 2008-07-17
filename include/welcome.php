@@ -9,12 +9,15 @@ if(!isset($HOST))
 
 $pre[0]=0;$game[0]=0;$done[0]=0;
 
-$r=DB_query("SELECT COUNT(id) FROM Game GROUP BY status");
-if($r) {
-  $pre  = DB_fetch_array($r);
-  $game = DB_fetch_array($r);
-  $done = DB_fetch_array($r);
- }
+$r=DB_query("SELECT COUNT(*) FROM Game where status='pre'");
+if($r)  $pre  = DB_fetch_array($r);
+
+$r=DB_query("SELECT COUNT(*) FROM Game where status='play'");
+if($r)  $game  = DB_fetch_array($r);
+
+$r=DB_query("SELECT COUNT(*) FROM Game where status='gameover'");
+if($r)  $done  = DB_fetch_array($r);
+
 
 $r=DB_query("SELECT AVG(datediff(mod_date,create_date)) FROM Game where status='gameover' ");
 if($r)
