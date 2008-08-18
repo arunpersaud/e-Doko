@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -9,42 +9,45 @@ if(!isset($HOST))
 if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
   {
     global $HOST,$INDEX;
+
+    /* is this name already in use/ */
     $ok=1;
     if(DB_get_userid('name',$_REQUEST["Rfullname"]))
       {
 	echo "please chose another name<br />";
 	$ok=0;
       }
+    /* check if email address is already used */
     if(DB_get_userid('email',$_REQUEST["Remail"]))
       {
 	echo "this email address is already used ?!<br />";
 	$ok=0;
       }
+
+    /* everything ok, go ahead and create user */
     if($ok)
       {
 	$r=DB_query("INSERT INTO User VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
 		    ",".DB_quote_smart($_REQUEST["Remail"]).
 		    ",".DB_quote_smart(md5($_REQUEST["Rpassword"])).
-		    ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL,NULL)"); 
-	
+		    ",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL,NULL)");
+
 	if($r)
 	  {
 	    /* Set session, so that new user doesn't need to log in */
 	    $myname = DB_get_name('email',$_REQUEST['Remail']);
 	    $_SESSION["name"] = $myname;
-	    
-	    echo "myname $myname --";
-	    
+
 	    echo " Welcome to e-DoKo, you are now registered, please visit the".
 	      " <a href=\"".$HOST.$INDEX."\">homepage</a> to continue.";
 	  }
 	else
 	  echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
       }
-   }
-/* page for registration */
+  }
  else
    {
+     /* No information for new user given, ouput a page for registration */
      echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
      ?>
         <form action="index.php?action=register" method="post">
@@ -74,6 +77,4 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
         </form>
 <?php
    }
-
-
 ?>

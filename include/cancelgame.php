@@ -1,12 +1,14 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
   exit;
 
+/* display the menu */
 output_status();
 
+/* you should only get here from a game page, so $me should be set */
 if(!myisset("me"))
   {
     echo "Hmm, you really shouldn't mess with the urls.<br />\n";
@@ -38,6 +40,7 @@ if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
       "Game ".DB_format_gameid($gameid).
       " has been canceled since nothing happend for a while and $myname requested it.\n";
 
+    /* email to all players */
     $userids = DB_get_all_userid_by_gameid($gameid);
     foreach($userids as $user)
       {
@@ -51,6 +54,6 @@ if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
     echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
       " has been canceled.<br /><br /></p>";
   }
- else
+ else /* game can't be canceled yet */
    echo "<p>You need to wait longer before you can cancel a game...</p>\n";
 ?>
