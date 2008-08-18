@@ -832,7 +832,7 @@ switch($mystatus)
 		DB_set_hand_status_by_hash($userhash,'poverty');
 
 		$message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
-		  " ".$HOST.$INDEX."?action=game&amp;me=".$userhash."\n\n" ;
+		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 		mymail($To,$EmailName." poverty (game ".DB_format_gameid($gameid).")",$message);
 	      }
 	  }
