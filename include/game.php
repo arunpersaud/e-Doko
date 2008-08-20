@@ -1557,7 +1557,7 @@ switch($mystatus)
 			  {
 			    if($call_contra==NULL)
 			      $call_contra = $call;
-			    else if( $call < $call_re)
+			    else if( $call < $call_contra)
 			      $call_contra = $call;
 			  }
 		      }
