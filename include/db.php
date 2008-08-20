@@ -877,10 +877,9 @@ function DB_format_gameid($gameid)
   $session = DB_get_session_by_gameid($gameid);
 
   /* get number of game */
-  $r = DB_query_array("SELECT COUNT(*),create_date FROM Game".
-		      " WHERE session='$session' ".
-		      " AND TIMEDIFF(create_date, (SELECT create_date FROM Game WHERE id='$gameid'))<=0 ".
-		      " GROUP by session");
+  $r = DB_query_array("SELECT SUM(TIME_TO_SEC(TIMEDIFF(create_date, (SELECT create_date FROM Game WHERE id='$gameid')))<=0) ".
+		      " FROM Game".
+		      " WHERE session='$session' ");
   return $session.".".$r[0];
 }
 
