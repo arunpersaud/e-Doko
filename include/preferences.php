@@ -103,9 +103,13 @@ if(myisset("password0") &&  $_REQUEST["password0"]!="" )
     if(!( ($password == $oldpasswd) || DB_check_recovery_passwords($oldpasswd,$email) ))
       $changed_password = -1;
 
-    /* check if new passwords are types the same twice */
+    /* check if new password has been typed in correctly */
     if($_REQUEST["password1"] != $_REQUEST["password2"] )
       $changed_password = -2;
+
+    /* check if new password is long enough */
+    if(strlen($_REQUEST["password1"])<4)
+      $changed_password = -3;
 
     if($changed_password==1)
       {
@@ -182,6 +186,9 @@ echo "    <tr><td>Password(old):         </td><td>",
   "<input type=\"password\" id=\"password0\" name=\"password0\" size=\"20\" maxlength=\"30\" />";
 switch($changed_password)
   {
+  case '-3':
+    echo "The new passwords is not long enough (you need at least 4 characters).";
+    break;
   case '-2':
     echo "The new passwords don't match.";
     break;
