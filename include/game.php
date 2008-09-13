@@ -1808,6 +1808,42 @@ switch($mystatus)
 	    "        <div class=\"score\">".$r[2]."<br /> ".$r[1]."</div>\n".
 	    "      </div>\n";
 
+	/* display totals */
+	$result = DB_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
+			   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
+			   " LEFT JOIN User ON User.id=Hand.user_id".
+			   " LEFT JOIN Play ON Trick.id=Play.trick_id".
+			   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
+			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+			   " WHERE Hand.game_id='$gameid'".
+			   " GROUP BY Hand.party" );
+	echo "<div class=\"total\">\n  Totals:<br />\n";
+	while( $r = DB_fetch_array($result))
+	  echo "  ".$r[0]." ".$r[1]."<br />\n";
+
+	$queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
+				" FROM Game WHERE id='$gameid'");
+	$r = DB_fetch_array($queryresult);
+	echo "  <p>This game took ".$r[0]." hours.</p>\n";
+
+	echo "  <div class=\"re\">\n   Points Re: <br />\n";
+	$queryresult = DB_query("SELECT score FROM Score ".
+				"  WHERE game_id=$gameid AND party='re'".
+				" ");
+	while($r = DB_fetch_array($queryresult) )
+	  echo "   ".$r[0]."<br />\n";
+	echo "  </div>\n";
+
+	echo "  <div class=\"contra\">\n   Points Contra: <br />\n";
+	$queryresult = DB_query("SELECT score FROM Score ".
+				"  WHERE game_id=$gameid AND party='contra'".
+				" ");
+	while($r = DB_fetch_array($queryresult) )
+	  echo "   ".$r[0]."<br />\n";
+	echo "  </div>\n";
+
+	echo "</div>\n";
+
 	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
       }
 
@@ -1883,45 +1919,6 @@ switch($mystatus)
     if(DB_get_game_status_by_gameid($gameid)=='play')
       {
 	echo "The game is over for you.. other people still need to play though";
-      }
-    else
-      {
-	$result = DB_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
-			   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-			   " LEFT JOIN User ON User.id=Hand.user_id".
-			   " LEFT JOIN Play ON Trick.id=Play.trick_id".
-			   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
-			   " WHERE Hand.game_id='$gameid'".
-			   " GROUP BY Hand.party" );
-	echo "<div class=\"total\"> Totals:<br />\n";
-	while( $r = DB_fetch_array($result))
-	  echo "  ".$r[0]." ".$r[1]."<br />\n";
-
-	$queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
-				" FROM Game WHERE id='$gameid'");
-	$r = DB_fetch_array($queryresult);
-	echo "<p>This game took ".$r[0]." hours.</p>";
-
-	echo "<div class=\"re\">\n Points Re: <br />\n";
-	$queryresult = DB_query("SELECT score FROM Score ".
-				"  WHERE game_id=$gameid AND party='re'".
-				" ");
-	while($r = DB_fetch_array($queryresult) )
-	  echo "   ".$r[0]."<br />\n";
-	echo "</div>\n";
-
-	echo "<div class=\"contra\">\n Points Contra: <br />\n";
-	$queryresult = DB_query("SELECT score FROM Score ".
-				"  WHERE game_id=$gameid AND party='contra'".
-				" ");
-	while($r = DB_fetch_array($queryresult) )
-	  echo "   ".$r[0]."<br />\n";
-	echo "</div>\n";
-
-	echo "</div>\n";
-
-
       }
     break;
   default:
