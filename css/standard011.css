@@ -430,6 +430,9 @@ div.session div.sessionscore div{
 div.session div.sessionscore:hover div{
   display:block;
 }
+div.session img.rulesicon {
+ height: 1em;
+}
 
 .scoretable{
   height:20em;

@@ -126,8 +126,41 @@ if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
 if($session)
   {
     echo "<div class=\"session\">\n";
-    echo "  <div class=\"sessionrules\">Rules (+icons for rules) \n";
-    echo "    <div>\n";
+    echo "  <div class=\"sessionrules\">Rules: ";
+    switch($RULES['dullen'])
+      {
+      case 'none':
+	echo "<img class=\"rulesicon\" alt=\"not ten of hearts\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
+      case 'firstwins':
+	echo "<img class=\"rulesicon\" alt=\"ten of hearts\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
+      case 'secondwins':
+	echo "<img class=\"rulesicon\" alt=\"second ten of hearts\" src=\"pics/button/second-ten-of-hearts.png\"/>\n"; break;
+      }
+    switch($RULES['schweinchen'])
+      {
+      case 'none':
+	echo "<img class=\"rulesicon\" alt=\"no schweinchen\" ".
+	  "src=\"pics/button/no-schweinchen.png\"/>\n"; break;
+      case 'both':
+	echo "<img class=\"rulesicon\" alt=\"two schweinchen \" ".
+	  "src=\"pics/button/two-schweinchen.png\"/>\n"; break;
+      case 'second':
+	echo "<img class=\"rulesicon\" alt=\"second schweinchen\" ".
+	  "src=\"pics/button/second-schweinchen.png\"/>\n"; break;
+      case 'secondaftercall':
+	echo "<img class=\"rulesicon\" alt=\"second schweinchen after call\" ".
+	  "src=\"pics/button/second-schweinchen-after-call.png\"/>\n"; break;
+      }
+    switch($RULES['call'])
+      {
+      case '1st-own-card':
+	echo "<img class=\"rulesicon\" alt=\"1st-own-card\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
+      case '5th-card':
+	echo "<img class=\"rulesicon\" alt=\"5th-card\" src=\"pics/button/5th-card.png\"/>\n"; break;
+      case '9-cards':
+	echo "<img class=\"rulesicon\" alt=\"9-cards\" src=\"pics/button/9-cards.png\"/>\n"; break;
+      }
+    echo " <div>\n";
     echo "       10ofhearts : {$RULES['dullen']}      <br />\n";
     echo "       schweinchen: {$RULES['schweinchen']} <br />\n";
     echo "       call:        {$RULES['call']}        <br />\n";
