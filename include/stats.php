@@ -104,15 +104,16 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
  select g1.id, g2.id from game g1 left join game g2 on g1.randomnumbers=g2.randomnumbers where g1.id<g2.id order by g1.id
  select id from game where randomnumbers like "blablabl%"; the % is like .* in regexp
  select id,type,solo,status from game where id in (select id from game where randomnumbers in (select randomnumbers from game where id=27));
- 
   */
-  $result = DB_query_array_all("SELECT fullname,COUNT(*) as c FROM Score".
-			       " LEFT JOIN User ON User.id=winner_id" .
-			       " WHERE score IN ('fox','doko','karlchen')".
-			       " GROUP BY game_id,fullname".
-			       " ORDER BY c DESC LIMIT 3" );
-  array_unshift($result,array("Name","Points"));
-  echo output_table($result,"Most extra points in a single game","stats");
+
+  /* number of calls*/
+  $result = DB_query_array_all("SELECT CONCAT_WS(' ',party,IFNULL(point_call,'no call')),COUNT(*) from Hand".
+			       " LEFT JOIN Game on Game.id=Hand.game_id ".
+			       " WHERE Game.status='gameover'".
+			       " GROUP BY party,point_call");
+  array_unshift($result,array("call","Frequency"));
+  echo output_table($result,"Kind of call","stats");
+
   
   /* most reminders */
   $result = DB_query_array_all("SELECT fullname, COUNT(*)  /" .
