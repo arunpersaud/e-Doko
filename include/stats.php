@@ -189,7 +189,7 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
 			       " FROM Game ".
 			       " LEFT JOIN Hand ON Hand.position=startplayer AND Game.id=Hand.game_id ".
 			       " LEFT JOIN User ON User.id=Hand.user_id ".
-			       " WHERE type='solo' AND Game.solo<>'silent' AND Game.status='gameover' ".
+			       " WHERE type='solo' AND Game.status='gameover' ".
 			       " GROUP BY user_id ".
 			       " ORDER BY c DESC;");
   array_unshift($result,array("Name","Number of solos","Solos/game"));
