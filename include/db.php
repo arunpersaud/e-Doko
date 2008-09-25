@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -81,14 +81,14 @@ function DB_query_array($query)
 {
   $result = DB_query($query);
   $return = DB_fetch_array($result);
-  
+
   return $return;
 }
 
 function DB_query_array_all($query)
 {
   $result = array();
-  
+
   $queryresult  = DB_query($query);
   while($row = DB_fetch_array($queryresult))
     $result[] = $row;
@@ -638,7 +638,7 @@ function DB_get_ruleset($dullen,$schweinchen,$call)
 
   $result = DB_query("SELECT id FROM Rulesets WHERE".
 		     " dullen=".DB_quote_smart($dullen)." AND ".
-		     " call=".DB_quote_smart($call)." AND ".
+		     " Rulesets.call=".DB_quote_smart($call)." AND ".
 		     " schweinchen=".DB_quote_smart($schweinchen));
   if($result)
     $r    = DB_fetch_array($result);
@@ -695,7 +695,7 @@ function DB_get_PREF($myid)
   if($r)
     {
       /* licence only valid until then */
-      if($r[0]=="altenburg" && (time()-strtotime( "2009-12-31 23:59:59")<0) ) 
+      if($r[0]=="altenburg" && (time()-strtotime( "2009-12-31 23:59:59")<0) )
 	$PREF["cardset"]="altenburg";
       else
 	$PREF["cardset"]="english";
@@ -737,11 +737,11 @@ function DB_get_RULES($gameid)
   $r = DB_query_array("SELECT * FROM Rulesets".
 		      " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
 		      " WHERE Game.id='$gameid'" );
-  
+
   $RULES["dullen"]      = $r[2];
   $RULES["schweinchen"] = $r[3];
   $RULES["call"]        = $r[4];
-  
+
   return $RULES;
 }
 
@@ -979,7 +979,7 @@ function DB_get_userid($type,$var1="",$var2="")
    */
 
   $r = NULL;
-  
+
   switch($type)
     {
     case 'name':
@@ -1051,7 +1051,7 @@ function DB_get_email($type,$var1='',$var2='')
 			 "AND Hand.position=".DB_quote_smart($var1)."");
       break;
     }
-  
+
   $r = DB_fetch_array($result);
 
   if($r)
