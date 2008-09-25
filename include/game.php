@@ -65,7 +65,7 @@ if( $gamestatus == 'pre' )
 else
   {
     /* in a game Schweinchen is not valid in all types of games */
-    if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' )
+    if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' || $gametype=='wedding')
       if( in_array($RULES['schweinchen'],array('both','second','secondaftercall')) )
 	$ok=1;
   }
