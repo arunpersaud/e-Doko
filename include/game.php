@@ -297,7 +297,7 @@ switch($mystatus)
 	    $userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 
 	    if($userstatus=='start' || $userstatus=='init')
-	      echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
+	      echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br/ > to decide </div>\n"; /* show this to everyone */
 	    else
 	      if($usersick!=NULL && $pos<=$mypos ) /* only show this for people sitting before the player */
 		echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
@@ -414,7 +414,7 @@ switch($mystatus)
 	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 
 	if($userstatus=='start' || $userstatus=='init')
-	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs to decide </div>\n"; /* show this to everyone */
+	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br />to decide </div>\n"; /* show this to everyone */
 	else
 	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
 	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
