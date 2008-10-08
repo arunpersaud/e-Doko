@@ -354,6 +354,9 @@ ul.tricks li div div.card3 span.comment{
 
 span.comment{
  border: 3px solid green;
+ max-height:6em;
+ overflow: auto;
+ word-wrap: break-word;
 }
 
 ul.tricks li div div span.comment span{
