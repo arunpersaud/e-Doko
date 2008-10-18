@@ -1759,27 +1759,26 @@ switch($mystatus)
 
 		  $message .= "Score Table:\n";
 		  $message .= format_score_table_ascii($score);
+		  $message .= "Use these links to have a look at game ".DB_format_gameid($gameid).": \n"
 
 		  /* send out final email */
 		  $all = array();
 
 		  foreach($userids as $user)
-		    $all[] = DB_get_email('userid',$user);
+		    {
+		      $all[] = DB_get_email('userid',$user);
+
+		      /* add links for all players */
+		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+		      $name = DB_get_name('userid',$user);
+
+		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
+		      $message .= $link;
+		    }
 		  $To = implode(",",$all);
 
-		  $help = "\n\n (you can use reply all on this email to reach all the players.)\n";
-		  mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 1(2)",$message.$help);
-
-		  foreach($userids as $user)
-		    {
-		      $To   = DB_get_email('userid',$user);
-		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-
-		      $link = "Use this link to have a look at game ".DB_format_gameid($gameid).": ".
-			$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		      if( DB_get_email_pref_by_uid($user) != 'emailaddict' )
-			mymail($To,$EmailName."game over (game ".DB_format_gameid($gameid).") part 2(2)",$link);
-		    }
+		  $message .= "\n\n (you can use reply all on this email to reach all the players.)\n";
+		  mymail($To,$EmailName."Game over (game ".DB_format_gameid($gameid).") ",$message);
 	      }
 	  }
 	else
