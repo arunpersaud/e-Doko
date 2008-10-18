@@ -1,12 +1,12 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
   exit;
 
 /* test id and password, should really be done in one step */
-if(!isset($_SESSION["name"])) 
+if(!isset($_SESSION["name"]))
   {
     $email     = $_REQUEST["email"];
     $password  = $_REQUEST["password"];
@@ -70,7 +70,7 @@ if(myisset("forgot"))
       }
     else
       {/* can't find user id in the database */
-	     
+
 	/* no email given? */
 	if($email=="")
 	  echo "You need to give me an email address! <br />".
@@ -81,30 +81,30 @@ if(myisset("forgot"))
 	    "or else try <a href=\"$INDEX\">again</a>.";
       }
   }
-else 
+else
   { /* normal user page */
-    
+
     /* verify password and email */
     if(strlen($password)!=32)
       $password = md5($password);
-    
+
     $ok  = 1;
     $myid = DB_get_userid('email-password',$email,$password);
     if(!$myid)
       $ok = 0;
-    
+
     if($ok)
       {
 	/* user information is ok */
 	$myname = DB_get_name('email',$email);
 	$_SESSION["name"] = $myname;
-	
+
 	$PREF = DB_get_PREF($myid);
-	
+
 	DB_update_user_timestamp($myid);
-	
+
 	display_user_menu();
-	
+
 	/* display all games the user has played */
 	echo "<div class=\"user\">";
 	echo "<h4>These are all your games:</h4>\n";
@@ -113,12 +113,15 @@ else
 	echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
 	echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
 	echo "</p>\n";
-	
+
 	$output = array();
-	$result = DB_query("SELECT Hand.hash,Hand.game_id,Game.mod_date,Game.player,Game.status from Hand".
-			   " LEFT JOIN Game ON Game.id=Hand.game_id".
+	$result = DB_query("SELECT Hand.hash,Hand.game_id,G.mod_date,G.player,G.status, ".
+			   " (SELECT count(H.randomnumbers) FROM Game H WHERE H.randomnumbers=G.randomnumbers) AS count ".
+			   " FROM Hand".
+			   " LEFT JOIN Game G ON G.id=Hand.game_id".
 			   " WHERE user_id='$myid'".
-			   " ORDER BY Game.session,Game.create_date" );
+			   " ORDER BY G.session,G.create_date" );
+
 	$gamenrold = -1;
 	echo "<table>\n <tr><td>\n";
 	while( $r = DB_fetch_array($result))
@@ -134,12 +137,13 @@ else
 		$gamenrold = $gamenr;
 		echo "<td class=\"usergames\">\n";
 	      }
+	    $Multi = ($r[5]>1) ? "multi" : "";
 	    if($r[4]=='pre')
-	      echo "   <span class=\"gamestatuspre\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span>\n";
+	      echo "   <span class=\"gamestatuspre $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span>\n";
 	    else if ($r[4]=='gameover')
-	      echo "   <span class=\"gamestatusover\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span>\n";
+	      echo "   <span class=\"gamestatusover $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span>\n";
 	    else
-	      echo "   <span class=\"gamestatusplay\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span>\n";
+	      echo "   <span class=\"gamestatusplay $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span>\n";
 	    if($r[4] != 'gameover')
 	      {
 		echo "</td>\n<td>\n    ";
@@ -160,19 +164,19 @@ else
 	      }
 	  }
 	echo "</td></tr>\n</table>\n";
-	
+
 	/* display last 5 users that have signed up to e-DoKo */
 	$names = DB_get_names_of_new_logins(5);
 	echo "<h4>New Players:</h4>\n<p>\n";
 	echo implode(", ",$names).",...\n";
 	echo "</p>\n";
-	
+
 	/* display last 5 users that logged on */
 	$names = DB_get_names_of_last_logins(5);
 	echo "<h4>Players last logged in:</h4>\n<p>\n";
 	echo implode(", ",$names).",...\n";
 	echo "</p>\n";
-	
+
 	echo "</div>\n";
       }
     else

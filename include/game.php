@@ -25,7 +25,8 @@ if(!$myid)
 global $GAME,$RULES,$CARDS;
 
 /* the user has done something, update the timestamp */
-DB_update_user_timestamp($myid);
+if(isset($_SESSION['id']))
+  DB_update_user_timestamp($_SESSION['id']);
 
 /* get some information from the DB */
 $gameid   = DB_get_gameid_by_hash($me);
@@ -36,7 +37,7 @@ $myhand   = DB_get_handid('hash',$me);
 $session  = DB_get_session_by_gameid($gameid);
 
 /* get prefs and save them in a variable*/
-$PREF = DB_get_PREF($myid);
+$PREF = DB_get_PREF(isset($_SESSION['id'])?$_SESSION['id']:$myid);
 
 /* get rule set for this game */
 $RULES = DB_get_RULES($gameid);
@@ -179,7 +180,10 @@ if($session)
 	$lasthash=$hash;
       }
     $i--;
-    echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.";
+    if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
+      echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.";
+    else
+      echo "This is game number $j of $i in session $session.";
     echo "</div>\n";
   }
 
@@ -1946,11 +1950,26 @@ if($gamestatus == 'play' || $gameend < 60*60*24*7)
 
 echo "<input type=\"submit\" value=\"submit\" />\n";
 
+/* has this hand been played by others? */
+$other_game_ids = DB_played_by_others($gameid);
+if(sizeof($other_game_ids)>0 && $mystatus=='gameover')
+  {
+    $mypos = DB_get_pos_by_hash($me);
+    echo "<p>See how other played the same hand: <br />\n";
+    foreach($other_game_ids as $id)
+      {
+	$otherhash = DB_get_hash_from_game_and_pos($id,$mypos);
+	$othername = DB_get_name('hash',$otherhash);
+	echo "<a href=\"$INDEX?action=game&amp;me=$otherhash\">$othername</a><br />";
+      }
+    echo "</p>\n";
+  }
+
 echo "</div>\n";
 
 echo "</form>\n";
 
-if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
+if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' && isset($_SESSION['id']) && $_SESSION['id']==$myid)
   {
     $session = DB_get_session_by_gameid($gameid);
     $result  = DB_query("SELECT id,create_date FROM Game".

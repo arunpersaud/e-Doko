@@ -846,7 +846,13 @@ function display_table ()
 
 function display_user_menu()
 {
-  global $WIKI,$myid,$INDEX;
+  global $WIKI,$INDEX;
+
+  /* get the id we are looking for */
+  if(isset($_SESSION['id']))
+     $myid = $_SESSION['id'];
+  else
+    return;
 
   $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
@@ -1055,7 +1061,12 @@ function format_score_table_html($score,$userid)
       $i++;
       $output.=" <tr>";
       $userhash = DB_get_hash_from_gameid_and_userid($game['gameid'],$userid);
-      $output.="  <td> <a href=\"".$INDEX."?action=game&amp;me=".$userhash."\">$i</a></td>";
+      /* create link to old games only if you are logged in and its your game*/
+      if(isset($_SESSION['id']) && $_SESSION['id']==$userid)
+	$output.="  <td> <a href=\"".$INDEX."?action=game&amp;me=".$userhash."\">$i</a></td>";
+      else
+	$output.="  <td>$i</td>";
+
       foreach($game['players'] as $id=>$points)
 	$output.="<td>".$points."</td>";
       $output.="<td>".$game['points'];
@@ -1071,7 +1082,7 @@ function format_score_table_html($score,$userid)
   return $output;
 }
 
-function createCache($content, $cacheFile) 
+function createCache($content, $cacheFile)
 {
   $fp = fopen($cacheFile,"w");
   if($fp)
@@ -1085,10 +1096,10 @@ function createCache($content, $cacheFile)
   return;
 }
 
-function getCache($cacheFile, $expireTime) 
+function getCache($cacheFile, $expireTime)
 {
-  if( file_exists($cacheFile) && 
-      filemtime($cacheFile )>( time() - $expireTime ) ) 
+  if( file_exists($cacheFile) &&
+      filemtime($cacheFile )>( time() - $expireTime ) )
     {
       return file_get_contents($cacheFile);
     }

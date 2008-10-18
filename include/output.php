@@ -270,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard013.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard014.css" />
      <script type="text/javascript">
        var current=0;
        function hl(num) {
@@ -437,6 +437,9 @@ function output_password_recovery($email,$password)
 
 function output_user_notes($userid,$gameid,$userstatus)
 {
+  /* make sure to only show these if the person is logged in */
+  if(!isset($_SESSION['id']) || $userid != $_SESSION['id']) return;
+
   echo "<div class=\"notes\"> Personal notes: <br />\n";
   $notes = DB_get_notes_by_userid_and_gameid($userid,$gameid);
   foreach($notes as $note)
@@ -447,5 +450,5 @@ function output_user_notes($userid,$gameid,$userstatus)
 
   return;
 }
-    
+
 ?>

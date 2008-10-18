@@ -545,17 +545,20 @@ div span img.button {
 }
 
 .gamestatuspre {
-   padding: 0 0.3em;
-
-    background-color: #fd8901;
+  padding: 0 0.3em;
+  background-color: #fd8901;
 }
 .gamestatusover {
-   padding:0 0.3em;
+  padding:0 0.3em;
   background-color: #f82c20 ;
 }
 .gamestatusplay {
   padding:0 0.3em;
   background-color: #15de26;
+}
+
+.multi a{
+  color: #fff;
 }
 
 .bigger {

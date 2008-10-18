@@ -1,5 +1,5 @@
 <?php
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -64,7 +64,7 @@ if($done==0)
 ?>
 
   <h4> Login/Register:</h4>
-  <p> 
+  <p>
   Please <a href="index.php?action=register">register</a>, in case you have not done that yet  <br />
   or login with you email-address or name and password here:
   </p>
@@ -87,5 +87,5 @@ if($done==0)
   </table>
   </fieldset>
   </form>
-  
-</div>  
+
+</div>

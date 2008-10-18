@@ -6,14 +6,14 @@ if(!isset($HOST))
   exit;
 
 /* check if login information is present */
-if(!myisset("email","password"))
+if(!myisset('email','password'))
   {
     echo "can't log you in... missing login information.";
   }
 else
   {
-    $email     = $_REQUEST["email"];
-    $password  = $_REQUEST["password"];
+    $email     = $_REQUEST['email'];
+    $password  = $_REQUEST['password'];
 
     /* verify password and email */
     if(strlen($password)!=32)
@@ -28,7 +28,9 @@ else
       {
 	/* user information is ok, set session variabel */
 	$myname = DB_get_name('email',$email);
-	$_SESSION["name"] = $myname;
+	$_SESSION['name'] = $myname;
+	$_SESSION['id']   = $myid;
+	$_SESSION['pass'] = $password;
       }
   }
 ?>

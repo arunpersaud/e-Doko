@@ -1102,5 +1102,13 @@ function DB_get_exchanged_cards($hash)
   return $cards;
 }
 
-
+function DB_played_by_others($gameid)
+{
+  $gameids = array();
+  $result = DB_query("SELECT id FROM Game WHERE randomnumbers=(SELECT randomnumbers from Game where id=$gameid) and status='gameover'");
+  while($r = DB_fetch_array($result))
+    if($r[0]!=$gameid)
+      $gameids[]=$r[0];
+  return $gameids;
+}
 ?>
