@@ -75,8 +75,8 @@ function output_form_for_new_game($names)
         </li>
         <li> <input type="radio" name="schweinchen" value="second" />
              first one normal, second one becomes highest (call during the game) </li>
-        <li> <input type="radio" name="schweinchen" value="secondaftercall"  disabled="disabled" />
-             second one become highest only in case re/contra was announced (not working yet)
+        <li> <input type="radio" name="schweinchen" value="secondaftercall" />
+             second one become highest only in case re/contra was announced
         </li>
       </ul>
       <p> Call Re/Contra, etc.: </p>

@@ -177,14 +177,27 @@ function compare_cards($a,$b,$game)
 	    return 1;
 	  if($b == 19 || $b == 20 )
 	    return 0;
-	};
-      if($RULES['schweinchen']=='second' && $GAME['schweinchen-second'])
+	}
+      else if($RULES['schweinchen']=='second' && $GAME['schweinchen-second'])
 	{
 	  if($a == 19 || $a == 20 )
 	    return 1;
 	  if($b == 19 || $b == 20 )
 	    return 0;
-	};
+	}
+      else if($RULES['schweinchen']=='secondaftercall' && $GAME['schweinchen-who'] && $GAME['schweinchen-second'] )
+	{
+	  /* check if a call was made either by the player or his partner. If so activate Schweinchen rule. */
+	  if(DB_get_call_by_hash($GAME['schweinchen-who']) || DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
+	    {
+	      if($a == 19 || $a == 20 )
+		return 1;
+	      if($b == 19 || $b == 20 )
+		return 0;
+	    }
+	  /* if not, do nothing and the foxes are just handeled as normal trump */
+	}
+	;
     case "heart":
     case "spade":
     case "club":

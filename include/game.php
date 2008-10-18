@@ -1324,7 +1324,11 @@ switch($mystatus)
 		else
 		  $GAME['schweinchen-second'] = 1; /* this must be the second fox */
 
-		if( ($GAME['schweinchen-second']==1 && $RULES['schweinchen']=='second') || $RULES['schweinchen']=='both')
+		if( $RULES['schweinchen']=='both' ||
+		    ($RULES['schweinchen']=='second' && $GAME['schweinchen-second']==1 )||
+		    ($RULES['schweinchen']=='secondaftercall' && $GAME['schweinchen-second']==1 &&
+		     (DB_get_call_by_hash($GAME['schweinchen-who']) || DB_get_partner_call_by_hash($GAME['schweinchen-who']) ))
+		  )
 		  {
 		    DB_insert_comment('Schweinchen! ',$playid,$myid);
 		    $commentSchweinchen = 'Schweinchen! ';
@@ -1871,9 +1875,15 @@ switch($mystatus)
 
 	foreach($mycards as $card)
 	  {
+	    /* display only cards that the player is allowed to play as links, the rest just display normal
+	     * also check if we have both schweinchen, in that case only display on of them as playable
+	     */
 	    if( ($followsuit && !same_type($card,$firstcard)) ||
-		( (int)($card)==19 && ($RULES['schweinchen']=='second'||$RULES['schweinchen']=='secondaftercall')
-		  && $GAME['schweinchen-who']==$me && !$GAME['schweinchen-first'] )
+		( (int)($card)==19 && !$GAME['schweinchen-first'] &&
+		  ($RULES['schweinchen']=='second'||
+		   ( $RULES['schweinchen']=='secondaftercall' &&
+		     (DB_get_call_by_hash($GAME['schweinchen-who']) || DB_get_partner_call_by_hash($GAME['schweinchen-who']) )))
+		  && $GAME['schweinchen-who']==$me  )
 		)
 	      display_card($card,$PREF['cardset']);
 	    else
