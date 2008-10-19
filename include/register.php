@@ -48,7 +48,10 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
  else
    {
      /* No information for new user given, ouput a page for registration */
-     echo "IMPORTANT: passwords are going over the net as clear text, so pick an easy password. No need to pick anything complicated here ;)<br /><br />";
+     echo "<p><br /><strong> IMPORTANT: passwords are going over the net as clear text, so pick an easy password. ".
+       "No need to pick anything complicated here ;)<br />";
+     echo "N.B. Your email address will be exposed to other players whom you play games with. ";
+     echo "<br /><br /></strong></p>";
      ?>
         <form action="index.php?action=register" method="post">
           <fieldset>
