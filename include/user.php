@@ -111,7 +111,8 @@ else
 	echo "<p>Session: <br />\n";
 	echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
 	echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
-	echo "<span class=\"gamestatusover\">F </span> =  game finished <br />";
+	echo "<span class=\"gamestatusover\">F </span> =  game finished ";
+	echo "<span class=\"gamestatusover multi\"><a> N</a> </span> =  game finished, hand played by others too <br />";
 	echo "</p>\n";
 
 	$output = array();
@@ -141,7 +142,14 @@ else
 	    if($r[4]=='pre')
 	      echo "   <span class=\"gamestatuspre $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span>\n";
 	    else if ($r[4]=='gameover')
-	      echo "   <span class=\"gamestatusover $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">F </a></span>\n";
+	    {
+	      echo "   <span class=\"gamestatusover $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">";
+	      if($r[5]<2)
+		echo "F ";
+	      else
+		echo $r[5];
+	      echo "</a></span>\n";
+	    }
 	    else
 	      echo "   <span class=\"gamestatusplay $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span>\n";
 	    if($r[4] != 'gameover')
