@@ -103,7 +103,7 @@ else
 
 	DB_update_user_timestamp($myid);
 
-	display_user_menu();
+	display_user_menu($myid);
 
 	/* display all games the user has played */
 	echo "<div class=\"user\">";

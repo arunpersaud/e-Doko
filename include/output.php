@@ -437,9 +437,6 @@ function output_password_recovery($email,$password)
 
 function output_user_notes($userid,$gameid,$userstatus)
 {
-  /* make sure to only show these if the person is logged in */
-  if(!isset($_SESSION['id']) || $userid != $_SESSION['id']) return;
-
   echo "<div class=\"notes\"> Personal notes: <br />\n";
   $notes = DB_get_notes_by_userid_and_gameid($userid,$gameid);
   foreach($notes as $note)

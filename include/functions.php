@@ -857,20 +857,14 @@ function display_table ()
 }
 
 
-function display_user_menu()
+function display_user_menu($id)
 {
   global $WIKI,$INDEX;
 
-  /* get the id we are looking for */
-  if(isset($_SESSION['id']))
-     $myid = $_SESSION['id'];
-  else
-    return;
-
   $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
-		     " WHERE Hand.user_id='$myid'".
-		     " AND ( Game.player='$myid' OR ISNULL(Game.player) )".
+		     " WHERE Hand.user_id='$id'".
+		     " AND ( Game.player='$id' OR ISNULL(Game.player) )".
 		     " AND Game.status<>'gameover'".
 		     " ORDER BY Game.session" );
 
@@ -884,7 +878,8 @@ function display_user_menu()
 	}
 
       $i++;
-      echo "<a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">game ".DB_format_gameid($r[1])." </a><br />\n";
+      echo "<a href=\"".$INDEX."?action=game&amp;me=".$r[0].
+	"\">game ".DB_format_gameid($r[1])." </a><br />\n";
       if($i>4)
 	{
 	  echo "...<br />\n";

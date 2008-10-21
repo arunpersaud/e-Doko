@@ -18,7 +18,7 @@ $changed_cards	   = 0;
 $changed_timezone  = 0;
 $changed_autosetup = 0;
 
-display_user_menu();
+display_user_menu($myid);
 
 /* get old infos */
 $PREF = DB_get_PREF($myid);

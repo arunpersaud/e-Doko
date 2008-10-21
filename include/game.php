@@ -109,7 +109,15 @@ if( $mystatus!='gameover'  )
       if($note != '')
 	DB_insert_note($note,$gameid,$myid);
     };
-output_user_notes($myid,$gameid,$mystatus);
+
+/* make sure that we don't show the notes to the wrong person
+ * (e.g. other people looking at an old game)
+ */
+if( $mystatus != 'gameover' ||
+    (  $mystatus == 'gameover' &&
+       isset($_SESSION['id'])  &&
+       $myid == $_SESSION['id']))
+  output_user_notes($myid,$gameid,$mystatus);
 
 /* handle calls */
 if(myisset('call')  && $_REQUEST['call']  == '120' && can_call(120,$me))
@@ -1937,10 +1945,24 @@ switch($mystatus)
   default:
     myerror("error in testing the status");
   }
-/* output left menu */
-display_user_menu();
 
-/* output right menu */
+/* output other games where it is the users turn
+ * make sure that the people looking at old games don't see the wrong games here
+ */
+if( $mystatus != 'gameover' )
+  display_user_menu($myid);
+else if(  $mystatus == 'gameover' &&
+       isset($_SESSION['id']) )
+  {
+    display_user_menu($_SESSION['id']);
+  }
+else
+  {
+    echo "<div class=\"usermenu\">\n";
+    echo "It's your turn in these games:<br />\n";
+    echo "Please log in to see this information.\n";
+    echo "</div>\n";
+  }
 
 /* display rule set for this game */
 echo "<div class=\"gameinfo\">\n";

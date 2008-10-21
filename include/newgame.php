@@ -27,7 +27,7 @@ else
 	echo "<div class=\"user\">\n";
 	output_form_for_new_game($names);
 	echo "</div>\n";
-        display_user_menu();
+        display_user_menu($myid);
       }
     else
       {
@@ -182,7 +182,7 @@ else
 	       "Hello $PlayerD,\n".$message.$hashD);
 
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
-        display_user_menu();
+        display_user_menu($myid);
       }
   }
 
