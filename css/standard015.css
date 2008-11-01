@@ -38,9 +38,7 @@ body { background-color: #ddd; }
   top:0;
   left:3em;
 }
-.lastlogin span {
-  font-size:smaller;
-}
+.lastlogin span { font-size:smaller;}
 
 .main {
   background-color: #fff;
@@ -59,10 +57,8 @@ body { background-color: #ddd; }
   clear:both;
   height: 8em;
 }
-.footer .right { float:right;   font-size:smaller;
-}
-.footer .left  { float:left;  font-size:smaller;
- }
+.footer .right { float:right;   font-size:smaller;}
+.footer .left  { float:left;  font-size:smaller; }
 
 .status {
   position:absolute;
@@ -105,9 +101,7 @@ body { background-color: #ddd; }
 }
 
 /* output possible rules for  a new game  */
-.rules {
-  margin-top:24em;
-}
+.rules { margin-top:24em;}
 
 /* playing cards*/
 .card {
@@ -375,9 +369,7 @@ ul.tricks li div div span.comment span{
   text-align:center;
 }
 
-.mycards img {
-  height:6em;
-}
+.mycards img { height:6em;}
 
 .exchange {
   clear:both;
@@ -387,9 +379,7 @@ ul.tricks li div div span.comment span{
   background-color:yellow;
 }
 
-.exchange img {
-  height:6em;
-}
+.exchange img { height:6em;}
 
 .line{
   clear:both;
@@ -434,12 +424,8 @@ div.session div.sessionscore div{
   border: 1px solid #000;
   z-index: 30;
 }
-div.session div.sessionscore:hover div{
-  display:block;
-}
-div.session img.rulesicon {
- height: 1em;
-}
+div.session div.sessionscore:hover div{ display:block;}
+div.session img.rulesicon{ height: 1em; }
 
 .scoretable{
   height:20em;
@@ -521,9 +507,7 @@ table.score {
   background-color: #efe;
 }
 
-.submitbutton:hover {
-  background-color:#afa;
-}
+.submitbutton:hover{ background-color:#afa;}
 
 
 .cardinput {
@@ -532,17 +516,11 @@ table.score {
   border: 1px solid #000;
 }
 
-.cardinput img {
-  width: 4em;
-}
+.cardinput img { width: 4em;}
 
-.cardinput:hover{
-  background-color:red;
-}
+.cardinput:hover{ background-color:red;}
 
-div span img.button {
-  width: 2em;
-}
+div span img.button { width: 2em;}
 
 .gamestatuspre {
   padding: 0 0.3em;
@@ -557,13 +535,9 @@ div span img.button {
   background-color: #15de26;
 }
 
-.multi a{
-  color: #fff;
-}
+.multi a{ color: #fff;}
 
-.bigger {
-  font-size:larger;
-}
+.bigger{ font-size:larger;}
 
 caption {
   text-align: center;
@@ -604,15 +578,12 @@ table.stats th { border-bottom: solid 0.2em #000 }
   padding: 0.3em 0.3em 0.45em;
 }
 
+/* the login form */
 .login form{
-  width: 20em;
+  width: 24em;
   margin: 0.5em auto;
   padding: 0.5em 0.5em  1.5em;
   text-align: center;
-}
-
-.login legend, .login label, .login input{
-  padding: 0.5em 0.5em 0.75em;
 }
 
 .login fieldset {
@@ -621,14 +592,18 @@ table.stats th { border-bottom: solid 0.2em #000 }
   background-color: #eee;
 }
 
-.login .submitbutton {
-  background-color: #fff;
+.login label, .login input{ margin: 0.5em 0.5em 0.75em;}
+
+.login label{
+  float:left;
+  width:7em;
+  text-align: left;
 }
 
-.login .submitbutton:hover {
-  background-color: #aaa;
+.login input #email, .login input #password{
+  width:9em;
+  float:right;
 }
 
-.login tr.center td{
-  text-align: center;
-}
+.login .submitbutton { background-color: #fff;}
+.login .submitbutton:hover { background-color: #aaa;}

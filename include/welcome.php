@@ -30,7 +30,7 @@ $game	= $game[0];
 $done	= $done[0];
 $avgage	= $avgage[0];
 
-echo "<div class=\"login\">\n";
+echo "\n\n<div class=\"login\">\n";
 
 echo "<p> If you want to play a game of Doppelkopf, you found the right place ;)</p>".
 "<p> For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>".
@@ -71,21 +71,12 @@ if($done==0)
 
   <form action="index.php?action=login" method="post">
   <fieldset>
-  <table>
-  <tr>
-    <td><label for="email">Email:</label></td>
-    <td><input type="text" class="submitbutton" id="email" name="email" size="20" maxlength="30" /> </td>
-  </tr>
-  <tr>
-    <td><label for="password">Password:</label></td>
-    <td><input type="password" class="submitbutton" id="password" name="password" size="20" maxlength="30" /></td>
-  </tr>
-  <tr class="center">
-    <td> <input type="submit" class="submitbutton" name="login" value="login" /></td>
-    <td> <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" /></td>
-  </tr>
-  </table>
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" size="20" maxlength="30" /> <br />
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" size="20" maxlength="30" /> <br />
+    <input type="submit" class="submitbutton" name="login" value="login" />
+    <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" />
   </fieldset>
   </form>
-
 </div>
