@@ -1010,7 +1010,9 @@ function format_score_table_ascii($score)
   if(sizeof($score)==0)
     return "";
 
-  //  if(sizeof($score)>5) $header.=   "                ...   \n";
+  /* truncate table if we have too many games */
+  $max = sizeof($score);
+  if($max>6) $output.=" (table truncated to last 6 games)\n";
 
   /* output header */
   foreach($score[0]['players'] as $id=>$points)
@@ -1018,18 +1020,16 @@ function format_score_table_ascii($score)
       $name = DB_get_name('userid',$id); /*TODO*/
       $output.= "  ".substr($name,0,2)."  |";
     }
-  $output.="  P   |\n ";
+  $output.="  P   |\n";
   $output.= "------+------+------+------+------+\n";
 
-  $max = sizeof($score);
+  /* output score for each game */
   $i=0;
-
-  if($i<$max-6) $output.="       ...\n";
-
   foreach($score as $game)
     {
       $i++;
       if($i-1<$max-6) continue;
+
       foreach($game['players'] as $id=>$points)
 	$output.=str_pad($points,6," ",STR_PAD_LEFT)."|";
       $output.=str_pad($game['points'],4," ",STR_PAD_LEFT);

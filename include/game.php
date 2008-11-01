@@ -1767,7 +1767,7 @@ switch($mystatus)
 
 		  $message .= "Score Table:\n";
 		  $message .= format_score_table_ascii($score);
-		  $message .= "Use these links to have a look at game ".DB_format_gameid($gameid).": \n";
+		  $message .= "\nUse these links to have a look at game ".DB_format_gameid($gameid).": \n";
 
 		  /* send out final email */
 		  $all = array();
