@@ -271,43 +271,7 @@ function output_header()
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
      <link rel="stylesheet" type="text/css" href="css/standard014.css" />
-     <script type="text/javascript">
-       var current=0;
-       function hl(num) {
-         if(document.getElementById){
-	   var i;
-	   for(i=0;i<14;i++){
-	     if(document.getElementById("trick"+i))
-	       document.getElementById("trick"+i).style.display = 'none';
-	   }
-	   document.getElementById("trick"+num).style.display = 'block';
-	   current=num;
-	 }
-       }
-       function high_last(){
-	 if(document.getElementById){
-	   var i;
-	   for(i=13;i>=0;i--) {
-	     if(document.getElementById("trick"+i))
-	       {
-		 hl(i);
-		 current=i;
-		 break;
-	       }
-	   }
-	 }
-       }
-       function hl_next()
-	 {
-	   if(document.getElementById("trick"+(current+1)))
-	     hl(current+1);
-	 }
-       function hl_prev()
-	 {
-	   if(document.getElementById("trick"+(current-1)))
-	     hl(current-1);
-	 }
-     </script>
+     <script type="text/javascript" src="include/game.js"> </script>
   </head>
 <body onload="high_last();">
 <div class="header">
