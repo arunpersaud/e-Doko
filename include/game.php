@@ -139,41 +139,41 @@ if($session)
     switch($RULES['dullen'])
       {
       case 'none':
-	echo "<img class=\"rulesicon\" alt=\"not ten of hearts\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"not ten of hearts\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
       case 'firstwins':
-	echo "<img class=\"rulesicon\" alt=\"ten of hearts\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"ten of hearts\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
       case 'secondwins':
-	echo "<img class=\"rulesicon\" alt=\"second ten of hearts\" src=\"pics/button/second-ten-of-hearts.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"second ten of hearts\" src=\"pics/button/second-ten-of-hearts.png\"/>\n"; break;
       }
     switch($RULES['schweinchen'])
       {
       case 'none':
-	echo "<img class=\"rulesicon\" alt=\"no schweinchen\" ".
+	echo "  <img class=\"rulesicon\" alt=\"no schweinchen\" ".
 	  "src=\"pics/button/no-schweinchen.png\"/>\n"; break;
       case 'both':
-	echo "<img class=\"rulesicon\" alt=\"two schweinchen \" ".
+	echo "  <img class=\"rulesicon\" alt=\"two schweinchen \" ".
 	  "src=\"pics/button/two-schweinchen.png\"/>\n"; break;
       case 'second':
-	echo "<img class=\"rulesicon\" alt=\"second schweinchen\" ".
+	echo "  <img class=\"rulesicon\" alt=\"second schweinchen\" ".
 	  "src=\"pics/button/second-schweinchen.png\"/>\n"; break;
       case 'secondaftercall':
-	echo "<img class=\"rulesicon\" alt=\"second schweinchen after call\" ".
+	echo "  <img class=\"rulesicon\" alt=\"second schweinchen after call\" ".
 	  "src=\"pics/button/second-schweinchen-after-call.png\"/>\n"; break;
       }
     switch($RULES['call'])
       {
       case '1st-own-card':
-	echo "<img class=\"rulesicon\" alt=\"1st-own-card\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"1st-own-card\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
       case '5th-card':
-	echo "<img class=\"rulesicon\" alt=\"5th-card\" src=\"pics/button/5th-card.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"5th-card\" src=\"pics/button/5th-card.png\"/>\n"; break;
       case '9-cards':
-	echo "<img class=\"rulesicon\" alt=\"9-cards\" src=\"pics/button/9-cards.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"9-cards\" src=\"pics/button/9-cards.png\"/>\n"; break;
       }
-    echo " <div>\n";
+    echo "  <div>\n";
     echo "       10ofhearts : {$RULES['dullen']}      <br />\n";
     echo "       schweinchen: {$RULES['schweinchen']} <br />\n";
     echo "       call:        {$RULES['call']}        <br />\n";
-    echo "    </div>\n  </div>\n";
+    echo "  </div>\n  </div>\n";
     echo "  <div class=\"sessionscore\">Score \n";
     $score   = generate_score_table($session);
     echo format_score_table_html($score,$myid);
@@ -192,7 +192,7 @@ if($session)
       echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.";
     else
       echo "This is game number $j of $i in session $session.";
-    echo "</div>\n";
+    echo "\n</div>\n";
   }
 
 /* display the table and the names */

@@ -1052,22 +1052,22 @@ function format_score_table_html($score,$userid)
   if(sizeof($score)==0)
     return "";
 
-  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <thead><tr>\n";
+  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <thead>\n  <tr>\n";
 
   /* output header */
-  $output.= "  <th> No </th>";
+  $output.= "   <th> No </th>";
   foreach($score[0]['players'] as $id=>$points)
     {
       $name = DB_get_name('userid',$id); /*TODO*/
       $output.= "<th> ".substr($name,0,2)." </th>";
     }
-  $output.="<th>P</th>\n </tr>\n</thead>\n<tbody>\n";
+  $output.="<th>P</th>\n  </tr>\n </thead>\n <tbody>\n";
 
   $i=0;
   foreach($score as $game)
     {
       $i++;
-      $output.=" <tr>";
+      $output.="  <tr>";
       $userhash = DB_get_hash_from_gameid_and_userid($game['gameid'],$userid);
       /* create link to old games only if you are logged in and its your game*/
       if(isset($_SESSION['id']) && $_SESSION['id']==$userid)
@@ -1085,7 +1085,7 @@ function format_score_table_html($score,$userid)
       $output.="</td></tr>\n";
     }
 
-  $output.="</tbody>\n</table></div>\n";
+  $output.=" </tbody>\n</table>\n</div>\n";
 
   return $output;
 }

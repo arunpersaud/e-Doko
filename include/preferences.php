@@ -206,7 +206,7 @@ echo "    <tr><td>Password(new):         </td><td>",
 echo "    <tr><td>Password(new, retype): </td><td>",
   "<input type=\"password\" id=\"password2\" name=\"password2\" size=\"20\" maxlength=\"30\" />",
   " </td></tr>\n";
-echo "    <tr><td><input type=\"submit\" class=\"submitbutton\" name=\"passwd\" value=\"set\" /></td>",
+echo "    <tr><td><input type=\"submit\"  name=\"passwd\" value=\"set\" /></td>",
   "<td></td></tr>\n";
 echo "    </table>\n";
 echo "  </form>\n";
