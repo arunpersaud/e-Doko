@@ -92,6 +92,24 @@ if(myisset("autosetup"))
       }
   }
 
+if(myisset("sorting"))
+  {
+    $sorting = $_REQUEST['sorting'];
+    if($sorting != $PREF['sorting'])
+      {
+	/* check if we already have an entry for the user, if so change it, if not create new one */
+	$result = DB_query("SELECT * from User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='sorting'" );
+	if( DB_fetch_array($result))
+	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($sorting).
+			     " WHERE user_id='$myid' AND pref_key='sorting'" );
+	else
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','sorting',".
+			     DB_quote_smart($sorting).")");
+	$changed_sorting=1;
+      }
+  }
+
 
 if(myisset("password0") &&  $_REQUEST["password0"]!="" )
   {
@@ -165,6 +183,22 @@ echo "  <select id=\"autosetup\" name=\"autosetup\" size=\"1\">\n";
 	}
   echo "  </select>\n";
 if($changed_autosetup) echo "changed";
+echo " </td></tr>\n";
+echo "    <tr><td>Sorting:          </td><td>";
+
+echo "  <select id=\"sorting\" name=\"sorting\" size=\"1\">\n";
+      if($PREF['sorting']=="high-low")
+	{
+	  echo "   <option value=\"high-low\" selected=\"selected\">high to low</option>\n";
+	  echo "   <option value=\"low-high\">low to high</option>\n";
+	}
+      else
+	{
+	  echo "   <option value=\"high-low\">high to low</option>\n";
+	  echo "   <option value=\"low-high\" selected=\"selected\">low to high</option>\n";
+	}
+  echo "  </select>\n";
+if($changed_sorting) echo "changed";
 echo " </td></tr>\n";
 echo "    <tr><td>Card set:              </td><td>";
 

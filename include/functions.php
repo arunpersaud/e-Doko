@@ -608,19 +608,37 @@ function set_gametype($gametype)
 
 function mysort($cards,$gametype)
 {
-  usort ( $cards, "sort_comp" );
+  global $PREF;
+  if(isset($PREF['sorting']))
+    if($PREF['sorting']=='high-low')
+      usort ( $cards, 'sort_comp_high_low' );
+    else
+      usort ( $cards, 'sort_comp_low_high' );
+  else
+    usort ( $cards, 'sort_comp_high_low' );
   return $cards;
 }
 
-function sort_comp($a,$b)
+function sort_comp_high_low($a,$b)
 {
   global $CARDS;
 
   $ALL = array();
-  $ALL = array_merge($CARDS["trump"],$CARDS["diamonds"],$CARDS["clubs"],
-		     $CARDS["hearts"],$CARDS["spades"]);
+  $ALL = array_merge($CARDS['trump'],$CARDS['diamonds'],$CARDS['clubs'],
+		     $CARDS['hearts'],$CARDS['spades']);
 
   return pos_array($a,$ALL)-pos_array($b,$ALL);
+}
+
+function sort_comp_low_high($a,$b)
+{
+  global $CARDS;
+
+  $ALL = array();
+  $ALL = array_merge($CARDS['trump'],$CARDS['diamonds'],$CARDS['clubs'],
+		     $CARDS['hearts'],$CARDS['spades']);
+
+  return -pos_array($a,$ALL)+pos_array($b,$ALL);
 }
 
 function can_call($what,$hash)

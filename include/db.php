@@ -729,6 +729,14 @@ function DB_get_PREF($myid)
   else
     $PREF['autosetup']='no';
 
+  /* Sorting */
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='sorting'" );
+  if($r)
+    $PREF['sorting'] = $r[0];
+  else
+    $PREF['sorting']='high-low';
+
   return $PREF;
 }
 
