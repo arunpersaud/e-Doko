@@ -207,6 +207,21 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
   array_unshift($result,array("Name","Number of active games"));
   echo output_table($result,"Active games","stats");
 
+  /* respones by user*/
+  $result = DB_query_array_all("SELECT User.fullname,".
+			       "IFNULL(AVG(if(P1.sequence in (2,3,4),".
+			       "-timestampdiff(MINUTE,mod_date,(select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1)),NULL )),1e9) as a, ".
+			       " COUNT(*) as na ".
+			       "FROM Play P1 ".
+			       "LEFT JOIN Hand_Card ON P1.hand_card_id=Hand_Card.id ".
+			       "LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
+			       "LEFT JOIN User ON Hand.user_id=User.id ".
+			       "GROUP BY user_id ".
+			       "HAVING na>8 ".
+			       "ORDER BY a " );
+  array_unshift($result,array("Name","Average minutes before respond","NR"));
+  echo output_table($result,"Response","stats");
+
   /*
  does the party win more often if they start
 
