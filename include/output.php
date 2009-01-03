@@ -270,7 +270,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard016.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard017.css" />
      <script type="text/javascript" src="include/game.js"> </script>
   </head>
 <body onload="high_last();">

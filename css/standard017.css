@@ -48,11 +48,7 @@ body { background-color: #ddd; }
 }
 
 .footer {
-  float: left;
-  clear: both;
-  width: 100%;
   background-color: #fff;
-  margin:0;
   margin-left: 3em;
   margin-right: 3em;
   padding:0;
