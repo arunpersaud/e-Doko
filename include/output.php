@@ -28,6 +28,10 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 
 function output_form_for_new_game($names)
 {
+  $copy_names = $names; /* local copy, so that we can delete names from it
+			 * after we selected them to make sure that each name
+			 * only shows up once
+			 */
 ?>
   <form action="index.php?action=new" method="post">
     <h2> Select players (Remember: you need to be one of the players) </h2>
@@ -35,13 +39,27 @@ function output_form_for_new_game($names)
    <div class="table">
      <img class="table" src="pics/table.png" alt="table" />
 <?php
-    /* ask for player names */
-    $i=0;
+  /* ask for player names */
+  $i=0;
+  /* delete players name, since he will be on position D anyway */
+  unset($copy_names[array_search($_SESSION["name"],$copy_names)]);
+
+  srand((float) microtime() * 10000000);
   foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
     {
-      srand((float) microtime() * 10000000);
-      $randkey = array_rand($names);
-      $rand = $names[$randkey];
+      /* pick 3 names at random and put the players name on position D*/
+      if($i<3)
+	{
+	  $randkey = array_rand($copy_names);
+	  $rand = $copy_names[$randkey];
+	  /* delete this name from the list of possible names */
+	  unset($copy_names[$randkey]);
+	}
+      else
+	{
+	  $rand = $_SESSION["name"];
+	}
+
       echo  "     <div class=\"table".$i."\">\n";
       $i++;
       echo "       <select name=\"$player\" size=\"1\">  \n";
