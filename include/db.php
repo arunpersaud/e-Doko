@@ -439,6 +439,24 @@ function DB_get_all_names()
   $names  = array();
 
   $result = DB_query("SELECT fullname FROM User");
+
+  while($r = DB_fetch_array($result))
+    $names[] = $r[0];
+
+  return $names;
+}
+
+function DB_get_all_user_names_open_for_games()
+{
+  $names  = array();
+
+  DB_query("DROP   TEMPORARY TABLE IF EXISTS Usertmp;");
+  DB_query("CREATE TEMPORARY TABLE Usertmp SELECT id,fullname FROM User;");
+  DB_query("DELETE FROM Usertmp WHERE id IN (SELECT user_id FROM User_Prefs WHERE pref_key='open for games' and value='no')");
+
+  $result = DB_query("SELECT fullname FROM Usertmp");
+  DB_query("DROP   TEMPORARY TABLE IF EXISTS Usertmp;");
+
   while($r = DB_fetch_array($result))
     $names[] = $r[0];
 
@@ -736,6 +754,15 @@ function DB_get_PREF($myid)
     $PREF['sorting'] = $r[0];
   else
     $PREF['sorting']='high-low';
+
+  /* Open for new games */
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='open for games'" );
+  if($r)
+    $PREF['open_for_games'] = $r[0];
+  else
+    $PREF['open_for_games']='yes';
+
 
   return $PREF;
 }
@@ -1118,7 +1145,7 @@ function DB_get_exchanged_cards($hash)
 function DB_played_by_others($gameid)
 {
   $gameids = array();
-  $result = DB_query("SELECT id FROM Game WHERE randomnumbers=(SELECT randomnumbers from Game where id=$gameid) and status='gameover'");
+  $result = DB_query("SELECT id FROM Game WHERE randomnumbers=(SELECT randomnumbers FROM Game WHERE id=$gameid) AND status='gameover'");
   while($r = DB_fetch_array($result))
     if($r[0]!=$gameid)
       $gameids[]=$r[0];

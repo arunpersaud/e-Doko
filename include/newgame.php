@@ -23,10 +23,20 @@ else
 
     if( !myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
       {
-	$names = DB_get_all_names();
+	/* only get players that want to be in new games */
+	$names = DB_get_all_user_names_open_for_games();
+
+	/* add player if he is not open for games */
+	if(!in_array($names,$_SESSION["name"]))
+	  $names[]=$_SESSION["name"];
+
+	/* add some randomness */
+	shuffle($names);
+
 	echo "<div class=\"user\">\n";
 	output_form_for_new_game($names);
 	echo "</div>\n";
+
         display_user_menu($myid);
       }
     else

@@ -39,8 +39,11 @@ function output_form_for_new_game($names)
    <div class="table">
      <img class="table" src="pics/table.png" alt="table" />
 <?php
-  /* ask for player names */
+
+  /* ask player for names */
+
   $i=0;
+
   /* delete players name, since he will be on position D anyway */
   unset($copy_names[array_search($_SESSION["name"],$copy_names)]);
 

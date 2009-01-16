@@ -110,6 +110,24 @@ if(myisset("sorting"))
       }
   }
 
+if(myisset("open_for_games"))
+  {
+    $openforgames = $_REQUEST['open_for_games'];
+    if($openforgames != $PREF['open_for_games'])
+      {
+	/* check if we already have an entry for the user, if so change it, if not create new one */
+	$result = DB_query("SELECT * from User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='open for games'" );
+	if( DB_fetch_array($result))
+	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($openforgames).
+			     " WHERE user_id='$myid' AND pref_key='open for games'" );
+	else
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','open for games',".
+			     DB_quote_smart($openforgames).")");
+	$changed_openforgames=1;
+      }
+  }
+
 
 if(myisset("password0") &&  $_REQUEST["password0"]!="" )
   {
@@ -199,6 +217,22 @@ echo "  <select id=\"sorting\" name=\"sorting\" size=\"1\">\n";
 	}
   echo "  </select>\n";
 if($changed_sorting) echo "changed";
+echo " </td></tr>\n";
+echo "    <tr><td>Open for new games:          </td><td>";
+
+echo "  <select id=\"open_for_games\" name=\"open_for_games\" size=\"1\">\n";
+      if($PREF['open_for_games']=="no")
+	{
+	  echo "   <option value=\"yes\">yes</option>\n";
+	  echo "   <option value=\"no\" selected=\"selected\">no</option>\n";
+	}
+      else /* default */
+	{
+	  echo "   <option value=\"yes\" selected=\"selected\">yes</option>\n";
+	  echo "   <option value=\"no\">no</option>\n";
+	}
+  echo "  </select>\n";
+if($changed_openforgames) echo "changed";
 echo " </td></tr>\n";
 echo "    <tr><td>Card set:              </td><td>";
 
