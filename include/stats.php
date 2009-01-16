@@ -207,7 +207,7 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
   array_unshift($result,array("Name","Number of active games"));
   echo output_table($result,"Active games","stats");
 
-  /* respones by user*/
+  /* response time of users*/
   $result = DB_query_array_all("SELECT User.fullname,".
 			       "IFNULL(AVG(if(P1.sequence in (2,3,4),".
 			       "-timestampdiff(MINUTE,mod_date,(select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1)),NULL )),1e9) as a, ".
@@ -219,7 +219,7 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
 			       "GROUP BY user_id ".
 			       "HAVING na>8 ".
 			       "ORDER BY a " );
-  array_unshift($result,array("Name","Average minutes before respond","NR"));
+  array_unshift($result,array("Name","Average minutes before response","trick count"));
   echo output_table($result,"Response","stats");
 
   /*
