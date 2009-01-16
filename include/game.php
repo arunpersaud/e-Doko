@@ -1968,8 +1968,10 @@ else
 echo "<div class=\"gameinfo\">\n";
 
 if($gamestatus == 'play' )
-  output_form_calls($me);
-
+  {
+    $myparty = DB_get_party_by_hash($me);
+    output_form_calls($me,$myparty);
+  }
 /* get time from the last action of the game */
 $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
 $gameend = time() - strtotime($r[0]);

@@ -221,11 +221,18 @@ function output_check_for_sickness($me,$mycards)
   return;
 }
 
-function output_form_calls($me)
+function output_form_calls($me,$myparty)
 {
   if( can_call(120,$me) )
-    echo " re/contra (120):".
-      " <input type=\"radio\" name=\"call\" value=\"120\" /> <br />";
+    {
+    if($myparty=='re')
+      echo "re (120):";
+    else if ($myparty=='contra')
+      echo "contra (120):";
+    else
+      echo " re/contra (120):";
+    echo " <input type=\"radio\" name=\"call\" value=\"120\" /> <br />";
+    }
   if( can_call(90,$me) )
     echo " 90:".
       " <input type=\"radio\" name=\"call\" value=\"90\" /> <br />";
