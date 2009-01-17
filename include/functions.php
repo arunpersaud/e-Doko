@@ -727,7 +727,7 @@ function can_call($what,$hash)
 
 function display_table ()
 {
-  global $gameid, $GT, $debug,$INDEX,$defaulttimezone;
+  global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
   global $RULES,$GAME,$gametype;
 
   $result = DB_query("SELECT  User.fullname as name,".
@@ -863,8 +863,8 @@ function display_table ()
 	}
 
       echo "    <br />\n";
-      echo "    <span title=\"".date("Y-m-d H:i:s",$timenow).  "\">local time</span>\n";
-      echo "    <span title=\"".date("Y-m-d H:i:s",$lastlogin)."\">last login</span>\n";
+      echo "    <span title=\"local time: ".date("Y-m-d H:i:s",$timenow).  " ".
+	                     "last login: ".date("Y-m-d H:i:s",$lastlogin)."\">time info</span>\n";
       echo "   </div>\n";
 
     }

@@ -174,10 +174,23 @@ if($session)
     echo "       schweinchen: {$RULES['schweinchen']} <br />\n";
     echo "       call:        {$RULES['call']}        <br />\n";
     echo "  </div>\n  </div>\n";
-    echo "  <div class=\"sessionscore\">Score \n";
+
+    /* show score */
     $score   = generate_score_table($session);
+    $tmpscore= $score;
+    $finalscore = array_pop($tmpscore);
+    $finalscore = $finalscore['players'];
+
+    echo "  <div class=\"sessionscore\">Score: \n";
+    foreach($finalscore as $user=>$value)
+      {
+	$name = DB_get_name('userid',$user);
+	echo " ".substr($name,0,2).": $value ";
+      }
     echo format_score_table_html($score,$myid);
     echo "  </div>\n";
+
+    /* figure out which game in a session we are in and link to the previous and next game if possible */
     $hashes = DB_get_hashes_by_session($session,$myid);
     $next     = NULL;
     $i = 1;
