@@ -939,11 +939,12 @@ function generate_score_table($session)
   foreach($gameids as $gameid)
     {
       $re_score = DB_get_score_by_gameid($gameid);
+      $gametype = DB_get_gametype_by_gameid($gameid);
       foreach($player as $id=>$points)
 	{
 	  $party = DB_get_party_by_gameid_and_userid($gameid,$id);
 	  if($party == "re")
-	    if(DB_get_gametype_by_gameid($gameid)=="solo")
+	    if($gametype=="solo")
 	      $player[$id] += 3*$re_score;
 	    else
 	      $player[$id] += $re_score;
@@ -953,7 +954,7 @@ function generate_score_table($session)
       $score[$i]['gameid']  = $gameid ;
       $score[$i]['players'] = $player;
       $score[$i]['points']  = abs($re_score);
-      $score[$i]['solo']    = (DB_get_gametype_by_gameid($gameid)=="solo");
+      $score[$i]['solo']    = ($gametype=="solo");
 
       $i++;
     }
@@ -982,12 +983,14 @@ function generate_global_score_table()
   foreach($gameids as $gameid)
     {
       $re_score = DB_get_score_by_gameid($gameid);
+      $gametype = DB_get_gametype_by_gameid($gameid);
+
       /* TODO: this shouldn't loop over all players, just the 4 players that are in the game */
       foreach($player as $key=>$pl)
 	{
 	  $party = DB_get_party_by_gameid_and_userid($gameid,$pl['id']);
 	  if($party == "re")
-	    if(DB_get_gametype_by_gameid($gameid)=="solo")
+	    if($gametype=="solo")
 	      $player[$key]['points'] += 3*$re_score;
 	    else
 	      $player[$key]['points'] += $re_score;
