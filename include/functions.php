@@ -1070,38 +1070,59 @@ function format_score_table_html($score,$userid)
   if(sizeof($score)==0)
     return "";
 
-  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n <thead>\n  <tr>\n";
+  $output = "<div class=\"scoretable\">\n<table class=\"score\">\n";
 
   /* output header */
-  $output.= "   <th> No </th>";
+  $header = "";
+  $header.= " <thead>\n  <tr>\n";
+  $header.= "   <th> No </th>";
   foreach($score[0]['players'] as $id=>$points)
     {
       $name = DB_get_name('userid',$id); /*TODO*/
-      $output.= "<th> ".substr($name,0,2)." </th>";
+      $header.= "<th> ".substr($name,0,2)." </th>";
     }
-  $output.="<th>P</th>\n  </tr>\n </thead>\n <tbody>\n";
+  $header.="<th>P</th>\n  </tr>\n </thead>\n";
 
+  /* use the same as footer */
+  $footer = "";
+  $footer.= " <tfoot>\n  <tr>\n";
+  $footer.= "   <td> No </td>";
+  foreach($score[0]['players'] as $id=>$points)
+    {
+      $name = DB_get_name('userid',$id); /*TODO*/
+      $footer.= "<td> ".substr($name,0,2)." </td>";
+    }
+  $footer.="<td>P</td>\n  </tr>\n </tfoot>\n";
+
+  /* body */
+  $body = "";
+  $body.= " <tbody>\n";
   $i=0;
   foreach($score as $game)
     {
       $i++;
-      $output.="  <tr>";
+      $body.="  <tr>";
       $userhash = DB_get_hash_from_gameid_and_userid($game['gameid'],$userid);
       /* create link to old games only if you are logged in and its your game*/
       if(isset($_SESSION['id']) && $_SESSION['id']==$userid)
-	$output.="  <td> <a href=\"".$INDEX."?action=game&amp;me=".$userhash."\">$i</a></td>";
+	$body.="  <td> <a href=\"".$INDEX."?action=game&amp;me=".$userhash."\">$i</a></td>";
       else
-	$output.="  <td>$i</td>";
+	$body.="  <td>$i</td>";
 
       foreach($game['players'] as $id=>$points)
-	$output.="<td>".$points."</td>";
-      $output.="<td>".$game['points'];
+	$body.="<td>".$points."</td>";
+      $body.="<td>".$game['points'];
 
       /* check for solo */
       if($game['solo'])
-	$output.= " S";
-      $output.="</td></tr>\n";
+	$body.= " S";
+      $body.="</td></tr>\n";
     }
+
+  $output.=$header;
+  if($i>12)
+    $output.=$footer;
+  $output.=$body;
 
   $output.=" </tbody>\n</table>\n</div>\n";
 
