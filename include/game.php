@@ -179,6 +179,7 @@ if($session)
     echo format_score_table_html($score,$myid);
     echo "  </div>\n";
     $hashes = DB_get_hashes_by_session($session,$myid);
+    $next     = NULL;
     $i = 1;
     foreach($hashes as $hash)
       {
@@ -188,8 +189,24 @@ if($session)
 	$lasthash=$hash;
       }
     $i--;
+
+    if($j>1)
+      $previous = $hashes[$j-2];
+    else
+      $previous = NULL;
+    if($j<$i)
+      $next = $hashes[$j];
+    else
+      $next = NULL;
+
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
-      echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.";
+      {
+	if($previous)
+	  echo "<a href=\"{$INDEX}?action=game&amp;me=$previous\">previous game</a>&nbsp;&nbsp;&nbsp; \n";
+	echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.\n";
+	if($next)
+	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$next\">next game</a> \n";
+      }
     else
       echo "This is game number $j of $i in session $session.";
     echo "\n</div>\n";
