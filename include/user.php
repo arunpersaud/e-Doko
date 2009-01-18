@@ -108,11 +108,12 @@ else
 	/* display all games the user has played */
 	echo "<div class=\"user\">";
 	echo "<h4>These are all your games:</h4>\n";
+	/* output legend */
 	echo "<p>Session: <br />\n";
 	echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
 	echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
-	echo "<span class=\"gamestatusover\">F </span> =  game finished ";
-	echo "<span class=\"gamestatusover multi\"><a> N</a> </span> =  game finished, hand played by others too <br />";
+	echo "<span class=\"gamestatusover\">E </span> =  game ended ";
+	echo "<span class=\"gamestatusover multi\"><a>N</a> </span> =  N games with same hand <br />";
 	echo "</p>\n";
 
 	$output = array();
@@ -124,9 +125,11 @@ else
 			   " ORDER BY G.session,G.create_date" );
 
 	$gamenrold = -1;
+	$count = 0;
 	echo "<table>\n <tr><td>\n";
 	while( $r = DB_fetch_array($result))
 	  {
+	    $count++;
 	    $game = DB_format_gameid($r[1]);
 	    $gamenr = (int) $game;
 	    if($gamenrold < $gamenr)
@@ -145,7 +148,7 @@ else
 	    {
 	      echo "   <span class=\"gamestatusover $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">";
 	      if($r[5]<2)
-		echo "F ";
+		echo "E ";
 	      else
 		echo $r[5];
 	      echo "</a></span>\n";
@@ -172,6 +175,10 @@ else
 	      }
 	  }
 	echo "</td></tr>\n</table>\n";
+
+	/* give a hint for new players */
+	if($count<10)
+	  echo "<p class=\"newbiehint\">You can start new games using the link in the top right corner!</p>\n";
 
 	/* display last 5 users that have signed up to e-DoKo */
 	$names = DB_get_names_of_new_logins(5);

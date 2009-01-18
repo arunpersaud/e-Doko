@@ -591,3 +591,7 @@ table.stats th { border-bottom: solid 0.2em #000 }
 
 .login .submitbutton { background-color: #fff;}
 .login .submitbutton:hover { background-color: #aaa;}
+
+.newbiehint {
+    background-color: #fee;
+}
