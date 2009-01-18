@@ -440,4 +440,20 @@ function output_user_notes($userid,$gameid,$userstatus)
   return;
 }
 
+function output_robotproof($i)
+{
+  switch($i)
+    {
+    case 0:
+      return "6*7=";
+    case 1:
+      return "5*7=";
+    case 2:
+      return "4*7=";
+    case 3:
+      return "3*7=";
+    case 4:
+      return "2*7=";
+    }
+}
 ?>

@@ -12,15 +12,57 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 
     /* is this name already in use/ */
     $ok=1;
-    if(DB_get_userid('name',$_REQUEST["Rfullname"]))
+    if(DB_get_userid('name',$_REQUEST['Rfullname']))
       {
 	echo "please chose another name<br />";
 	$ok=0;
       }
     /* check if email address is already used */
-    if(DB_get_userid('email',$_REQUEST["Remail"]))
+    if(DB_get_userid('email',$_REQUEST['Remail']))
       {
 	echo "this email address is already used ?!<br />";
+	$ok=0;
+      }
+    /* check against robots */
+    $robots=0; /* at least one anti-robot question needs to be answered */
+    if(myisset('Robotproof0'))
+      {
+	if($_REQUEST['Robotproof0']!=42)
+	  $ok=0;
+	else
+	  $robot=1;
+      }
+    else if(myisset('Robotproof1'))
+      {
+	if($_REQUEST['Robotproof1']!=35)
+	  $ok=0;
+	else
+	  $robot=1;
+      }
+    else if(myisset('Robotproof2'))
+      {
+	if($_REQUEST['Robotproof2']!=28)
+	  $ok=0;
+	else
+	  $robot=1;
+      }
+    else if(myisset('Robotproof3'))
+      {
+	if($_REQUEST['Robotproof3']!=21)
+	  $ok=0;
+	else
+	  $robot=1;
+      }
+    else if(myisset('Robotproof4'))
+      {
+	if($_REQUEST['Robotproof4']!=14)
+	  $ok=0;
+	else
+	  $robot=1;
+      }
+    if($robot==0)
+      {
+	echo "You answered the math question wrong. <br />\n";
 	$ok=0;
       }
 
@@ -44,6 +86,10 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 	else
 	  echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
       }
+    else
+      {
+	echo "Couldn't register you. Please <a href=\"index.php?action=register\">try again</a>! </br />\n";
+      }
   }
  else
    {
@@ -59,13 +105,13 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
              <table>
               <tr>
                <td><label for="Rfullname">Full name:</label></td>
-	       <td><input type="text" id="Rfullname" name="Rfullname" size="20" maxsize="30" /> </td>
+	       <td><input type="text" id="Rfullname" name="Rfullname" size="20" maxlength="30" /> </td>
               </tr><tr>
                <td><label for="Remail">Email:</label></td>
-	       <td><input type="text" id="Remail" name="Remail" size="20" maxsize="30" /></td>
+	       <td><input type="text" id="Remail" name="Remail" size="20" maxlength="30" /></td>
               </tr><tr>
 	       <td><label for="Rpassword">Password(will be displayed in cleartext on the next page):</label></td>
-               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxsize="30" /></td>
+               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxlength="30" /></td>
               </tr><tr>
 	       <td><label for="Rtimezone">Timezone:</label></td>
                <td>
@@ -74,7 +120,19 @@ if(myisset("Rfullname","Remail","Rpassword","Rtimezone") )
 ?>
 	       </td>
               </tr><tr>
+              </tr><tr>
+<?php
+              /* random number to select robotproof question */
+	      $rand_number = mt_rand(0,3); /* to get numbers between 0 and 4  */
+              $Robotproof = "Robotproof".$rand_number;
+?>
+		<td><label for="Robotproof">Please answer this question: <?php echo output_robotproof($rand_number); ?></label></td>
+<?php
+	 echo "<td><input type=\"text\" id=\"$Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /></td>\n";
+?>
+              </tr><tr>
                <td colspan="2"> <input type="submit" value="register" /></td>
+              </tr>
              </table>
           </fieldset>
         </form>
