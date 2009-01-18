@@ -820,7 +820,7 @@ function DB_get_unused_randomnumbers($userstr)
   */
   DB_query("DROP   TEMPORARY TABLE IF EXISTS gametmp;");
   DB_query("CREATE TEMPORARY TABLE gametmp SELECT id,randomnumbers FROM Game;");
-  DB_query("DELETE FROM gametmp WHERE id IN (SELECT game_id FROM Hand WHERE user_id IN (".$userstr."));");
+  DB_query("DELETE FROM gametmp WHERE randomnumbers IN (SELECT randomnumbers FROM Hand LEFT JOIN Game ON Game.id=game_id WHERE user_id IN (".$userstr."));");
 
   $r = DB_query_array("SELECT randomnumbers FROM gametmp LIMIT 1;");
   DB_query("DROP   TEMPORARY TABLE IF EXISTS gametmp;");
