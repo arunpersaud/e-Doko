@@ -27,7 +27,7 @@ else
 	$names = DB_get_all_user_names_open_for_games();
 
 	/* add player if he is not open for games */
-	if(!in_array($names,$_SESSION["name"]))
+	if(!in_array($_SESSION["name"],$names))
 	  $names[]=$_SESSION["name"];
 
 	/* add some randomness */
