@@ -456,4 +456,130 @@ function output_robotproof($i)
       return "2*7=";
     }
 }
+
+function output_exchanged_cards()
+{
+  /* in a poverty game this function will output the exchanged cards
+   * players in the team will see the cards, the other team will see
+   * the backside of cards
+   */
+
+  /* need some information about the game */
+  global $gameid,$mygametype, $PREF,$me;
+
+  /* some variables to track where the people with poverty are sitting */
+  $partnerpos1 = 0;
+  $povertypos1 = 0;
+  $partnerpos2 = 0;
+  $povertypos2 = 0;
+
+  /* only need to do it in a poverty game, this might not be needed, but
+   * just to make sure everything is ok
+   */
+  if($mygametype == 'poverty' || $mygametype=='dpoverty')
+    {
+      /* find out who has poverty */
+      for($mypos=1;$mypos<5;$mypos++)
+	{
+	  $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
+	  if($usersick == 'poverty')
+	    if($povertypos1)
+	      $povertypos2 = $mypos;
+	    else
+	      $povertypos1 = $mypos;
+	}
+      /* get hash and exchanged cards for all involved */
+      $povertyhash1 = DB_get_hash_from_game_and_pos($gameid,$povertypos1);
+      $partnerhash1 = DB_get_partner_hash_by_hash($povertyhash1);
+
+      $povertycards1 = DB_get_exchanged_cards($povertyhash1);
+      $partnercards1 = DB_get_exchanged_cards($partnerhash1);
+
+      $partnerpos1 = DB_get_pos_by_hash($partnerhash1);
+      if($povertypos2)
+	{
+	  $povertyhash2 = DB_get_hash_from_game_and_pos($gameid,$povertypos2);
+	  $partnerhash2 = DB_get_partner_hash_by_hash($povertyhash2);
+
+	  $povertycards2 = DB_get_exchanged_cards($povertyhash2);
+	  $partnercards2 = DB_get_exchanged_cards($partnerhash2);
+
+	  $partnerpos2 = DB_get_pos_by_hash($partnerhash2);
+	}
+    }
+
+  /* output the cards
+   * go through all positions, check that position has cards that need to be shown and
+   * show those cards
+   */
+  $show = 1;
+  for($mypos=1;$mypos<5;$mypos++)
+    {
+      $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
+      if($usersick!=NULL ||
+	 $mypos==$povertypos1 || $mypos==$partnerpos1 ||
+	 $mypos==$povertypos2 || $mypos==$partnerpos2 )
+	{
+	  echo "      <div class=\"vorbehalt".($mypos-1)."\"> Vorbehalt <br />\n";
+	  if($show)
+	    echo "       $usersick <br />\n";
+	  if($mypos==$partnerpos1)
+	    {
+	      $trump_back=0;
+	      foreach($partnercards1 as $card)
+		{
+		  if(is_trump($card)) $trump_back=1;
+		  echo '        ';
+		  if($povertyhash1 == $me || $partnerhash1 == $me || $mystatus=='gameover')
+		    display_card($card,$PREF['cardset']);
+		  else
+		    display_card(0,$PREF['cardset']);
+		}
+	      if($trump_back) echo "Trump back";
+	    }
+	  else if($mypos==$povertypos1)
+	    {
+	      foreach($povertycards1 as $card)
+		{
+		  echo '        ';
+		  if($povertyhash1 == $me || $partnerhash1 == $me || $mystatus=='gameover')
+		    display_card($card,$PREF['cardset']);
+		  else
+		    display_card(0,$PREF['cardset']);
+	      }
+	    }
+	  else if($mypos==$povertypos2)
+	    {
+	      foreach($povertycards2 as $card)
+		{
+		  echo '        ';
+		  if($povertyhash2 == $me || $partnerhash2 == $me || $mystatus=='gameover')
+		    display_card($card,$PREF['cardset']);
+		  else
+		    display_card(0,$PREF['cardset']);
+		}
+	    }
+	  else if($mypos==$partnerpos2)
+	    {
+	      $trump_back=0;
+	      foreach($partnercards2 as $card)
+		{
+		  if(is_trump($card)) $trump_back=1;
+		  echo '        ';
+		  if($povertyhash2 == $me || $partnerhash2 == $me || $mystatus=='gameover')
+		    display_card($card,$PREF['cardset']);
+		  else
+		    display_card(0,$PREF['cardset']);
+		}
+	      if($trump_back) echo "Trump back";
+	    }
+	  echo  "      </div>\n";
+
+	  if($mygametype == $usersick)
+	    $show = 0;
+	}
+    }
+}
+
+
 ?>

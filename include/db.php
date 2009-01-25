@@ -852,6 +852,9 @@ function DB_set_recovery_password($user,$newpw)
 
 function DB_get_card_name($card)
 {
+  if($card==0)
+    return 'backside';
+
   $r = DB_query_array("SELECT strength,suite FROM Card WHERE id='$card'");
 
   if($r)
