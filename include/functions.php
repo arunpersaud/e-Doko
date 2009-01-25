@@ -329,16 +329,21 @@ function check_wedding($cards)
   return 0;
 }
 
-function count_trump($cards)
+function count_trump($cards,$status='pregame')
 {
   global $RULES;
 
   $trump = 0;
 
-  /* count each trump, including the foxes */
+  /* count each trump, including the foxes, since this is used to determine poverty status */
   foreach($cards as $c)
     if( (int)($c) <27)
       $trump++;
+
+  /* In case we really want to know the amount of trump, we can use the status variable.
+   * This is needed for example to figure out what icon to display on the table in case of
+   * trump given back in poverty */
+  if($status=='all') return $trump;
 
   /* normally foxes don't count as trump, so we substract them here
    * in case someone has schweinchen, one or two of them should count as trump
@@ -777,7 +782,7 @@ function display_table ()
 	  {
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	    $cards    = DB_get_all_hand($userhash);
-	    $trumpNR  = count_trump($cards);
+	    $trumpNR  = count_trump($cards,'all');
 	    if($trumpNR)
 	      echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" title=\"poverty - trump back\" />";
 	    else
@@ -792,7 +797,7 @@ function display_table ()
 	    {
 	      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	      $cards    = DB_get_all_hand($userhash);
-	      $trumpNR  = count_trump($cards);
+	      $trumpNR  = count_trump($cards,'all');
 	      if($trumpNR)
 		echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" title=\"poverty - trump back\" />";
 	      else
@@ -805,7 +810,7 @@ function display_table ()
 	    {
 	      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	      $cards    = DB_get_all_hand($userhash);
-	      $trumpNR  = count_trump($cards);
+	      $trumpNR  = count_trump($cards,'all');
 	      if($trumpNR)
 		echo "   <img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" alt=\"poverty2 < trump back\" title=\"poverty2 - trump back\"/>";
 	      else
