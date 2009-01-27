@@ -171,8 +171,8 @@ else
 
 	/* send out email, TODO: check for error with email */
 	$message = "\n".
-	  "you are invited to play a game of DoKo (that is to debug the program ;).\n".
-	  "Place comments and bug reports here:\n".
+	  "you are invited to play a game of DoKo.\n".
+	  "Please, place comments and bug reports here:\n".
 	  "http://wiki.nubati.net/index.php?title=EmailDoko\n\n".
 	  "The whole round would consist of the following players:\n".
 	  "$PlayerA\n".
