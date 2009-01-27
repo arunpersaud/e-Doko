@@ -465,7 +465,7 @@ function output_exchanged_cards()
    */
 
   /* need some information about the game */
-  global $gameid,$mygametype, $PREF,$me;
+  global $gameid,$mygametype, $PREF,$me,$mystatus;
 
   /* some variables to track where the people with poverty are sitting */
   $partnerpos1 = 0;
