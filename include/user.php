@@ -107,6 +107,15 @@ else
 
 	/* display all games the user has played */
 	echo "<div class=\"user\">";
+
+	if($myvacation = check_vacation($myid))
+	  {
+	    $vac_start   = $myvacation[0];
+	    $vac_stop    = $myvacation[1];
+	    $vac_comment = $myvacation[2];
+	    echo "<p class=\"vacation\">Enjoy your vacation (don't forgot to change your settings once you're back). Between $vac_start and $vac_stop other users will see the following message: $vac_comment.</p>\n";
+	  }
+
 	echo "<h4>These are all your games:</h4>\n";
 	/* output legend */
 	echo "<p>Session: <br />\n";
@@ -164,10 +173,20 @@ else
 		  {
 		    $name = DB_get_name('userid',$r[3]);
 		    $gameid = $r[1];
+		    /* check if we need to send out a reminder */
 		    if(DB_get_reminder($r[3],$gameid)==0)
 		      if(time()-strtotime($r[2]) > 60*60*24*7)
 			echo "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
-		    echo "(it's $name's turn)\n";
+
+		    /* check vacaction status of this user */
+		    if($vacation=check_vacation($r[3]))
+		      {
+			$stop = substr($vacation[1],0,10);
+			$title = 'begin:'.substr($vacation[0],0,10).' end:'.$vacation[1].' '.$vacation[2];
+			echo "(it's <span class=\"vacation\" title=\"$title\">$name's (on vacation until $stop)</span> turn)\n";
+		      }
+		    else
+		      echo "(it's $name's turn)\n";
 		  };
 		if(time()-strtotime($r[2]) > 60*60*24*30)
 		  echo "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".

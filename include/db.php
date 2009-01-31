@@ -763,6 +763,29 @@ function DB_get_PREF($myid)
   else
     $PREF['open_for_games']='yes';
 
+  /* Vacation start */
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='vacation start'" );
+  if($r)
+    $PREF['vacation_start'] = $r[0];
+  else
+    $PREF['vacation_start'] = NULL;
+
+  /* Vacation stop */
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+  if($r)
+    $PREF['vacation_stop'] = $r[0];
+  else
+    $PREF['vacation_stop'] = NULL;
+
+  /* Vacation comment */
+  $r = DB_query_array("SELECT value FROM User_Prefs".
+		      " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+  if($r)
+    $PREF['vacation_comment'] = $r[0];
+  else
+    $PREF['vacation_comment'] = "";
 
   return $PREF;
 }

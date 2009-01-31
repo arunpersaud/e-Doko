@@ -570,7 +570,7 @@ table.stats th { border-bottom: solid 0.2em #000 }
   text-align: center;
 }
 
-.login fieldset {
+fieldset {
   border: 2px solid #000;
   padding: 0.5em 0.5em 0.75em;
   background-color: #eee;
@@ -594,4 +594,9 @@ table.stats th { border-bottom: solid 0.2em #000 }
 
 .newbiehint {
     background-color: #fee;
+}
+
+.vacation {
+    color: #666;
+    background-color: #fc3;
 }

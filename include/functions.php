@@ -767,10 +767,22 @@ function display_table ()
       $timenow   = strtotime(date("Y-m-d H:i:s"));
 
       echo "  <div class=\"table".($pos-1)."\">\n";
-      if(!$debug)
-	echo "   $name \n";
+
+      if($debug)
+	echo "   <a href=\"".$INDEX."?action=game&amp;me=".$hash."\">";
+      if($vacation = check_vacation($user))
+	{
+	  $start   = $vacation[0];
+	  $stop    = substr($vacation[1],0,10);
+	  $comment = $vacation[2];
+
+	      $title = "begin: $start  end: $stop $comment";
+	      echo "   <span class=\"vacation\" title=\"$title\">$name (on vacation until $stop)</span> \n";
+	}
       else
-	echo "   <a href=\"".$INDEX."?action=game&amp;me=".$hash."\">$name</a>\n";
+	echo "   $name \n";
+      if($debug)
+	echo"</a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
       if( $gametype != "solo")
@@ -1162,5 +1174,38 @@ function getCache($cacheFile, $expireTime)
   return false;
 }
 
+function check_vacation($userid)
+{
+  /* get start date */
+  $result = DB_query_array("SELECT value FROM User_Prefs".
+		     " WHERE user_id='$userid' AND pref_key='vacation start'" );
+  if($result)
+    $start = $result[0];
+  else
+    return NULL;
+
+  /* get end date */
+  $result = DB_query_array("SELECT value FROM User_Prefs".
+		     " WHERE user_id='$userid' AND pref_key='vacation stop'" );
+  if($result)
+    $stop = $result[0];
+  else
+    return NULL;
+
+  /* get comment */
+  $result = DB_query_array("SELECT value FROM User_Prefs".
+		     " WHERE user_id='$userid' AND pref_key='vacation comment'" );
+  if($result)
+    $comment = $result[0];
+  else
+    $comment = '';
+
+  /* check if user is on vacation. TODO: use user's timezone */
+  if( (time() - strtotime($start) >0) &&
+      (strtotime($stop) - time()  >0))
+    return array ($start,$stop,$comment);
+  else
+    return NULL;
+}
 
 ?>

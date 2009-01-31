@@ -7,7 +7,7 @@ if(!isset($HOST))
 
 $name  = $_SESSION["name"];
 $email = DB_get_email('name',$name);
-$myid = DB_get_userid('email',$email);
+$myid  = DB_get_userid('email',$email);
 if(!$myid)
   return;
 
@@ -33,6 +33,79 @@ DB_update_user_timestamp($myid);
  * update the database and track changes with a variable, so that
  * we can later highlight the changed value
  */
+if(myisset('vacation_start','vacation_stop','vacation_comment'))
+  {
+    $vacation_start   = $_REQUEST['vacation_start'].' 00:00:00';
+    $vacation_stop    = $_REQUEST['vacation_stop'].' 23:59:59';
+    $vacation_comment = $_REQUEST['vacation_comment'];
+
+    /* check if everything is valid */
+    if(!strtotime($vacation_start))
+      $changed_vacation = -1;
+    if(!strtotime($vacation_stop))
+      $changed_vacation = -1;
+
+    /* test if we should delete the entry */
+    if($vacation_start == '- 00:00:00')
+      {
+	$result = DB_query("DELETE FROM User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='vacation start'" );
+	$result = DB_query("DELETE FROM User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+	$result = DB_query("DELETE FROM User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+	$changed_vacation = 1;
+      }
+    /* change in database if format is ok */
+    else if($changed_vacation>=0)
+      {
+	/* only change if different from current value */
+	if($vacation_start!=$PREF['vacation_start'])
+	  {
+	    $result = DB_query("SELECT * from User_Prefs".
+			       " WHERE user_id='$myid' AND pref_key='vacation start'" );
+	    if( DB_fetch_array($result))
+	      $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($vacation_start).
+				 " WHERE user_id='$myid' AND pref_key='vacation start'" );
+	    else
+	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','vacation start',".
+				 DB_quote_smart($vacation_start).")");
+
+	    $changed_vacation = 1;
+	  }
+
+	/* same for the stop date */
+	if($vacation_stop!=$PREF['vacation_stop'])
+	  {
+	    $result = DB_query("SELECT * from User_Prefs".
+			       " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+	    if( DB_fetch_array($result))
+	      $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($vacation_stop).
+				 " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+	    else
+	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','vacation stop',".
+				 DB_quote_smart($vacation_stop).")");
+
+	    $changed_vacation = 1;
+	  }
+
+	/* does the user want to add a comment? */
+	if($vacation_comment!=$PREF['vacation_comment'])
+	  {
+	    $result = DB_query("SELECT * from User_Prefs".
+			       " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+	    if( DB_fetch_array($result))
+	      $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($vacation_comment).
+				 " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+	    else
+	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','vacation comment',".
+				 DB_quote_smart($vacation_comment).")");
+
+	    $changed_vacation = 1;
+	  }
+      }
+  }
+
 if(myisset("timezone"))
   {
     $newtimezone = $_REQUEST['timezone'];
@@ -174,8 +247,28 @@ echo "  <form action=\"index.php?action=prefs\" method=\"post\">\n";
 echo "  <h2>Your settings are</h2>\n";
 echo "    <fieldset>\n";
 echo "    <legend>Game-related</legend>\n";
-
 echo "      <table>\n";
+
+echo "        <tr><td>Vacation:             </td>\n";
+if($PREF['vacation_start'])
+  $value = substr($PREF['vacation_start'],0,10);
+ else
+   $value = '';
+echo "            <td>start:<input type=\"text\" id=\"vacation_start\" name=\"vacation_start\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
+if($PREF['vacation_stop'])
+  $value = substr($PREF['vacation_stop'],0,10);
+ else
+   $value = '';
+echo "            <td>stop:<input type=\"text\" id=\"vacation_stop\" name=\"vacation_stop\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
+if($PREF['vacation_comment'])
+  $value = $PREF['vacation_comment'];
+else
+  $value = '';
+echo "            <td>comment:<input type=\"text\" id=\"vacation_comment\" name=\"vacation_comment\" size=\"10\" maxlength=\"50\" value=\"$value\" />";
+if($changed_vacation == 1) echo "changed";
+if($changed_vacation == -1) echo "wrong date format";
+echo "</td></tr>\n";
+echo "<tr><td></td><td>use YYYY-MM-DD</td><td>use '-'  in start field to unset vacation</td></tr>\n";
 echo "        <tr><td>Notification:          </td><td>\n";
 echo "          <select id=\"notify\" name=\"notify\" size=\"1\">\n";
 if($PREF['email']=="emailaddict")
