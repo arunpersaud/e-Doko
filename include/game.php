@@ -215,12 +215,23 @@ if($session)
     $finalscore = array_pop($tmpscore);
     $finalscore = $finalscore['players'];
 
-    echo "  <div class=\"sessionscore\">Score: \n";
-    foreach($finalscore as $user=>$value)
-      {
-	$name = DB_get_name('userid',$user);
-	echo " ".substr($name,0,2).": $value ";
+    echo "  <div class=\"sessionscore\">";
+    if($finalscore)
+      { 
+	echo "Score: \n";
+	/* output the final score on the front page */
+	foreach($finalscore as $user=>$value)
+	  {
+	    $name = DB_get_name('userid',$user);
+	    echo " ".substr($name,0,2).": $value ";
+	  }
       }
+    else 
+      {
+	/* first game, no score yet */ 
+	echo "&nbsp;";
+      }
+
     echo format_score_table_html($score,$myid);
     echo "  </div>\n";
 
