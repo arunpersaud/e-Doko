@@ -58,6 +58,11 @@ function DB_test()
 /* use Mysql in the background */
 function DB_query($query)
 {
+  /* debug/optimize the database
+  $logfile=fopen('/tmp/DBlog.log','a+');
+  fwrite($logfile,"EXPLAIN $query ;\n");
+  fclose($logfile);
+  */
   return mysql_query($query);
 }
 
@@ -707,86 +712,65 @@ function DB_set_party_by_hash($hash,$party)
 
 function DB_get_PREF($myid)
 {
-  /* Cardset */
-  $r = DB_query_array("SELECT value from User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='cardset'" );
-  if($r)
+  /* set defaults */
+  $PREF['cardset']		= 'english';
+  $PREF['email']		= 'emailnonaddict';
+  $PREF['autosetup']		= 'no';
+  $PREF['sorting']		= 'high-low';
+  $PREF['open_for_games']	= 'yes';
+  $PREF['vacation_start']	=  NULL;
+  $PREF['vacation_stop']	=  NULL;
+  $PREF['vacation_comment']	=  '';
+
+  /* get all preferences */
+  $r = DB_query('SELECT pref_key, value FROM User_Prefs'.
+		      " WHERE user_id='$myid' " );
+  while($pref = DB_fetch_array($r) )
     {
-      /* licence only valid until then */
-      if($r[0]=="altenburg" && (time()-strtotime( "2009-12-31 23:59:59")<0) )
-	$PREF["cardset"]="altenburg";
-      else
-	$PREF["cardset"]="english";
+      switch($pref[0])
+	{
+	case 'cardset':
+	  /* licence only valid until then */
+	  if($pref[1]=="altenburg" && (time()-strtotime( "2009-12-31 23:59:59")<0) )
+	    $PREF["cardset"]="altenburg";
+	  break;
+
+	case 'email':
+	  if($pref[1]=="emailaddict")
+	    $PREF["email"]="emailaddict";
+	  break;
+
+	case 'autosetup':
+	  if($pref[1]=='yes')
+	    $PREF['autosetup']='yes';
+	  break;
+
+	case 'sorting':
+	  if($pref[1])
+	    $PREF['sorting'] = $pref[1];
+	  break;
+
+	case 'open for games':
+	  if($pref[1])
+	    $PREF['open_for_games'] = $pref[1];
+	  break;
+
+	case 'vacation start':
+	  if($pref[1])
+	    $PREF['vacation_start'] = $pref[1];
+	  break;
+
+	case 'vacation stop':
+	  if($pref[1])
+	    $PREF['vacation_stop'] = $pref[1];
+	  break;
+
+	case 'vacation comment':
+	  if($pref[1])
+	    $PREF['vacation_comment'] = $pref[1];
+	  break;
+	}
     }
-  else
-    $PREF["cardset"]="english";
-
-  /* Email */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='email'" );
-  if($r)
-    {
-      if($r[0]=="emailaddict")
-	$PREF["email"]="emailaddict";
-      else
-	$PREF["email"]="emailnonaddict";
-    }
-  else
-    $PREF["email"]="emailnonaddict";
-
-  /* Autosetup */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='autosetup'" );
-  if($r)
-    {
-      if($r[0]=='yes')
-	$PREF['autosetup']='yes';
-      else
-	$PREF['autosetup']='no';
-    }
-  else
-    $PREF['autosetup']='no';
-
-  /* Sorting */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='sorting'" );
-  if($r)
-    $PREF['sorting'] = $r[0];
-  else
-    $PREF['sorting']='high-low';
-
-  /* Open for new games */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='open for games'" );
-  if($r)
-    $PREF['open_for_games'] = $r[0];
-  else
-    $PREF['open_for_games']='yes';
-
-  /* Vacation start */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='vacation start'" );
-  if($r)
-    $PREF['vacation_start'] = $r[0];
-  else
-    $PREF['vacation_start'] = NULL;
-
-  /* Vacation stop */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='vacation stop'" );
-  if($r)
-    $PREF['vacation_stop'] = $r[0];
-  else
-    $PREF['vacation_stop'] = NULL;
-
-  /* Vacation comment */
-  $r = DB_query_array("SELECT value FROM User_Prefs".
-		      " WHERE user_id='$myid' AND pref_key='vacation comment'" );
-  if($r)
-    $PREF['vacation_comment'] = $r[0];
-  else
-    $PREF['vacation_comment'] = "";
-
   return $PREF;
 }
 
@@ -940,13 +924,16 @@ function DB_get_partner_hash_by_hash($hash)
 
 function DB_format_gameid($gameid)
 {
-  $session = DB_get_session_by_gameid($gameid);
+  /* get session and create date */
+  $r = DB_query_array("SELECT session, create_date FROM Game WHERE id='$gameid' ");
+  $session = $r[0];
+  $date    = $r[1];
 
   /* get number of game */
-  $r = DB_query_array("SELECT SUM(TIME_TO_SEC(TIMEDIFF(create_date, (SELECT create_date FROM Game WHERE id='$gameid')))<=0) ".
+  $r = DB_query_array("SELECT SUM(TIME_TO_SEC(TIMEDIFF(create_date, '$date'))<=0) ".
 		      " FROM Game".
 		      " WHERE session='$session' ");
-  return $session.".".$r[0];
+  return $session.'.'.$r[0];
 }
 
 function DB_get_reminder($user,$gameid)

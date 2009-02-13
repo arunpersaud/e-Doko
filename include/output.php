@@ -114,12 +114,17 @@ function output_form_for_new_game($names)
 <?php
 }
 
-function output_table($data,$caption="",$class="")
+function output_table($data,$caption="",$class="",$id="")
 {
+
+  $HTML  = "\n<table";
+
   if($class!="")
-    $HTML  = "\n<table class=\"$class\">\n";
-  else
-    $HTML  = "\n<table>\n";
+    $HTML.= " class=\"$class\"";
+  if($id!="")
+    $HTML.= " id=\"$id\"";
+
+  $HTML.=">\n";
 
   $i=0;
 
@@ -133,10 +138,7 @@ function output_table($data,$caption="",$class="")
       else
 	{
 	  if($i==1) $HTML .= "  <tbody>\n";
-	  if($i % 2)
-	    $HTML .= "  <tr class=\"odd\">   ";
-	  else
-	    $HTML .= "  <tr class=\"even\">  ";
+	  $HTML .= "  <tr>  ";
 	}
       foreach($record as $point)
 	{
@@ -298,8 +300,16 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard018.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard019.css" />
      <script type="text/javascript" src="include/game.js"> </script>
+     <script type="text/javascript" src="include/jquery.js"> </script>
+     <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
+     <script type="text/javascript">
+        $(document).ready(function()
+	   {
+              $("#ScoreTable").tablesorter({ widgets: ['zebra']});
+           });
+     </script>
   </head>
 <body onload="high_last();">
 <div class="header">

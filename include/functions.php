@@ -987,14 +987,15 @@ function generate_global_score_table()
   $gameids = DB_get_gameids_of_finished_games_by_session(0);
 
   if($gameids == NULL)
-    return "";
+    return '';
 
   /* get player id, names... from the User table */
   $player = array();
-  $result = DB_query("SELECT User.id, User.fullname FROM User");
+  $result = DB_query('SELECT User.id, User.fullname FROM User');
 
+  /* save information in an array */
   while( $r = DB_fetch_array($result))
-    $player[] = array( 'id' => $r[0], 'name'=> $r[1], 'points' => 0 ,'nr' => 0);
+    $player[$r[0]] = array('name'=> $r[1], 'points' => 0 ,'nr' => 0);
 
   /* get points and generate table */
   foreach($gameids as $gameid)
@@ -1002,19 +1003,21 @@ function generate_global_score_table()
       $re_score = DB_get_score_by_gameid($gameid);
       $gametype = DB_get_gametype_by_gameid($gameid);
 
-      /* TODO: this shouldn't loop over all players, just the 4 players that are in the game */
-      foreach($player as $key=>$pl)
+      /* get players involved in this game */
+      $result = DB_query('SELECT user_id FROM Hand WHERE game_id='.DB_quote_smart($gameid));
+      while($r = DB_fetch_array($result))
 	{
-	  $party = DB_get_party_by_gameid_and_userid($gameid,$pl['id']);
-	  if($party == "re")
-	    if($gametype=="solo")
-	      $player[$key]['points'] += 3*$re_score;
+	  $id = $r[0];
+	  $party = DB_get_party_by_gameid_and_userid($gameid,$id);
+	  if($party == 're')
+	    if($gametype=='solo')
+	      $player[$id]['points'] += 3*$re_score;
 	    else
-	      $player[$key]['points'] += $re_score;
-	  else if ($party == "contra")
-	    $player[$key]['points'] -= $re_score;
+	      $player[$id]['points'] += $re_score;
+	  else if ($party == 'contra')
+	    $player[$id]['points'] -= $re_score;
 	  if($party)
-	    $player[$key]['nr']+=1;
+	    $player[$id]['nr']+=1;
 	}
     }
 
@@ -1030,13 +1033,13 @@ function generate_global_score_table()
       return 0;
     return ($a > $b) ? -1 : 1;
   }
-  usort($player,"cmp");
+  usort($player,'cmp');
 
   foreach($player as $pl)
     {
       /* limit to players with at least 10 games */
       if($pl['nr']>10)
-	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3) );
+	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3), $pl['points'],$pl['nr']);
     }
 
   return $return;

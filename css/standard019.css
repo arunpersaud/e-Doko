@@ -523,6 +523,8 @@ div span img.button { width: 2em;}
 
 .bigger{ font-size:larger;}
 
+
+/* statistics using jquery*/
 caption {
   text-align: center;
   margin: 0.5em;
@@ -530,13 +532,15 @@ caption {
   padding-bottom: 0em;
   margin-bottom: 0;
  }
-table.stats { margin: 0.5em 1em;
+
+table.stats { 
+  margin: 0.5em 1em;
   border: solid 0.2em #aeaeae;
   -moz-border-radius: 0.5em ;
   float: left;
 }
-table.stats tr.odd  { background-color:#aeaeae; }
-table.stats tr.even { background-color:#eaeaea; }
+table.stats tbody tr.odd td  { background-color:#aeaeae; }
+table.stats tbody tr.even td { background-color:#eaeaea; }
 table.stats td, table.stats th {
   margin-left:  0.2em;
   margin-right: 0.2em;
@@ -544,9 +548,30 @@ table.stats td, table.stats th {
   padding-right: 0.2em;
   border-right: solid 0.1em #000;
 }
-table.stats  tr td:last-child, table.stats  tr th:last-child { border-right: solid 0 #000; }
-
+table.stats tr td:last-child, table.stats  tr th:last-child { border-right: solid 0 #000; }
 table.stats th { border-bottom: solid 0.2em #000 }
+
+table.stats thead tr .header {
+    background-image: url(bg.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+table.stats tbody td {
+    padding: 4px;
+    background-color: #eaeaea;
+    vertical-align: top;
+}
+table.stats thead tr .headerSortUp {
+    background-image: url(asc.png);
+}
+table.stats thead tr .headerSortDown {
+    background-image: url(desc.png);
+}
+table.stats thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+    background-color: #8dbdd8;
+}
+
 
 
 /* the login window */

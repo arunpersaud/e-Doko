@@ -104,7 +104,8 @@ CREATE TABLE `Game` (
   `ruleset` int(11) default NULL,
   `session` int(11) default NULL,
   `id` int(11) NOT NULL auto_increment,
-  UNIQUE KEY `id` (`id`)
+  UNIQUE KEY `id` (`id`),
+  KEY `session` (`session`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --

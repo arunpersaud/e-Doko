@@ -38,9 +38,7 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
 
   echo "<p>The contra party wins in ";
   $result = DB_query("SELECT COUNT(*) from Score".
-		     " LEFT JOIN Game ON Game.id=game_id".
-		     " WHERE score='againstqueens'".
-		     " AND Game.status='gameover'");
+		     " WHERE score='againstqueens'");
   while( $r = DB_fetch_array($result))
     echo $r[0];
   echo " games.</p>\n";
@@ -173,15 +171,6 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
   array_unshift($result,array("Position","Number of tricks"));
   echo output_table($result,"Tricks at the table","stats");
 
-  /* most games */
-  $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
-			       " FROM Hand".
-			       " LEFT JOIN User ON User.id=user_id".
-			       " GROUP BY user_id".
-			       " ORDER BY c DESC LIMIT 7" );
-  array_unshift($result,array("Name","Number of games"));
-  echo output_table($result,"Most games","stats");
-
   /* most solos */
   $result = DB_query_array_all("SELECT fullname as fname,".
 			       "       COUNT(*), ".
@@ -236,12 +225,12 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
  echo " games</p>\n";
   */
   $result = generate_global_score_table();
-  array_unshift($result,array("Name","Average score per game"));
-  echo output_table($result,"Points per game","stats");
+  array_unshift($result,array("Name","Average score per game","Total Points","Number of games"));
+  echo output_table($result,"Points per game (need more than 10 games)","stats","ScoreTable");
 
   /*
- how often is the last trick a non-trump trick
-  */
+   * how often is the last trick a non-trump trick
+   */
 
   /* needs this so that all tables are within the div and don't float around */
   echo "<p style=\"clear:both;\">&nbsp;</p>\n";
