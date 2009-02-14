@@ -53,8 +53,9 @@ if(myisset("forgot"))
 	      "   $newpw    \n".
 	      "to log into the server. The new password is valid for 24h, so make\n".
 	      "sure you reset your password to something new. Your old password will\n".
-	      " also still be valid until you set a new one\n";
-	    mymail($email,$EmailName."recovery ",$message);
+	      "also still be valid until you set a new one.\n";
+	    $subject = $EmailName.' Recovery';
+	    sendmail($email,$subject,$message);
 
 	    /* we save these in the database */
 	    DB_set_recovery_password($myid,md5($newpw));

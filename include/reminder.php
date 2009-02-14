@@ -33,7 +33,6 @@ $r = DB_query_array("SELECT mod_date,player,status from Game WHERE id='$gameid' 
 if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week */
   {
     $name = DB_get_name('userid',$r[1]);
-    $To   = DB_get_email('userid',$r[1]);
     $userhash = DB_get_hash_from_gameid_and_userid($gameid,$r[1]);
 
     $message = "Hello $name, \n\n".
@@ -50,12 +49,13 @@ if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week
     else
       {
 	DB_set_reminder($r[1],$gameid);
-	mymail($To,$EmailName."Reminder: game ".DB_format_gameid($gameid)." it's your turn",$message);
+	$subject ='Reminder: game '.DB_format_gameid($gameid)." it's your turn";
+	mymail($r[1],$subject,$message);
 
 	echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
 	  ": an email has been sent out.<br /><br /></p>";
       }
   }
  else
-   echo "<p>You need to wait longer before you can send out a reminder...</p>\n";
+   echo '<p>You need to wait longer before you can send out a reminder...</p>\n';
 ?>

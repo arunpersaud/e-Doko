@@ -44,8 +44,8 @@ if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
     $userids = DB_get_all_userid_by_gameid($gameid);
     foreach($userids as $user)
       {
-	$To = DB_get_email('userid',$user);
-	mymail($To,$EmailName."game ".DB_format_gameid($gameid)." canceled (timed out)",$message);
+	$subject = "Game ".DB_format_gameid($gameid)." canceled (timed out)";
+	mymail($user,$subject,$message);
       }
 
     /* delete everything from the dB */

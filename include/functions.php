@@ -54,9 +54,48 @@ function config_check()
   return;
 }
 
-function mymail($To,$Subject,$message,$header="")
+function mymail($uid,$subject,$message)
 {
+  global $EmailName;
+
+  /* check if user wants email right away or if we should save it in
+   * the database for later delivery
+   */
+  if(0)
+    {
+      /* send to database (not yet implemented)*/
+    }
+  else
+    {
+      /* send email right away */
+
+      /* add standard header and footer */
+      $subject = "$EmailName".$subject;
+
+      /* standard greeting */
+      $header  = "Hello ...\n\n";
+
+      /* and standard goodbye */
+      $footer  = "\n\nHave a nice day\n".
+	"   your E-Doko service department\n\n".
+	"-- \n".
+	"You can change your mail delivery mode in the preference menu.\n".
+	'web: http://doko.nubati.net   '.
+	'help: http://wiki.nubati.net/EmailDoko   '.
+	'bugs: http://wiki.nubati.net/EmailDokoIssues';
+
+      $To = DB_get_email('userid',$uid);
+
+      sendmail($To,$subject,$header.$message.$footer);
+    }
+}
+
+function sendmail($To,$Subject,$message)
+{
+  /* this function sends the mail or outputs to the screen in case of debugging */
   global $debug,$EMAIL_REPLY;
+
+  $header = "";
 
   if(isset($EMAIL_REPLY))
     $header .= "From: e-DoKo daemon <$EMAIL_REPLY>\r\n";
@@ -104,7 +143,7 @@ function myisset()
 function myerror($message)
 {
   echo "<span class=\"error\">".htmlspecialchars($message)."</span>\n";
-  mymail($ADMIN_EMAIL,$EmailName." Error in Code",$message);
+  sendmail($ADMIN_EMAIL,$EmailName." Error in Code",$message);
   return;
 }
 

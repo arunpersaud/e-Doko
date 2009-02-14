@@ -182,14 +182,11 @@ else
 	  "If you want to join this game, please follow this link:\n\n".
 	  "".$HOST.$INDEX."?action=game&me=";
 
-	mymail($EmailA,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
-	       "Hello $PlayerA,\n".$message.$hashA);
-	mymail($EmailB,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
-	       "Hello $PlayerB,\n".$message.$hashB);
-	mymail($EmailC,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
-	       "Hello $PlayerC,\n".$message.$hashC);
-	mymail($EmailD,"$EmailName You are invited to a game of DoKo (game ".DB_format_gameid($gameid).")",
-	       "Hello $PlayerD,\n".$message.$hashD);
+	$subject = 'You are invited to a game of DoKo (game '.DB_format_gameid($gameid).')';
+	sendmail($EmailA,$subject, "Hello $PlayerA,\n".$message.$hashA);
+	sendmail($EmailB,$subject, "Hello $PlayerB,\n".$message.$hashB);
+	sendmail($EmailC,$subject, "Hello $PlayerC,\n".$message.$hashC);
+	sendmail($EmailD,$subject, "Hello $PlayerD,\n".$message.$hashD);
 
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
         display_user_menu($myid);
