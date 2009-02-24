@@ -73,10 +73,11 @@ function mymail($uid,$subject,$message)
       $subject = "$EmailName".$subject;
 
       /* standard greeting */
-      $header  = "Hello ...\n\n";
+      $name    = DB_get_name('userid',$uid);
+      $header  = "Hello $name\n\n";
 
       /* and standard goodbye */
-      $footer  = "\n\nHave a nice day\n".
+      $footer  = "\nHave a nice day\n".
 	"   your E-Doko service department\n\n".
 	"-- \n".
 	"You can change your mail delivery mode in the preference menu.\n".
