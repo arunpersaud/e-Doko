@@ -881,7 +881,9 @@ function display_table ()
 
       echo "    <br />\n";
       echo "    <span title=\"local time: ".date("Y-m-d H:i:s",$timenow).  " ".
-	                     "last login: ".date("Y-m-d H:i:s",$lastlogin)."\">time info</span>\n";
+	                     "last login: ".date("Y-m-d H:i:s",$lastlogin)."\">".
+			     "<img src=\"pics/button/time-info.png\" class=\"button\" alt-\"time info\" />".
+			     "</span>\n";
       echo "   </div>\n";
 
     }
