@@ -33,7 +33,9 @@ DB_update_user_timestamp($myid);
  * update the database and track changes with a variable, so that
  * we can later highlight the changed value
  */
-if(myisset('vacation_start','vacation_stop','vacation_comment'))
+if(myisset('vacation_start','vacation_stop','vacation_comment') &&
+   ($_REQUEST['vacation_start']!='' || $_REQUEST['vacation_stop']!='')
+   )
   {
     $vacation_start   = $_REQUEST['vacation_start'].' 00:00:00';
     $vacation_stop    = $_REQUEST['vacation_stop'].' 23:59:59';
