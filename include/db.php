@@ -61,8 +61,18 @@ function DB_query($query)
   /* debug/optimize the database
   $logfile=fopen('/tmp/DBlog.log','a+');
   fwrite($logfile,"EXPLAIN $query ;\n");
+
+  $time = microtime();
+  $return = mysql_query($query);
+  $time = $time - microtime();
+
+  fwrite($logfile,"time of above query: $time\n");
+
   fclose($logfile);
+
+  return $return;
   */
+
   return mysql_query($query);
 }
 
