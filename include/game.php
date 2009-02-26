@@ -746,7 +746,7 @@ switch($mystatus)
 		  }
 	      }
 	    else
-	      echo " Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
+	      echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
 	  }
 	else
 	  {
@@ -756,7 +756,7 @@ switch($mystatus)
 
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
-	      echo " Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
+	      echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
 	    else
 	      {
 		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
@@ -871,7 +871,7 @@ switch($mystatus)
 	      }
 	  }
 	else
-	  echo " Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
+	  echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
       }
 
     /* the following is part A) of what needs to be done */
@@ -1063,7 +1063,7 @@ switch($mystatus)
 		    mymail($userid,$subject,$message);
 		  }
 	      }
-	    echo "<div class=\"message\"> Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
+	    echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
 	  }
       }
     echo "</div>";
