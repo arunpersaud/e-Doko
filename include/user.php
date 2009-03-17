@@ -154,7 +154,7 @@ else
 	    $Multi = ($r[5]>1) ? "multi" : "";
 	    if($r[4]=='pre')
 	      echo "   <span class=\"gamestatuspre $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span>\n";
-	    else if ($r[4]=='gameover')
+	    else if (in_array($r[4],array('gameover','cancel-timedout','cancel-nines','cancel-noplay','cancel-trump')))
 	    {
 	      echo "   <span class=\"gamestatusover $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">";
 	      if($r[5]<2)
@@ -165,7 +165,7 @@ else
 	    }
 	    else
 	      echo "   <span class=\"gamestatusplay $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span>\n";
-	    if($r[4] != 'gameover')
+	    if($r[4] == 'pre' || $r[4] == 'play')
 	      {
 		echo "</td>\n<td>\n    ";
 		if($r[3]==$myid || !$r[3])
@@ -190,8 +190,7 @@ else
 		      echo "(it's $name's turn)\n";
 		  };
 		if(time()-strtotime($r[2]) > 60*60*24*30)
-		  echo "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a>".
-		    " (clicking here is final and can't be restored)";
+		  echo "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a> ";
 	      }
 	  }
 	echo "</td></tr>\n</table>\n";

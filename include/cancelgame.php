@@ -48,8 +48,8 @@ if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
 	mymail($user,$subject,$message);
       }
 
-    /* delete everything from the dB */
-    DB_cancel_game($me);
+    /* set gamestatus to canceled */
+    cancel_game('timedout',$gameid);
 
     echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
       " has been canceled.<br /><br /></p>";

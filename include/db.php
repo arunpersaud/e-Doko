@@ -971,7 +971,7 @@ function DB_is_session_active($session)
 {
   $r = DB_query_array("SELECT COUNT(*) FROM Game ".
 		      "  WHERE session=$session ".
-		      "  AND status<>'gameover' ");
+		      "  AND status IN ('pre','play') ");
   if($r)
     return $r[0];
   else

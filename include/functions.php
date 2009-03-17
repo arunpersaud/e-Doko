@@ -1253,4 +1253,35 @@ function check_vacation($userid)
     return NULL;
 }
 
+function cancel_game($why,$gameid)
+{
+  $gameid = DB_quote_smart($gameid);
+
+  /* update the game table */
+  switch($why)
+    {
+    case 'timedout':
+      DB_query("UPDATE Game SET status='cancel-timedout' WHERE id=$gameid");
+      break;
+    case 'nines':
+      DB_query("UPDATE Game SET status='cancel-nines' WHERE id=$gameid");
+      break;
+    case 'trump':
+      DB_query("UPDATE Game SET status='cancel-trump' WHERE id=$gameid");
+      break;
+    case 'noplay':
+      DB_query("UPDATE Game SET status='cancel-noplay' WHERE id=$gameid");
+      break;
+    }
+  /* set each player to gameover */
+  $result = DB_query("SELECT id FROM Hand WHERE game_id=".DB_quote_smart($gameid));
+  while($r = DB_fetch_array($result))
+    {
+      $id = $r[0];
+      DB_query("UPDATE Hand SET status='gameover' WHERE id=".DB_quote_smart($id));
+    }
+
+  return;
+}
+
 ?>

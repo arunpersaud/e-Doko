@@ -12,6 +12,28 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
+
+--
+-- Table structure for table `Version`
+--
+
+DROP TABLE IF EXISTS `Version`;
+CREATE TABLE `Version` (
+  `version` int NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Card`
+--
+
+
+/*!40000 ALTER TABLE `Card` DISABLE KEYS */;
+LOCK TABLES `Version` WRITE;
+INSERT INTO `Version` VALUES (1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `Version` ENABLE KEYS */;
+
+
 --
 -- Table structure for table `Card`
 --
@@ -98,9 +120,9 @@ CREATE TABLE `Game` (
   `type` enum('normal','solo','wedding','poverty','dpoverty') default NULL,
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `sickness` int(11) default NULL,
-  `startplayer` tinyint(4) default '1', 
-  `player` int(11) default NULL, 
-  `status` enum('pre','play','gameover') default NULL,
+  `startplayer` tinyint(4) default '1',
+  `player` int(11) default NULL,
+  `status` enum('pre','play','gameover','cancel-timedout','cancel-nines','cancel-trump','cancel-noplay') default NULL,
   `ruleset` int(11) default NULL,
   `session` int(11) default NULL,
   `id` int(11) NOT NULL auto_increment,
@@ -133,7 +155,7 @@ CREATE TABLE `Rulesets` (
   `id` int(11) NOT NULL auto_increment,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-  
+
 --
 -- Dumping data for table `Rulesets`
 --

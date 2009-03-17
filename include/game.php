@@ -217,7 +217,7 @@ if($session)
 
     echo "  <div class=\"sessionscore\">";
     if($finalscore)
-      { 
+      {
 	echo "Score: \n";
 	/* output the final score on the front page */
 	foreach($finalscore as $user=>$value)
@@ -226,9 +226,9 @@ if($session)
 	    echo " ".substr($name,0,2).": $value ";
 	  }
       }
-    else 
+    else
       {
-	/* first game, no score yet */ 
+	/* first game, no score yet */
 	echo "&nbsp;";
       }
 
@@ -311,8 +311,8 @@ switch($mystatus)
 		mymail($user,$subject,$message);
 	      }
 
-	    /* delete everything from the dB */
-	    DB_cancel_game($me);
+	    /* update game status */
+	    cancel_game('noplay',$gameid);
 	    break;
 	  }
 	else
@@ -589,7 +589,6 @@ switch($mystatus)
 	else if($nines)
 	  {
 	    /* cancel game */
-	    /* TODO: should we keep statistics of this? */
 	    $message = "Hello, \n\n".
 	      " the game has been canceled because ".DB_get_name('userid',$nines).
 	      " has five or more nines and nobody is playing solo.\n\n".
@@ -603,8 +602,8 @@ switch($mystatus)
 		mymail($user,$subject,$message);
 	      }
 
-	    /* delete everything from the dB */
-	    DB_cancel_game($me);
+	    /* update game status */
+	    cancel_game('nines',$gameid);
 
 	    echo "The game has been canceled because ".DB_get_name('userid',$nines).
 	      " has five or more nines and nobody is playing solo.\n";
@@ -950,8 +949,8 @@ switch($mystatus)
 		    mymail($user,$subject,$message);
 		  }
 
-		/* delete everything from the dB */
-		DB_cancel_game($me);
+		/* update game status */
+		cancel_game('trump',$gameid);
 
 		echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
 		return;
@@ -1074,6 +1073,27 @@ switch($mystatus)
     /* both entries here,  so that the tricks are visible for both.
      * in case of 'play' there is a break later that skips the last part
      */
+
+    /* first check if the game has been canceled and display */
+    switch($gamestatus)
+      {
+      case 'cancel-noplay':
+	echo "<div class=\"message\"><p>The game has been canceled due to the request of one player.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.</p></div>";
+	break;
+      case 'cancel-timedout':
+	echo "<div class=\"message\"><p>The game has been canceled because one player wasn't responding.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.</p></div>";
+	break;
+      case 'cancel-nines':
+      case 'cancel-timedout':
+	echo "<div class=\"message\"><p>The game has been canceled because one player had too many nines.</p></div>";
+	break;
+      case 'cancel-trump':
+	echo "<div class=\"message\"><p>The game has been canceled because nobody wanted to take the trump.</p></div>";
+	break;
+      }
+    /* for these two types, we shouldn't show the cards, since we might want to restart the game */
+    if (in_array($gamestatus,array('cancel-noplay','cancel-timedout')))
+      break;
 
     /* check if all players are ready to play,
      * if so, send out email to the startplayer
@@ -2011,7 +2031,10 @@ echo "</div>\n";
 
 echo "</form>\n";
 
-if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' && isset($_SESSION['id']) && $_SESSION['id']==$myid)
+$gamestatus = DB_get_game_status_by_gameid($gameid);
+if($mystatus=='gameover' &&
+   ($gamestatus =='gameover' || $gamestatus =='cancel-nines' || $gamestatus =='cancel-trump') &&
+   isset($_SESSION['id']) && $_SESSION['id']==$myid)
   {
     $session = DB_get_session_by_gameid($gameid);
     $result  = DB_query("SELECT id,create_date FROM Game".
@@ -2037,6 +2060,8 @@ if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' &&
 	    else /* rotate normally */
 	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
 	  }
+	else if($gamestatus == 'cancel-nines' || $gamestatus == 'cancel-trump')
+	  output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
 	else /* rotate normally */
 	  output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);
       }
