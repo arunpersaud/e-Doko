@@ -59,16 +59,17 @@ function DB_test()
 function DB_query($query)
 {
   /* debug/optimize the database
-  $logfile=fopen('/tmp/DBlog.log','a+');
-  fwrite($logfile,"EXPLAIN $query ;\n");
-
   $time = microtime();
   $return = mysql_query($query);
   $time = $time - microtime();
 
-  fwrite($logfile,"time of above query: $time\n");
-
-  fclose($logfile);
+  if($time > 0.05) // this way we can find only the long ones
+  {
+    $logfile=fopen('/tmp/DBlog.log','a+');
+    fwrite($logfile,"EXPLAIN $query ;\n");
+    fwrite($logfile,"time of above query: $time\n");
+    fclose($logfile);
+  };
 
   return $return;
   */
