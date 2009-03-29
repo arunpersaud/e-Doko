@@ -266,34 +266,6 @@ function DB_get_gameid_by_hash($hash)
     return 0;
 }
 
-function DB_cancel_game($hash)
-{
-  $gameid = DB_get_gameid_by_hash($hash);
-
-  if(!$gameid)
-    return;
-
-  /* get the IDs of all players */
-  $result = DB_query("SELECT id FROM Hand WHERE game_id=".DB_quote_smart($gameid));
-  while($r = DB_fetch_array($result))
-    {
-      $id = $r[0];
-
-      $tmp = DB_query_array("SELECT id  FROM Hand_Card WHERE hand_id=".DB_quote_smart($id));
-      DB_query("DELETE FROM Play WHERE hand_card_id=".DB_quote_smart($tmp[0]));
-
-      DB_query("DELETE FROM Hand_Card WHERE hand_id=".DB_quote_smart($id));
-      DB_query("DELETE FROM Hand WHERE id=".DB_quote_smart($id));
-    }
-
-  /* delete game */
-  DB_query("DELETE FROM User_Game_Prefs WHERE game_id=".DB_quote_smart($gameid));
-  DB_query("DELETE FROM Trick WHERE game_id=".DB_quote_smart($gameid));
-  DB_query("DELETE FROM Game WHERE id=".DB_quote_smart($gameid));
-
-  return;
-}
-
 function DB_get_hand($me)
 {
   $cards = array();
