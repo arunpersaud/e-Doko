@@ -942,7 +942,7 @@ function display_user_menu($id)
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
 		     " WHERE Hand.user_id='$id'".
 		     " AND ( Game.player='$id' OR ISNULL(Game.player) )".
-		     " AND Game.status<>'gameover'".
+		     " AND ( Game.status='pre' OR Game.status='play' )".
 		     " ORDER BY Game.session" );
 
   $i=0;
