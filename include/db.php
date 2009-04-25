@@ -18,8 +18,10 @@ function DB_open()
       mysql_select_db($DB_database) or die('Could not select database');
     }
   else
-    return -1;
-
+    {
+      echo mysql_errno() . ": " . mysql_error(). "\n";
+      return -1;
+    }
   return 0;
 }
 
@@ -1036,7 +1038,7 @@ function DB_get_userid($type,$var1="",$var2="")
       /* test if a recovery password has been set */
       if(!$r)
 	{
-	  echo "testing alternative password";
+	  /* testing alternative password */
 	  $result = DB_query("SELECT User.id FROM User".
 			     " LEFT JOIN Recovery ON User.id=Recovery.user_id".
 			     " WHERE email=".DB_quote_smart($var1).
