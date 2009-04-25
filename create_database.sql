@@ -457,3 +457,11 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
+DROP TABLE IF EXISTS `user_openids`;
+create table user_openids (
+  openid_url varchar(255) not null,
+  primary key (openid_url),
+
+  user_id int not null,
+  index (user_id)
+);

@@ -5,6 +5,8 @@
 if(!isset($HOST))
   exit;
 
+include_once('openid.php');
+
 $name  = $_SESSION["name"];
 $email = DB_get_email('name',$name);
 $myid  = DB_get_userid('email',$email);
@@ -20,6 +22,7 @@ $changed_autosetup    = 0;
 $changed_sorting      = 0;
 $changed_openforgames = 0;
 $changed_vacation     = 0;
+$changed_openid       = 0;
 
 display_user_menu($myid);
 
@@ -33,6 +36,20 @@ DB_update_user_timestamp($myid);
  * update the database and track changes with a variable, so that
  * we can later highlight the changed value
  */
+
+/* check for deleted openids */
+foreach($_REQUEST as $key=>$value)
+{
+  if(strstr($key,"delete-openid-"))
+    {
+      /* found and openid to delete */
+      $DelOpenID = substr(str_replace("_",".",$key),14);
+      DB_DetachOpenID($DelOpenID, $myid);
+      $changed_openid = 1;
+    }
+}
+
+
 if(myisset('vacation_start','vacation_stop','vacation_comment') &&
    ($_REQUEST['vacation_start']!='' || $_REQUEST['vacation_stop']!='')
    )
@@ -236,6 +253,12 @@ if(myisset("password0") &&  $_REQUEST["password0"]!="" )
     /* error output below */
   }
 
+if(myisset("openid_url") && $_REQUEST['openid_url']!='')
+  {
+    $openid_url = OpenIDUrlEncode($_REQUEST['openid_url']);
+    DB_AttachOpenID($openid_url, $myid);
+  }
+
 /* get infos again in case they have changed */
 $PREF     = DB_get_PREF($myid);
 $timezone = DB_get_user_timezone($myid);
@@ -385,6 +408,31 @@ echo "        <tr><td>Password(new, retype): </td><td>",
   "<input type=\"password\" id=\"password2\" name=\"password2\" size=\"20\" maxlength=\"30\" />",
   " </td></tr>\n";
 echo "      </table>\n";
+echo "    </fieldset>\n";
+echo "    <fieldset>\n";
+echo "      <legend>OpenID</legend>\n";
+
+$openids = array();
+$openids = DB_GetOpenIDsByUser($myid);
+
+if(sizeof($openids))
+  {
+    echo "     <table class=\"openid\">\n";
+    echo "     <thead><tr><th>Delete?</th><th>OpenId</th></tr></thead>\n";
+    echo "     <tbody>\n";
+    foreach ($openids as $ids)
+      {
+	$id=($ids[0]);
+	echo "        <tr><td><input type=\"checkbox\" name=\"delete-openid-$id\" /></td><td>",$id, "</td></tr>\n";
+      }
+    echo "     </tbody>\n";
+    echo "     </table>\n";
+  }
+
+echo "        add OpenID: ",
+  "<input type=\"text\" id=\"openid_url\" name=\"openid_url\" size=\"20\" maxlength=\"50\" />";
+if($changed_openid)
+  echo "   Deleted some OpenIDs! <br />\n";
 echo "    </fieldset>\n";
 echo "    <fieldset><legend>Submit</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
 echo "  </form>\n";

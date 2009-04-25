@@ -28,7 +28,7 @@
     $EMAIL_REPLY="";
 
     /* this should point to your index.file and to your domain.
-     * The HOST variable is also used to test, if files are called 
+     * The HOST variable is also used to test, if files are called
      * from within e-DoKo, so it needs to be set.
      */
     $INDEX = "/index.php";
@@ -39,4 +39,20 @@
 
     /* the default timezone for you domain */
     $defaulttimezone = date_default_timezone_get();
+
+    /* OpenId
+     *
+     * we use the php-openid library (tested with version 2.1.3)
+     * E-DoKo needs to know where to find the file examples/consumer/common.php
+     * that comes with the library. That file also needs to be modified the
+     * function getReturnTo(), change:
+     -    return sprintf("%s://%s:%s%s/finish_auth.php",
+     +    return sprintf("%s://%s:%s%s/index.php?action=login",
+
+    */
+
+    /* Openidpath that points to the top php-openid directory */
+    //$OPENIDPATH = "..fill in correct path here.../openid/php-openid-2.1.3/"
+    // leave empty if not used.
+    $OPENIDPATH = '';
 ?>

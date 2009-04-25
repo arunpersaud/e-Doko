@@ -77,6 +77,15 @@ if($done==0)
     <input type="password" id="password" name="password" size="20" maxlength="30" /> <br />
     <input type="submit" class="submitbutton" name="login" value="login" />
     <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" />
+<?php
+  if($OPENIDPATH)
+    {?>
+    <hr>
+    <p> Have an OpenID account? Sign in below <br />
+    <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" />
+    <input type="submit" class="submitbutton" name="login" value="Sign in" /><br />
+     e.g. http://username.openid.net. See <a href="http://openid.net">openid.net</a> for more information.</p>
+<?php }?>
   </fieldset>
   </form>
 </div>
