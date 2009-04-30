@@ -816,6 +816,7 @@ function display_table ()
       $call      = $r[5];
       $hash      = $r[7];
       $timezone  = $r[8];
+      $wins      = DB_get_number_of_tricks($gameid,$pos);
       date_default_timezone_set($defaulttimezone);
       $lastlogin = strtotime($r[6]);
       date_default_timezone_set($timezone);
@@ -939,6 +940,22 @@ function display_table ()
 	                     "last login: ".date("Y-m-d H:i:s",$lastlogin)."\">".
 			     "<img src=\"pics/button/time-info.png\" class=\"tinybutton\" alt=\"time info\" />".
 			     "</span>\n";
+
+      /* show how many tricks the person made */
+      switch($wins)
+	{
+	case 0:
+	  echo "#tricks 0"; break;
+	case 1:
+	  echo "#tricks 1"; break;
+	case 2:
+	case 3:
+	case 4:
+	  echo "#tricks few"; break;
+	default:
+	  echo "#tricks many"; break;
+	}
+
       echo "   </div>\n";
 
     }
