@@ -170,8 +170,7 @@ else
 	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
 
 	/* send out email, TODO: check for error with email */
-	$message = "\n".
-	  "you are invited to play a game of DoKo.\n".
+	$message = "You are invited to play a game of DoKo.\n".
 	  "Please, place comments and bug reports here:\n".
 	  "http://wiki.nubati.net/index.php?title=EmailDoko\n\n".
 	  "The whole round would consist of the following players:\n".
@@ -183,10 +182,10 @@ else
 	  "".$HOST.$INDEX."?action=game&me=";
 
 	$subject = 'You are invited to a game of DoKo (game '.DB_format_gameid($gameid).')';
-	sendmail($EmailA,$subject, "Hello $PlayerA,\n".$message.$hashA);
-	sendmail($EmailB,$subject, "Hello $PlayerB,\n".$message.$hashB);
-	sendmail($EmailC,$subject, "Hello $PlayerC,\n".$message.$hashC);
-	sendmail($EmailD,$subject, "Hello $PlayerD,\n".$message.$hashD);
+	mymail($useridA,$subject, $message.$hashA);
+	mymail($useridB,$subject, $message.$hashB);
+	mymail($useridC,$subject, $message.$hashC);
+	mymail($useridD,$subject, $message.$hashD);
 
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
         display_user_menu($myid);

@@ -72,11 +72,7 @@ function mymail($uid,$subject,$message)
       /* add standard header and footer */
       $subject = "$EmailName".$subject;
 
-      /* standard greeting */
-      $name    = DB_get_name('userid',$uid);
-      $header  = "Hello $name\n\n";
-
-      /* and standard goodbye */
+      /* standard goodbye */
       $footer  = "\nHave a nice day\n".
 	"   your E-Doko service department\n\n".
 	"-- \n".
@@ -85,7 +81,26 @@ function mymail($uid,$subject,$message)
 	'help: http://wiki.nubati.net/EmailDoko   '.
 	'bugs: http://wiki.nubati.net/EmailDokoIssues';
 
-      $To = DB_get_email('userid',$uid);
+      if(is_array($uid))
+	{
+	  /* send email to more than one person */
+
+	  $header  = "Hello all\n\n";
+
+	  foreach($uid as $user)
+	    {
+	      $all[] = DB_get_email('userid',$user);
+	    }
+	  $To = implode(",",$all);
+	}
+      else
+	{
+	  /* standard greeting */
+	  $name    = DB_get_name('userid',$uid);
+	  $header  = "Hello $name\n\n";
+
+	  $To = DB_get_email('userid',$uid);
+	}
 
       sendmail($To,$subject,$header.$message.$footer);
     }

@@ -1798,12 +1798,8 @@ switch($mystatus)
 		  $message .= "\nUse these links to have a look at game ".DB_format_gameid($gameid).": \n";
 
 		  /* send out final email */
-		  $all = array();
-
 		  foreach($userids as $user)
 		    {
-		      $all[] = DB_get_email('userid',$user);
-
 		      /* add links for all players */
 		      $hash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		      $name = DB_get_name('userid',$user);
@@ -1811,11 +1807,9 @@ switch($mystatus)
 		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
 		      $message .= $link;
 		    }
-		  $To = implode(",",$all);
-
 		  $message .= "\n\n (you can use reply all on this email to reach all the players.)\n";
-		  $subject = $EmailName.' Game over (game '.DB_format_gameid($gameid).') ';
-		  sendmail($To,$subject,$message);
+		  $subject = ' Game over (game '.DB_format_gameid($gameid).') ';
+		  mymail($userids,$subject,$message);
 	      }
 	  }
 	else
