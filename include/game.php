@@ -1295,6 +1295,7 @@ switch($mystatus)
 	/* end of trick? */
 	if($seq==4)
 	  {
+	    $winner    = get_winner($play,$gametype); /* returns the position */
 	    echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
 	  }
       }

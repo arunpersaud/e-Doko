@@ -270,7 +270,9 @@ hr {clear:both;}
 /*ul.tricks li:hover div.table{ display:block; }*/
 
 /* left player */
-ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
+ul.tricks li div div.card0 img,
+ul.tricks li div div.card0 .score,
+.vorbehalt0 {
   position:absolute;
   margin:0;
   padding:0;
@@ -281,6 +283,7 @@ ul.tricks li div div.card0 img,ul.tricks li div div.card0 .score, .vorbehalt0 {
   width:6%;
   z-index:30;
 }
+
 .vorbehalt0 {
   left:37.5%;
   right:57.5%;
@@ -299,7 +302,9 @@ ul.tricks li div div.card0 span.comment{
 }
 
 /* top player */
-ul.tricks li div div.card1 img,ul.tricks li div div.card1 .score, .vorbehalt1 {
+ul.tricks li div div.card1 img,
+ul.tricks li div div.card1 .score,
+.vorbehalt1 {
   position:absolute;
   margin:0;
   padding:0;
@@ -330,7 +335,9 @@ ul.tricks li div div.card1 span.comment{
 }
 
 /* right player */
-ul.tricks li div div.card2 img,ul.tricks li div div.card2 .score, .vorbehalt2{
+ul.tricks li div div.card2 img,
+ul.tricks li div div.card2 .score,
+.vorbehalt2{
   position:absolute;
   margin:0;
   padding:0;
@@ -360,7 +367,9 @@ ul.tricks li div div.card2 span.comment{
 }
 
 /* bottom player */
-ul.tricks li div div.card3 img,ul.tricks li div div.card3 .score, .vorbehalt3{
+ul.tricks li div div.card3 img,
+ul.tricks li div div.card3 .score,
+.vorbehalt3{
   position:absolute;
   margin:0;
   padding:0;

@@ -1149,4 +1149,10 @@ function DB_played_by_others($gameid)
       $gameids[]=$r[0];
   return $gameids;
 }
+
+function DB_get_number_of_tricks($gameid,$position)
+{
+  $r = DB_query_array("SELECT COUNT(winner) FROM Trick Where game_id='$gameid' and winner='$position'");
+  return $r[0];
+}
 ?>
