@@ -178,14 +178,14 @@ else
 	  "$PlayerB\n".
 	  "$PlayerC\n".
 	  "$PlayerD\n\n".
-	  "If you want to join this game, please follow this link:\n\n".
+	  "If you want to join this game, please follow this link:\n".
 	  "".$HOST.$INDEX."?action=game&me=";
 
 	$subject = 'You are invited to a game of DoKo (game '.DB_format_gameid($gameid).')';
-	mymail($useridA,$subject, $message.$hashA);
-	mymail($useridB,$subject, $message.$hashB);
-	mymail($useridC,$subject, $message.$hashC);
-	mymail($useridD,$subject, $message.$hashD);
+	mymail($useridA,$subject, $message.$hashA."\n\n");
+	mymail($useridB,$subject, $message.$hashB."\n\n");
+	mymail($useridC,$subject, $message.$hashC."\n\n");
+	mymail($useridD,$subject, $message.$hashD."\n\n");
 
 	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
         display_user_menu($myid);

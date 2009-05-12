@@ -38,7 +38,7 @@ if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
   {
     $message = "Hello, \n\n".
       "Game ".DB_format_gameid($gameid).
-      " has been canceled since nothing happend for a while and $myname requested it.\n";
+      " has been canceled since nothing happend for a while and $myname requested it.\n\n";
 
     /* email to all players */
     $userids = DB_get_all_userid_by_gameid($gameid);
