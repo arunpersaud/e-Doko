@@ -36,8 +36,7 @@ $myname   = DB_get_name('hash',$me);
 $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
 if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
   {
-    $message = "Hello, \n\n".
-      "Game ".DB_format_gameid($gameid).
+    $message = "Game ".DB_format_gameid($gameid).
       " has been canceled since nothing happend for a while and $myname requested it.\n\n";
 
     /* email to all players */
