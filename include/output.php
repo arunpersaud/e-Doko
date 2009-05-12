@@ -522,7 +522,7 @@ function output_exchanged_cards()
    * go through all positions, check that position has cards that need to be shown and
    * show those cards
    */
-  $show = 1;
+  $show=1;
   for($mypos=1;$mypos<5;$mypos++)
     {
       $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
@@ -530,22 +530,45 @@ function output_exchanged_cards()
 	 $mypos==$povertypos1 || $mypos==$partnerpos1 ||
 	 $mypos==$povertypos2 || $mypos==$partnerpos2 )
 	{
+	  /* figure out if we gave trump back */
+	  $trump_back1=0;
+	  if($povertypos2)
+	    foreach($povertycards1 as $card)
+	      {
+		if(is_trump($card)) 
+		  {
+		    $trump_back1=1;
+		    break;
+		  }
+	      }
+	  $trump_back2=0;
+	  if($povertypos2)
+	    foreach($povertycards2 as $card)
+	      {
+		if(is_trump($card)) 
+		  {
+		    $trump_back2=1;
+		    break;
+		  }
+	      }
+	  
+	  /* output vorbehalt  */
 	  echo "      <div class=\"vorbehalt".($mypos-1)."\"> Vorbehalt <br />\n";
 	  if($show)
 	    echo "       $usersick <br />\n";
+
+	  /* output cards */
 	  if($mypos==$partnerpos1)
 	    {
-	      $trump_back=0;
 	      foreach($partnercards1 as $card)
 		{
-		  if(is_trump($card)) $trump_back=1;
 		  echo '        ';
 		  if($povertyhash1 == $me || $partnerhash1 == $me || $mystatus=='gameover')
 		    display_card($card,$PREF['cardset']);
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back) echo "Trump back";
+	      if($trump_back1) echo "        Trump back";
 	    }
 	  else if($mypos==$povertypos1)
 	    {
@@ -557,6 +580,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 	      }
+	      if($trump_back1) echo "        Trump back";
 	    }
 	  else if($mypos==$povertypos2)
 	    {
@@ -568,10 +592,10 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
+	      if($trump_back2) echo "        Trump back";
 	    }
 	  else if($mypos==$partnerpos2)
 	    {
-	      $trump_back=0;
 	      foreach($partnercards2 as $card)
 		{
 		  if(is_trump($card)) $trump_back=1;
@@ -581,13 +605,12 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back) echo "Trump back";
+	      if($trump_back2) echo "        Trump back";
 	    }
 	  echo  "      </div>\n";
-
-	  if($mygametype == $usersick)
-	    $show = 0;
 	}
+      if($mygametype == $usersick)
+	$show = 0;
     }
 }
 
