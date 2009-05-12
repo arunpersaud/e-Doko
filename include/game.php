@@ -302,7 +302,7 @@ switch($mystatus)
 	  {
 	    /* cancel the game */
 	    $message = "Hello, \n\n".
-	      "the game has been canceled due to the request of one of the players.\n";
+	      "the game has been canceled due to the request of one of the players.\n\n";
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
@@ -593,7 +593,7 @@ switch($mystatus)
 	      " the game has been canceled because ".DB_get_name('userid',$nines).
 	      " has five or more nines and nobody is playing solo.\n\n".
 	      " To redeal either start a new game or, in case the game was part of a tournament, \n".
-	      " go to the last game and use the link at the bottom of the page to redeal.";
+	      " go to the last game and use the link at the bottom of the page to redeal.\n\n";
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
@@ -940,7 +940,7 @@ switch($mystatus)
 	    if($mypos+$next>4)
 	      {
 		$message = "Hello, \n\n".
-		  "Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n";
+		  "Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n\n";
 
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		foreach($userids as $user)
@@ -1807,7 +1807,7 @@ switch($mystatus)
 		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
 		      $message .= $link;
 		    }
-		  $message .= "\n\n (you can use reply all on this email to reach all the players.)\n";
+		  $message .= "\n\n (you can use reply all on this email to reach all the players.)\n\n";
 		  $subject = ' Game over (game '.DB_format_gameid($gameid).') ';
 		  mymail($userids,$subject,$message);
 	      }
