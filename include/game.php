@@ -589,11 +589,10 @@ switch($mystatus)
 	else if($nines)
 	  {
 	    /* cancel game */
-	    $message = "Hello, \n\n".
-	      " the game has been canceled because ".DB_get_name('userid',$nines).
-	      " has five or more nines and nobody is playing solo.\n\n".
-	      " To redeal either start a new game or, in case the game was part of a tournament, \n".
-	      " go to the last game and use the link at the bottom of the page to redeal.\n\n";
+	    $message = "the game has been canceled because ".DB_get_name('userid',$nines).
+	      "has five or more nines and nobody is playing solo.\n\n".
+	      "To redeal either start a new game or, in case the game was part of a tournament,\n".
+	      "go to the last game and use the link at the bottom of the page to redeal.\n\n";
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
