@@ -210,16 +210,19 @@ if($session)
     echo "  </div>\n  </div>\n";
 
     /* show score */
+
+    echo "  <div class=\"sessionscore\">";
+
     $score   = generate_score_table($session);
+
+    /* get the last entry to show on the main page */
     $tmpscore= $score;
     $finalscore = array_pop($tmpscore);
     $finalscore = $finalscore['players'];
 
-    echo "  <div class=\"sessionscore\">";
     if($finalscore)
       {
 	echo "Score: \n";
-	/* output the final score on the front page */
 	foreach($finalscore as $user=>$value)
 	  {
 	    $name = DB_get_name('userid',$user);
@@ -232,10 +235,13 @@ if($session)
 	echo "&nbsp;";
       }
 
+    /* output all games for the score table */
     echo format_score_table_html($score,$myid);
     echo "  </div>\n";
 
-    /* figure out which game in a session we are in and link to the previous and next game if possible */
+    /* figure out which game in a session we are in and link to the
+     * previous and next game if possible
+     */
     $hashes = DB_get_hashes_by_session($session,$myid);
     $next     = NULL;
     $i = 1;
