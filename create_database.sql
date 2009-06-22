@@ -465,3 +465,15 @@ create table user_openids (
   user_id int not null,
   index (user_id)
 );
+
+DROP TABLE IF EXISTS `digest_email`;
+create table digest_email (
+  `id` int(11) NOT NULL auto_increment,
+  `email` varchar(255) default null,
+  `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `content` text,
+  UNIQUE KEY `id` (`id`),
+  index (email)
+);
+
+

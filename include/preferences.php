@@ -23,6 +23,7 @@ $changed_sorting      = 0;
 $changed_openforgames = 0;
 $changed_vacation     = 0;
 $changed_openid       = 0;
+$changed_digest       = 0;
 
 display_user_menu($myid);
 
@@ -172,6 +173,24 @@ if(myisset("notify"))
       }
   }
 
+if(myisset("digest"))
+  {
+    $digest=$_REQUEST['digest'];
+    if($digest != $PREF['digest'])
+      {
+	/* check if we already have an entry for the user, if so change it, if not create new one */
+	$result = DB_query("SELECT * from User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='digest'" );
+	if( DB_fetch_array($result))
+	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($digest).
+			     " WHERE user_id='$myid' AND pref_key='digest'" );
+	else
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','digest',".
+			     DB_quote_smart($digest).")");
+	$changed_digest=1;
+      }
+  }
+
 if(myisset("autosetup"))
   {
     $autosetup = $_REQUEST['autosetup'];
@@ -301,14 +320,55 @@ if($PREF['email']=="emailaddict")
     echo "            <option value=\"emailaddict\" selected=\"selected\">less emails</option>\n";
     echo "            <option value=\"emailnonaddict\">lots of emails</option>\n";
   }
- else
-   {
-     echo "            <option value=\"emailaddict\">less email</option>\n";
-     echo "            <option value=\"emailnonaddict\" selected=\"selected\">lots of email</option>\n";
-   }
+else
+  {
+    echo "            <option value=\"emailaddict\">less email</option>\n";
+    echo "            <option value=\"emailnonaddict\" selected=\"selected\">lots of email</option>\n";
+  }
 echo "          </select>";
 if($changed_notify) echo "changed";
 echo " </td></tr>\n";
+
+echo "        <tr><td>Digest:          </td><td>\n";
+echo "          <select id=\"digest\" name=\"digest\" size=\"1\">\n";
+
+$selected = "selected=\"selected\"";
+echo "            <option value=\"digest-off\"";
+if($PREF['digest']=="digest-off") echo $selected;
+echo ">digest off</option>\n";
+
+echo "            <option value=\"digest-1h\" ";
+if($PREF['digest']=="digest-1h") echo $selected;
+echo ">every hour</option>\n";
+
+echo "            <option value=\"digest-2h\" ";
+if($PREF['digest']=="digest-2h") echo $selected;
+echo ">every 2h</option>\n";
+
+echo "            <option value=\"digest-3h\" ";
+if($PREF['digest']=="digest-3h") echo $selected;
+echo ">every 3h</option>\n";
+
+echo "            <option value=\"digest-4h\" ";
+if($PREF['digest']=="digest-4h") echo $selected;
+echo ">every 4h</option>\n";
+
+echo "            <option value=\"digest-6h\" ";
+if($PREF['digest']=="digest-6h") echo $selected;
+echo ">every 6h</option>\n";
+
+echo "            <option value=\"digest-12h\"";
+if($PREF['digest']=="digest-12h") echo $selected;
+echo ">every 12h</option>\n";
+
+echo "            <option value=\"digest-24h\"";
+if($PREF['digest']=="digest-24h") echo $selected;
+echo ">every 24h</option>\n";
+
+echo "          </select>";
+if($changed_digest) echo "changed";
+echo " </td></tr>\n";
+
 
 echo "        <tr><td>Autosetup:          </td><td>\n";
 echo "          <select id=\"autosetup\" name=\"autosetup\" size=\"1\">\n";

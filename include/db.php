@@ -114,6 +114,12 @@ function DB_query_array_all($query)
   return $result;
 }
 
+function DB_get_version()
+{
+  $version = DB_query_array('SELECT version FROM Version');
+  return $version[0];
+}
+
 function DB_get_passwd_by_name($name)
 {
   $r = DB_query_array("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
@@ -700,6 +706,7 @@ function DB_get_PREF($myid)
   /* set defaults */
   $PREF['cardset']		= 'english';
   $PREF['email']		= 'emailnonaddict';
+  $PREF['digest']               = 'digest-off';
   $PREF['autosetup']		= 'no';
   $PREF['sorting']		= 'high-low';
   $PREF['open_for_games']	= 'yes';
@@ -716,13 +723,18 @@ function DB_get_PREF($myid)
 	{
 	case 'cardset':
 	  /* licence only valid until then */
-	  if($pref[1]=="altenburg" && (time()-strtotime( "2009-12-31 23:59:59")<0) )
-	    $PREF["cardset"]="altenburg";
+	  if($pref[1]=='altenburg' && (time()-strtotime( '2009-12-31 23:59:59')<0) )
+	    $PREF['cardset']='altenburg';
 	  break;
 
 	case 'email':
-	  if($pref[1]=="emailaddict")
-	    $PREF["email"]="emailaddict";
+	  if($pref[1]=='emailaddict')
+	    $PREF['email']='emailaddict';
+	  break;
+
+	case 'digest':
+	  if($pref[1])
+	    $PREF['digest'] = $pref[1];
 	  break;
 
 	case 'autosetup':
@@ -1155,4 +1167,38 @@ function DB_get_number_of_tricks($gameid,$position)
   $r = DB_query_array("SELECT COUNT(winner) FROM Trick Where game_id='$gameid' and winner='$position'");
   return $r[0];
 }
+
+function DB_digest_insert_email($To,$message)
+{
+  DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",NULL,".DB_quote_smart($message).")");
+  return;
+}
+
+function DB_get_digest_users()
+{
+  $users = array();
+
+  $result = DB_query("SELECT user_id FROM User_Prefs WHERE pref_key='digest' and value <> 'digest-off'");
+  while($r = DB_fetch_array($result))
+    $users[]=$r[0];
+
+  return $users;
+}
+
+function DB_get_digest_message_by_email($email)
+{
+  $messages = array();
+
+  $result = DB_query("SELECT id,content FROM digest_email Where email='$email'");
+  while($r = DB_fetch_array($result))
+    $messages[]=$r;
+
+  return $messages;
+}
+
+function DB_digest_delete_message($id)
+{
+  DB_query("Delete from digest_email where id='$id'");
+}
+
 ?>

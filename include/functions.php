@@ -58,51 +58,56 @@ function mymail($uid,$subject,$message)
 {
   global $EmailName;
 
-  /* check if user wants email right away or if we should save it in
-   * the database for later delivery
-   */
-  if(0)
+  /* do we send the email right away or save it in the database? */
+  $send_now = 1;
+
+  /* add standard header and footer */
+  $subject = "$EmailName".$subject;
+
+  /* standard goodbye */
+  $footer  = "\nHave a nice day\n".
+    "   your E-Doko service department\n\n".
+    "-- \n".
+    "You can change your mail delivery mode in the preference menu.\n".
+    'web: http://doko.nubati.net   '.
+    'help: http://wiki.nubati.net/EmailDoko   '.
+    'bugs: http://wiki.nubati.net/EmailDokoIssues';
+
+  if(is_array($uid))
     {
-      /* send to database (not yet implemented)*/
+      /* send email to more than one person */
+
+      $header  = "Hello all\n\n";
+
+      foreach($uid as $user)
+	{
+	  $all[] = DB_get_email('userid',$user);
+	}
+      $To = implode(",",$all);
     }
   else
     {
-      /* send email right away */
+      /* standard greeting */
+      $name    = DB_get_name('userid',$uid);
+      $header  = "Hello $name\n\n";
 
-      /* add standard header and footer */
-      $subject = "$EmailName".$subject;
+      $To = DB_get_email('userid',$uid);
 
-      /* standard goodbye */
-      $footer  = "\nHave a nice day\n".
-	"   your E-Doko service department\n\n".
-	"-- \n".
-	"You can change your mail delivery mode in the preference menu.\n".
-	'web: http://doko.nubati.net   '.
-	'help: http://wiki.nubati.net/EmailDoko   '.
-	'bugs: http://wiki.nubati.net/EmailDokoIssues';
+      /* check if user wants email right away or if we should save it in
+       * the database for later delivery
+       */
 
-      if(is_array($uid))
-	{
-	  /* send email to more than one person */
+      $PREF = DB_get_PREF($uid);
+      if( $PREF['digest'] != 'digest-off' )
+	$send_now = 0;
+    }
 
-	  $header  = "Hello all\n\n";
-
-	  foreach($uid as $user)
-	    {
-	      $all[] = DB_get_email('userid',$user);
-	    }
-	  $To = implode(",",$all);
-	}
-      else
-	{
-	  /* standard greeting */
-	  $name    = DB_get_name('userid',$uid);
-	  $header  = "Hello $name\n\n";
-
-	  $To = DB_get_email('userid',$uid);
-	}
-
-      sendmail($To,$subject,$header.$message.$footer);
+  if($send_now)
+    sendmail($To,$subject,$header.$message.$footer);
+  else
+    {
+      /* store email in database */
+      DB_digest_insert_email($To,$message);
     }
 }
 
