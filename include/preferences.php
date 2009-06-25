@@ -246,7 +246,7 @@ if(myisset("open_for_games"))
   }
 
 
-if(myisset("password0") &&  $_REQUEST["password0"]!="" )
+if(myisset("password0","password1","password2") &&  $_REQUEST["password0"]!="" &&  $_REQUEST["password0"]!= $_REQUEST["password1"])
   {
     $changed_password = 1;
 
