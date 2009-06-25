@@ -67,7 +67,7 @@ if( $gamestatus == 'pre' )
 else
   {
     /* in a game Schweinchen is not valid in all types of games */
-    if( $gametype == 'normal' || $gametype == 'silent' || $gametype=='trump' || $gametype=='wedding')
+    if( in_array($gametype,array('normal','wedding','trump','silent') ))
       if( in_array($RULES['schweinchen'],array('both','second','secondaftercall')) )
 	$ok=1;
   }
@@ -1915,11 +1915,17 @@ switch($mystatus)
 	     * also check if we have both schweinchen, in that case only display on of them as playable
 	     */
 	    if( ($followsuit && !same_type($card,$firstcard)) ||
-		( (int)($card)==19 && !$GAME['schweinchen-first'] &&
-		  ($RULES['schweinchen']=='second'||
-		   ( $RULES['schweinchen']=='secondaftercall' &&
-		     (DB_get_call_by_hash($GAME['schweinchen-who']) || DB_get_partner_call_by_hash($GAME['schweinchen-who']) )))
-		  && $GAME['schweinchen-who']==$me  )
+		( (int)($card)==19 &&
+		  !$GAME['schweinchen-first'] &&
+		  ( $RULES['schweinchen']=='second' ||
+		    ( $RULES['schweinchen']=='secondaftercall' &&
+		     (DB_get_call_by_hash($GAME['schweinchen-who']) ||
+		      DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
+		    )
+		  ) &&
+		  $GAME['schweinchen-who']==$me &&
+		  in_array($gametype,array('normal','wedding','trump','silent'))
+		  )
 		)
 	      display_card($card,$PREF['cardset']);
 	    else
