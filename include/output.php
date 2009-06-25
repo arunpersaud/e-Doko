@@ -386,10 +386,35 @@ function output_status()
 
 function output_select_timezone($name,$timezone="")
 {
-  $Tzone = array ( "Europe/London"     => "London",
-		   "Europe/Berlin"     => "Berlin",
-		   "America/Vancouver" => "Berkeley",
-		   "Pacific/Auckland"  => "Wellington" );
+  $Tzone = array ("Pacific/Apia"         => "Apia",                /*UTC-11*/
+                  "Pacific/Honolulu"     => "Honolulu",            /*UTC-10*/
+                  "America/Anchorage"    => "Anchorage",           /*UTC-9*/
+                  "America/Vancouver"    => "Berkeley",            /*UTC-8*/
+                  "America/Phoenix"      => "Phoenix",             /*UTC-7*/
+                  "America/Chicago"      => "Chicago",             /*UTC-6*/
+                  "America/New_York"     => "New York",            /*UTC-5*/
+                  "America/Santiago"     => "Santiago",            /*UTC-4*/
+                  "America/Buenos_Aires" => "Buenos Aires",        /*UTC-3*/
+                  "Atlantic/South_Georgia" => "Fernando de Noronha", /*UTC-2*/
+                  "Atlantic/Azores"       => "Azores",             /*UTC-1"*/
+                  "Europe/London"         => "London",             /*UTC*/
+                  "Europe/Berlin"         => "Berlin",             /*UTC+1*/
+                  "Africa/Cairo"          => "Cairo",              /*UTC+2*/
+                  "Europe/Moscow"         => "Moscow",             /*UTC+3*/
+                  "Asia/Tehran"           => "Tehran",             /*UTC+3:30*/
+                  "Asia/Dubai"            => "Dubai",              /*UTC+4*/
+                  "Asia/Karachi"          => "Karachi",            /*UTC+5*/
+                  "Asia/Calcutta"         => "Delhi",              /*UTC+5:30*/
+                  "Asia/Kathmandu"        => "Kathmandu",          /*UTC+5:45*/
+                  "Asia/Dhaka"            => "Dhaka",              /*UTC+6*/
+                  "Asia/Rangoon"          => "Yangon",             /*UTC+6:30*/
+                  "Asia/Bangkok"          => "Bangkok",            /*UTC+7*/
+                  "Asia/Hong_Kong"        => "Beijing",            /*UTC+8*/
+                  "Asia/Tokyo"            => "Tokyo",              /*UTC+9*/
+                  "Australia/Darwin"      => "Darwin",             /*UTC+9:30*/
+                  "Australia/Sydney"      => "Sydney",             /*UTC+10*/
+                  "Asia/Magadan"          => "Magadan",            /*UTC+11*/
+                  "Pacific/Auckland"      => "Wellington" );       /*UTC+12*/
 
   echo "  <select id=\"$name\" name=\"$name\" size=\"1\">\n";
 
