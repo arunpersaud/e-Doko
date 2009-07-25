@@ -80,37 +80,38 @@ function output_form_for_new_game($names)
 ?>
     </div>
 
-   <h2 class="rules"> Rules </h2>
-      <p> Some areas are grayed out which means that the rule is not implemented yet and therefore cannot be selected </p>
-      <p> Ten of hearts: </p>
-      <ul>
-        <li> <input type="radio" name="dullen" value="none" /> just normal non-trump  </li>
-        <li> <input type="radio" name="dullen" value="firstwins" /> first ten of hearts wins the trick </li>
-        <li> <input type="radio" name="dullen" value="secondwins" checked="checked" /> second ten of hearts wins the trick </li>
-      </ul>
-      <p> Schweinchen (both foxes), only in normal games or silent solos: </p>
-      <ul>
-        <li> <input type="radio" name="schweinchen" value="none" checked="checked" /> none </li>
-        <li> <input type="radio" name="schweinchen" value="both" />
-              both become highest trump (automatic call at beginning of the game)
-        </li>
-        <li> <input type="radio" name="schweinchen" value="second" />
-             first one normal, second one becomes highest (call during the game) </li>
-        <li> <input type="radio" name="schweinchen" value="secondaftercall" />
-             second one become highest only in case re/contra was announced
-        </li>
-      </ul>
-      <p> Call Re/Contra, etc.: </p>
-      <ul>
-         <li><input type="radio" name="callrule" value="1st-own-card" checked="checked" />
-              Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</li>
-         <li><input type="radio" name="callrule" value="5th-card" />
-              Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</li>
-         <li><input type="radio" name="callrule" value="9-cards"  />
-              Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</li>
-      </ul>
-   <input type="submit" value="start game" />
- </form>
+     <h2 class="rules">Rules</h2>
+     <h3>Gameplay-related</h3>
+     <h4>Ten of hearts:</h4>
+     <p>
+       <select name="dullen">
+         <option value="none"> just normal non-trump  </option>
+         <option value="firstwins"> first ten of hearts wins the trick </option>
+         <option value="secondwins" selected="selected"> second ten of hearts wins the trick </option>
+       </select>
+     </p>
+     <h4>Schweinchen (both foxes), only in normal games or silent solos:</h4>
+     <p>
+       <select name="schweinchen">
+         <option value="none" selected="selected"> none </option>
+	 <option value="both"> both become highest trump (automatic call at beginning of the game)   </option>
+	 <option value="second"> first one normal, second one becomes highest (call during the game) </option>
+	 <option value="secondaftercall">  second one become highest only in case re/contra was announced
+	 </option>
+       </select>
+     </p>
+     <h4>Call Re/Contra, etc.:</h4>
+     <p>
+       <select name="callrule">
+	 <option value="1st-own-card" selected="selected">  Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</option>
+	 <option value="5th-card">  Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</option>
+	 <option value="9-cards" > Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</option>
+       </select>
+     </p>
+     <h3>Scoring-related</h3>
+     <h4>(not yet implemented)</h4>
+     <p><input type="submit" value="start game"></p>
+     </form>
 <?php
 }
 
@@ -560,7 +561,7 @@ function output_exchanged_cards()
 	  if($povertypos2)
 	    foreach($povertycards1 as $card)
 	      {
-		if(is_trump($card)) 
+		if(is_trump($card))
 		  {
 		    $trump_back1=1;
 		    break;
@@ -570,13 +571,13 @@ function output_exchanged_cards()
 	  if($povertypos2)
 	    foreach($povertycards2 as $card)
 	      {
-		if(is_trump($card)) 
+		if(is_trump($card))
 		  {
 		    $trump_back2=1;
 		    break;
 		  }
 	      }
-	  
+
 	  /* output vorbehalt  */
 	  echo "      <div class=\"vorbehalt".($mypos-1)."\"> Vorbehalt <br />\n";
 	  if($show)
