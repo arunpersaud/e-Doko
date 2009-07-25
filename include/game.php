@@ -610,9 +610,10 @@ switch($mystatus)
 	    /* update game status */
 	    cancel_game('nines',$gameid);
 
-	    echo "The game has been canceled because ".DB_get_name('userid',$nines).
-	      " has five or more nines and nobody is playing solo.\n";
-	    return;
+	    echo "<p>The game has been canceled because ".DB_get_name('userid',$nines).
+	      " has five or more nines and nobody is playing solo.</p>\n";
+	    echo "</div>\n";
+	    break;
 	  }
 	else if($poverty==1) /* one person has poverty */
 	  {
@@ -957,8 +958,8 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('trump',$gameid);
 
-		echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
-		return;
+		echo "<p class=\"message\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
+		break;
 	      }
 	    else
 	      {
