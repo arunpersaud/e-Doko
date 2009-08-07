@@ -190,7 +190,7 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
 			       " FROM Hand".
 			       " LEFT JOIN User ON User.id=user_id".
 			       " LEFT JOIN Game ON Game.id=game_id".
-			       " WHERE Game.status<>'gameover'".
+			       " WHERE Game.status IN ('pre','play')".
 			       " GROUP BY user_id".
 			       " ORDER BY c DESC LIMIT 7" );
   array_unshift($result,array("Name","Number of active games"));
