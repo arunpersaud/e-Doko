@@ -35,13 +35,12 @@ if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week
     $name = DB_get_name('userid',$r[1]);
     $userhash = DB_get_hash_from_gameid_and_userid($gameid,$r[1]);
 
-    $message = "Hello $name, \n\n".
-      "It's your turn in game ".DB_format_gameid($gameid)." \n".
+    $message = "It's your turn in game ".DB_format_gameid($gameid)." \n".
       "Actually everyone else is waiting for you for more than a week now ;)\n\n".
       "Please visit this link now to continue: \n".
       " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 
-    /* make sure we don't send too  many reminders to one person */
+    /* make sure we don't send too many reminders to one person */
     if(DB_get_reminder($r[1],$gameid)>0)
       {
 	echo "<p>An email has already been sent out.</p>\n";
