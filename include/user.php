@@ -206,9 +206,14 @@ else
 	echo "</p>\n";
 
 	/* display last 5 users that logged on */
-	$names = DB_get_names_of_last_logins(5);
 	echo "<h4>Players last logged in:</h4>\n<p>\n";
-	echo implode(", ",$names).",...\n";
+
+	$names  = DB_get_names_of_last_logins(7);
+	$emails = DB_get_emails_of_last_logins(7);
+	for($i=0;$i<7;$i++)
+	  {
+	    echo "<img class=\"gravatar\" title=\"".$names[$i]."\" src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($emails[$i])))."?d=identicon\" />\n";
+	  }
 	echo "</p>\n";
 
 	echo "</div>\n";

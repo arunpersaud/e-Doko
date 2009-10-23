@@ -496,6 +496,7 @@ if($changed_openid)
 echo "    </fieldset>\n";
 echo "    <fieldset><legend>Submit</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
 echo "  </form>\n";
+echo " <p>E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons. I</p>";
 echo "</div>\n";
 
 return;

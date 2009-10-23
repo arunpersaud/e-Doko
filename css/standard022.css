@@ -165,7 +165,7 @@ body { background-color: #ddd; }
 div.table {
   position:absolute;
   width:100%;
-  height:35em;
+  height:37em;
   margin:0;
   left:0;
   padding:0;
@@ -202,7 +202,7 @@ div.table div.table0 {
   right:62.5%;
 }
 div.table div.table1 {
-  top:7.5%;
+  top:0%;
   left:43.75%;
 }
 div.table div.table2 {
@@ -210,7 +210,7 @@ div.table div.table2 {
   left:62.5%;
 }
 div.table div.table3 {
-  bottom:5%;
+  bottom:0%;
   left: 43.75%;
 }
 
@@ -413,7 +413,7 @@ ul.tricks li div div span.comment span{
 
 .mycards {
   margin:0;
-  margin-top:34.5em;
+  margin-top:38.5em;
   padding:0;
   border-top:       2px solid gray;
 /* border-bottom:    2px solid green;*/
@@ -643,4 +643,10 @@ table.openid td, table.openid th{
 .vacation {
     color: #666;
     background-color: #fc3;
+}
+
+div.table div img.gravatar, img.gravatar  { 
+    width:  4em;
+    height: 4em;
+    border: 3px solid #aaa;
 }

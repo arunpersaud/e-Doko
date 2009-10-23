@@ -803,7 +803,8 @@ function display_table ()
 		     "        Hand.point_call, ".
 		     "        User.last_login, ".
 		     "        Hand.hash,       ".
-		     "        User.timezone    ".
+		     "        User.timezone,    ".
+		     "        User.email       ".
 		     "FROM Hand ".
 		     "LEFT JOIN User ON User.id=Hand.user_id ".
 		     "WHERE Hand.game_id='".$gameid."' ".
@@ -821,11 +822,14 @@ function display_table ()
       $call      = $r[5];
       $hash      = $r[7];
       $timezone  = $r[8];
+      $email     = $r[9];      
       $wins      = DB_get_number_of_tricks($gameid,$pos);
       date_default_timezone_set($defaulttimezone);
       $lastlogin = strtotime($r[6]);
       date_default_timezone_set($timezone);
       $timenow   = strtotime(date("Y-m-d H:i:s"));
+      $gravatar = "$name<br /><img class=\"gravatar\" title=\"$name\" src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" />";
+
 
       echo "  <div class=\"table".($pos-1)."\">\n";
 
@@ -838,10 +842,10 @@ function display_table ()
 	  $comment = $vacation[2];
 
 	      $title = "begin: $start  end: $stop $comment";
-	      echo "   <span class=\"vacation\" title=\"$title\">$name (on vacation until $stop)</span> \n";
+	      echo "   <span class=\"vacation\" title=\"$title\">$gravatar (on vacation until $stop)</span> \n";
 	}
       else
-	echo "   $name \n";
+	echo "   $gravatar \n";
       if($debug)
 	echo"</a>\n";
 

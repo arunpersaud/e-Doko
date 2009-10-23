@@ -470,6 +470,17 @@ function DB_get_names_of_last_logins($N)
   return $names;
 }
 
+function DB_get_emails_of_last_logins($N)
+{
+  $emails  = array();
+
+  $result = DB_query("SELECT email FROM User ORDER BY last_login DESC LIMIT $N");
+  while($r = DB_fetch_array($result))
+    $emails[] = $r[0];
+
+  return $emails;
+}
+
 function DB_get_names_of_new_logins($N)
 {
   $names  = array();
