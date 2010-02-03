@@ -247,30 +247,61 @@ function output_check_for_sickness($me,$mycards)
 
 function output_form_calls($me,$myparty)
 {
-  if( can_call(120,$me) )
+  $highstart = "<span class=\"highcall\">";
+  $highend   = "</span>";
+
+  $tmp = can_call(120,$me);
+  if( $tmp )
     {
-    if($myparty=='re')
-      echo "re (120):";
-    else if ($myparty=='contra')
-      echo "contra (120):";
-    else
-      echo " re/contra (120):";
-    echo " <input type=\"radio\" name=\"call\" value=\"120\" /> <br />";
+      if($tmp==2) echo $highstart;
+      if($myparty=='re')
+	echo "re (120):";
+      else if ($myparty=='contra')
+	echo "contra (120):";
+      else
+	echo " re/contra (120):";
+      echo " <input type=\"radio\" name=\"call\" value=\"120\" />";
+      if($tmp==2) echo $highend;
+      echo "<br />\n";
     }
-  if( can_call(90,$me) )
-    echo " 90:".
-      " <input type=\"radio\" name=\"call\" value=\"90\" /> <br />";
-  if( can_call(60,$me) )
-    echo " 60:".
-      " <input type=\"radio\" name=\"call\" value=\"60\" /> <br />";
-  if( can_call(30,$me) )
-    echo " 30:".
-      " <input type=\"radio\" name=\"call\" value=\"30\" /> <br />";
-  if( can_call(0,$me) )
-    echo " 0:".
-      " <input type=\"radio\" name=\"call\" value=\"0\" /> <br />".
-      " no call:".
-      " <input type=\"radio\" name=\"call\" value=\"no\" /> <br />";
+  $tmp =  can_call(90,$me);
+  if( $tmp )
+    {
+      if($tmp==2) echo $highstart;
+      echo " 90:".
+	" <input type=\"radio\" name=\"call\" value=\"90\" />";
+      if($tmp==2) echo $highend;
+      echo "<br />\n";
+    }
+  $tmp = can_call(60,$me);
+  if( $tmp )
+    {
+      if($tmp==2) echo $highstart;
+      echo " 60:".
+	" <input type=\"radio\" name=\"call\" value=\"60\" />";
+      if($tmp==2) echo $highend;
+      echo "<br />\n";
+    }
+  $tmp = can_call(30,$me);
+  if( $tmp )
+    {
+      if($tmp==2) echo $highstart;
+      echo " 30:".
+	" <input type=\"radio\" name=\"call\" value=\"30\" />";
+      if($tmp==2) echo $highend;
+      echo "<br />\n";
+    }
+  $tmp = can_call(0,$me);
+  if( $tmp )
+    {
+      if($tmp==2) echo $highstart;
+      echo " 0:".
+	" <input type=\"radio\" name=\"call\" value=\"0\" />";
+      if($tmp==2) echo $highend;
+      echo "<br />\n".
+	" no call:".
+	" <input type=\"radio\" name=\"call\" value=\"no\" /> <br />";
+    }
 }
 
 function output_check_want_to_play($me)
@@ -301,7 +332,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard022.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard023.css" />
      <script type="text/javascript" src="include/game.js"> </script>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>

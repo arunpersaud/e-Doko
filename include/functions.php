@@ -708,19 +708,36 @@ function sort_comp_low_high($a,$b)
 
 function can_call($what,$hash)
 {
+  /* figure out if a person can make a call:
+   $what in 0,30,60,90,120 = points of the call
+   $hash                   = the hash of the person who wants to make the call
+
+   return values:
+   0   can't make that call
+   1   can make the call
+   2   can make the call, but this is the last chance to do so...
+   */
+
   global $RULES;
 
+  /* get some information
+   */
   $gameid   = DB_get_gameid_by_hash($hash);
   $gametype = DB_get_gametype_by_gameid($gameid);
-  $oldcall  = DB_get_call_by_hash($hash);
-  $pcall    = DB_get_partner_call_by_hash($hash);
+  $oldcall  = DB_get_call_by_hash($hash); /* did the person already made a call? */
+  $pcall    = DB_get_partner_call_by_hash($hash); /* did the partner already made a call */
 
-  if( ($pcall!=NULL && $what >= $pcall) ||
-      ($oldcall!=NULL && $what >=$oldcall) )
+
+  /* you're call must be better than the one you or your partner already made
+   */
+  if( ($pcall!=NULL && ($what >= $pcall))
+      || ($oldcall!=NULL && ($what >=$oldcall)) )
     {
       return 0;
     }
 
+  /* for some rules we need to know how many cards people have
+   */
   $NRcards  = count(DB_get_hand($hash));
 
   $NRallcards = 0;
@@ -730,7 +747,8 @@ function can_call($what,$hash)
       $NRallcards  += count(DB_get_hand($user));
     };
 
-  /* in case of a wedding, everything will be delayed by an offset */
+  /* in case of a wedding, everything will be delayed by an offset
+   */
   $offset = 0;
   if($gametype=="wedding")
     {
@@ -739,18 +757,34 @@ function can_call($what,$hash)
 	return 0;
     };
 
+  /* now check if the call is allowed depending on the rule set
+   */
   switch ($RULES["call"])
     {
     case "1st-own-card":
-      if( 4-($what/30) >= 12 - ($NRcards + $offset))
+      /* calls can be made before/while you play your card...
+       * first card = 120, second card = 90, etc.
+       */
+      if( 4-($what/30) == 12 - ($NRcards + $offset))
+	return 2;
+      if( 4-($what/30) > 12 - ($NRcards + $offset))
 	return 1;
       break;
     case "5th-card":
-      if( 27+4*($what/30) <= $NRallcards + $offset*4)
+      /* you can make the first call anytime during the first trick
+       */
+      if( 27+4*($what/30) == $NRallcards + $offset*4)
+	return 2;
+      if( 27+4*($what/30) < $NRallcards + $offset*4)
 	return 1;
       break;
     case "9-cards":
+      /* you can call 120 with 12 cards, 90 with 9 or more cards, 60 with 6 or more, etc.
+       * you can't skip a call though
+       */
 
+      /* figure out last call
+       */
       if($oldcall!=NULL && $pcall!=NULL)
 	$mincall = ($oldcall>$pcall) ? $pcall : $oldcall;
       else if($oldcall!=NULL)
@@ -760,26 +794,51 @@ function can_call($what,$hash)
       else
 	$mincall = -1;
 
-      if( 12 <= ($NRcards + $offset))
+
+      if( 12 == ($NRcards + $offset))
+	{
+	  return 2;
+	}
+      else if( 12 < ($NRcards + $offset))
 	{
 	  return 1;
 	}
-      else if ( 9 <= ($NRcards + $offset))
+      else if ( 9 == ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall==120) )
+	    return 2;
+	}
+      else if ( 9 < ($NRcards + $offset))
 	{
 	  if( ($mincall>=0 && $mincall==120) )
 	    return 1;
 	}
-      else if ( 6 <= ($NRcards + $offset))
+      else if ( 6 == ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall<=90 && $what<=60 ) )
+	    return 2;
+	}
+      else if ( 6 < ($NRcards + $offset))
 	{
 	  if( ($mincall>=0 && $mincall<=90 && $what<=60 ) )
 	    return 1;
 	}
-      else if ( 3 <= ($NRcards + $offset))
+      else if ( 3 == ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall<=60 && $what<=30 ) )
+	    return 2;
+	}
+      else if ( 3 < ($NRcards + $offset))
 	{
 	  if( ($mincall>=0 && $mincall<=60 && $what<=30 ) )
 	    return 1;
 	}
-      else if ( 0 <= ($NRcards + $offset))
+      else if ( 0 == ($NRcards + $offset))
+	{
+	  if( ($mincall>=0 && $mincall<=30 && $what==0 ) )
+	    return 2;
+	}
+      else if ( 0 < ($NRcards + $offset))
 	{
 	  if( ($mincall>=0 && $mincall<=30 && $what==0 ) )
 	    return 1;
@@ -822,7 +881,7 @@ function display_table ()
       $call      = $r[5];
       $hash      = $r[7];
       $timezone  = $r[8];
-      $email     = $r[9];      
+      $email     = $r[9];
       $wins      = DB_get_number_of_tricks($gameid,$pos);
       date_default_timezone_set($defaulttimezone);
       $lastlogin = strtotime($r[6]);

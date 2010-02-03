@@ -1420,7 +1420,10 @@ switch($mystatus)
 		$play   = DB_get_cards_by_trick($trickid);
 		$winner = get_winner($play,$gametype); /* returns the position */
 
-		/* check if someone caught a fox */
+		/*
+		 * check if someone caught a fox
+		 *******************************/
+
 		/* first check if we should account for solos at all,
 		 * since it doesn't make sense in some games
 		 */
@@ -1453,7 +1456,10 @@ switch($mystatus)
 			  }
 		    }
 
-		/* check for karlchen (jack of clubs in the last trick)*/
+		/*
+		 * check for karlchen (jack of clubs in the last trick)
+		 ******************************************************/
+
 		/* same as for foxes, karlchen doesn't always make sense
 		 * check what kind of game it is and set karlchen accordingly */
 		$ok = 1; /* default: karlchen should be accounted for */
@@ -1478,7 +1484,10 @@ switch($mystatus)
 			  DB_query("INSERT INTO Score".
 				   " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
 			}
-		/* check for doppelopf (>40 points)*/
+		/*
+		 * check for doppelopf (>40 points)
+		 ***********************************/
+
 		$points = 0;
 		foreach($play as $played)
 		  {
@@ -1492,6 +1501,10 @@ switch($mystatus)
 		    DB_query("INSERT INTO Score".
 			     " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'doko')");
 		  }
+
+		/*
+		 * set winner (for this trick)
+		 */
 
 		if($winner>0)
 		  DB_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
