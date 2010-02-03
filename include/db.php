@@ -498,6 +498,15 @@ function DB_update_game_timestamp($gameid)
   return;
 }
 
+function DB_get_game_timestamp($gameid)
+{
+  $r = DB_query_array("SELECT mod_date FROM Game WHERE id=".DB_quote_smart($gameid));
+
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
 
 function DB_update_user_timestamp($userid)
 {
@@ -514,6 +523,17 @@ function DB_get_user_timestamp($userid)
   else
     return NULL;
 }
+
+function DB_get_user_creation_date($userid)
+{
+  $r = DB_query_array("SELECT create_date FROM User WHERE id=".DB_quote_smart($userid));
+
+  if($r)
+    return $r[0];
+  else
+    return NULL;
+}
+
 function DB_get_user_timezone($userid)
 {
   $r = DB_query_array("SELECT timezone FROM User WHERE id=".DB_quote_smart($userid));

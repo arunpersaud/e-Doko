@@ -380,39 +380,44 @@ function output_footer()
 
 function output_status()
 {
-  global $defaulttimezone,$INDEX,$WIKI;
-   if(isset($_SESSION["name"]))
-     {
-       $name = $_SESSION["name"];
+  global $defaulttimezone, $INDEX, $WIKI, $RSS;
 
-       /* logout info */
-       echo "\n<div class=\"status\">\n";
-       echo $name,"\n";
-       echo " | <a href=\"".$INDEX."\"> mypage </a>\n";
-       echo " | <a href=\"".$INDEX."?action=prefs\">settings</a>\n";
-       echo " | <a href=\"".$INDEX."?action=new\">new game</a>\n";
-       echo " | <a href=\"".$INDEX."?action=stats\">statistics</a>\n";
-       echo " | <a href=\"".$WIKI."\">wiki</a>\n";
-       echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">logout</a>\n";
-       echo "</div>\n";
+  if(isset($_SESSION["name"]))
+    {
+      $name = $_SESSION["name"];
 
-       /* last logon time */
-       $myid  = DB_get_userid("name",$name);
-       $zone  = DB_get_user_timezone($myid);
+      /* last logon time */
+      $myid  = DB_get_userid("name",$name);
+      $zone  = DB_get_user_timezone($myid);
 
-       $time     = DB_get_user_timestamp($myid);
-       date_default_timezone_set($defaulttimezone);
-       $unixtime = strtotime($time);
-       date_default_timezone_set($zone);
+      $time     = DB_get_user_timestamp($myid);
+      date_default_timezone_set($defaulttimezone);
+      $unixtime = strtotime($time);
+      date_default_timezone_set($zone);
 
-       echo "<div class=\"lastlogin\"><span>last login: ".date("r",$unixtime)."</span></div>\n";
-     }
-   else
-     {
-       echo "\n<div class=\"status\">\n";
-       echo "<a href=\"".$INDEX."\">login</a>\n";
-       echo "</div>\n";
-     }
+      /* rss token */
+      $token = get_user_token($myid);
+
+      /* logout info */
+      echo "\n<div class=\"status\">\n";
+      echo $name,"\n";
+      echo " | <a href=\"".$INDEX."\"> mypage </a>\n";
+      echo " | <a href=\"".$INDEX."?action=prefs\">settings</a>\n";
+      echo " | <a href=\"".$INDEX."?action=new\">new game</a>\n";
+      echo " | <a href=\"".$INDEX."?action=stats\">statistics</a>\n";
+      echo " | <a href=\"".$WIKI."\">wiki</a>\n";
+      echo " | <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">rss</a>\n";
+      echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">logout</a>\n";
+      echo "</div>\n";
+
+      echo "<div class=\"lastlogin\"><span>last login: ".date("r",$unixtime)."</span></div>\n";
+    }
+  else
+    {
+      echo "\n<div class=\"status\">\n";
+      echo "<a href=\"".$INDEX."\">login</a>\n";
+      echo "</div>\n";
+    }
   return;
 }
 

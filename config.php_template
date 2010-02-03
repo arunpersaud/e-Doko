@@ -33,6 +33,8 @@
      */
     $INDEX = "/index.php";
     $HOST  = "http://www.example.com";
+    $STATS = "/stats.php";
+    $RSS   = "/rss.php";
 
     /* point this to a Wiki that explains the rules, etc (or use this one)*/
     $WIKI  = "http://wiki.nubati.net/index.php?title=EmailDoko";

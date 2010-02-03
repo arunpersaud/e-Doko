@@ -1384,4 +1384,18 @@ function cancel_game($why,$gameid)
   return;
 }
 
+function get_user_token($userid)
+{
+
+  $token = NULL;
+
+  $date = DB_get_user_creation_date($userid);
+  $name = DB_get_name('userid',$userid);
+
+  if($date && $name)
+    $token = md5("token".$name.$date);
+
+  return $token;
+}
+
 ?>
