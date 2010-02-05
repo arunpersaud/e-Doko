@@ -1962,7 +1962,15 @@ switch($mystatus)
       {
 	$oldcards = DB_get_all_hand($me);
 	$oldcards = mysort($oldcards,$gametype);
-	echo "Your cards were: <br />\n";
+
+	if(isset($_SESSION['id']) && $myid==$_SESSION['id'])
+	  echo "Your cards were: <br />\n";
+	else
+	  {
+	    $name = DB_get_name('userid',$myid);
+	    echo "$name's were: <br />\n";
+	  }
+
 	foreach($oldcards as $card)
 	  display_card($card,$PREF['cardset']);
 
