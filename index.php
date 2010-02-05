@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 
 /* start a session, if it is not already running.
- * This way people don't have to log in all the times. 
+ * This way people don't have to log in all the times.
  * The session variables can also be read out from different
  * php scripts, so that the code can be easily split up across several files
  */
@@ -50,11 +50,11 @@ switch($action)
     require './include/reminder.php';
     break;
   case 'logout':
-    require './include/logout.php'; 
+    require './include/logout.php';
     require './include/welcome.php';
     break;
   case 'login':
-    require './include/login.php'; 
+    require './include/login.php';
     require './include/user.php';
     break;
   case 'register':

@@ -24,10 +24,6 @@ if(!$myid)
 
 global $GAME,$RULES,$CARDS;
 
-/* the user has done something, update the timestamp */
-if(isset($_SESSION['id']))
-  DB_update_user_timestamp($_SESSION['id']);
-
 /* get some information from the DB */
 $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
@@ -288,6 +284,16 @@ display_table();
  * play:     game in progress
  * gameover: are we revisiting a game
  */
+
+/* the user has done something, update the timestamp. Use $myid in
+ * active games and check for session-id in old games (myid might be wrong in that case)
+ */
+if($mystatus!='gameover')
+  DB_update_user_timestamp($myid);
+ else
+   if(isset($_SESSION['id']))
+     DB_update_user_timestamp($_SESSION['id']);
+
 switch($mystatus)
   {
   case 'start':
@@ -1420,7 +1426,10 @@ switch($mystatus)
 		$play   = DB_get_cards_by_trick($trickid);
 		$winner = get_winner($play,$gametype); /* returns the position */
 
-		/* check if someone caught a fox */
+		/*
+		 * check if someone caught a fox
+		 *******************************/
+
 		/* first check if we should account for solos at all,
 		 * since it doesn't make sense in some games
 		 */
@@ -1453,7 +1462,10 @@ switch($mystatus)
 			  }
 		    }
 
-		/* check for karlchen (jack of clubs in the last trick)*/
+		/*
+		 * check for karlchen (jack of clubs in the last trick)
+		 ******************************************************/
+
 		/* same as for foxes, karlchen doesn't always make sense
 		 * check what kind of game it is and set karlchen accordingly */
 		$ok = 1; /* default: karlchen should be accounted for */
@@ -1478,7 +1490,10 @@ switch($mystatus)
 			  DB_query("INSERT INTO Score".
 				   " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
 			}
-		/* check for doppelopf (>40 points)*/
+		/*
+		 * check for doppelopf (>40 points)
+		 ***********************************/
+
 		$points = 0;
 		foreach($play as $played)
 		  {
@@ -1492,6 +1507,10 @@ switch($mystatus)
 		    DB_query("INSERT INTO Score".
 			     " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'doko')");
 		  }
+
+		/*
+		 * set winner (for this trick)
+		 */
 
 		if($winner>0)
 		  DB_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
@@ -1943,7 +1962,15 @@ switch($mystatus)
       {
 	$oldcards = DB_get_all_hand($me);
 	$oldcards = mysort($oldcards,$gametype);
-	echo "Your cards were: <br />\n";
+
+	if(isset($_SESSION['id']) && $myid==$_SESSION['id'])
+	  echo "Your cards were: <br />\n";
+	else
+	  {
+	    $name = DB_get_name('userid',$myid);
+	    echo "$name's were: <br />\n";
+	  }
+
 	foreach($oldcards as $card)
 	  display_card($card,$PREF['cardset']);
 

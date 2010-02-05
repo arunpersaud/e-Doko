@@ -26,6 +26,7 @@ Installation
   $HOST:  for example "http://localhost"
   $INDEX: the absolute web path to your index.php file e.g. "/mypath/index.php"
   $STATS: the absolute web path to your stats.php file e.g. "/mypath/stast.php"
+  $RSSS:  the absolute web path to your rss.php file e.g. "/mypath/rss.php"
 
   database info:
 
