@@ -24,10 +24,6 @@ if(!$myid)
 
 global $GAME,$RULES,$CARDS;
 
-/* the user has done something, update the timestamp */
-if(isset($_SESSION['id']))
-  DB_update_user_timestamp($_SESSION['id']);
-
 /* get some information from the DB */
 $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
@@ -288,6 +284,16 @@ display_table();
  * play:     game in progress
  * gameover: are we revisiting a game
  */
+
+/* the user has done something, update the timestamp. Use $myid in
+ * active games and check for session-id in old games (myid might be wrong in that case)
+ */
+if($mystatus!='gameover')
+  DB_update_user_timestamp($myid);
+ else
+   if(isset($_SESSION['id']))
+     DB_update_user_timestamp($_SESSION['id']);
+
 switch($mystatus)
   {
   case 'start':
