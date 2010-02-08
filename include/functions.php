@@ -146,8 +146,8 @@ function sendmail($To,$Subject,$message)
        * change txt -> html
        */
       $message = str_replace("\n","<br />\n",$message);
-      $message = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
-                     "<a href=\"\\0\">\\0</a>", $message);
+      $message = preg_replace("#(\w+://[^<>\s]+[\w/]*)#",
+			      "<a href=\"$1\">$1</a>", $message);
 
       echo "<br />To: $To<br />";
       if($header != "")
@@ -980,21 +980,21 @@ function display_table ()
 	else
 	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" title=\"wedding partner\" />";
 
-      if(ereg("solo",$GT) && $party=="re")
+      if( (strpos($GT,"solo")!==false) && $party=="re")
 	{
-	  if(ereg("queen",$GT))
+	  if(strpos($GT,"queen")!==false)
 	    echo "   <img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Queen solo\" />";
-	  else if(ereg("jack",$GT))
+	  else if(strpos($GT,"jack")!==false)
 	    echo "   <img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Jack solo\" />";
-	  else if(ereg("club",$GT))
+	  else if(strpos($GT,"club")!==false)
 	    echo "   <img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Club solo\" />";
-	  else if(ereg("spade",$GT))
+	  else if(strpos($GT,"spade")!==false)
 	    echo "   <img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Spade solo\" />";
-	  else if(ereg("heart",$GT))
+	  else if(strpos($GT,"heart")!==false)
 	    echo "   <img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Heart solo\" />";
-	  else if(ereg("trumpless",$GT))
+	  else if(strpos($GT,"trumpless")!==false)
 	    echo "   <img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trumpless solo\" />";
-	  else if(ereg("trump",$GT))
+	  else if(strpos($GT,"trump")!==false)
 	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trump solo\" />";
 	}
 
