@@ -31,7 +31,7 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   global $RULES;
 
   echo "<div class=\"message\">\n<form action=\"index.php?action=new\" method=\"post\">\n";
-  echo "Do you want to continue playing?(This will start a new game, with $playerD as dealer.)\n";
+  echo "Do you want to continue playing?(This will start a new game, with $playerA starting the game.)\n";
   echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"$playerA\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"$playerC\" />\n";
