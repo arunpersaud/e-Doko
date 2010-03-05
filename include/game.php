@@ -47,6 +47,7 @@ global $GAME,$RULES,$CARDS;
 $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
 $mystatus = DB_get_status_by_hash($me);
+$origmystatus = DB_get_status_by_hash($me); /* to show "it's your turn" menu when game has just finished */
 $mypos    = DB_get_pos_by_hash($me);
 $myhand   = DB_get_handid('hash',$me);
 $myparty  = DB_get_party_by_hash($me);
@@ -2031,11 +2032,20 @@ switch($mystatus)
 /* output other games where it is the users turn
  * make sure that the people looking at old games don't see the wrong games here
  */
-if( $mystatus != 'gameover' )
-  display_user_menu($myid);
-else if(  $mystatus == 'gameover' &&
-       isset($_SESSION['id']) )
+if( $gamestatus != 'gameover' )
   {
+    /* game isn't over, only valid user can get here, so show menu */
+    display_user_menu($myid);
+  }
+else if(  $origmystatus != 'gameover' )
+  {
+    /* user just played the very last card, game is now over, it's still ok to show the menu though */
+    display_user_menu($myid);
+  }
+else if(  $mystatus == 'gameover' &&
+	  isset($_SESSION['id']) )
+  {
+    /* user is looking at someone else's game, show the menu for the correct user */
     display_user_menu($_SESSION['id']);
   }
 else
