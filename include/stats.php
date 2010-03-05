@@ -24,6 +24,9 @@
 if(!isset($HOST))
   exit;
 
+/* turn warnings off (problem with two warnings in function.php */
+error_reporting(!E_ALL & ~E_NOTICE);
+
 $name  = $_SESSION["name"];
 $email = DB_get_email('name',$name);
 
@@ -190,46 +193,6 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
   array_unshift($result,array("Position","Number of tricks"));
   echo output_table($result,"Tricks at the table","stats");
 
-  /* most solos */
-  $result = DB_query_array_all("SELECT fullname as fname,".
-			       "       COUNT(*), ".
-			       "       COUNT(*)/(SELECT COUNT(*) FROM Hand LEFT JOIN User ON User.id=Hand.user_id WHERE fullname=fname) as c ".
-			       " FROM Game ".
-			       " LEFT JOIN Hand ON Hand.position=startplayer AND Game.id=Hand.game_id ".
-			       " LEFT JOIN User ON User.id=Hand.user_id ".
-			       " WHERE type='solo' AND Game.status='gameover' ".
-			       " GROUP BY user_id ".
-			       " ORDER BY c DESC;");
-  array_unshift($result,array("Name","Number of solos","Solos/game"));
-  echo output_table($result,"Most solos","stats");
-
-
-  /* most active games */
-  $result = DB_query_array_all("SELECT fullname, COUNT(*) as c  " .
-			       " FROM Hand".
-			       " LEFT JOIN User ON User.id=user_id".
-			       " LEFT JOIN Game ON Game.id=game_id".
-			       " WHERE Game.status IN ('pre','play')".
-			       " GROUP BY user_id".
-			       " ORDER BY c DESC LIMIT 7" );
-  array_unshift($result,array("Name","Number of active games"));
-  echo output_table($result,"Active games","stats");
-
-  /* response time of users*/
-  $result = DB_query_array_all("SELECT User.fullname,".
-			       "IFNULL(AVG(if(P1.sequence in (2,3,4),".
-			       "-timestampdiff(MINUTE,mod_date,(select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1)),NULL )),1e9) as a, ".
-			       " COUNT(*) as na ".
-			       "FROM Play P1 ".
-			       "LEFT JOIN Hand_Card ON P1.hand_card_id=Hand_Card.id ".
-			       "LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
-			       "LEFT JOIN User ON Hand.user_id=User.id ".
-			       "GROUP BY user_id ".
-			       "HAVING na>8 ".
-			       "ORDER BY a " );
-  array_unshift($result,array("Name","Average minutes before response","trick count"));
-  echo output_table($result,"Response","stats");
-
   /*
  does the party win more often if they start
 
@@ -244,8 +207,9 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
  echo " games</p>\n";
   */
   $result = generate_global_score_table();
-  array_unshift($result,array("Name","Average score per game","Total Points","Number of games"));
-  echo output_table($result,"Points per game (need more than 10 games)","stats","ScoreTable");
+  array_unshift($result,array('Name','Average score per game','Total Points','Number of games', 'Active games',
+			      'Response Time [min]','Number of solos','Solos/game'));
+  echo output_table($result,'Players (need more than 10 games)','stats','ScoreTable');
 
   /*
    * how often is the last trick a non-trump trick

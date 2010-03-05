@@ -1156,7 +1156,8 @@ function generate_global_score_table()
 
   /* save information in an array */
   while( $r = DB_fetch_array($result))
-    $player[$r[0]] = array('name'=> $r[1], 'points' => 0 ,'nr' => 0);
+    $player[$r[0]] = array('name'=> $r[1], 'points' => 0 , 'nr' => 0, 'active' => 0,
+			   'response' => 0 , 'solo' => 0, 'soloavg' => 0);
 
   /* get points and generate table */
   foreach($gameids as $gameid)
@@ -1182,9 +1183,53 @@ function generate_global_score_table()
 	}
     }
 
+  /* add number of active games */
+  $result = DB_query_array_all("SELECT user_id, COUNT(*) as c  " .
+			       " FROM Hand".
+			       " LEFT JOIN Game ON Game.id=game_id".
+			       " WHERE Game.status IN ('pre','play')".
+			       " GROUP BY user_id");
+
+  foreach($result as $res)
+    {
+      $player[$res[0]]['active'] = $res[1];
+    }
+
+  /* response time of users*/
+  $result = DB_query_array_all("SELECT user_id,".
+                              "IFNULL(AVG(if(P1.sequence in (2,3,4),".
+                              "-timestampdiff(MINUTE,mod_date,(select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1)),NULL )),1e9) as a ".
+                              "FROM Play P1 ".
+                              "LEFT JOIN Hand_Card ON P1.hand_card_id=Hand_Card.id ".
+                              "LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
+                              "GROUP BY user_id ");
+
+  foreach($result as $res)
+    {
+      $player[$res[0]]['response'] = $res[1];
+    }
+
+  /* most solos */
+  $result = DB_query_array_all("SELECT user_id as uid,".
+			       "       COUNT(*), ".
+			       "       COUNT(*)/(SELECT COUNT(*) FROM Hand LEFT JOIN User ON User.id=Hand.user_id WHERE User.id=uid) as c ".
+			       " FROM Game ".
+			       " LEFT JOIN Hand ON Hand.position=startplayer AND Game.id=Hand.game_id ".
+			       " WHERE type='solo' AND Game.status='gameover' ".
+			       " GROUP BY user_id ");
+
+  foreach($result as $res)
+    {
+      $player[$res[0]]['solo'] = $res[1];
+      $player[$res[0]]['soloavg'] = $res[2];
+    }
+
+
+  /* sort everything nicely */
+
   function cmp($a,$b)
   {
-    if($a['nr']==0 ) return 1;
+    if($a['nr']==0) return 1;
     if($b['nr']==0) return 1;
 
     $a=$a['points']/$a['nr'];
@@ -1196,11 +1241,13 @@ function generate_global_score_table()
   }
   usort($player,'cmp');
 
+
   foreach($player as $pl)
     {
       /* limit to players with at least 10 games */
       if($pl['nr']>10)
-	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3), $pl['points'],$pl['nr']);
+	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3), $pl['points'],$pl['nr'],$pl['active'],
+			   $pl['response'],$pl['solo'],$pl['soloavg']);
     }
 
   return $return;
