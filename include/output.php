@@ -123,8 +123,17 @@ function output_form_for_new_game($names)
      <p>
        <select name="callrule">
 	 <option value="1st-own-card" selected="selected">  Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</option>
-	 <option value="5th-card">  Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</option>
+	 <option value="5th-card"> Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</option>
 	 <option value="9-cards" > Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</option>
+       </select>
+     </p>
+     <h4>Low trump</h4>
+     <p>
+       Player can't trump a fox, that is none of his trump is higher than a fox.
+       <select name="lowtrump">
+	 <option value="poverty">The trump will be treated as poverty and offered to another player.</option>
+	 <option value="cancel">  The game will be canceled unless there is a solo.</option>
+	 <option value="none">   Bad luck, the player needs to play a normal game.</option>
        </select>
      </p>
      <h3>Scoring-related</h3>
@@ -205,10 +214,11 @@ function display_link_card($card,$dir="english",$type="card")
 
 function output_check_for_sickness($me,$mycards)
 {
+  global $RULES;
  ?>
   <div class="sickness"> Thanks for joining the game...<br />
 
-    do you want to play solo?
+    Do you want to play solo?
     <select name="solo" size="1">
       <option selected="selected">No</option>
       <option>trumpless</option>
@@ -245,7 +255,7 @@ function output_check_for_sickness($me,$mycards)
       echo " no <input type=\"hidden\" name=\"poverty\" value=\"no\" /> <br />\n";
     };
 
-   echo "Do you have too many nines?";
+  echo "Do you have too many nines?";
   if(count_nines($mycards)>4)
      {
        echo " yes<input type=\"radio\" name=\"nines\" value=\"yes\" checked=\"checked\" />";
@@ -255,6 +265,26 @@ function output_check_for_sickness($me,$mycards)
      {
        echo " no <input type=\"hidden\" name=\"nines\" value=\"no\" /> <br />\n";
      };
+
+  if($RULES['lowtrump']=='cancel' || $RULES['lowtrump']=='poverty')
+    {
+      if($RULES['lowtrump']=='cancel')
+	echo "Do you have low trump (cancel game)?";
+      else
+	echo "Do you have low trump (poverty)?";
+
+      if(check_low_trump($mycards))
+	{
+	  echo " yes<input type=\"radio\" name=\"lowtrump\" value=\"yes\" checked=\"checked\" />";
+	  echo " no <input type=\"radio\" name=\"lowtrump\" value=\"no\" /> <br />\n";
+	}
+      else
+	{
+	  echo " no <input type=\"hidden\" name=\"lowtrump\" value=\"no\" /> <br />\n";
+	};
+    }
+  else
+    echo "<input type=\"hidden\" name=\"lowtrump\" value=\"no\" />";
 
    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
    echo "<input type=\"submit\" value=\"count me in\" />\n";
@@ -556,7 +586,7 @@ function output_exchanged_cards()
    */
 
   /* need some information about the game */
-  global $gameid,$mygametype, $PREF,$me,$mystatus;
+  global $gameid,$mygametype, $PREF,$me,$mystatus, $RULES;
 
   /* some variables to track where the people with poverty are sitting */
   $partnerpos1 = 0;
@@ -573,7 +603,7 @@ function output_exchanged_cards()
       for($mypos=1;$mypos<5;$mypos++)
 	{
 	  $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
-	  if($usersick == 'poverty')
+	  if($usersick == 'poverty' || ($RULES['lowtrump']=='poverty' && $usersick=='lowtrump'))
 	    if($povertypos1)
 	      $povertypos2 = $mypos;
 	    else

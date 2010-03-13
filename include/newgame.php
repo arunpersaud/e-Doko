@@ -40,7 +40,7 @@ else
 
     DB_update_user_timestamp($myid);
 
-    if( !myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule" ))
+    if( !myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule","lowtrump" ))
       {
 	/* only get players that want to be in new games */
 	$names = DB_get_all_user_names_open_for_games();
@@ -80,6 +80,7 @@ else
 	$dullen      = $_REQUEST["dullen"];
 	$schweinchen = $_REQUEST["schweinchen"];
 	$call        = $_REQUEST["callrule"];
+	$lowtrump    = $_REQUEST["lowtrump"];
 
 	/* get the emails addresses of the players */
 	$EmailA  = DB_get_email('name',$PlayerA);
@@ -142,7 +143,7 @@ else
 	else /* no follow up, start a new session */
 	  {
 	    /* get ruleset information or create new one */
-	    $ruleset = DB_get_ruleset($dullen,$schweinchen,$call);
+	    $ruleset = DB_get_ruleset($dullen,$schweinchen,$call,$lowtrump);
 	    if($ruleset <0)
 	      {
 		myerror("Error defining ruleset: $ruleset");

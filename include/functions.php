@@ -455,6 +455,39 @@ function count_trump($cards,$status='pregame')
   return $trump;
 }
 
+function check_low_trump($cards)
+{
+  global $RULES;
+
+  if($RULES['lowtrump']=='none')
+    return 0;
+
+  /* check if we have low trump */
+
+  $lowtrump=1;
+  foreach($cards as $card)
+    {
+      /* card a trump, but not a diamond? */
+      if( $card<19 )
+	 $lowtrump=0;
+    }
+
+  /* handle case where player has schweinchen */
+  if( in_array("19",$cards) && in_array("20",$cards) )
+    switch($RULES["schweinchen"])
+      {
+      case "both":
+      case "second":
+      case "secondaftercall":
+	$lowtrump=0;
+	break;
+      case "none":
+	break;
+      }
+
+  return $lowtrump;
+}
+
 function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
 {
   global $debug;
@@ -467,12 +500,12 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
       $r[ 1]=2;     $r[13]=23;   $r[25]=14;	  $r[37]=38;
       $r[ 2]=3;     $r[14]=27;   $r[26]=15;	  $r[38]=39;
       $r[ 3]=4;     $r[15]=16;   $r[27]=28;	  $r[39]=40;
-      $r[ 4]=5;     $r[16]=17;   $r[28]=29;	  $r[40]=41;
+      $r[ 4]=5;     $r[16]=17;   $r[28]=29;	  $r[40]=21;
       $r[ 5]=18;    $r[17]=6;    $r[29]=30;	  $r[41]=42;
-      $r[ 6]=21;    $r[18]=7;    $r[30]=31;	  $r[42]=43;
-      $r[ 7]=22;    $r[19]=8;    $r[31]=32;	  $r[43]=44;
-      $r[ 8]=45;    $r[20]=9;    $r[32]=19;	  $r[44]=33;
-      $r[ 9]=46;    $r[21]=10;   $r[33]=20;	  $r[45]=24;
+      $r[ 6]=41;    $r[18]=7;    $r[30]=31;	  $r[42]=43;
+      $r[ 7]=22;    $r[19]=8;    $r[31]=32;	  $r[43]=20;
+      $r[ 8]=45;    $r[20]=9;    $r[32]=33;	  $r[44]=19;
+      $r[ 9]=46;    $r[21]=10;   $r[33]=44;	  $r[45]=24;
       $r[10]=35;    $r[22]=11;   $r[34]=48;	  $r[46]=25;
       $r[11]=36;    $r[23]=12;   $r[35]=34;	  $r[47]=26;
     }
@@ -933,7 +966,7 @@ function display_table ()
 	  echo " Schweinchen. <br />";
 
       if($GT=="poverty" && $party=="re")
-	if($sickness=="poverty")
+	if($sickness=="poverty" || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	  {
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	    $cards    = DB_get_all_hand($userhash);
@@ -948,7 +981,7 @@ function display_table ()
 
       if($GT=="dpoverty")
 	if($party=="re")
-	  if($sickness=="poverty")
+	  if($sickness=="poverty" || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	    {
 	      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	      $cards    = DB_get_all_hand($userhash);
@@ -961,7 +994,7 @@ function display_table ()
 	  else
 	    echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" title=\"poverty partner\" />";
 	else
-	  if($sickness=="poverty")
+	  if($sickness=="poverty"  || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	    {
 	      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	      $cards    = DB_get_all_hand($userhash);
@@ -1437,6 +1470,9 @@ function cancel_game($why,$gameid)
       break;
     case 'noplay':
       DB_query("UPDATE Game SET status='cancel-noplay' WHERE id=$gameid");
+      break;
+    case 'lowtrump':
+      DB_query("UPDATE Game SET status='cancel-lowtrump' WHERE id=$gameid");
       break;
     }
   /* set each player to gameover */

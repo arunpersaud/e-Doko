@@ -30,7 +30,7 @@ if(!isset($HOST))
 
 function DB_open()
 {
-  $version_needed = 1;
+  $version_needed = 2;
 
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
   $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
@@ -703,14 +703,15 @@ function DB_get_hashes_by_session($session,$user)
   return $r;
 }
 
-function DB_get_ruleset($dullen,$schweinchen,$call)
+function DB_get_ruleset($dullen,$schweinchen,$call,$lowtrump)
 {
   $r = array();
 
   $result = DB_query("SELECT id FROM Rulesets WHERE".
 		     " dullen=".DB_quote_smart($dullen)." AND ".
 		     " Rulesets.call=".DB_quote_smart($call)." AND ".
-		     " schweinchen=".DB_quote_smart($schweinchen));
+		     " schweinchen=".DB_quote_smart($schweinchen)." AND ".
+		     " lowtrump=".DB_quote_smart($lowtrump));
   if($result)
     $r    = DB_fetch_array($result);
 
@@ -722,6 +723,7 @@ function DB_get_ruleset($dullen,$schweinchen,$call)
       $result = DB_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
 			 DB_quote_smart($dullen).",".
 			 DB_quote_smart($schweinchen).",".
+			 DB_quote_smart($lowtrump).",".
 			 DB_quote_smart($call).
 			 ", NULL)");
       if($result)
@@ -834,9 +836,10 @@ function DB_get_RULES($gameid)
 		      " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
 		      " WHERE Game.id='$gameid'" );
 
-  $RULES["dullen"]      = $r[2];
-  $RULES["schweinchen"] = $r[3];
-  $RULES["call"]        = $r[4];
+  $RULES['dullen']      = $r[2];
+  $RULES['schweinchen'] = $r[3];
+  $RULES['lowtrump']    = $r[4];
+  $RULES['call']        = $r[5];
 
   return $RULES;
 }

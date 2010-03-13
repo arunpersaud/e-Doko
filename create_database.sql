@@ -48,7 +48,7 @@ CREATE TABLE `Version` (
 
 /*!40000 ALTER TABLE `Card` DISABLE KEYS */;
 LOCK TABLES `Version` WRITE;
-INSERT INTO `Version` VALUES (1);
+INSERT INTO `Version` VALUES (2);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `Version` ENABLE KEYS */;
 
@@ -141,7 +141,7 @@ CREATE TABLE `Game` (
   `sickness` int(11) default NULL,
   `startplayer` tinyint(4) default '1',
   `player` int(11) default NULL,
-  `status` enum('pre','play','gameover','cancel-timedout','cancel-nines','cancel-trump','cancel-noplay') default NULL,
+  `status` enum('pre','play','gameover','cancel-timedout','cancel-nines','cancel-trump','cancel-noplay','cancel-lowtrump') default NULL,
   `ruleset` int(11) default NULL,
   `session` int(11) default NULL,
   `id` int(11) NOT NULL auto_increment,
@@ -171,6 +171,7 @@ CREATE TABLE `Rulesets` (
   `dullen` enum('none','firstwins','secondwins') default 'secondwins',
   `schweinchen` enum ('none','both','second','secondaftercall') default 'second',
   `call` enum ('1st-own-card','5th-card','9-cards') default '1st-own-card',
+  `lowtrump` enum('poverty','cancel','none') default 'poverty',
   `id` int(11) NOT NULL auto_increment,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -200,7 +201,7 @@ CREATE TABLE `Hand` (
   `status` enum('start','init','check','poverty','play','gameover') default 'start',
   `position` tinyint(4) NOT NULL default '0',
   `party` enum('re','contra') default NULL,
-  `sickness` enum('wedding','nines','poverty','solo') default NULL,
+  `sickness` enum('wedding','nines','poverty','solo','lowtrump') default NULL,
   `solo` enum('trumpless','jack','queen','trump','club','spade','heart','silent') default NULL,
   `point_call` enum('120','90','60','30','0') default NULL,
   UNIQUE KEY `id` (`id`),

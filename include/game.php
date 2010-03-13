@@ -223,6 +223,7 @@ if($session)
     echo "       10ofhearts : {$RULES['dullen']}      <br />\n";
     echo "       schweinchen: {$RULES['schweinchen']} <br />\n";
     echo "       call:        {$RULES['call']}        <br />\n";
+    echo "       lowtrump:    {$RULES['lowtrump']}    <br />\n";
     echo "  </div>\n  </div>\n";
 
     /* show score */
@@ -400,7 +401,7 @@ switch($mystatus)
     $mycards = DB_get_hand($me);
     $mycards = mysort($mycards,$gametype);
 
-    if(!myisset('solo','wedding','poverty','nines') )
+    if(!myisset('solo','wedding','poverty','nines','lowtrump') )
       {
 	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
 	echo "\n<ul class=\"tricks\">\n";
@@ -439,9 +440,10 @@ switch($mystatus)
 	/* check if someone selected more than one sickness */
 	$Nsickness = 0;
 	if($_REQUEST['solo']!='No')       $Nsickness++;
-	if($_REQUEST['wedding'] == 'yes') $Nsickness++;
-	if($_REQUEST['poverty'] == 'yes') $Nsickness++;
-	if($_REQUEST['nines'] == 'yes')   $Nsickness++;
+	if($_REQUEST['wedding']  == 'yes') $Nsickness++;
+	if($_REQUEST['poverty']  == 'yes') $Nsickness++;
+	if($_REQUEST['nines']    == 'yes') $Nsickness++;
+	if($_REQUEST['lowtrump'] == 'yes') $Nsickness++;
 
 	if($Nsickness>1)
 	  {
@@ -502,6 +504,16 @@ switch($mystatus)
 		echo "What? You just don't want to play a game because you have a few nines? Well, if no one".
 		  " is playing solo, this game will be canceled.<br />\n";
 		DB_set_sickness_by_hash($me,'nines');
+	      }
+	    else if($_REQUEST['lowtrump'] == 'yes')
+	      {
+		if($RULES['lowtrump']=='cancel')
+		  echo "What? You just don't want to play a game because you have low trump? Well, if no one".
+		  " is playing solo, this game will be canceled.<br />\n";
+		else
+		  echo "Don't think you can win with low trumps...? ok, poverty chosen <br />.<br />\n";
+
+		DB_set_sickness_by_hash($me,'lowtrump');
 	      }
 
 	    echo "</p>\n";
@@ -592,7 +604,7 @@ switch($mystatus)
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
 
 	/* check for sickness */
-	$nines   = 0;
+	$cancel  = 0;
 	$poverty = 0;
 	$wedding = 0;
 	$solo    = 0;
@@ -600,12 +612,13 @@ switch($mystatus)
 	  {
 	    $name     = DB_get_name('userid',$user);
 	    $usersick = DB_get_sickness_by_userid_and_gameid($user,$gameid);
-	    if($usersick == 'nines')
+	    if($usersick == 'nines' || ($RULES['lowtrump']=='cancel' && $usersick=='lowtrump') )
 	      {
-		$nines = $user;
+		$cancel     = $user;
+		$cancelsick = $usersick;
 		break; /* no need to check for other poverties, since only solo can win and that is already set */
 	      }
-	    else if($usersick == 'poverty')
+	    else if($usersick == 'poverty' || ($RULES['lowtrump']=='poverty' && $usersick=='lowtrump'))
 	      $poverty++;
 	    else if($usersick == 'wedding')
 	      $wedding=$user;
@@ -618,13 +631,35 @@ switch($mystatus)
 	  {
 	    /* do nothing */
 	  }
-	else if($nines)
+	else if($cancel)
 	  {
 	    /* cancel game */
-	    $message = "The game has been canceled because ".DB_get_name('userid',$nines).
-	      " has five or more nines and nobody is playing solo.\n\n".
-	      "To redeal either start a new game or, in case the game was part of a tournament,\n".
-	      "go to the last game and use the link at the bottom of the page to redeal.\n\n";
+	    if($cancelsick == 'nines')
+	      {
+		$message = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		  " has five or more nines and nobody is playing solo.\n\n".
+		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
+		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
+
+		/* update game status */
+		cancel_game('nines',$gameid);
+
+		echo "<p>The game has been canceled because ".DB_get_name('userid',$cancel).
+		  " has five or more nines and nobody is playing solo.</p>\n";
+	      }
+	    else if ($cancelsick == 'lowtrump')
+	      {
+		$message = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		  " has low trump and nobody is playing solo.\n\n".
+		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
+		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
+
+		/* update game status */
+		cancel_game('lowtrump',$gameid);
+
+		echo "<p>The game has been canceled because ".DB_get_name('userid',$cancel).
+		  " has low trump and nobody is playing solo.</p>\n";
+	      };
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
@@ -633,11 +668,6 @@ switch($mystatus)
 		mymail($user,$subject,$message);
 	      }
 
-	    /* update game status */
-	    cancel_game('nines',$gameid);
-
-	    echo "<p>The game has been canceled because ".DB_get_name('userid',$nines).
-	      " has five or more nines and nobody is playing solo.</p>\n";
 	    echo "</div>\n";
 	    break;
 	  }
@@ -649,7 +679,7 @@ switch($mystatus)
 	    if(!$who)
 	      {
 		$firstsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
-		if($firstsick == 'poverty')
+		if($firstsick == 'poverty' || ($RULES['lowtrump']=='poverty' && $firstsick=='lowtrump'))
 		  DB_set_sickness_by_gameid($gameid,2); /* who needs to be asked first */
 		else
 		  DB_set_sickness_by_gameid($gameid,1); /* who needs to be asked first */
@@ -663,10 +693,10 @@ switch($mystatus)
 	    if(!$who)
 	      {
 		$firstsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
-		if($firstsick == 'poverty')
+		if($firstsick == 'poverty' || ($RULES['lowtrump']=='poverty' && $firstsick=='lowtrump'))
 		  {
-		    $seconsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
-		    if($secondsick == 'poverty')
+		    $secondsick = DB_get_sickness_by_pos_and_gameid(1,$gameid);
+		    if($secondsick == 'poverty'  || ($RULES['lowtrump']=='poverty' && $secondsick=='lowtrump'))
 		      DB_set_sickness_by_gameid($gameid,30); /* who needs to be asked first */
 		    else
 		      DB_set_sickness_by_gameid($gameid,20); /* who needs to be asked first */
@@ -726,7 +756,7 @@ switch($mystatus)
 	      case 'dpoverty':
 		/* set person with poverty to play status */
 		$usersick = DB_get_sickness_by_userid_and_gameid($userid,$gameid);
-		if($usersick == 'poverty')
+		if($usersick == 'poverty'  || ($RULES['lowtrump']=='poverty' && $usersick=='lowtrump'))
 		  DB_set_hand_status_by_hash($userhash,'play');
 
 		/* set status of first player to be asked to poverty */
@@ -806,6 +836,7 @@ switch($mystatus)
 	echo "</div>\n";
 	break;
       }
+    echo "</div>\n";
   case 'poverty':
     /* user only gets here in a poverty game, several things have to be handled here:
      * A) ask, if user wants to take trump
@@ -919,7 +950,7 @@ switch($mystatus)
 		$userhash  = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		$userparty = DB_get_party_by_hash($userhash);
 
-		if($usersick=='poverty' && !$userparty)
+		if(($usersick=='poverty'|| ($RULES['lowtrump']=='poverty' && $usersick=='lowtrump')) && !$userparty)
 		  {
 		    $hash    = DB_get_hash_from_gameid_and_userid($gameid,$user);
 		    $cards   = DB_get_hand($hash);
@@ -927,7 +958,10 @@ switch($mystatus)
 		    $nrtrump = 0;
 		    foreach($cards as $card)
 		      if($card<27) $nrtrump++;
-		    echo "Player $name has $nrtrump trump. Do you want to take them?".
+		    $low='';
+		    if($usersick=='lowtrump')
+		      $low='low';
+		    echo "Player $name has $nrtrump $low trump. Do you want to take them?".
 		      "<a href=\"index.php?action=game&amp;me=$me&amp;trump=$user\">Yes</a> <br />\n";
 		  }
 	      }
@@ -956,9 +990,9 @@ switch($mystatus)
 
 	    /* don't ask people who have poverty */
 	    $next=1;
-	    if($firstsick=='poverty')
+	    if($firstsick=='poverty' || ($RULES['lowtrump']=='poverty' && $firstsick=='lowtrump'))
 	      {
-		if($secondsick=='poverty')
+		if($secondsick=='poverty'|| ($RULES['lowtrump']=='poverty' && $secondsick=='lowtrump'))
 		  $next=3;
 		else
 		  $next=2;
@@ -1073,8 +1107,8 @@ switch($mystatus)
 		    $secondsick = (string) DB_get_sickness_by_pos_and_gameid($mypos+2,$gameid);
 
 		    $next=1;
-		    if($firstsick=='poverty')
-		      if($secondsick=='poverty')
+		    if($firstsick=='poverty'|| ($RULES['lowtrump']=='poverty' && $firstsick=='lowtrump'))
+		      if($secondsick=='poverty'|| ($RULES['lowtrump']=='poverty' && $secondsick=='lowtrump'))
 			$next=3;
 		      else
 			$next=2;
@@ -1097,7 +1131,7 @@ switch($mystatus)
 	    echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
 	  }
       }
-    echo "</div>";
+    echo "</div>\n";
     break;
 
   case 'play':
@@ -1116,8 +1150,10 @@ switch($mystatus)
 	echo "<div class=\"message\"><p>The game has been canceled because one player wasn't responding.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.</p></div>";
 	break;
       case 'cancel-nines':
-      case 'cancel-timedout':
 	echo "<div class=\"message\"><p>The game has been canceled because one player had too many nines.</p></div>";
+	break;
+      case 'cancel-lowtrump':
+	echo "<div class=\"message\"><p>The game has been canceled because one player had low trump.</p></div>";
 	break;
       case 'cancel-trump':
 	echo "<div class=\"message\"><p>The game has been canceled because nobody wanted to take the trump.</p></div>";
