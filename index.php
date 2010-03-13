@@ -36,11 +36,17 @@ include_once("./include/functions.php");   /* the rest */
 config_check();
 
 /* open the database */
-if(DB_open()<0)
+$DBopen = DB_open();
+if($DBopen<0)
   {
     output_header();
-    echo "Database error, can't connect... Please wait a while and try again. ".
-      "If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
+
+    if($DBopen == -1)
+      echo "Database error, can't connect... Please wait a while and try again. ".
+	"If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
+    else if ($DBopen == -2)
+      echo "Wrong database version, please update your database using the update.php script.";
+
     output_footer();
     exit();
   }

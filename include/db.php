@@ -30,17 +30,24 @@ if(!isset($HOST))
 
 function DB_open()
 {
+  $version_needed = 1;
+
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
   $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
   if ( $DB )
     {
-      mysql_select_db($DB_database) or die('Could not select database');
+      mysql_select_db($DB_database) or die('Error: Could not select database');
     }
   else
     {
       echo mysql_errno() . ": " . mysql_error(). "\n";
       return -1;
-    }
+    };
+
+  $version = DB_get_version();
+  if ($version != $version_needed)
+    return -2;
+
   return 0;
 }
 
