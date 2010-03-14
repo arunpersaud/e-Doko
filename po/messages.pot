@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-03-14 15:07-0700\n"
+"POT-Creation-Date: 2010-03-14 15:48-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,8 +16,72 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: include/functions.php:1106
+msgid "It's your turn in these games"
+msgstr ""
+
+#: include/game.php:1907
+msgid "please wait until it's your turn!"
+msgstr ""
+
+#: include/game.php:1984 include/game.php:2016
+msgid "Your cards are"
+msgstr ""
+
+#: include/game.php:2026
+msgid "Your cards were"
+msgstr ""
+
+#: include/game.php:2112
+msgid "A short comment"
+msgstr ""
+
+#: include/game.php:2115
+msgid "submit"
+msgstr ""
+
 #: include/output.php:398
 msgid "Welcome to E-Doko"
+msgstr ""
+
+#: include/output.php:455
+msgid "mypage"
+msgstr ""
+
+#: include/output.php:456
+msgid "settings"
+msgstr ""
+
+#: include/output.php:457
+msgid "new game"
+msgstr ""
+
+#: include/output.php:458
+msgid "statistics"
+msgstr ""
+
+#: include/output.php:459
+msgid "wiki/bugs"
+msgstr ""
+
+#: include/output.php:460
+msgid "atom"
+msgstr ""
+
+#: include/output.php:461
+msgid "logout"
+msgstr ""
+
+#: include/output.php:464
+msgid "last login"
+msgstr ""
+
+#: include/output.php:469
+msgid "login"
+msgstr ""
+
+#: include/output.php:575
+msgid "Personal notes"
 msgstr ""
 
 #: include/preferences.php:330
@@ -29,7 +93,7 @@ msgid "Game-related"
 msgstr ""
 
 #: include/preferences.php:335
-msgid "Vacation:"
+msgid "Vacation"
 msgstr ""
 
 #: include/preferences.php:350
@@ -70,6 +134,10 @@ msgstr ""
 
 #: include/preferences.php:393
 msgid "every 4h"
+msgstr ""
+
+#: include/preferences.php:397
+msgid "every 6h"
 msgstr ""
 
 #: include/preferences.php:401

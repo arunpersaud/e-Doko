@@ -433,12 +433,12 @@ function output_status()
 {
   global $defaulttimezone, $INDEX, $WIKI, $RSS;
 
-  if(isset($_SESSION["name"]))
+  if(isset($_SESSION['name']))
     {
-      $name = $_SESSION["name"];
+      $name = $_SESSION['name'];
 
       /* last logon time */
-      $myid  = DB_get_userid("name",$name);
+      $myid  = DB_get_userid('name',$name);
       $zone  = DB_get_user_timezone($myid);
 
       $time     = DB_get_user_timestamp($myid);
@@ -452,21 +452,21 @@ function output_status()
       /* logout info */
       echo "\n<div class=\"status\">\n";
       echo $name,"\n";
-      echo " | <a href=\"".$INDEX."\"> mypage </a>\n";
-      echo " | <a href=\"".$INDEX."?action=prefs\">settings</a>\n";
-      echo " | <a href=\"".$INDEX."?action=new\">new game</a>\n";
-      echo " | <a href=\"".$INDEX."?action=stats\">statistics</a>\n";
-      echo " | <a href=\"".$WIKI."\">wiki</a>\n";
-      echo " | <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">rss</a>\n";
-      echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">logout</a>\n";
+      echo " | <a href=\"".$INDEX."\">"._('mypage')."</a>\n";
+      echo " | <a href=\"".$INDEX."?action=prefs\">"._('settings')."</a>\n";
+      echo " | <a href=\"".$INDEX."?action=new\">"._('new game')."</a>\n";
+      echo " | <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a>\n";
+      echo " | <a href=\"".$WIKI."\">"._('wiki/bugs')."</a>\n";
+      echo " | <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a>\n";
+      echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">"._('logout')."</a>\n";
       echo "</div>\n";
 
-      echo "<div class=\"lastlogin\"><span>last login: ".date("r",$unixtime)."</span></div>\n";
+      echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n";
     }
   else
     {
       echo "\n<div class=\"status\">\n";
-      echo "<a href=\"".$INDEX."\">login</a>\n";
+      echo "<a href=\"".$INDEX."\">"._('login')."</a>\n";
       echo "</div>\n";
     }
   return;
@@ -572,7 +572,7 @@ function output_password_recovery($email,$password)
 
 function output_user_notes($userid,$gameid,$userstatus)
 {
-  echo "<div class=\"notes\"> Personal notes: <br />\n";
+  echo "<div class=\"notes\"> "._('Personal notes').": <br />\n";
   $notes = DB_get_notes_by_userid_and_gameid($userid,$gameid);
   foreach($notes as $note)
     echo "$note <hr />\n";

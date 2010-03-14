@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-03-14 15:07-0700\n"
-"PO-Revision-Date: 2010-03-14 15:09-0700\n"
+"POT-Creation-Date: 2010-03-14 15:48-0700\n"
+"PO-Revision-Date: 2010-03-14 16:00-0700\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,73 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: include/functions.php:1106
+msgid "It's your turn in these games"
+msgstr "In diesen Spielen bist Du dran"
+
+#: include/game.php:1907
+msgid "please wait until it's your turn!"
+msgstr "Bitte warte bis Du dran bist!"
+
+#: include/game.php:1984 include/game.php:2016
+msgid "Your cards are"
+msgstr "Deine Karten sind"
+
+#: include/game.php:2026
+msgid "Your cards were"
+msgstr "Deine Karten waren"
+
+#: include/game.php:2112
+msgid "A short comment"
+msgstr "Ein kurzer Kommentar"
+
+#: include/game.php:2115
+msgid "submit"
+msgstr ""
+
 #: include/output.php:398
 msgid "Welcome to E-Doko"
 msgstr "Willkommen bei E-Doko"
+
+#: include/output.php:455
+msgid "mypage"
+msgstr ""
+
+#: include/output.php:456
+msgid "settings"
+msgstr "Einstellungen"
+
+#: include/output.php:457
+msgid "new game"
+msgstr "neues Spiel"
+
+#: include/output.php:458
+msgid "statistics"
+msgstr "Statistik"
+
+#: include/output.php:459
+msgid "wiki/bugs"
+msgstr "Wiki/Bugs"
+
+#: include/output.php:460
+msgid "atom"
+msgstr "Atom"
+
+#: include/output.php:461
+msgid "logout"
+msgstr "ausloggen"
+
+#: include/output.php:464
+msgid "last login"
+msgstr "Letzter Login"
+
+#: include/output.php:469
+msgid "login"
+msgstr ""
+
+#: include/output.php:575
+msgid "Personal notes"
+msgstr "Notizen"
 
 #: include/preferences.php:330
 msgid "Your settings are"
@@ -29,7 +93,7 @@ msgid "Game-related"
 msgstr ""
 
 #: include/preferences.php:335
-msgid "Vacation:"
+msgid "Vacation"
 msgstr "Urlaub"
 
 #: include/preferences.php:350
@@ -71,6 +135,10 @@ msgstr "alle 3h"
 #: include/preferences.php:393
 msgid "every 4h"
 msgstr "alle 4h"
+
+#: include/preferences.php:397
+msgid "every 6h"
+msgstr "alle 6h"
 
 #: include/preferences.php:401
 msgid "every 12h"
