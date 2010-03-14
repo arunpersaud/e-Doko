@@ -456,7 +456,7 @@ function output_status()
       echo " | <a href=\"".$INDEX."?action=prefs\">settings</a>\n";
       echo " | <a href=\"".$INDEX."?action=new\">new game</a>\n";
       echo " | <a href=\"".$INDEX."?action=stats\">statistics</a>\n";
-      echo " | <a href=\"".$WIKI."\">wiki</a>\n";
+      echo " | <a href=\"".$WIKI."\">wiki/bugs</a>\n";
       echo " | <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">rss</a>\n";
       echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">logout</a>\n";
       echo "</div>\n";
