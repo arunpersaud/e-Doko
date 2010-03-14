@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-03-14 11:35-0700\n"
+"POT-Creation-Date: 2010-03-14 15:07-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,4 +18,72 @@ msgstr ""
 
 #: include/output.php:398
 msgid "Welcome to E-Doko"
+msgstr ""
+
+#: include/preferences.php:330
+msgid "Your settings are"
+msgstr ""
+
+#: include/preferences.php:332
+msgid "Game-related"
+msgstr ""
+
+#: include/preferences.php:335
+msgid "Vacation:"
+msgstr ""
+
+#: include/preferences.php:350
+msgid "comment:"
+msgstr ""
+
+#: include/preferences.php:351 include/preferences.php:368
+#: include/preferences.php:408 include/preferences.php:425
+#: include/preferences.php:441 include/preferences.php:456
+#: include/preferences.php:472 include/preferences.php:482
+#: include/preferences.php:486 include/preferences.php:502
+msgid "changed"
+msgstr ""
+
+#: include/preferences.php:352
+msgid "wrong date format"
+msgstr ""
+
+#: include/preferences.php:359 include/preferences.php:364
+msgid "less emails"
+msgstr ""
+
+#: include/preferences.php:360 include/preferences.php:365
+msgid "lots of emails"
+msgstr ""
+
+#: include/preferences.php:381
+msgid "every hour"
+msgstr ""
+
+#: include/preferences.php:385
+msgid "every 2h"
+msgstr ""
+
+#: include/preferences.php:389
+msgid "every 3h"
+msgstr ""
+
+#: include/preferences.php:393
+msgid "every 4h"
+msgstr ""
+
+#: include/preferences.php:401
+msgid "every 12h"
+msgstr ""
+
+#: include/preferences.php:405
+msgid "every 24h"
+msgstr ""
+
+#: include/preferences.php:416 include/preferences.php:421
+msgid "accept every game"
+msgstr ""
+
+#: include/preferences.php:417 include/preferences.php:422
+msgid "ask for games"
 msgstr ""

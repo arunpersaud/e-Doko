@@ -327,12 +327,12 @@ $timezone = DB_get_user_timezone($myid);
 
 echo "<div class=\"user\">\n";
 echo "  <form action=\"index.php?action=prefs\" method=\"post\">\n";
-echo "  <h2>Your settings are</h2>\n";
+echo '  <h2>'._('Your settings are')."</h2>\n";
 echo "    <fieldset>\n";
-echo "    <legend>Game-related</legend>\n";
+echo '    <legend>'._('Game-related')."</legend>\n";
 echo "      <table>\n";
 
-echo "        <tr><td>Vacation:             </td>\n";
+echo '        <tr><td>'._('Vacation:')."             </td>\n";
 if($PREF['vacation_start'])
   $value = substr($PREF['vacation_start'],0,10);
  else
@@ -347,25 +347,25 @@ if($PREF['vacation_comment'])
   $value = $PREF['vacation_comment'];
 else
   $value = '';
-echo "            <td>comment:<input type=\"text\" id=\"vacation_comment\" name=\"vacation_comment\" size=\"10\" maxlength=\"50\" value=\"$value\" />";
-if($changed_vacation == 1) echo "changed";
-if($changed_vacation == -1) echo "wrong date format";
+echo '            <td>'._('comment:')."<input type=\"text\" id=\"vacation_comment\" name=\"vacation_comment\" size=\"10\" maxlength=\"50\" value=\"$value\" />";
+if($changed_vacation == 1) echo _('changed');
+if($changed_vacation == -1) echo _('wrong date format');
 echo "</td></tr>\n";
 echo "<tr><td></td><td>use YYYY-MM-DD</td><td>use '-'  in start field to unset vacation</td></tr>\n";
 echo "        <tr><td>Notification:          </td><td>\n";
 echo "          <select id=\"notify\" name=\"notify\" size=\"1\">\n";
 if($PREF['email']=="emailaddict")
   {
-    echo "            <option value=\"emailaddict\" selected=\"selected\">less emails</option>\n";
-    echo "            <option value=\"emailnonaddict\">lots of emails</option>\n";
+    echo "            <option value=\"emailaddict\" selected=\"selected\">"._('less emails')."</option>\n";
+    echo "            <option value=\"emailnonaddict\">"._('lots of emails')."</option>\n";
   }
 else
   {
-    echo "            <option value=\"emailaddict\">less email</option>\n";
-    echo "            <option value=\"emailnonaddict\" selected=\"selected\">lots of email</option>\n";
+    echo "            <option value=\"emailaddict\">"._('less emails')."</option>\n";
+    echo "            <option value=\"emailnonaddict\" selected=\"selected\">"._('lots of emails')."</option>\n";
   }
 echo "          </select>";
-if($changed_notify) echo "changed";
+if($changed_notify) echo _('changed');
 echo " </td></tr>\n";
 
 echo "        <tr><td>Digest:          </td><td>\n";
@@ -378,34 +378,34 @@ echo ">digest off</option>\n";
 
 echo "            <option value=\"digest-1h\" ";
 if($PREF['digest']=="digest-1h") echo $selected;
-echo ">every hour</option>\n";
+echo ">"._('every hour')."</option>\n";
 
 echo "            <option value=\"digest-2h\" ";
 if($PREF['digest']=="digest-2h") echo $selected;
-echo ">every 2h</option>\n";
+echo ">"._('every 2h')."</option>\n";
 
 echo "            <option value=\"digest-3h\" ";
 if($PREF['digest']=="digest-3h") echo $selected;
-echo ">every 3h</option>\n";
+echo ">"._('every 3h')."</option>\n";
 
 echo "            <option value=\"digest-4h\" ";
 if($PREF['digest']=="digest-4h") echo $selected;
-echo ">every 4h</option>\n";
+echo ">"._('every 4h')."</option>\n";
 
 echo "            <option value=\"digest-6h\" ";
 if($PREF['digest']=="digest-6h") echo $selected;
-echo ">every 6h</option>\n";
+echo ">"._('every 6h')."</option>\n";
 
 echo "            <option value=\"digest-12h\"";
 if($PREF['digest']=="digest-12h") echo $selected;
-echo ">every 12h</option>\n";
+echo ">"._('every 12h')."</option>\n";
 
 echo "            <option value=\"digest-24h\"";
 if($PREF['digest']=="digest-24h") echo $selected;
-echo ">every 24h</option>\n";
+echo ">"._('every 24h')."</option>\n";
 
 echo "          </select>";
-if($changed_digest) echo "changed";
+if($changed_digest) echo _('changed');
 echo " </td></tr>\n";
 
 
@@ -413,16 +413,16 @@ echo "        <tr><td>Autosetup:          </td><td>\n";
 echo "          <select id=\"autosetup\" name=\"autosetup\" size=\"1\">\n";
 if($PREF['autosetup']=="yes")
   {
-    echo "           <option value=\"yes\" selected=\"selected\">accept every game</option>\n";
-    echo "           <option value=\"no\">ask for games</option>\n";
+    echo "           <option value=\"yes\" selected=\"selected\">"._('accept every game')."</option>\n";
+    echo "           <option value=\"no\">"._('ask for games')."</option>\n";
   }
  else
    {
-     echo "           <option value=\"yes\">accept every game</option>\n";
-     echo "           <option value=\"no\" selected=\"selected\">ask for games</option>\n";
+     echo "           <option value=\"yes\">"._('accept every game')."</option>\n";
+     echo "           <option value=\"no\" selected=\"selected\">"._('ask for games')."</option>\n";
    }
 echo "         </select>";
-if($changed_autosetup) echo "changed";
+if($changed_autosetup) echo _('changed');
 echo " </td></tr>\n";
 echo "    <tr><td>Sorting:          </td><td>\n";
 
@@ -438,7 +438,7 @@ if($PREF['sorting']=="high-low")
      echo "           <option value=\"low-high\" selected=\"selected\">low to high</option>\n";
    }
 echo "         </select>";
-if($changed_sorting) echo "changed";
+if($changed_sorting) echo _('changed');
 echo " </td></tr>\n";
 echo "        <tr><td>Open for new games:          </td><td>\n";
 echo "         <select id=\"open_for_games\" name=\"open_for_games\" size=\"1\">\n";
@@ -453,7 +453,7 @@ if($PREF['open_for_games']=="no")
      echo "           <option value=\"no\">no</option>\n";
    }
 echo "         </select>";
-if($changed_openforgames) echo "changed";
+if($changed_openforgames) echo _('changed');
 echo " </td></tr>\n";
 
 echo "    <tr><td>Card set:              </td><td>\n";
@@ -469,7 +469,7 @@ if($PREF['cardset']=="altenburg")
      echo "           <option value=\"english\" selected=\"selected\">English cards</option>\n";
    }
 echo "         </select>";
-if($changed_cards) echo "changed";
+if($changed_cards) echo _('changed');
 echo " </td></tr>\n";
 echo "      </table>\n";
 echo "    </fieldset>\n";
@@ -479,10 +479,11 @@ echo "      <table>\n";
 echo "        <tr><td>Email:                 </td><td> $email    </td></tr>\n";
 echo "        <tr><td>Timezone:              </td><td>\n";
 output_select_timezone("timezone",$timezone);
-if($changed_timezone) echo "changed";
+if($changed_timezone) echo _('changed');
 echo "</td></tr>\n";
 echo "        <tr><td>Language:              </td><td>\n";
 output_select_language("language",$PREF['language']);
+if($changed_language == 1) echo _('changed');
 echo "</td></tr>\n";
 echo "        <tr><td>Password(old):         </td><td>",
   "<input type=\"password\" id=\"password0\" name=\"password0\" size=\"20\" maxlength=\"30\" />";
@@ -498,7 +499,7 @@ switch($changed_password)
     echo "The old password is not correct.";
     break;
   case '1':
-    echo "changed";
+    echo _('changed');
     break;
   }
 echo " </td></tr>\n";
@@ -537,7 +538,7 @@ if($changed_openid)
 echo "    </fieldset>\n";
 echo "    <fieldset><legend>Submit</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
 echo "  </form>\n";
-echo " <p>E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons. I</p>";
+echo " <p>E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons.</p>";
 echo "</div>\n";
 
 return;

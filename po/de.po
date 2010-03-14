@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-03-14 11:35-0700\n"
-"PO-Revision-Date: 2010-03-14 12:01-0700\n"
+"POT-Creation-Date: 2010-03-14 15:07-0700\n"
+"PO-Revision-Date: 2010-03-14 15:09-0700\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -19,3 +19,71 @@ msgstr ""
 #: include/output.php:398
 msgid "Welcome to E-Doko"
 msgstr "Willkommen bei E-Doko"
+
+#: include/preferences.php:330
+msgid "Your settings are"
+msgstr "Deine Einstellungen sind"
+
+#: include/preferences.php:332
+msgid "Game-related"
+msgstr ""
+
+#: include/preferences.php:335
+msgid "Vacation:"
+msgstr "Urlaub"
+
+#: include/preferences.php:350
+msgid "comment:"
+msgstr "Kommentar:"
+
+#: include/preferences.php:351 include/preferences.php:368
+#: include/preferences.php:408 include/preferences.php:425
+#: include/preferences.php:441 include/preferences.php:456
+#: include/preferences.php:472 include/preferences.php:482
+#: include/preferences.php:486 include/preferences.php:502
+msgid "changed"
+msgstr "geaendert"
+
+#: include/preferences.php:352
+msgid "wrong date format"
+msgstr "Falsches Datumformat"
+
+#: include/preferences.php:359 include/preferences.php:364
+msgid "less emails"
+msgstr "weniger E-mails"
+
+#: include/preferences.php:360 include/preferences.php:365
+msgid "lots of emails"
+msgstr "viele E-mails"
+
+#: include/preferences.php:381
+msgid "every hour"
+msgstr "stuendlich"
+
+#: include/preferences.php:385
+msgid "every 2h"
+msgstr "alle 2h"
+
+#: include/preferences.php:389
+msgid "every 3h"
+msgstr "alle 3h"
+
+#: include/preferences.php:393
+msgid "every 4h"
+msgstr "alle 4h"
+
+#: include/preferences.php:401
+msgid "every 12h"
+msgstr "alle 12h"
+
+#: include/preferences.php:405
+msgid "every 24h"
+msgstr "alle 24h"
+
+#: include/preferences.php:416 include/preferences.php:421
+msgid "accept every game"
+msgstr "jedes Spiel akzeptieren"
+
+#: include/preferences.php:417 include/preferences.php:422
+msgid "ask for games"
+msgstr ""
