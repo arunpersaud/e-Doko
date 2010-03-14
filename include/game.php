@@ -668,7 +668,7 @@ switch($mystatus)
 		mymail($user,$subject,$message);
 	      }
 
-	    echo "</div>\n";
+	    echo "</div>\n"; /* end div message */
 	    break;
 	  }
 	else if($poverty==1) /* one person has poverty */
@@ -807,7 +807,7 @@ switch($mystatus)
 		  }
 	      }
 	    else
-	      echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
+	      echo "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
 	  }
 	else
 	  {
@@ -817,7 +817,7 @@ switch($mystatus)
 
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
-	      echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
+	      echo "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br /\n";
 	    else
 	      {
 		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
@@ -836,7 +836,7 @@ switch($mystatus)
 	echo "</div>\n";
 	break;
       }
-    echo "</div>\n";
+
   case 'poverty':
     /* user only gets here in a poverty game, several things have to be handled here:
      * A) ask, if user wants to take trump
@@ -894,7 +894,7 @@ switch($mystatus)
 	/* get information so show the cards that have been handed over in a poverty game */
 	output_exchanged_cards();
 
-	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	echo "    </div>\n  </li>\n</ul>\n\n";  /* end div trick, end li trick , end ul tricks */
       }
     /* end output pre-game trick */
 
