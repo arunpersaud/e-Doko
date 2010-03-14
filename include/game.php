@@ -1524,28 +1524,31 @@ switch($mystatus)
 
 		/* same as for foxes, karlchen doesn't always make sense
 		 * check what kind of game it is and set karlchen accordingly */
-		$ok = 1; /* default: karlchen should be accounted for */
-		if($tricknr != 12 )
-		  $ok = 0; /* Karlchen works only in the last trick */
-		if($ok && DB_get_gametype_by_gameid($gameid)=='solo' )
+
+		if($tricknr == 12 ) /* Karlchen works only in the last trick */
 		  {
-		    $solo = DB_get_solo_by_gameid($gameid);
-		    if($solo == 'trumpless' || $solo == 'jack' || $solo == 'queen' )
-		      $ok = 0; /* no Karlchen in these solos */
-		  }
+		    /* check for solo */
+		    $solo = 'none';
+		    if(DB_get_gametype_by_gameid($gameid)=='solo' )
+		      $solo = DB_get_solo_by_gameid($gameid);
 
-		if($ok)
-		  foreach($play as $played)
-		    if ( $played['card']==11 || $played['card']==12 )
-		      if ($played['pos'] == $winner )
-			{
-			  /* possible caught a fox, check party */
-			  $uid1   = DB_get_userid('gameid-position',$gameid,$winner);
-			  $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
+		    /* no Karlchen in these solos */
+		    if($solo != 'trumpless' && $solo != 'jack' && $solo != 'queen' )
+		      {
+			foreach($play as $played)
+			  if ( $played['card']==11 || $played['card']==12 )
+			    if ($played['pos'] == $winner )
+			      {
+				/* save Karlchen */
+				$uid1   = DB_get_userid('gameid-position',$gameid,$winner);
+				$party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
-			  DB_query("INSERT INTO Score".
-				   " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
-			}
+				DB_query("INSERT INTO Score".
+					 " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
+			      };
+		      };
+		  }; /* end scoring Karlchen */
+
 		/*
 		 * check for doppelopf (>40 points)
 		 ***********************************/
