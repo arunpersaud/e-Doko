@@ -14,7 +14,7 @@ msginit -i messages.pot  -o de.po
 To update a po file run:
 
 cd po
-msgmerge de.po messages.pot
+msgmerge de.po messages.pot -o de.po
 
 Start editing and then after updating a po run:
 
