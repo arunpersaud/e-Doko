@@ -1103,7 +1103,7 @@ function display_user_menu($id)
       if($i==0)
 	{
 	  echo "<div class=\"usermenu\">\n";
-	  echo "It's your turn in these games:<br />\n";
+	  echo _('It\'s your turn in these games').":<br />\n";
 	}
 
       $i++;

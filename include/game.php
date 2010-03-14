@@ -1904,7 +1904,7 @@ switch($mystatus)
       }
     else if(myisset('card') && !$myturn )
       {
-	echo "please wait until it's your turn! <br />\n";
+	echo _("please wait until it's your turn!")."<br />\n";
       }
 
     if($seq!=4 && $trickNR>=1 && !(myisset('card') && $myturn) )
@@ -1981,7 +1981,7 @@ switch($mystatus)
     if($myturn && !myisset('card') && $mystatus=='play' )
       {
 	echo "Hello ".$myname.", it's your turn!  <br />\n";
-	echo "Your cards are: <br />\n";
+	echo _('Your cards are').": <br />\n";
 
 	/* do we have to follow suite? */
 	$followsuit = 0;
@@ -2013,7 +2013,7 @@ switch($mystatus)
       }
     else if($mystatus=='play' )
       {
-	echo "Your cards are: <br />\n";
+	echo _('Your cards are').": <br />\n";
 	foreach($mycards as $card)
 	  display_card($card,$PREF['cardset']);
       }
@@ -2023,7 +2023,7 @@ switch($mystatus)
 	$oldcards = mysort($oldcards,$gametype);
 
 	if(isset($_SESSION['id']) && $myid==$_SESSION['id'])
-	  echo "Your cards were: <br />\n";
+	  echo _('Your cards were').": <br />\n";
 	else
 	  {
 	    $name = DB_get_name('userid',$myid);
@@ -2109,10 +2109,10 @@ $gameend = time() - strtotime($r[0]);
 
 if($gamestatus == 'play' || $gameend < 60*60*24*7)
   {
-    echo "<br />\nA short comment:<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+    echo "<br />\n"._('A short comment').":<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
   }
 
-echo "<input type=\"submit\" value=\"submit\" />\n";
+echo "<input type=\"submit\" value=\""._('submit')."\" />\n";
 
 /* has this hand been played by others? */
 $other_game_ids = DB_played_by_others($gameid);

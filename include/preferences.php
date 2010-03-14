@@ -332,7 +332,7 @@ echo "    <fieldset>\n";
 echo '    <legend>'._('Game-related')."</legend>\n";
 echo "      <table>\n";
 
-echo '        <tr><td>'._('Vacation:')."             </td>\n";
+echo '        <tr><td>'._('Vacation').":             </td>\n";
 if($PREF['vacation_start'])
   $value = substr($PREF['vacation_start'],0,10);
  else
