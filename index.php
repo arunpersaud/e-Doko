@@ -51,7 +51,36 @@ if($DBopen<0)
     exit();
   }
 
-/* done major error checking, output5B header of HTML page */
+/* localization */
+/* needs to be in front of output_header, but we don't know the users preferences at this time,
+ * so we go by the session variable or if language is set
+ */
+if(myisset('language') || isset($_SESSION['language']))
+  {
+    $language = 'en';
+    if(isset($_SESSION['language']))
+       $language = $_SESSION['language'];
+    if(myisset('language'))
+      {
+	$language = $_REQUEST['language'];
+	$_SESSION['language'] = $language; /* overrule preferences */
+      }
+    switch($language)
+      {
+      case 'de':
+	putenv("LC_ALL=de_DE");
+	setlocale(LC_ALL, "de_DE");
+	// Specify location of translation tables
+	bindtextdomain("edoko", "./locale");
+	// Choose domain
+	textdomain("edoko");
+	break;
+      default:
+	/* do nothing */
+      }
+  }
+
+/* done major error checking, output header of HTML page */
 output_header();
 
 /* The rest of the file consists of handling user input.
@@ -120,5 +149,3 @@ DB_close();
  *End:
  */
 ?>
-
-

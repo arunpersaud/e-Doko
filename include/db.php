@@ -772,6 +772,7 @@ function DB_get_PREF($myid)
   $PREF['vacation_start']	=  NULL;
   $PREF['vacation_stop']	=  NULL;
   $PREF['vacation_comment']	=  '';
+  $PREF['language']	        =  'en';
 
   /* get all preferences */
   $r = DB_query('SELECT pref_key, value FROM User_Prefs'.
@@ -825,8 +826,14 @@ function DB_get_PREF($myid)
 	  if($pref[1])
 	    $PREF['vacation_comment'] = $pref[1];
 	  break;
+
+	case 'language':
+	  if($pref[1])
+	    $PREF['language'] = $pref[1];
+	  break;
 	}
     }
+  $_SESSION['language'] =  $PREF['language'];
   return $PREF;
 }
 

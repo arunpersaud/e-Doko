@@ -394,7 +394,9 @@ function output_header()
   </head>
 <body onload="high_last();">
 <div class="header">
-<h1> Welcome to E-Doko </h1>
+<?php
+  echo '<h1> '._('Welcome to E-Doko').' </h1>';
+?>
 </div>
 <?php
 
@@ -515,6 +517,26 @@ function output_select_timezone($name,$timezone="")
 
   return;
 }
+
+function output_select_language($name,$language="")
+{
+  $LOCALE = array ("English"     => "en",
+		   "Deutsch"     => "de" );
+
+  echo "  <select id=\"$name\" name=\"$name\" size=\"1\">\n";
+
+  foreach($LOCALE as $place=>$locale)
+    {
+      if($language==$locale)
+	echo "   <option value=\"$locale\" selected=\"selected\">$place</option>\n";
+      else
+	echo "   <option value=\"$locale\">$place</option>\n";
+    }
+  echo "  </select>\n";
+
+  return;
+}
+
 
 function output_password_recovery($email,$password)
 {

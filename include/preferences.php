@@ -43,6 +43,7 @@ $changed_openforgames = 0;
 $changed_vacation     = 0;
 $changed_openid       = 0;
 $changed_digest       = 0;
+$changed_language     = 0;
 
 display_user_menu($myid);
 
@@ -297,6 +298,25 @@ if(myisset("openid_url") && $_REQUEST['openid_url']!='')
     DB_AttachOpenID($openid_url, $myid);
   }
 
+if(myisset("language"))
+  {
+    $language = $_REQUEST['language'];
+    if($language != $PREF['language'])
+      {
+	/* check if we already have an entry for the user, if so change it, if not create new one */
+	$result = DB_query("SELECT * from User_Prefs".
+			   " WHERE user_id='$myid' AND pref_key='language'" );
+	if( DB_fetch_array($result))
+	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($language).
+			     " WHERE user_id='$myid' AND pref_key='language'" );
+	else
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','language',".
+			     DB_quote_smart($language).")");
+	$changed_language = 1;
+      }
+  }
+
+
 /* get infos again in case they have changed */
 $PREF     = DB_get_PREF($myid);
 $timezone = DB_get_user_timezone($myid);
@@ -461,7 +481,9 @@ echo "        <tr><td>Timezone:              </td><td>\n";
 output_select_timezone("timezone",$timezone);
 if($changed_timezone) echo "changed";
 echo "</td></tr>\n";
-
+echo "        <tr><td>Language:              </td><td>\n";
+output_select_language("language",$PREF['language']);
+echo "</td></tr>\n";
 echo "        <tr><td>Password(old):         </td><td>",
   "<input type=\"password\" id=\"password0\" name=\"password0\" size=\"20\" maxlength=\"30\" />";
 switch($changed_password)
