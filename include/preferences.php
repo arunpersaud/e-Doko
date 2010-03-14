@@ -483,6 +483,7 @@ if($changed_timezone) echo "changed";
 echo "</td></tr>\n";
 echo "        <tr><td>Language:              </td><td>\n";
 output_select_language("language",$PREF['language']);
+if($changed_language == 1) echo "changed";
 echo "</td></tr>\n";
 echo "        <tr><td>Password(old):         </td><td>",
   "<input type=\"password\" id=\"password0\" name=\"password0\" size=\"20\" maxlength=\"30\" />";
@@ -537,7 +538,7 @@ if($changed_openid)
 echo "    </fieldset>\n";
 echo "    <fieldset><legend>Submit</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
 echo "  </form>\n";
-echo " <p>E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons. I</p>";
+echo " <p>E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons.</p>";
 echo "</div>\n";
 
 return;
