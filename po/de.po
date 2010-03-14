@@ -1,0 +1,21 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Arun Persaud <arun@nubati.net>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: edoko\n"
+"Report-Msgid-Bugs-To: arun@nubati.net\n"
+"POT-Creation-Date: 2010-03-14 11:35-0700\n"
+"PO-Revision-Date: 2010-03-14 12:01-0700\n"
+"Last-Translator: Arun Persaud <arun@nubati.net>\n"
+"Language-Team: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: include/output.php:398
+msgid "Welcome to E-Doko"
+msgstr "Willkommen bei E-Doko"

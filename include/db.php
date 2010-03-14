@@ -30,17 +30,24 @@ if(!isset($HOST))
 
 function DB_open()
 {
+  $version_needed = 2;
+
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
   $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
   if ( $DB )
     {
-      mysql_select_db($DB_database) or die('Could not select database');
+      mysql_select_db($DB_database) or die('Error: Could not select database');
     }
   else
     {
       echo mysql_errno() . ": " . mysql_error(). "\n";
       return -1;
-    }
+    };
+
+  $version = DB_get_version();
+  if ($version != $version_needed)
+    return -2;
+
   return 0;
 }
 
@@ -696,14 +703,15 @@ function DB_get_hashes_by_session($session,$user)
   return $r;
 }
 
-function DB_get_ruleset($dullen,$schweinchen,$call)
+function DB_get_ruleset($dullen,$schweinchen,$call,$lowtrump)
 {
   $r = array();
 
   $result = DB_query("SELECT id FROM Rulesets WHERE".
 		     " dullen=".DB_quote_smart($dullen)." AND ".
 		     " Rulesets.call=".DB_quote_smart($call)." AND ".
-		     " schweinchen=".DB_quote_smart($schweinchen));
+		     " schweinchen=".DB_quote_smart($schweinchen)." AND ".
+		     " lowtrump=".DB_quote_smart($lowtrump));
   if($result)
     $r    = DB_fetch_array($result);
 
@@ -715,6 +723,7 @@ function DB_get_ruleset($dullen,$schweinchen,$call)
       $result = DB_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
 			 DB_quote_smart($dullen).",".
 			 DB_quote_smart($schweinchen).",".
+			 DB_quote_smart($lowtrump).",".
 			 DB_quote_smart($call).
 			 ", NULL)");
       if($result)
@@ -763,6 +772,7 @@ function DB_get_PREF($myid)
   $PREF['vacation_start']	=  NULL;
   $PREF['vacation_stop']	=  NULL;
   $PREF['vacation_comment']	=  '';
+  $PREF['language']	        =  'en';
 
   /* get all preferences */
   $r = DB_query('SELECT pref_key, value FROM User_Prefs'.
@@ -816,8 +826,14 @@ function DB_get_PREF($myid)
 	  if($pref[1])
 	    $PREF['vacation_comment'] = $pref[1];
 	  break;
+
+	case 'language':
+	  if($pref[1])
+	    $PREF['language'] = $pref[1];
+	  break;
 	}
     }
+  $_SESSION['language'] =  $PREF['language'];
   return $PREF;
 }
 
@@ -827,9 +843,10 @@ function DB_get_RULES($gameid)
 		      " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
 		      " WHERE Game.id='$gameid'" );
 
-  $RULES["dullen"]      = $r[2];
-  $RULES["schweinchen"] = $r[3];
-  $RULES["call"]        = $r[4];
+  $RULES['dullen']      = $r[2];
+  $RULES['schweinchen'] = $r[3];
+  $RULES['lowtrump']    = $r[4];
+  $RULES['call']        = $r[5];
 
   return $RULES;
 }

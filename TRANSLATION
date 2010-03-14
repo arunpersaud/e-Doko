@@ -1,0 +1,23 @@
+Translation:
+
+to update the pot file run:
+
+xgettext -L PHP -n --package-name=edoko --msgid-bugs-address=arun@nubati.net *php */*php
+mv messages.po po/messages.pot
+
+
+To start a new translation use something like (here shown to create de.po):
+
+cd po
+msginit -i messages.pot  -o de.po
+
+To update a po file run:
+
+cd po
+msgmerge de.po messages.pot
+
+Start editing and then after updating a po run:
+
+msgconv -t ISO-8859-1 de.po > de.po.new && mv de.po.new de.po
+msgfmt -cv -o de.mo de.po
+mv de.mo ../locale/de/LC_MESSAGES/edoko.mo

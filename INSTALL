@@ -3,7 +3,7 @@ Installation
 ------------
 
 -1) What you need
-   all you need is PHP and MYSQL
+   all you need is PHP and MYSQL. PHP has to include gettext support.
 
 0) Get files
 

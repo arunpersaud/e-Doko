@@ -36,16 +36,51 @@ include_once("./include/functions.php");   /* the rest */
 config_check();
 
 /* open the database */
-if(DB_open()<0)
+$DBopen = DB_open();
+if($DBopen<0)
   {
     output_header();
-    echo "Database error, can't connect... Please wait a while and try again. ".
-      "If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
+
+    if($DBopen == -1)
+      echo "Database error, can't connect... Please wait a while and try again. ".
+	"If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
+    else if ($DBopen == -2)
+      echo "Wrong database version, please update your database using the update.php script.";
+
     output_footer();
     exit();
   }
 
-/* done major error checking, output5B header of HTML page */
+/* localization */
+/* needs to be in front of output_header, but we don't know the users preferences at this time,
+ * so we go by the session variable or if language is set
+ */
+if(myisset('language') || isset($_SESSION['language']))
+  {
+    $language = 'en';
+    if(isset($_SESSION['language']))
+       $language = $_SESSION['language'];
+    if(myisset('language'))
+      {
+	$language = $_REQUEST['language'];
+	$_SESSION['language'] = $language; /* overrule preferences */
+      }
+    switch($language)
+      {
+      case 'de':
+	putenv("LC_ALL=de_DE");
+	setlocale(LC_ALL, "de_DE");
+	// Specify location of translation tables
+	bindtextdomain("edoko", "./locale");
+	// Choose domain
+	textdomain("edoko");
+	break;
+      default:
+	/* do nothing */
+      }
+  }
+
+/* done major error checking, output header of HTML page */
 output_header();
 
 /* The rest of the file consists of handling user input.
@@ -114,5 +149,3 @@ DB_close();
  *End:
  */
 ?>
-
-

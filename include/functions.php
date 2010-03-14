@@ -146,8 +146,8 @@ function sendmail($To,$Subject,$message)
        * change txt -> html
        */
       $message = str_replace("\n","<br />\n",$message);
-      $message = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
-                     "<a href=\"\\0\">\\0</a>", $message);
+      $message = preg_replace("#(\w+://[^<>\s]+[\w/]*)#",
+			      "<a href=\"$1\">$1</a>", $message);
 
       echo "<br />To: $To<br />";
       if($header != "")
@@ -455,6 +455,39 @@ function count_trump($cards,$status='pregame')
   return $trump;
 }
 
+function check_low_trump($cards)
+{
+  global $RULES;
+
+  if($RULES['lowtrump']=='none')
+    return 0;
+
+  /* check if we have low trump */
+
+  $lowtrump=1;
+  foreach($cards as $card)
+    {
+      /* card a trump, but not a diamond? */
+      if( $card<19 )
+	 $lowtrump=0;
+    }
+
+  /* handle case where player has schweinchen */
+  if( in_array("19",$cards) && in_array("20",$cards) )
+    switch($RULES["schweinchen"])
+      {
+      case "both":
+      case "second":
+      case "secondaftercall":
+	$lowtrump=0;
+	break;
+      case "none":
+	break;
+      }
+
+  return $lowtrump;
+}
+
 function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
 {
   global $debug;
@@ -467,12 +500,12 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
       $r[ 1]=2;     $r[13]=23;   $r[25]=14;	  $r[37]=38;
       $r[ 2]=3;     $r[14]=27;   $r[26]=15;	  $r[38]=39;
       $r[ 3]=4;     $r[15]=16;   $r[27]=28;	  $r[39]=40;
-      $r[ 4]=5;     $r[16]=17;   $r[28]=29;	  $r[40]=41;
+      $r[ 4]=5;     $r[16]=17;   $r[28]=29;	  $r[40]=21;
       $r[ 5]=18;    $r[17]=6;    $r[29]=30;	  $r[41]=42;
-      $r[ 6]=21;    $r[18]=7;    $r[30]=31;	  $r[42]=43;
-      $r[ 7]=22;    $r[19]=8;    $r[31]=32;	  $r[43]=44;
-      $r[ 8]=45;    $r[20]=9;    $r[32]=19;	  $r[44]=33;
-      $r[ 9]=46;    $r[21]=10;   $r[33]=20;	  $r[45]=24;
+      $r[ 6]=41;    $r[18]=7;    $r[30]=31;	  $r[42]=43;
+      $r[ 7]=22;    $r[19]=8;    $r[31]=32;	  $r[43]=20;
+      $r[ 8]=45;    $r[20]=9;    $r[32]=33;	  $r[44]=19;
+      $r[ 9]=46;    $r[21]=10;   $r[33]=44;	  $r[45]=24;
       $r[10]=35;    $r[22]=11;   $r[34]=48;	  $r[46]=25;
       $r[11]=36;    $r[23]=12;   $r[35]=34;	  $r[47]=26;
     }
@@ -933,7 +966,7 @@ function display_table ()
 	  echo " Schweinchen. <br />";
 
       if($GT=="poverty" && $party=="re")
-	if($sickness=="poverty")
+	if($sickness=="poverty" || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	  {
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	    $cards    = DB_get_all_hand($userhash);
@@ -948,7 +981,7 @@ function display_table ()
 
       if($GT=="dpoverty")
 	if($party=="re")
-	  if($sickness=="poverty")
+	  if($sickness=="poverty" || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	    {
 	      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	      $cards    = DB_get_all_hand($userhash);
@@ -961,7 +994,7 @@ function display_table ()
 	  else
 	    echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" title=\"poverty partner\" />";
 	else
-	  if($sickness=="poverty")
+	  if($sickness=="poverty"  || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	    {
 	      $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
 	      $cards    = DB_get_all_hand($userhash);
@@ -980,21 +1013,21 @@ function display_table ()
 	else
 	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" title=\"wedding partner\" />";
 
-      if(ereg("solo",$GT) && $party=="re")
+      if( (strpos($GT,"solo")!==false) && $party=="re")
 	{
-	  if(ereg("queen",$GT))
+	  if(strpos($GT,"queen")!==false)
 	    echo "   <img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Queen solo\" />";
-	  else if(ereg("jack",$GT))
+	  else if(strpos($GT,"jack")!==false)
 	    echo "   <img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Jack solo\" />";
-	  else if(ereg("club",$GT))
+	  else if(strpos($GT,"club")!==false)
 	    echo "   <img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Club solo\" />";
-	  else if(ereg("spade",$GT))
+	  else if(strpos($GT,"spade")!==false)
 	    echo "   <img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Spade solo\" />";
-	  else if(ereg("heart",$GT))
+	  else if(strpos($GT,"heart")!==false)
 	    echo "   <img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Heart solo\" />";
-	  else if(ereg("trumpless",$GT))
+	  else if(strpos($GT,"trumpless")!==false)
 	    echo "   <img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trumpless solo\" />";
-	  else if(ereg("trump",$GT))
+	  else if(strpos($GT,"trump")!==false)
 	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trump solo\" />";
 	}
 
@@ -1156,7 +1189,8 @@ function generate_global_score_table()
 
   /* save information in an array */
   while( $r = DB_fetch_array($result))
-    $player[$r[0]] = array('name'=> $r[1], 'points' => 0 ,'nr' => 0);
+    $player[$r[0]] = array('name'=> $r[1], 'points' => 0 , 'nr' => 0, 'active' => 0,
+			   'response' => 0 , 'solo' => 0, 'soloavg' => 0);
 
   /* get points and generate table */
   foreach($gameids as $gameid)
@@ -1182,9 +1216,53 @@ function generate_global_score_table()
 	}
     }
 
+  /* add number of active games */
+  $result = DB_query_array_all("SELECT user_id, COUNT(*) as c  " .
+			       " FROM Hand".
+			       " LEFT JOIN Game ON Game.id=game_id".
+			       " WHERE Game.status IN ('pre','play')".
+			       " GROUP BY user_id");
+
+  foreach($result as $res)
+    {
+      $player[$res[0]]['active'] = $res[1];
+    }
+
+  /* response time of users*/
+  $result = DB_query_array_all("SELECT user_id,".
+                              "IFNULL(AVG(if(P1.sequence in (2,3,4),".
+                              "-timestampdiff(MINUTE,mod_date,(select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1)),NULL )),1e9) as a ".
+                              "FROM Play P1 ".
+                              "LEFT JOIN Hand_Card ON P1.hand_card_id=Hand_Card.id ".
+                              "LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
+                              "GROUP BY user_id ");
+
+  foreach($result as $res)
+    {
+      $player[$res[0]]['response'] = $res[1];
+    }
+
+  /* most solos */
+  $result = DB_query_array_all("SELECT user_id as uid,".
+			       "       COUNT(*), ".
+			       "       COUNT(*)/(SELECT COUNT(*) FROM Hand LEFT JOIN User ON User.id=Hand.user_id WHERE User.id=uid) as c ".
+			       " FROM Game ".
+			       " LEFT JOIN Hand ON Hand.position=startplayer AND Game.id=Hand.game_id ".
+			       " WHERE type='solo' AND Game.status='gameover' ".
+			       " GROUP BY user_id ");
+
+  foreach($result as $res)
+    {
+      $player[$res[0]]['solo'] = $res[1];
+      $player[$res[0]]['soloavg'] = $res[2];
+    }
+
+
+  /* sort everything nicely */
+
   function cmp($a,$b)
   {
-    if($a['nr']==0 ) return 1;
+    if($a['nr']==0) return 1;
     if($b['nr']==0) return 1;
 
     $a=$a['points']/$a['nr'];
@@ -1196,11 +1274,13 @@ function generate_global_score_table()
   }
   usort($player,'cmp');
 
+
   foreach($player as $pl)
     {
       /* limit to players with at least 10 games */
       if($pl['nr']>10)
-	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3), $pl['points'],$pl['nr']);
+	$return[] = array( $pl['name'], round($pl['points']/$pl['nr'],3), $pl['points'],$pl['nr'],$pl['active'],
+			   $pl['response'],$pl['solo'],$pl['soloavg']);
     }
 
   return $return;
@@ -1390,6 +1470,9 @@ function cancel_game($why,$gameid)
       break;
     case 'noplay':
       DB_query("UPDATE Game SET status='cancel-noplay' WHERE id=$gameid");
+      break;
+    case 'lowtrump':
+      DB_query("UPDATE Game SET status='cancel-lowtrump' WHERE id=$gameid");
       break;
     }
   /* set each player to gameover */

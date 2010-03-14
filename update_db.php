@@ -28,7 +28,8 @@ include_once("./include/functions.php");   /* the rest */
 config_check();
 
 /* open the database */
-if(DB_open()<0)
+$return = DB_open();
+if($return<0 && $return != -2) /* -2 = wrong DB version is ok */
   exit();
 
 /* only callable via cron or CLI */
@@ -36,7 +37,7 @@ if(isset($_SERVER['REMOTE_ADDR']))
   exit();
 
 $old_version = DB_get_version();
-$current_version = 1;
+$current_version = 2;
 
 if($old_version < $current_version)
   echo "Will upgrade your database now:\n";
@@ -56,6 +57,17 @@ switch($old_version)
 	     " index (email))");
     DB_query("UPDATE Version set version=1");
     echo "Upgraded to version 1.\n";
+  case 1:
+    /* add new rules */
+    DB_query("ALTER TABLE Rulesets".
+	     " ADD COLUMN `lowtrump` enum('poverty','cancel','none') default 'poverty' AFTER schweinchen");
+    DB_query("ALTER TABLE Hand".
+	     " MODIFY COLUMN `sickness` enum('wedding','nines','poverty','solo','lowtrump') default NULL");
+    DB_query("ALTER TABLE Game".
+	     " MODIFY COLUMN `status` enum('pre','play','gameover','cancel-timedout','cancel-nines','cancel-trump','cancel-noplay','cancel-lowtrump') default NULL");
+
+    DB_query("UPDATE Version set version=2");
+    echo "Upgraded to version 2.\n";
   }
 
 ?>
