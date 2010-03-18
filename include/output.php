@@ -36,9 +36,10 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"$playerC\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerD\" value=\"$playerD\" />\n";
-  echo "  <input type=\"hidden\" name=\"dullen\"  value=\"".$RULES["dullen"]."\" />\n";
-  echo "  <input type=\"hidden\" name=\"schweinchen\" value=\"".$RULES["schweinchen"]."\" />\n";
-  echo "  <input type=\"hidden\" name=\"callrule\" value=\"".$RULES["call"]."\" />\n";
+  echo "  <input type=\"hidden\" name=\"dullen\"  value=\"".$RULES['dullen']."\" />\n";
+  echo "  <input type=\"hidden\" name=\"schweinchen\" value=\"".$RULES['schweinchen']."\" />\n";
+  echo "  <input type=\"hidden\" name=\"callrule\" value=\"".$RULES['call']."\" />\n";
+  echo "  <input type=\"hidden\" name=\"lowtrump\" value=\"".$RULES['lowtrump']."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
   echo "  <input type=\"submit\" value=\"keep playing\" />\n";
   echo "</form>\n</div>";
