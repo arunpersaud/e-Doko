@@ -185,11 +185,11 @@ unset($comment);
 if($session)
   {
     echo "<div class=\"session\">\n";
-    echo "  <div class=\"sessionrules\">Rules: ";
+    echo '  <div class="sessionrules">'._('Rules').': ';
     switch($RULES['dullen'])
       {
       case 'none':
-	echo "  <img class=\"rulesicon\" alt=\"not ten of hearts\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
+	echo "  <img class=\"rulesicon\" alt=\"no ten of hearts\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
       case 'firstwins':
 	echo "  <img class=\"rulesicon\" alt=\"ten of hearts\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
       case 'secondwins':
@@ -491,27 +491,27 @@ switch($mystatus)
 	    else if($_REQUEST['wedding'] == 'yes')
 	      {
 		/* silent solo is set further down */
-		echo "Ok, you don't want to play a silent solo...wedding was chosen.<br />\n";
+		echo _("Ok, you don't want to play a silent solo...wedding was chosen.")."<br />\n";
 		DB_set_sickness_by_hash($me,'wedding');
 	      }
 	    else if($_REQUEST['poverty'] == 'yes')
 	      {
-		echo "Don't think you can win with just a few trump...? ok, poverty chosen <br />\n";
+		echo _("Don't think you can win with just a few trump...? Ok, poverty chosen.")." <br />\n";
 		DB_set_sickness_by_hash($me,'poverty');
 	      }
 	    else if($_REQUEST['nines'] == 'yes')
 	      {
-		echo "What? You just don't want to play a game because you have a few nines? Well, if no one".
-		  " is playing solo, this game will be canceled.<br />\n";
+		echo _("What? You just don't want to play a game because you have a few nines? Well, if no one".
+		       " is playing solo, this game will be canceled.")."<br />\n";
 		DB_set_sickness_by_hash($me,'nines');
 	      }
 	    else if($_REQUEST['lowtrump'] == 'yes')
 	      {
 		if($RULES['lowtrump']=='cancel')
-		  echo "What? You just don't want to play a game because you have low trump? Well, if no one".
-		  " is playing solo, this game will be canceled.<br />\n";
+		  echo _("What? You just don't want to play a game because you have low trump? Well, if no one".
+			 " is playing solo, this game will be canceled.")."<br />\n";
 		else
-		  echo "Don't think you can win with low trumps...? ok, poverty chosen <br />.<br />\n";
+		  echo _("Don't think you can win with low trumps...? Ok, poverty chosen.")." <br />.<br />\n";
 
 		DB_set_sickness_by_hash($me,'lowtrump');
 	      }
@@ -555,7 +555,7 @@ switch($mystatus)
     /* end displaying sickness */
 
     echo "<div class=\"message\">\n";
-    echo "<p> Checking if someone else selected solo, nines, wedding or poverty.</p>";
+    echo '<p> '._('Checking if someone else selected solo, nines, wedding or poverty.').'</p>';
 
     /* check if everyone has reached this stage */
     $userids = DB_get_all_userid_by_gameid($gameid);
@@ -585,7 +585,7 @@ switch($mystatus)
 	if($mystatus=='check')
 	  {
 	    /* show cards */
-	    echo "<div class=\"mycards\">Your cards are: <br />\n";
+	    echo '<div class="mycards">'._('Your cards are').": <br />\n";
 	    foreach($mycards as $card)
 	      display_card($card,$PREF['cardset']);
 	    echo "</div>\n";
@@ -598,7 +598,7 @@ switch($mystatus)
 	 * are playing, in case there are any solos this already
 	 * will have the correct information in it */
 
-	echo "<p> Ok, everyone is done... figuring out what kind of game we are playing.</p>";
+	echo '<p>'._('Ok, everyone is done... figuring out what kind of game we are playing.').'</p>';
 
 	$gametype    = DB_get_gametype_by_gameid($gameid);
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
@@ -901,7 +901,7 @@ switch($mystatus)
     /* check if user need to give more cards back */
     if( ($myparty=='re' || $myparty=='contra') && count($mycards)>12)
       {
-	echo "<div class=\"poverty\"> you need to get rid of a few cards</div>\n";
+	echo '<div class="poverty"> '._('You need to get rid of a few cards')."</div>\n";
 
 	$type='exchange';
 	echo "<div class=\"mycards\">Your cards are: <br />\n";
@@ -1230,13 +1230,13 @@ switch($mystatus)
     /* has the game started? No, then just wait here...*/
     if($gamestatus == 'pre')
       {
-	echo "<p class=\"message\"> You finished the setup, but not everyone else finished it... ".
-	  "You need to wait for the others. Just wait for an email. </p>";
+	echo '<p class="message"> '._('You finished the setup, but not everyone else finished it... '.
+	  'You need to wait for the others. Just wait for an email.').' </p>';
 
 	$mycards = DB_get_hand($me);
 	$mycards = mysort($mycards,$gametype);
 
-	echo "<div class=\"mycards\">Your cards are: <br />\n";
+	echo '<div class="mycards">'._('Your cards are').": <br />\n";
 	foreach($mycards as $card)
 	  display_card($card,$PREF['cardset']);
 	echo "</div>\n";
