@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-03-18 22:00-0700\n"
-"PO-Revision-Date: 2010-03-14 16:00-0700\n"
+"POT-Creation-Date: 2010-04-17 22:55-0700\n"
+"PO-Revision-Date: 2010-04-17 23:09-0700\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -22,48 +22,130 @@ msgstr "In diesen Spielen bist Du dran"
 
 #: include/game.php:188 include/output.php:101
 msgid "Rules"
-msgstr ""
+msgstr "Regeln"
+
+#: include/game.php:192
+#, fuzzy
+msgid "no ten of hearts"
+msgstr "Keine Herzzehner"
+
+#: include/game.php:194
+msgid "ten of hearts"
+msgstr "Herzzehner"
+
+#: include/game.php:196
+msgid "second ten of hearts"
+msgstr "Zweite Herzzehn"
+
+#: include/game.php:201
+msgid "no schweinchen"
+msgstr "Kein Schweinchen"
+
+#: include/game.php:204
+msgid "two schweinchen"
+msgstr "Zwei Schweinchen"
+
+#: include/game.php:210
+msgid "second schweinchen after call"
+msgstr "Zweites Schweinchen nach Ansage"
+
+#: include/game.php:216
+msgid "1st-own-card"
+msgstr "Erste eigene Karte"
+
+#: include/game.php:218
+msgid "5th-card"
+msgstr "Fuenfte Karte"
+
+#: include/game.php:220
+msgid "9-cards"
+msgstr "Neunte Karte"
+
+#: include/game.php:223
+msgid "10ofhearts"
+msgstr "Herzzehn"
+
+#: include/game.php:224
+msgid "schweinchen"
+msgstr "Schweinchen"
+
+#: include/game.php:225
+msgid "call"
+msgstr "Ansage"
+
+#: include/game.php:226
+msgid "lowtrump"
+msgstr "Trumpfarmut"
+
+#: include/game.php:286
+msgid "previous game"
+msgstr "vorheriges Spiel"
+
+#: include/game.php:289
+msgid "next game"
+msgstr "naechstes Spiel"
+
+#: include/game.php:431 include/game.php:453 include/game.php:588
+#: include/game.php:907 include/game.php:971 include/game.php:1239
+#: include/game.php:1984 include/game.php:2016
+msgid "Your cards are"
+msgstr "Deine Karten sind"
 
 #: include/game.php:494
 msgid "Ok, you don't want to play a silent solo...wedding was chosen."
-msgstr ""
+msgstr "Ok, du willst also keine stille Hochzeit spielen... Hochzeit ist es."
 
 #: include/game.php:499
 msgid "Don't think you can win with just a few trump...? Ok, poverty chosen."
 msgstr ""
+"Du glaubst also, dass du mit den paar Truempfen kein Spiel gewinnen "
+"kannst...? Ok, Armut reklamiert."
 
 #: include/game.php:504
 msgid ""
 "What? You just don't want to play a game because you have a few nines? Well, "
 "if no one is playing solo, this game will be canceled."
 msgstr ""
+"Was? Wegen den paar Neunern gleich das ganze Spiel kippen? Ok, wenn keiner "
+"Solo spielt, wird das Spiel annuliert."
 
 #: include/game.php:511
 msgid ""
 "What? You just don't want to play a game because you have low trump? Well, "
 "if no one is playing solo, this game will be canceled."
 msgstr ""
+"Was? Nur weil du keine hohen Trumpf hast, gleich das ganze Spiel kippen? "
+"Naja, wenn keiner Solo spielt, wird es annuliert."
 
 #: include/game.php:514
 msgid "Don't think you can win with low trumps...? Ok, poverty chosen."
 msgstr ""
+"Du glaubst also nicht mit ein paar niedrigen Trumpf gewinnen zu koennen...? "
+"Ok, Armut ausgewaehlt."
 
 #: include/game.php:558
 msgid "Checking if someone else selected solo, nines, wedding or poverty."
-msgstr ""
+msgstr "Pruefe, ob jemande Solo, Armut oder Hochzeit ausgewaehlt hat."
 
-#: include/game.php:588 include/game.php:1239 include/game.php:1984
-#: include/game.php:2016
-msgid "Your cards are"
-msgstr "Deine Karten sind"
+#: include/game.php:576
+msgid ""
+"This step can only be handled after everyone finished the last step. Seems "
+"like this is not the case, so you need to wait a bit... you will get an "
+"email once that is the case, please use the link in that email to continue "
+"the game."
+msgstr ""
 
 #: include/game.php:601
 msgid "Ok, everyone is done... figuring out what kind of game we are playing."
-msgstr ""
+msgstr "Ok, alle sind fertig... ueberpruefe was fuer ein Spiel gespielt wird."
+
+#: include/game.php:715
+msgid "Got it"
+msgstr "Hab's."
 
 #: include/game.php:904
 msgid "You need to get rid of a few cards"
-msgstr ""
+msgstr "Du musst noch ein paar Karten zurueckgeben"
 
 #: include/game.php:1233
 msgid ""
@@ -79,13 +161,18 @@ msgstr "Bitte warte bis Du dran bist!"
 msgid "Your cards were"
 msgstr "Deine Karten waren"
 
+#: include/game.php:2064
+msgid "The game is over for you... other people still need to play though"
+msgstr ""
+"Das Spiel ist fuer dich vorbei... andere muessen aber noch eine Karte spielen"
+
 #: include/game.php:2112
 msgid "A short comment"
 msgstr "Ein kurzer Kommentar"
 
 #: include/game.php:2115 include/output.php:361
 msgid "submit"
-msgstr ""
+msgstr "abschicken"
 
 #: include/output.php:34
 #, php-format
@@ -96,7 +183,7 @@ msgstr ""
 
 #: include/output.php:45
 msgid "keep playing"
-msgstr ""
+msgstr "weiterspielen"
 
 #: include/output.php:57
 msgid "Select players (Remember: you need to be one of the players)"
@@ -194,9 +281,8 @@ msgid "start game"
 msgstr ""
 
 #: include/output.php:218
-#, fuzzy
 msgid "Thanks for joining the game"
-msgstr "In diesen Spielen bist Du dran"
+msgstr "Danke, dass du am Spiel teilnimmst"
 
 #: include/output.php:220
 msgid "Do you want to play solo?"
@@ -208,46 +294,46 @@ msgstr ""
 
 #: include/output.php:223
 msgid "trumpless"
-msgstr ""
+msgstr "fleischlos"
 
 #: include/output.php:224
 msgid "trump"
-msgstr ""
+msgstr "Trumpf"
 
 #: include/output.php:225
 msgid "queen"
-msgstr ""
+msgstr "Damen"
 
 #: include/output.php:226
 msgid "jack"
-msgstr ""
+msgstr "Buben"
 
 #: include/output.php:227
 msgid "club"
-msgstr ""
+msgstr "Kreuz"
 
 #: include/output.php:228
 msgid "spade"
-msgstr ""
+msgstr "Pik"
 
 #: include/output.php:229
 msgid "heart"
-msgstr ""
+msgstr "Herz"
 
 #: include/output.php:233
 msgid "Wedding?"
-msgstr ""
+msgstr "Hochzeit?"
 
 #: include/output.php:236 include/output.php:247 include/output.php:258
 #: include/output.php:275 include/output.php:357
 msgid "yes"
-msgstr ""
+msgstr "Ja"
 
 #: include/output.php:237 include/output.php:241 include/output.php:248
 #: include/output.php:252 include/output.php:259 include/output.php:263
 #: include/output.php:276 include/output.php:280 include/output.php:358
 msgid "no"
-msgstr ""
+msgstr "Nein"
 
 #: include/output.php:244
 msgid "Do you have poverty?"
@@ -316,6 +402,11 @@ msgstr ""
 #: include/output.php:570
 msgid "Personal notes"
 msgstr "Notizen"
+
+#: include/output.php:699 include/output.php:711 include/output.php:723
+#: include/output.php:736
+msgid "Trump back"
+msgstr ""
 
 #: include/preferences.php:330
 msgid "Your settings are"
