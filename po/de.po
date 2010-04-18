@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-04-17 22:55-0700\n"
-"PO-Revision-Date: 2010-04-17 23:09-0700\n"
+"POT-Creation-Date: 2010-04-17 23:20-0700\n"
+"PO-Revision-Date: 2010-04-17 23:24-0700\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -76,6 +76,10 @@ msgstr "Ansage"
 #: include/game.php:226
 msgid "lowtrump"
 msgstr "Trumpfarmut"
+
+#: include/game.php:242 include/game.php:1916
+msgid "Score"
+msgstr "Punkte"
 
 #: include/game.php:286
 msgid "previous game"
@@ -153,9 +157,25 @@ msgid ""
 "wait for the others. Just wait for an email."
 msgstr ""
 
+#: include/game.php:1291
+msgid "Game"
+msgstr "Spiel"
+
+#: include/game.php:1335 include/game.php:1342 include/game.php:1605
+msgid "Trick"
+msgstr "Stich"
+
 #: include/game.php:1907
 msgid "please wait until it's your turn!"
 msgstr "Bitte warte bis Du dran bist!"
+
+#: include/game.php:1973
+msgid "prev"
+msgstr "zurueck"
+
+#: include/game.php:1974
+msgid "next"
+msgstr "vor"
 
 #: include/game.php:2026
 msgid "Your cards were"
@@ -278,7 +298,7 @@ msgstr ""
 
 #: include/output.php:140
 msgid "start game"
-msgstr ""
+msgstr "Starte Spiel"
 
 #: include/output.php:218
 msgid "Thanks for joining the game"
@@ -286,11 +306,11 @@ msgstr "Danke, dass du am Spiel teilnimmst"
 
 #: include/output.php:220
 msgid "Do you want to play solo?"
-msgstr ""
+msgstr "Willst du Solo spielen?"
 
 #: include/output.php:222
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: include/output.php:223
 msgid "trumpless"
@@ -337,11 +357,11 @@ msgstr "Nein"
 
 #: include/output.php:244
 msgid "Do you have poverty?"
-msgstr ""
+msgstr "Hast du Armut?"
 
 #: include/output.php:255
 msgid "Do you have too many nines?"
-msgstr ""
+msgstr "Hast du zuviele Neuner?"
 
 #: include/output.php:269
 msgid "Do you have low trump (cancel game)?"
