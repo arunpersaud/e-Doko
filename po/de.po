@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-03-14 15:48-0700\n"
-"PO-Revision-Date: 2010-03-14 16:00-0700\n"
+"POT-Creation-Date: 2010-04-17 22:55-0700\n"
+"PO-Revision-Date: 2010-04-17 23:09-0700\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -20,69 +20,393 @@ msgstr ""
 msgid "It's your turn in these games"
 msgstr "In diesen Spielen bist Du dran"
 
-#: include/game.php:1907
-msgid "please wait until it's your turn!"
-msgstr "Bitte warte bis Du dran bist!"
+#: include/game.php:188 include/output.php:101
+msgid "Rules"
+msgstr "Regeln"
 
+#: include/game.php:192
+#, fuzzy
+msgid "no ten of hearts"
+msgstr "Keine Herzzehner"
+
+#: include/game.php:194
+msgid "ten of hearts"
+msgstr "Herzzehner"
+
+#: include/game.php:196
+msgid "second ten of hearts"
+msgstr "Zweite Herzzehn"
+
+#: include/game.php:201
+msgid "no schweinchen"
+msgstr "Kein Schweinchen"
+
+#: include/game.php:204
+msgid "two schweinchen"
+msgstr "Zwei Schweinchen"
+
+#: include/game.php:210
+msgid "second schweinchen after call"
+msgstr "Zweites Schweinchen nach Ansage"
+
+#: include/game.php:216
+msgid "1st-own-card"
+msgstr "Erste eigene Karte"
+
+#: include/game.php:218
+msgid "5th-card"
+msgstr "Fuenfte Karte"
+
+#: include/game.php:220
+msgid "9-cards"
+msgstr "Neunte Karte"
+
+#: include/game.php:223
+msgid "10ofhearts"
+msgstr "Herzzehn"
+
+#: include/game.php:224
+msgid "schweinchen"
+msgstr "Schweinchen"
+
+#: include/game.php:225
+msgid "call"
+msgstr "Ansage"
+
+#: include/game.php:226
+msgid "lowtrump"
+msgstr "Trumpfarmut"
+
+#: include/game.php:286
+msgid "previous game"
+msgstr "vorheriges Spiel"
+
+#: include/game.php:289
+msgid "next game"
+msgstr "naechstes Spiel"
+
+#: include/game.php:431 include/game.php:453 include/game.php:588
+#: include/game.php:907 include/game.php:971 include/game.php:1239
 #: include/game.php:1984 include/game.php:2016
 msgid "Your cards are"
 msgstr "Deine Karten sind"
+
+#: include/game.php:494
+msgid "Ok, you don't want to play a silent solo...wedding was chosen."
+msgstr "Ok, du willst also keine stille Hochzeit spielen... Hochzeit ist es."
+
+#: include/game.php:499
+msgid "Don't think you can win with just a few trump...? Ok, poverty chosen."
+msgstr ""
+"Du glaubst also, dass du mit den paar Truempfen kein Spiel gewinnen "
+"kannst...? Ok, Armut reklamiert."
+
+#: include/game.php:504
+msgid ""
+"What? You just don't want to play a game because you have a few nines? Well, "
+"if no one is playing solo, this game will be canceled."
+msgstr ""
+"Was? Wegen den paar Neunern gleich das ganze Spiel kippen? Ok, wenn keiner "
+"Solo spielt, wird das Spiel annuliert."
+
+#: include/game.php:511
+msgid ""
+"What? You just don't want to play a game because you have low trump? Well, "
+"if no one is playing solo, this game will be canceled."
+msgstr ""
+"Was? Nur weil du keine hohen Trumpf hast, gleich das ganze Spiel kippen? "
+"Naja, wenn keiner Solo spielt, wird es annuliert."
+
+#: include/game.php:514
+msgid "Don't think you can win with low trumps...? Ok, poverty chosen."
+msgstr ""
+"Du glaubst also nicht mit ein paar niedrigen Trumpf gewinnen zu koennen...? "
+"Ok, Armut ausgewaehlt."
+
+#: include/game.php:558
+msgid "Checking if someone else selected solo, nines, wedding or poverty."
+msgstr "Pruefe, ob jemande Solo, Armut oder Hochzeit ausgewaehlt hat."
+
+#: include/game.php:576
+msgid ""
+"This step can only be handled after everyone finished the last step. Seems "
+"like this is not the case, so you need to wait a bit... you will get an "
+"email once that is the case, please use the link in that email to continue "
+"the game."
+msgstr ""
+
+#: include/game.php:601
+msgid "Ok, everyone is done... figuring out what kind of game we are playing."
+msgstr "Ok, alle sind fertig... ueberpruefe was fuer ein Spiel gespielt wird."
+
+#: include/game.php:715
+msgid "Got it"
+msgstr "Hab's."
+
+#: include/game.php:904
+msgid "You need to get rid of a few cards"
+msgstr "Du musst noch ein paar Karten zurueckgeben"
+
+#: include/game.php:1233
+msgid ""
+"You finished the setup, but not everyone else finished it... You need to "
+"wait for the others. Just wait for an email."
+msgstr ""
+
+#: include/game.php:1907
+msgid "please wait until it's your turn!"
+msgstr "Bitte warte bis Du dran bist!"
 
 #: include/game.php:2026
 msgid "Your cards were"
 msgstr "Deine Karten waren"
 
+#: include/game.php:2064
+msgid "The game is over for you... other people still need to play though"
+msgstr ""
+"Das Spiel ist fuer dich vorbei... andere muessen aber noch eine Karte spielen"
+
 #: include/game.php:2112
 msgid "A short comment"
 msgstr "Ein kurzer Kommentar"
 
-#: include/game.php:2115
+#: include/game.php:2115 include/output.php:361
 msgid "submit"
+msgstr "abschicken"
+
+#: include/output.php:34
+#, php-format
+msgid ""
+"Do you want to continue playing? (This will start a new game, with %s "
+"starting the game.)"
 msgstr ""
 
-#: include/output.php:398
+#: include/output.php:45
+msgid "keep playing"
+msgstr "weiterspielen"
+
+#: include/output.php:57
+msgid "Select players (Remember: you need to be one of the players)"
+msgstr ""
+
+#: include/output.php:102
+msgid "Gameplay-related"
+msgstr ""
+
+#: include/output.php:103
+msgid "Ten of hearts"
+msgstr ""
+
+#: include/output.php:106
+msgid "just normal non-trump"
+msgstr ""
+
+#: include/output.php:107
+msgid "first ten of hearts wins the trick"
+msgstr ""
+
+#: include/output.php:111
+msgid "Schweinchen (both foxes), only in normal games or silent solos"
+msgstr ""
+
+#: include/output.php:114
+msgid "none"
+msgstr ""
+
+#: include/output.php:115
+msgid "both become highest trump (automatic call at beginning of the game)"
+msgstr ""
+
+#: include/output.php:116
+msgid "first one normal, second one becomes highest (call during the game)"
+msgstr ""
+
+#: include/output.php:117
+msgid "second one become highest only in case re/contra was announced"
+msgstr ""
+
+#: include/output.php:121
+msgid "Call Re/Contra, etc."
+msgstr ""
+
+#: include/output.php:124
+msgid ""
+"Can call re/contra on the first <strong>own</strong> card played, 90 on the "
+"second, etc."
+msgstr ""
+
+#: include/output.php:125
+msgid ""
+"Can call re/contra until 5th card is played, 90 until 9th card is played, "
+"etc."
+msgstr ""
+
+#: include/output.php:126
+msgid ""
+"Can call re/contra until 5th card is played, 90 if player still has 9 cards, "
+"etc."
+msgstr ""
+
+#: include/output.php:129
+msgid "Low trump"
+msgstr ""
+
+#: include/output.php:131
+msgid ""
+"Player can't trump a fox, that is none of his trump is higher than a fox."
+msgstr ""
+
+#: include/output.php:133
+msgid "The trump will be treated as poverty and offered to another player."
+msgstr ""
+
+#: include/output.php:134
+msgid "The game will be canceled unless there is a solo."
+msgstr ""
+
+#: include/output.php:135
+msgid "Bad luck, the player needs to play a normal game."
+msgstr ""
+
+#: include/output.php:138
+msgid "Scoring-related"
+msgstr ""
+
+#: include/output.php:139
+msgid "(not yet implemented)"
+msgstr ""
+
+#: include/output.php:140
+msgid "start game"
+msgstr ""
+
+#: include/output.php:218
+msgid "Thanks for joining the game"
+msgstr "Danke, dass du am Spiel teilnimmst"
+
+#: include/output.php:220
+msgid "Do you want to play solo?"
+msgstr ""
+
+#: include/output.php:222
+msgid "No"
+msgstr ""
+
+#: include/output.php:223
+msgid "trumpless"
+msgstr "fleischlos"
+
+#: include/output.php:224
+msgid "trump"
+msgstr "Trumpf"
+
+#: include/output.php:225
+msgid "queen"
+msgstr "Damen"
+
+#: include/output.php:226
+msgid "jack"
+msgstr "Buben"
+
+#: include/output.php:227
+msgid "club"
+msgstr "Kreuz"
+
+#: include/output.php:228
+msgid "spade"
+msgstr "Pik"
+
+#: include/output.php:229
+msgid "heart"
+msgstr "Herz"
+
+#: include/output.php:233
+msgid "Wedding?"
+msgstr "Hochzeit?"
+
+#: include/output.php:236 include/output.php:247 include/output.php:258
+#: include/output.php:275 include/output.php:357
+msgid "yes"
+msgstr "Ja"
+
+#: include/output.php:237 include/output.php:241 include/output.php:248
+#: include/output.php:252 include/output.php:259 include/output.php:263
+#: include/output.php:276 include/output.php:280 include/output.php:358
+msgid "no"
+msgstr "Nein"
+
+#: include/output.php:244
+msgid "Do you have poverty?"
+msgstr ""
+
+#: include/output.php:255
+msgid "Do you have too many nines?"
+msgstr ""
+
+#: include/output.php:269
+msgid "Do you have low trump (cancel game)?"
+msgstr ""
+
+#: include/output.php:271
+msgid "Do you have low trump (poverty)?"
+msgstr ""
+
+#: include/output.php:287
+msgid "count me in"
+msgstr ""
+
+#: include/output.php:356
+msgid "Do you want to play a game of DoKo?"
+msgstr ""
+
+#: include/output.php:393
 msgid "Welcome to E-Doko"
 msgstr "Willkommen bei E-Doko"
 
-#: include/output.php:455
+#: include/output.php:450
 msgid "mypage"
 msgstr ""
 
-#: include/output.php:456
+#: include/output.php:451
 msgid "settings"
 msgstr "Einstellungen"
 
-#: include/output.php:457
+#: include/output.php:452
 msgid "new game"
 msgstr "neues Spiel"
 
-#: include/output.php:458
+#: include/output.php:453
 msgid "statistics"
 msgstr "Statistik"
 
-#: include/output.php:459
+#: include/output.php:454
 msgid "wiki/bugs"
 msgstr "Wiki/Bugs"
 
-#: include/output.php:460
+#: include/output.php:455
 msgid "atom"
 msgstr "Atom"
 
-#: include/output.php:461
+#: include/output.php:456
 msgid "logout"
 msgstr "ausloggen"
 
-#: include/output.php:464
+#: include/output.php:459
 msgid "last login"
 msgstr "Letzter Login"
 
-#: include/output.php:469
+#: include/output.php:464
 msgid "login"
 msgstr ""
 
-#: include/output.php:575
+#: include/output.php:570
 msgid "Personal notes"
 msgstr "Notizen"
+
+#: include/output.php:699 include/output.php:711 include/output.php:723
+#: include/output.php:736
+msgid "Trump back"
+msgstr ""
 
 #: include/preferences.php:330
 msgid "Your settings are"

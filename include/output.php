@@ -31,7 +31,8 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   global $RULES;
 
   echo "<div class=\"message\">\n<form action=\"index.php?action=new\" method=\"post\">\n";
-  echo "Do you want to continue playing?(This will start a new game, with $playerA starting the game.)\n";
+  $output = sprintf(_('Do you want to continue playing? (This will start a new game, with %s starting the game.)'),$playerA);
+  echo $output."\n";
   echo "  <input type=\"hidden\" name=\"PlayerA\" value=\"$playerA\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerB\" value=\"$playerB\" />\n";
   echo "  <input type=\"hidden\" name=\"PlayerC\" value=\"$playerC\" />\n";
@@ -41,7 +42,7 @@ function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
   echo "  <input type=\"hidden\" name=\"callrule\" value=\"".$RULES['call']."\" />\n";
   echo "  <input type=\"hidden\" name=\"lowtrump\" value=\"".$RULES['lowtrump']."\" />\n";
   echo "  <input type=\"hidden\" name=\"followup\" value=\"$oldgameid\" />\n";
-  echo "  <input type=\"submit\" value=\"keep playing\" />\n";
+  echo "  <input type=\"submit\" value=\""._('keep playing')."\" />\n";
   echo "</form>\n</div>";
   return;
 }
@@ -52,13 +53,10 @@ function output_form_for_new_game($names)
 			 * after we selected them to make sure that each name
 			 * only shows up once
 			 */
-?>
-  <form action="index.php?action=new" method="post">
-    <h2> Select players (Remember: you need to be one of the players) </h2>
-
-   <div class="table">
-     <img class="table" src="pics/table.png" alt="table" />
-<?php
+  echo '  <form action="index.php?action=new" method="post">';
+  echo '    <h2> '._('Select players (Remember: you need to be one of the players)').' </h2>';
+  echo '   <div class="table">';
+  echo '     <img class="table" src="pics/table.png" alt="table" />';
 
   /* ask player for names */
 
@@ -97,51 +95,51 @@ function output_form_for_new_game($names)
 	}
       echo "       </select>\n     </div>\n";
     }
-?>
-    </div>
 
-     <h2 class="rules">Rules</h2>
-     <h3>Gameplay-related</h3>
-     <h4>Ten of hearts:</h4>
-     <p>
-       <select name="dullen">
-         <option value="none"> just normal non-trump  </option>
-         <option value="firstwins"> first ten of hearts wins the trick </option>
-         <option value="secondwins" selected="selected"> second ten of hearts wins the trick </option>
-       </select>
-     </p>
-     <h4>Schweinchen (both foxes), only in normal games or silent solos:</h4>
-     <p>
-       <select name="schweinchen">
-         <option value="none" selected="selected"> none </option>
-	 <option value="both"> both become highest trump (automatic call at beginning of the game)   </option>
-	 <option value="second"> first one normal, second one becomes highest (call during the game) </option>
-	 <option value="secondaftercall">  second one become highest only in case re/contra was announced
-	 </option>
-       </select>
-     </p>
-     <h4>Call Re/Contra, etc.:</h4>
-     <p>
-       <select name="callrule">
-	 <option value="1st-own-card" selected="selected">  Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.</option>
-	 <option value="5th-card"> Can call re/contra until 5th card is played, 90 until 9th card is played, etc.</option>
-	 <option value="9-cards" > Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.</option>
-       </select>
-     </p>
-     <h4>Low trump</h4>
-     <p>
-       Player can't trump a fox, that is none of his trump is higher than a fox.
-       <select name="lowtrump">
-	 <option value="poverty">The trump will be treated as poverty and offered to another player.</option>
-	 <option value="cancel">  The game will be canceled unless there is a solo.</option>
-	 <option value="none">   Bad luck, the player needs to play a normal game.</option>
-       </select>
-     </p>
-     <h3>Scoring-related</h3>
-     <h4>(not yet implemented)</h4>
-     <p><input type="submit" value="start game"></p>
-     </form>
-<?php
+    echo '    </div>';
+    echo '';
+    echo '     <h2 class="rules">'._('Rules').'</h2>';
+    echo '     <h3>'._('Gameplay-related').'</h3>';
+    echo '     <h4>'._('Ten of hearts').':</h4>';
+    echo '     <p>';
+    echo '       <select name="dullen">';
+    echo '         <option value="none"> '._('just normal non-trump').'  </option>';
+    echo '         <option value="firstwins"> '._('first ten of hearts wins the trick').' </option>';
+    echo '         <option value="secondwins" selected="selected"> '.('second ten of hearts wins the trick').' </option>';
+    echo '       </select>';
+    echo '     </p>';
+    echo '     <h4>'._('Schweinchen (both foxes), only in normal games or silent solos').':</h4>';
+    echo '     <p>';
+    echo '       <select name="schweinchen">';
+    echo '         <option value="none" selected="selected"> '._('none').' </option>';
+    echo '	 <option value="both"> '._('both become highest trump (automatic call at beginning of the game)').'   </option>';
+    echo '	 <option value="second"> '._('first one normal, second one becomes highest (call during the game)').' </option>';
+    echo '	 <option value="secondaftercall">  ',_('second one become highest only in case re/contra was announced');
+    echo '	 </option>';
+    echo '       </select>';
+    echo '     </p>';
+    echo '     <h4>'._('Call Re/Contra, etc.').':</h4>';
+    echo '     <p>';
+    echo '       <select name="callrule">';
+    echo '	 <option value="1st-own-card" selected="selected">  '._('Can call re/contra on the first <strong>own</strong> card played, 90 on the second, etc.').'</option>';
+    echo '	 <option value="5th-card"> '._('Can call re/contra until 5th card is played, 90 until 9th card is played, etc.').'</option>';
+    echo '	 <option value="9-cards" > '._('Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc.').'</option>';
+    echo '       </select>';
+    echo '     </p>';
+    echo '     <h4>'._('Low trump').'</h4>';
+    echo '     <p>';
+    echo '       '._('Player can\'t trump a fox, that is none of his trump is higher than a fox.');
+    echo '       <select name="lowtrump">';
+    echo '	 <option value="poverty">'._('The trump will be treated as poverty and offered to another player.').'</option>';
+    echo '	 <option value="cancel"> '._('The game will be canceled unless there is a solo.').'</option>';
+    echo '	 <option value="none">   '._('Bad luck, the player needs to play a normal game.').'</option>';
+    echo '       </select>';
+    echo '     </p>';
+    echo '     <h3>'._('Scoring-related').'</h3>';
+    echo '     <h4>'._('(not yet implemented)').'</h4>';
+    echo '     <p><input type="submit" value="'._('start game').'"></p>';
+    echo '     </form>';
+
 }
 
 function output_table($data,$caption="",$class="",$id="")
@@ -216,79 +214,77 @@ function display_link_card($card,$dir="english",$type="card")
 function output_check_for_sickness($me,$mycards)
 {
   global $RULES;
- ?>
-  <div class="sickness"> Thanks for joining the game...<br />
 
-    Do you want to play solo?
-    <select name="solo" size="1">
-      <option selected="selected">No</option>
-      <option>trumpless</option>
-      <option>trump</option>
-      <option>queen</option>
-      <option>jack</option>
-      <option>club</option>
-      <option>spade</option>
-      <option>heart</option>
-    </select>
-    <br />
+  echo '  <div class="sickness"> '._('Thanks for joining the game').'...<br />';
+  echo '';
+  echo '    '._('Do you want to play solo?').'';
+  echo '    <select name="solo" size="1">';
+  echo '      <option selected="selected">'._('No').'</option>';
+  echo '      <option>'._('trumpless').'</option>';
+  echo '      <option>'._('trump').'</option>';
+  echo '      <option>'._('queen').'</option>';
+  echo '      <option>'._('jack').'</option>';
+  echo '      <option>'._('club').'</option>';
+  echo '      <option>'._('spade').'</option>';
+  echo '      <option>'._('heart').'</option>';
+  echo '    </select>';
+  echo '    <br />';
 
- <?php
-
-  echo "Wedding?";
+  echo _('Wedding?');
   if(check_wedding($mycards))
      {
-       echo " yes<input type=\"radio\" name=\"wedding\" value=\"yes\" checked=\"checked\" />";
-       echo " no <input type=\"radio\" name=\"wedding\" value=\"no\" /> <br />\n";
+       echo ' '._('yes')."<input type=\"radio\" name=\"wedding\" value=\"yes\" checked=\"checked\" />";
+       echo ' '._('no')." <input type=\"radio\" name=\"wedding\" value=\"no\" /> <br />\n";
      }
    else
      {
-       echo " no <input type=\"hidden\" name=\"wedding\" value=\"no\" /> <br />\n";
+       echo ' '._('no')." <input type=\"hidden\" name=\"wedding\" value=\"no\" /> <br />\n";
      };
 
-  echo "Do you have poverty?";
+  echo _('Do you have poverty?');
   if(count_trump($mycards)<4)
     {
-      echo " yes<input type=\"radio\" name=\"poverty\" value=\"yes\" checked=\"checked\" />";
-      echo " no <input type=\"radio\" name=\"poverty\" value=\"no\" /> <br />\n";
+      echo ' '._('yes')."<input type=\"radio\" name=\"poverty\" value=\"yes\" checked=\"checked\" />";
+      echo ' '._('no')." <input type=\"radio\" name=\"poverty\" value=\"no\" /> <br />\n";
     }
   else
     {
-      echo " no <input type=\"hidden\" name=\"poverty\" value=\"no\" /> <br />\n";
+      echo ' '._('no')." <input type=\"hidden\" name=\"poverty\" value=\"no\" /> <br />\n";
     };
 
-  echo "Do you have too many nines?";
+  echo _('Do you have too many nines?');
   if(count_nines($mycards)>4)
      {
-       echo " yes<input type=\"radio\" name=\"nines\" value=\"yes\" checked=\"checked\" />";
-       echo " no <input type=\"radio\" name=\"nines\" value=\"no\" /> <br />\n";
+       echo ' '._('yes')."<input type=\"radio\" name=\"nines\" value=\"yes\" checked=\"checked\" />";
+       echo ' '._('no')." <input type=\"radio\" name=\"nines\" value=\"no\" /> <br />\n";
      }
    else
      {
-       echo " no <input type=\"hidden\" name=\"nines\" value=\"no\" /> <br />\n";
+       echo ' '._('no')." <input type=\"hidden\" name=\"nines\" value=\"no\" /> <br />\n";
      };
 
   if($RULES['lowtrump']=='cancel' || $RULES['lowtrump']=='poverty')
     {
       if($RULES['lowtrump']=='cancel')
-	echo "Do you have low trump (cancel game)?";
+	echo _('Do you have low trump (cancel game)?');
       else
-	echo "Do you have low trump (poverty)?";
+	echo _('Do you have low trump (poverty)?');
 
       if(check_low_trump($mycards))
 	{
-	  echo " yes<input type=\"radio\" name=\"lowtrump\" value=\"yes\" checked=\"checked\" />";
-	  echo " no <input type=\"radio\" name=\"lowtrump\" value=\"no\" /> <br />\n";
+	  echo ' '._('yes')."<input type=\"radio\" name=\"lowtrump\" value=\"yes\" checked=\"checked\" />";
+	  echo ' '._('no')." <input type=\"radio\" name=\"lowtrump\" value=\"no\" /> <br />\n";
 	}
       else
 	{
-	  echo " no <input type=\"hidden\" name=\"lowtrump\" value=\"no\" /> <br />\n";
+	  echo ' '._('no')." <input type=\"hidden\" name=\"lowtrump\" value=\"no\" /> <br />\n";
 	};
     }
   else
     echo "<input type=\"hidden\" name=\"lowtrump\" value=\"no\" />";
 
    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
-   echo "<input type=\"submit\" value=\"count me in\" />\n";
+   echo "<input type=\"submit\" value=\""._('count me in')."\" />\n";
 
    echo "</div>\n";
 
@@ -356,15 +352,13 @@ function output_form_calls($me,$myparty)
 
 function output_check_want_to_play($me)
 {
-   ?>
- <div class="joingame">
-   Do you want to play a game of DoKo? <br />
-   yes<input type="radio" name="in" value="yes" />
-   no<input type="radio" name="in" value="no" /> <br />
-<?php
+  echo ' <div class="joingame">';
+  echo '   '._('Do you want to play a game of DoKo?').' <br />';
+  echo '   '._('yes').'<input type="radio" name="in" value="yes" />';
+  echo '   '._('no').'<input type="radio" name="in" value="no" /> <br />';
   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
   echo "\n";
-  echo "<input type=\"submit\" value=\"submit\" />\n";
+  echo "<input type=\"submit\" value=\""._('submit')."\" />\n";
   echo " </div>\n";
 
   return;
@@ -702,7 +696,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back1) echo "        Trump back";
+	      if($trump_back1) echo '        '._('Trump back');
 	    }
 	  else if($mypos==$povertypos1)
 	    {
@@ -714,7 +708,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 	      }
-	      if($trump_back1) echo "        Trump back";
+	      if($trump_back1) echo '        '._('Trump back');
 	    }
 	  else if($mypos==$povertypos2)
 	    {
@@ -726,7 +720,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back2) echo "        Trump back";
+	      if($trump_back2) echo '        '._('Trump back');
 	    }
 	  else if($mypos==$partnerpos2)
 	    {
@@ -739,7 +733,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back2) echo "        Trump back";
+	      if($trump_back2) echo '        '._('Trump back');
 	    }
 	  echo  "      </div>\n";
 	}
