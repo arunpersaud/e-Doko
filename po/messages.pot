@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-04-17 22:55-0700\n"
+"POT-Creation-Date: 2010-04-17 23:20-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,6 +74,10 @@ msgstr ""
 
 #: include/game.php:226
 msgid "lowtrump"
+msgstr ""
+
+#: include/game.php:242 include/game.php:1916
+msgid "Score"
 msgstr ""
 
 #: include/game.php:286
@@ -144,8 +148,24 @@ msgid ""
 "wait for the others. Just wait for an email."
 msgstr ""
 
+#: include/game.php:1291
+msgid "Game"
+msgstr ""
+
+#: include/game.php:1335 include/game.php:1342 include/game.php:1605
+msgid "Trick"
+msgstr ""
+
 #: include/game.php:1907
 msgid "please wait until it's your turn!"
+msgstr ""
+
+#: include/game.php:1973
+msgid "prev"
+msgstr ""
+
+#: include/game.php:1974
+msgid "next"
 msgstr ""
 
 #: include/game.php:2026

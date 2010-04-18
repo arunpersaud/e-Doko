@@ -239,7 +239,7 @@ if($session)
 
     if($finalscore)
       {
-	echo "Score: \n";
+	echo _('Score').": \n";
 	foreach($finalscore as $user=>$value)
 	  {
 	    $name = DB_get_name('userid',$user);
@@ -1288,7 +1288,7 @@ switch($mystatus)
     $firstcard = ''; /* first card in a trick */
 
     echo "\n<ul class=\"tricks\">\n";
-    echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
+    echo '  <li class="nohighlight"> '._('Game').' '.DB_format_gameid($gameid).": </li>\n";
 
     /* output vorbehalte */
     $mygametype =  DB_get_gametype_by_gameid($gameid);
@@ -1332,14 +1332,14 @@ switch($mystatus)
 	    if($trick!=$lasttrick)
 	      {
 		/* start of an old trick? */
-		echo "  <li onclick=\"hl('$trickNR');\" class=\"old\"><a href=\"#\">Trick $trickNR</a>\n".
+		echo "  <li onclick=\"hl('$trickNR');\" class=\"old\"><a href=\"#\">"._('Trick')." $trickNR</a>\n".
 		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
 		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      }
 	    else if($trick==$lasttrick)
 	      {
 		/* start of a last trick? */
-		echo "  <li onclick=\"hl('$trickNR');\" class=\"current\"><a href=\"#\">Trick $trickNR</a>\n".
+		echo "  <li onclick=\"hl('$trickNR');\" class=\"current\"><a href=\"#\">"._('Trick')." $trickNR</a>\n".
 		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
 		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      };
@@ -1602,7 +1602,7 @@ switch($mystatus)
 	    $pos = DB_get_pos_by_hash($me);
 	    if($sequence==1)
 	      {
-		echo "  <li onclick=\"hl('".($tricknr)."');\" class=\"current\"><a href=\"#\">Trick ".($tricknr)."</a>\n".
+		echo "  <li onclick=\"hl('".($tricknr)."');\" class=\"current\"><a href=\"#\">"._('Trick').' '.($tricknr)."</a>\n".
 		  "    <div class=\"trick\" id=\"trick".($tricknr)."\">\n".
 		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      }
@@ -1913,7 +1913,7 @@ switch($mystatus)
     /* display points in case game is over */
     if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
       {
-	echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">Score</a>\n".
+	echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">"._('Score')."</a>\n".
 	  "    <div class=\"trick\" id=\"trick13\">\n";
 	/* add pic for re/contra
 	 "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
@@ -1970,8 +1970,8 @@ switch($mystatus)
 	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
       }
 
-    echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">prev</a></li>\n";
-    echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">next</a></li>\n";
+    echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">"._('prev')."</a></li>\n";
+    echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">"._('next')."</a></li>\n";
     echo "</ul>\n"; /* end ul tricks*/
 
     $mycards = DB_get_hand($me);
