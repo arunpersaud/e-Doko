@@ -696,7 +696,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back1) echo "        Trump back";
+	      if($trump_back1) echo '        '._('Trump back');
 	    }
 	  else if($mypos==$povertypos1)
 	    {
@@ -708,7 +708,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 	      }
-	      if($trump_back1) echo "        Trump back";
+	      if($trump_back1) echo '        '._('Trump back');
 	    }
 	  else if($mypos==$povertypos2)
 	    {
@@ -720,7 +720,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back2) echo "        Trump back";
+	      if($trump_back2) echo '        '._('Trump back');
 	    }
 	  else if($mypos==$partnerpos2)
 	    {
@@ -733,7 +733,7 @@ function output_exchanged_cards()
 		  else
 		    display_card(0,$PREF['cardset']);
 		}
-	      if($trump_back2) echo "        Trump back";
+	      if($trump_back2) echo '        '._('Trump back');
 	    }
 	  echo  "      </div>\n";
 	}
