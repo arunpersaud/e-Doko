@@ -219,14 +219,14 @@ function output_check_for_sickness($me,$mycards)
   echo '';
   echo '    '._('Do you want to play solo?').'';
   echo '    <select name="solo" size="1">';
-  echo '      <option selected="selected">'._('No').'</option>';
-  echo '      <option>'._('trumpless').'</option>';
-  echo '      <option>'._('trump').'</option>';
-  echo '      <option>'._('queen').'</option>';
-  echo '      <option>'._('jack').'</option>';
-  echo '      <option>'._('club').'</option>';
-  echo '      <option>'._('spade').'</option>';
-  echo '      <option>'._('heart').'</option>';
+  echo '      <option selected="selected">'.'No'.'</option>';
+  echo '      <option>'.'trumpless'.'</option>';
+  echo '      <option>'.'trump'.'</option>';
+  echo '      <option>'.'queen'.'</option>';
+  echo '      <option>'.'jack'.'</option>';
+  echo '      <option>'.'club'.'</option>';
+  echo '      <option>'.'spade'.'</option>';
+  echo '      <option>'.'heart'.'</option>';
   echo '    </select>';
   echo '    <br />';
 
