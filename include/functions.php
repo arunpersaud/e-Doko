@@ -75,7 +75,7 @@ function config_check()
 
 function mymail($uid,$subject,$message)
 {
-  global $EmailName;
+  global $EmailName,$WIKI;
 
   /* do we send the email right away or save it in the database? */
   $send_now = 1;
@@ -89,8 +89,7 @@ function mymail($uid,$subject,$message)
     "-- \n".
     "You can change your mail delivery mode in the preference menu.\n".
     'web: http://doko.nubati.net   '.
-    'help: http://wiki.nubati.net/EmailDoko   '.
-    'bugs: http://wiki.nubati.net/EmailDokoIssues';
+    "help, bugs, etc.: $WIKI";
 
   if(is_array($uid))
     {

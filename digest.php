@@ -39,6 +39,8 @@ if(isset($_SERVER['REMOTE_ADDR']))
 /* get userid for users that have digest set != digest-off */
 $users = DB_get_digest_users();
 
+global $WIKI;
+
 global $defaulttimezone;
 foreach($users as $uid)
   {
@@ -107,8 +109,7 @@ foreach($users as $uid)
 	      "-- \n".
 	      "You can change your mail delivery mode in the preference menu.\n".
 	      'web: http://doko.nubati.net   '.
-	      'help: http://wiki.nubati.net/EmailDoko   '.
-	      'bugs: http://wiki.nubati.net/EmailDokoIssues';
+	      "help, bugs, etc.: $WIKI";
 
 	    $subject = "$EmailName Digest";
 
