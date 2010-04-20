@@ -2095,41 +2095,51 @@ else
     echo "</div>\n";
   }
 
-/* display rule set for this game */
+/*
+ * display gameinfo: re/contra, comment-box, play-card button, games played by others
+ */
+
 echo "<div class=\"gameinfo\">\n";
 
+/* get time from the last action of the game */
+$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
+$gameend = time() - strtotime($r[0]);
+
+/* comment box */
+if($gamestatus == 'play' || $gameend < 60*60*24*7)
+  {
+    echo '  '._('A short comment').":<input name=\"comment\" type=\"text\" size=\"20\" maxlength=\"100\" />\n";
+  }
+
+/* re-contra */
 if($gamestatus == 'play' )
   {
     $myparty = DB_get_party_by_hash($me);
     output_form_calls($me,$myparty);
   }
-/* get time from the last action of the game */
-$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
-$gameend = time() - strtotime($r[0]);
 
+/* play-card button */
 if($gamestatus == 'play' || $gameend < 60*60*24*7)
   {
-    echo "<br />\n"._('A short comment').":<input name=\"comment\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+    echo "  <input type=\"submit\" value=\""._('submit')."\" />\n";
   }
-
-echo "<input type=\"submit\" value=\""._('submit')."\" />\n";
 
 /* has this hand been played by others? */
 $other_game_ids = DB_played_by_others($gameid);
 if(sizeof($other_game_ids)>0 && $mystatus=='gameover')
   {
     $mypos = DB_get_pos_by_hash($me);
-    echo "<p>See how other played the same hand: <br />\n";
+    echo "  <p>See how other played the same hand: \n";
     foreach($other_game_ids as $id)
       {
 	$otherhash = DB_get_hash_from_game_and_pos($id,$mypos);
 	$othername = DB_get_name('hash',$otherhash);
-	echo "<a href=\"$INDEX?action=game&amp;me=$otherhash\">$othername</a><br />";
+	echo "    <a href=\"$INDEX?action=game&amp;me=$otherhash\">$othername</a> ";
       }
-    echo "</p>\n";
+    echo "  </p>\n";
   }
 
-echo "</div>\n";
+echo "</div>\n"; /* end gameinfo */
 
 echo "</form>\n";
 
