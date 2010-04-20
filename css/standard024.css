@@ -460,19 +460,14 @@ ul.tricks li div div span.comment span{
 }
 
 .gameinfo {
-  position:absolute;
-  top:27em;
-  right:0em;
-  margin:1em;
-  margin-top:0em;
-  margin-right:3em;
-
-  width:12em;
-
-  padding:0.3em;
-
-  border:    2px solid gray;
-  background-color: #efefef;
+  position:relative;
+  top:0em;
+  margin:0em;
+  padding:0em;
+  width:100%;
+  border-top:    2px solid gray;
+  background-color: #efaaaa;
+  text-align:center;
 }
 
 .usermenu {
