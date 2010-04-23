@@ -509,7 +509,47 @@ ul.tricks li div div span.comment span{
 }
 
 .user { margin-left:25%;margin-right:5%; }
-.user td.usergames { width:50%; }
+
+div.user ul {
+  list-style:none;
+}
+
+div.user ul li {
+  position: relative;
+  padding:3px;
+  margin: 0px;
+  width: 80%;
+  min-height: 1.2em;
+  border-left: 2px solid #babdb6 ;
+  border-right: 2px solid #babdb6 ;
+  border-bottom: 2px solid #babdb6 ;
+}
+
+div.user ul li:first-child {
+  border-top: 2px solid #babdb6 ;
+}
+.gamessession {
+    display:none;
+}
+.link {
+    text-decoration:underline;
+    color: blue;
+}
+
+.user .gameid {
+    float: left;
+    width: 5em;
+}
+.user .turn {
+    padding-left: 1em;
+    float: left;
+    width: 20em;
+}
+.user .gameshidesession {
+    float:right;
+    width: 10em;
+}
+
 .wide { margin-left:5%;margin-right:5%; }
 
 .over {
@@ -532,18 +572,17 @@ div span img.tinybutton { width: 1.4em;}
 
 .gamestatuspre {
   padding: 0 0.3em;
-  background-color: #fd8901;
+  background-color: #f57900;
 }
 .gamestatusover {
   padding:0 0.3em;
-  background-color: #f82c20 ;
+  background-color: #e9b96e ;
+  color: #fff;
 }
 .gamestatusplay {
   padding:0 0.3em;
-  background-color: #15de26;
+  background-color: #8ae234;
 }
-
-.multi a{ color: #fff;}
 
 .bigger{ font-size:larger;}
 
