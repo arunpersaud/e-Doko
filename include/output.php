@@ -376,7 +376,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard024.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard025.css" />
      <script type="text/javascript" src="include/game.js"> </script>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
@@ -384,6 +384,19 @@ function output_header()
         $(document).ready(function()
 	   {
               $("#ScoreTable").tablesorter({ widgets: ['zebra']});
+
+	      $(".gameshidesession").click( function () {
+		  $(this).parent().children(".gamessession").toggle(300);
+		});
+
+	      $(".gameshowall").click( function () {
+		  $(".gamessession").show(300);
+		});
+	      $(".gamehideall").click( function () {
+		  $(".gamessession").hide(300);
+		});
+
+
            });
      </script>
   </head>

@@ -138,81 +138,167 @@ else
 
 	echo "<h4>These are all your games:</h4>\n";
 	/* output legend */
-	echo "<p>Session: <br />\n";
-	echo "<span class=\"gamestatuspre\"> p </span> =  pre-game phase ";
-	echo "<span class=\"gamestatusplay\">P </span> =  game in progess ";
-	echo "<span class=\"gamestatusover\">E </span> =  game ended ";
-	echo "<span class=\"gamestatusover multi\"><a>N</a> </span> =  N games with same hand <br />";
+	echo "<p>Games: \n";
+	echo "<span class=\"gamestatuspre\"> &nbsp; </span> =  pre-game phase ";
+	echo "<span class=\"gamestatusplay\"> &nbsp; </span> =  game in progess ";
+	echo "<span class=\"gamestatusover \"><a>N</a> </span> =  game over (N people played the same hand) <br />";
+	echo " Reminder: canceling a game can't be reversed!";
 	echo "</p>\n";
 
+	/* get all games */
 	$output = array();
 	$result = DB_query("SELECT Hand.hash,Hand.game_id,G.mod_date,G.player,G.status, ".
-			   " (SELECT count(H.randomnumbers) FROM Game H WHERE H.randomnumbers=G.randomnumbers) AS count ".
+			   " (SELECT count(H.randomnumbers) FROM Game H WHERE H.randomnumbers=G.randomnumbers) AS count, ".
+			   " G.session".
 			   " FROM Hand".
 			   " LEFT JOIN Game G ON G.id=Hand.game_id".
 			   " WHERE user_id='$myid'".
 			   " ORDER BY G.session,G.create_date" );
 
-	$gamenrold = -1;
-	$count = 0;
-	echo "<table>\n <tr><td>\n";
-	while( $r = DB_fetch_array($result))
+	/* sort into active and passive sessions */
+	$count   = 0; /* count number of games to check for beginner status */
+	$session = -1;
+	$maxgame =  0;
+	$output_active   = "";
+	$output_inactive = "";
+	$sessionoutput   = "";
+	$gameoutput      = "";
+	$keep_going = 2;
+	while( $keep_going )
 	  {
-	    $count++;
-	    $game = DB_format_gameid($r[1]);
-	    $gamenr = (int) $game;
-	    if($gamenrold < $gamenr)
-	      {
-		if($gamenrold!=-1)
-		  echo "</td></tr>\n <tr> <td>$gamenr:</td>\n";
-		else
-		  echo "$gamenr:</td>\n";
-		$gamenrold = $gamenr;
-		echo "<td class=\"usergames\">\n";
-	      }
-	    $Multi = ($r[5]>1) ? "multi" : "";
-	    if($r[4]=='pre')
-	      echo "   <span class=\"gamestatuspre $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">p </a></span>\n";
-	    else if (in_array($r[4],array('gameover','cancel-timedout','cancel-nines','cancel-noplay','cancel-trump')))
-	    {
-	      echo "   <span class=\"gamestatusover $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">";
-	      if($r[5]<2)
-		echo "E ";
-	      else
-		echo $r[5];
-	      echo "</a></span>\n";
-	    }
-	    else
-	      echo "   <span class=\"gamestatusplay $Multi\"><a href=\"".$INDEX."?action=game&amp;me=".$r[0]."\">P </a></span>\n";
-	    if($r[4] == 'pre' || $r[4] == 'play')
-	      {
-		echo "</td>\n<td>\n    ";
-		if($r[3]==$myid || !$r[3])
-		  echo "(it's <strong>your</strong> turn)\n";
-		else
-		  {
-		    $name = DB_get_name('userid',$r[3]);
-		    $gameid = $r[1];
-		    /* check if we need to send out a reminder */
-		    if(DB_get_reminder($r[3],$gameid)==0)
-		      if(time()-strtotime($r[2]) > 60*60*24*7)
-			echo "<a href=\"$INDEX?action=reminder&amp;me=".$r[0]."\">Send a reminder.</a>";
+	    /* get next element */
+	    $r = DB_fetch_array($result);
 
-		    /* check vacaction status of this user */
-		    if($vacation=check_vacation($r[3]))
+	    if($r)
+	      $count++;
+	    else
+	      {
+		/* need to run the while loop one more time when we run out of elements in the database */
+		$keep_going--;
+		$r[0] = NULL;
+		$r[1] = NULL;
+		$r[2] = NULL;
+		$r[3] = NULL;
+		$r[4] = NULL;
+		$r[5] = NULL;
+		$r[6] = -2;
+	      }
+	    if( $r[6]==$session )
+	      {
+		/* same session, update information */
+		$maxgame++;
+		$myhash        = $r[0];
+		$gameid        = $r[1];
+		$gamemoddate   = $r[2];
+		$userid        = $r[3];
+		$gamestatus    = $r[4];
+		$gamefrequence = $r[5];
+
+		/* create output */
+		$sessionoutput .= $gameoutput;
+		$gameoutput     = "   <span class=\"gamestatusover \"><a href=\"".$INDEX."?action=game&amp;me=".$myhash."\">"
+		  .$gamefrequence."</a></span>\n";
+	      }
+	    else
+	      {	/* new session */
+
+		/* output old session if available */
+		if($maxgame)
+		  {
+		    /* is session active? */
+		    if($gamestatus == 'pre' || $gamestatus== 'play' || time()-strtotime($gamemoddate) < 60*60*24*5 )
 		      {
-			$stop = substr($vacation[1],0,10);
-			$title = 'begin:'.substr($vacation[0],0,10).' end:'.$vacation[1].' '.$vacation[2];
-			echo "(it's <span class=\"vacation\" title=\"$title\">$name's (on vacation until $stop)</span> turn)\n";
+			$output_active .= "<li> ";
+			if($gamestatus == 'pre')
+			  $output_active .= '<span class="gamestatuspre gameid">';
+			else if($gamestatus == 'play')
+			  $output_active .= '<span class="gamestatusplay gameid">';
+			else
+			  $output_active .= '<span class="gamestatusover gameid">';
+			$output_active .= "<a href=\"$INDEX?action=game&amp;me=$myhash\">".
+			  DB_format_gameid($gameid).'</a></span>&nbsp;&nbsp;&nbsp;';
+
+
+
+			/* who's turn is it? */
+			if( $gamestatus == 'pre' || $gamestatus == 'play')
+			  {
+			    $output_active .= '<span class="turn">';
+			    if($userid==$myid || !$userid)
+			      $output_active .= " <strong>your</strong> turn\n";
+			    else
+			      {
+				$name = DB_get_name('userid',$userid);
+
+				/* check vacaction status of this user */
+				if($vacation=check_vacation($userid))
+				  {
+				    $stop = substr($vacation[1],0,10);
+				    $title = 'begin:'.substr($vacation[0],0,10).' end:'.$vacation[1].' '.$vacation[2];
+				    $output_active .= " <span class=\"vacation\" title=\"$title\">$name's (on vacation until $stop)</span> turn\n";
+				  }
+				else
+				  $output_active .= "$name's turn\n";
+
+				/* check if we need to send out a reminder */
+				if(DB_get_reminder($userid,$gameid)==0)
+				  if(time()-strtotime($gamemoddate) > 60*60*24*7)
+				    $output_active .= "<a href=\"$INDEX?action=reminder&amp;me=".$myhash."\">Send a reminder?</a> ";
+
+			      };
+			    $output_active .= '</span>';
+
+			    if(time()-strtotime($gamemoddate) > 60*60*24*30)
+			      $output_active .= "<a href=\"$INDEX?action=cancel&amp;me=".$myhash."\">Cancel?</a> ";
+			  }
+
+			if($maxgame>1)
+			  {
+			    $output_active .= ' <span class="gameshidesession link">(hide/show) old</span><br />'."\n";
+			    $output_active .= ' <span class="gamessession">'.$sessionoutput.'</span>';
+			  }
+
+			$output_active .= "</li>\n";
+
 		      }
 		    else
-		      echo "(it's $name's turn)\n";
-		  };
-		if(time()-strtotime($r[2]) > 60*60*24*30)
-		  echo "<a href=\"$INDEX?action=cancel&amp;me=".$r[0]."\">Cancel?</a> ";
+		      {
+			/* session is not active anymore */
+			$output_inactive .= "<li> $session:" ;
+			$output_inactive .= $sessionoutput.$gameoutput ;
+			$output_inactive .= "</li>\n";
+		      }
+
+		    /* reset all session variables */
+		    $maxgame =  0;
+		    $sessionoutput = "";
+		    $gameoutput    = "";
+
+		  }
+
+		/* save game information */
+		$maxgame++;
+		$myhash        = $r[0];
+		$gameid        = $r[1];
+		$gamemoddate   = $r[2];
+		$userid        = $r[3];
+		$gamestatus    = $r[4];
+		$gamefrequence = $r[5];
+		$session       = $r[6];
+
+		/* create output */
+		$sessionoutput .= $gameoutput;
+		$gameoutput     = "   <span class=\"gamestatusover \"><a href=\"".$INDEX."?action=game&amp;me=".$myhash."\">"
+		  .$gamefrequence."</a></span>\n";
+
 	      }
 	  }
-	echo "</td></tr>\n</table>\n";
+
+	echo "<ul>\n ";
+	echo " <li><span class=\"gameshowall link\">show all</span> <span class=\"gamehideall link\">hide all</span></li>\n";
+	echo $output_active;
+	echo " <li><span class=\"gameshidesession link\">hide/show inactive</span><ul class=\"gamessession\">$output_inactive </ul></li>";
+	echo "</ul>\n";
 
 	/* give a hint for new players */
 	if($count<10)
