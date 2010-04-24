@@ -783,7 +783,7 @@ function DB_get_PREF($myid)
 	{
 	case 'cardset':
 	  /* licence only valid until then */
-	  if($pref[1]=='altenburg' && (time()-strtotime( '2009-12-31 23:59:59')<0) )
+	  if($pref[1]=='altenburg' && (time()-strtotime( '2012-12-31 23:59:59')<0) )
 	    $PREF['cardset']='altenburg';
 	  break;
 
