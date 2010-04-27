@@ -376,7 +376,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard025.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard026.css" />
      <script type="text/javascript" src="include/game.js"> </script>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
@@ -414,11 +414,11 @@ function output_header()
 
 function output_footer()
 {
-  global $REV,$PREF;
+  global $REV, $PREF, $INDEX;
 
   echo "</div>\n\n";
   echo "<div class=\"footer\">\n";
-  echo "  <p class=\"left\"> copyright 2006,2007,2008,2009,2010 Arun Persaud, <a href=\"$INDEX?action=about\">et al.</a> <br />\n".
+  echo "  <p class=\"left\"> copyright 2006,2007,2008,2009,2010 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
     "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";

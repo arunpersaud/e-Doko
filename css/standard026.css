@@ -707,3 +707,38 @@ div.table div img.gravatar, img.gravatar  {
 .highcall {
     background-color: #fc3;
 }
+
+.about {
+    margin-left: 20%;
+    margin-right: 20%;
+    padding-top: 10%;
+}
+
+.about ul {
+    margin-left: 2em;
+}
+
+.about div {
+    width:12em;
+    height: 6em;
+    margin: 2em;
+    padding: 1em;
+    float:left;
+    border: 1px solid black;
+}
+
+.about .code {
+    background-color: #729fcf;
+}
+.about .database {
+    background-color: #8ae234;
+}
+.about .graphics {
+    background-color: #e9b96e;
+}
+.about .translation {
+    background-color: #fce94f;
+}
+
+
+
