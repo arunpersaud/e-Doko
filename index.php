@@ -120,6 +120,9 @@ switch($action)
   case 'game':
     require './include/game.php';
     break;
+  case 'about':
+    require './include/about.php';
+    break;
   case 'stats':
     if(isset($_SESSION["name"]))
       require './include/stats.php';
