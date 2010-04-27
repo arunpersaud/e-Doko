@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-04-17 23:20-0700\n"
+"POT-Creation-Date: 2010-04-26 22:33-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: include/functions.php:1106
+#: include/functions.php:1105
 msgid "It's your turn in these games"
 msgstr ""
 
@@ -176,11 +176,11 @@ msgstr ""
 msgid "The game is over for you... other people still need to play though"
 msgstr ""
 
-#: include/game.php:2112
+#: include/game.php:2111
 msgid "A short comment"
 msgstr ""
 
-#: include/game.php:2115 include/output.php:361
+#: include/game.php:2124 include/output.php:361
 msgid "submit"
 msgstr ""
 
@@ -298,38 +298,6 @@ msgstr ""
 msgid "Do you want to play solo?"
 msgstr ""
 
-#: include/output.php:222
-msgid "No"
-msgstr ""
-
-#: include/output.php:223
-msgid "trumpless"
-msgstr ""
-
-#: include/output.php:224
-msgid "trump"
-msgstr ""
-
-#: include/output.php:225
-msgid "queen"
-msgstr ""
-
-#: include/output.php:226
-msgid "jack"
-msgstr ""
-
-#: include/output.php:227
-msgid "club"
-msgstr ""
-
-#: include/output.php:228
-msgid "spade"
-msgstr ""
-
-#: include/output.php:229
-msgid "heart"
-msgstr ""
-
 #: include/output.php:233
 msgid "Wedding?"
 msgstr ""
@@ -369,52 +337,52 @@ msgstr ""
 msgid "Do you want to play a game of DoKo?"
 msgstr ""
 
-#: include/output.php:393
+#: include/output.php:406
 msgid "Welcome to E-Doko"
 msgstr ""
 
-#: include/output.php:450
+#: include/output.php:463
 msgid "mypage"
 msgstr ""
 
-#: include/output.php:451
+#: include/output.php:464
 msgid "settings"
 msgstr ""
 
-#: include/output.php:452
+#: include/output.php:465
 msgid "new game"
 msgstr ""
 
-#: include/output.php:453
+#: include/output.php:466
 msgid "statistics"
 msgstr ""
 
-#: include/output.php:454
+#: include/output.php:467
 msgid "wiki/bugs"
 msgstr ""
 
-#: include/output.php:455
+#: include/output.php:468
 msgid "atom"
 msgstr ""
 
-#: include/output.php:456
+#: include/output.php:469
 msgid "logout"
 msgstr ""
 
-#: include/output.php:459
+#: include/output.php:472
 msgid "last login"
 msgstr ""
 
-#: include/output.php:464
+#: include/output.php:477
 msgid "login"
 msgstr ""
 
-#: include/output.php:570
+#: include/output.php:583
 msgid "Personal notes"
 msgstr ""
 
-#: include/output.php:699 include/output.php:711 include/output.php:723
-#: include/output.php:736
+#: include/output.php:712 include/output.php:724 include/output.php:736
+#: include/output.php:749
 msgid "Trump back"
 msgstr ""
 
@@ -488,4 +456,69 @@ msgstr ""
 
 #: include/preferences.php:417 include/preferences.php:422
 msgid "ask for games"
+msgstr ""
+
+#: include/user.php:136
+msgid ""
+"Enjoy your vacation (don't forgot to change your settings once you're back)."
+msgstr ""
+
+#: include/user.php:140
+msgid "These are all your games"
+msgstr ""
+
+#: include/user.php:142
+msgid "Games"
+msgstr ""
+
+#: include/user.php:143
+msgid "pre-game phase"
+msgstr ""
+
+#: include/user.php:144
+msgid "game in progess"
+msgstr ""
+
+#: include/user.php:145
+msgid "game over (N people played the same hand)"
+msgstr ""
+
+#: include/user.php:146
+msgid "Reminder: canceling a game can't be reversed!"
+msgstr ""
+
+#: include/user.php:229
+msgid "your turn"
+msgstr ""
+
+#: include/user.php:247
+msgid "Send a reminder?"
+msgstr ""
+
+#: include/user.php:258
+msgid "(hide/show) old"
+msgstr ""
+
+#: include/user.php:299
+msgid "show all"
+msgstr ""
+
+#: include/user.php:299
+msgid "hide all"
+msgstr ""
+
+#: include/user.php:301
+msgid "hide/show inactive"
+msgstr ""
+
+#: include/user.php:306
+msgid "You can start new games using the link in the top right corner!"
+msgstr ""
+
+#: include/user.php:310
+msgid "New Players"
+msgstr ""
+
+#: include/user.php:315
+msgid "Players last logged in"
 msgstr ""

@@ -133,16 +133,17 @@ else
 	    $vac_start   = $myvacation[0];
 	    $vac_stop    = $myvacation[1];
 	    $vac_comment = $myvacation[2];
-	    echo "<p class=\"vacation\">Enjoy your vacation (don't forgot to change your settings once you're back). Between $vac_start and $vac_stop other users will see the following message: $vac_comment.</p>\n";
+	    echo '<p class="vacation">'._("Enjoy your vacation (don't forgot to change your settings once you're back).").
+	      " Between $vac_start and $vac_stop other users will see the following message: $vac_comment.</p>\n";
 	  }
 
-	echo "<h4>These are all your games:</h4>\n";
+	echo '<h4>'._('These are all your games').":</h4>\n";
 	/* output legend */
-	echo "<p>Games: \n";
-	echo "<span class=\"gamestatuspre\"> &nbsp; </span> =  pre-game phase ";
-	echo "<span class=\"gamestatusplay\"> &nbsp; </span> =  game in progess ";
-	echo "<span class=\"gamestatusover \"><a>N</a> </span> =  game over (N people played the same hand) <br />";
-	echo " Reminder: canceling a game can't be reversed!";
+	echo '<p>'._('Games').": \n";
+	echo '<span class="gamestatuspre"> &nbsp; </span> =  '._('pre-game phase');
+	echo '<span class="gamestatusplay"> &nbsp; </span> =  '._('game in progess');
+	echo '<span class="gamestatusover "><a>N</a> </span> = '._('game over (N people played the same hand)').' <br />';
+	echo ' '._("Reminder: canceling a game can't be reversed!");
 	echo "</p>\n";
 
 	/* get all games */
@@ -225,7 +226,7 @@ else
 			  {
 			    $output_active .= '<span class="turn">';
 			    if($userid==$myid || !$userid)
-			      $output_active .= " <strong>your</strong> turn\n";
+			      $output_active .= ' <strong>'._('your turn')."</strong>\n";
 			    else
 			      {
 				$name = DB_get_name('userid',$userid);
@@ -243,7 +244,7 @@ else
 				/* check if we need to send out a reminder */
 				if(DB_get_reminder($userid,$gameid)==0)
 				  if(time()-strtotime($gamemoddate) > 60*60*24*7)
-				    $output_active .= "<a href=\"$INDEX?action=reminder&amp;me=".$myhash."\">Send a reminder?</a> ";
+				    $output_active .= "<a href=\"$INDEX?action=reminder&amp;me=".$myhash."\">"._('Send a reminder?').'</a> ';
 
 			      };
 			    $output_active .= '</span>';
@@ -254,7 +255,7 @@ else
 
 			if($maxgame>1)
 			  {
-			    $output_active .= ' <span class="gameshidesession link">(hide/show) old</span><br />'."\n";
+			    $output_active .= ' <span class="gameshidesession link">'._('(hide/show) old').'</span><br />'."\n";
 			    $output_active .= ' <span class="gamessession">'.$sessionoutput.'</span>';
 			  }
 
@@ -295,23 +296,23 @@ else
 	  }
 
 	echo "<ul>\n ";
-	echo " <li><span class=\"gameshowall link\">show all</span> <span class=\"gamehideall link\">hide all</span></li>\n";
+	echo ' <li><span class="gameshowall link">'._('show all').'</span> <span class="gamehideall link">'._('hide all')."</span></li>\n";
 	echo $output_active;
-	echo " <li><span class=\"gameshidesession link\">hide/show inactive</span><ul class=\"gamessession\">$output_inactive </ul></li>";
+	echo ' <li><span class="gameshidesession link">'._('hide/show inactive').'</span><ul class="gamessession">'."$output_inactive </ul></li>";
 	echo "</ul>\n";
 
 	/* give a hint for new players */
 	if($count<10)
-	  echo "<p class=\"newbiehint\">You can start new games using the link in the top right corner!</p>\n";
+	  echo '<p class="newbiehint">'._('You can start new games using the link in the top right corner!')."</p>\n";
 
 	/* display last 5 users that have signed up to e-DoKo */
 	$names = DB_get_names_of_new_logins(5);
-	echo "<h4>New Players:</h4>\n<p>\n";
+	echo '<h4>'._('New Players').":</h4>\n<p>\n";
 	echo implode(", ",$names).",...\n";
 	echo "</p>\n";
 
 	/* display last 5 users that logged on */
-	echo "<h4>Players last logged in:</h4>\n<p>\n";
+	echo '<h4>'._('Players last logged in').":</h4>\n<p>\n";
 
 	$names  = DB_get_names_of_last_logins(7);
 	$emails = DB_get_emails_of_last_logins(7);
