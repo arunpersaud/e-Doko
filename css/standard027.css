@@ -531,10 +531,6 @@ div.user ul li:first-child {
 .gamessession {
     display:none;
 }
-.link {
-    text-decoration:underline;
-    color: blue;
-}
 
 .user .gameid {
     float: left;
@@ -545,7 +541,12 @@ div.user ul li:first-child {
     float: left;
     width: 20em;
 }
+
 .user .gameshidesession {
+  display: none;
+}
+
+.user .gameshidesession , .user .gamesshowsession {
     float:right;
     width: 10em;
 }
@@ -596,7 +597,7 @@ caption {
   margin-bottom: 0;
  }
 
-table.stats { 
+table.stats {
   margin: 0.5em 1em;
   border: solid 0.2em #aeaeae;
   -moz-border-radius: 0.5em ;
@@ -698,7 +699,7 @@ table.openid td, table.openid th{
     background-color: #fc3;
 }
 
-div.table div img.gravatar, img.gravatar  { 
+div.table div img.gravatar, img.gravatar  {
     width:  4em;
     height: 4em;
     border: 3px solid #aaa;

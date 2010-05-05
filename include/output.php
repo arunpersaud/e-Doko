@@ -376,24 +376,36 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard026.css" />
-     <script type="text/javascript" src="include/game.js"> </script>
+     <link rel="stylesheet" type="text/css" href="css/standard027.css" />
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
+     <script type="text/javascript" src="include/game.js"> </script>
      <script type="text/javascript">
         $(document).ready(function()
 	   {
               $("#ScoreTable").tablesorter({ widgets: ['zebra']});
 
 	      $(".gameshidesession").click( function () {
-		  $(this).parent().children(".gamessession").toggle(300);
+		  $(this).parent().children(".gamessession").hide(300);
+		  $(this).parent().children(".gamesshowsession").show();
+		  $(this).hide();
+		});
+
+	      $(".gamesshowsession").click( function () {
+		  $(this).parent().children(".gamessession").show(300);
+		  $(this).parent().children(".gameshidesession").show();
+		  $(this).hide();
 		});
 
 	      $(".gameshowall").click( function () {
 		  $(".gamessession").show(300);
+		  $(".gamesshowsession").hide();
+		  $(".gameshidesession").show();
 		});
 	      $(".gamehideall").click( function () {
 		  $(".gamessession").hide(300);
+		  $(".gamesshowsession").show();
+		  $(".gameshidesession").hide();
 		});
 
 

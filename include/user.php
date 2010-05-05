@@ -255,7 +255,8 @@ else
 
 			if($maxgame>1)
 			  {
-			    $output_active .= ' <span class="gameshidesession link">'._('(hide/show) old').'</span><br />'."\n";
+			    $output_active .= ' <span class="gamesshowsession"><a href="#">'._('show old').'</a></span>'.
+			      '  <span class="gameshidesession"><a href="#">'._('hide old').'</a></span><br />'."\n";
 			    $output_active .= ' <span class="gamessession">'.$sessionoutput.'</span>';
 			  }
 
@@ -296,9 +297,9 @@ else
 	  }
 
 	echo "<ul>\n ";
-	echo ' <li><span class="gameshowall link">'._('show all').'</span> <span class="gamehideall link">'._('hide all')."</span></li>\n";
+	echo ' <li><span class="gameshowall"><a href="#">'._('show all').'</a></span> <span class="gamehideall"><a href="#">'._('hide all')."</a></span></li>\n";
 	echo $output_active;
-	echo ' <li><span class="gameshidesession link">'._('hide/show inactive').'</span><ul class="gamessession">'."$output_inactive </ul></li>";
+	echo ' <li><span class="gamesshowsession"><a href="#">'._('show inactive').'</a></span><span class="gameshidesession"><a href="#">'._('hide inactive').'</a></span><ul class="gamessession">'."$output_inactive </ul></li>";
 	echo "</ul>\n";
 
 	/* give a hint for new players */
