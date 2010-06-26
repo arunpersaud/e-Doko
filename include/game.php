@@ -531,7 +531,7 @@ switch($mystatus)
     $mycards = DB_get_hand($me);
     $mycards = mysort($mycards,$gametype);
 
-    /* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+    /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
     echo "\n<ul class=\"tricks\">\n";
     echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
     echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
@@ -1291,17 +1291,19 @@ switch($mystatus)
     echo '  <li class="nohighlight"> '._('Game').' '.DB_format_gameid($gameid).": </li>\n";
 
     /* output vorbehalte */
-    $mygametype =  DB_get_gametype_by_gameid($gameid);
-    if($mygametype != 'normal' && $mygametype != 'silent') /* only show when needed */
-      {
-	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	     "    <div class=\"trick\" id=\"trick0\">\n";
+    $mygametype = DB_get_gametype_by_gameid($gameid);
+    $mygamesolo = DB_get_solo_by_gameid($gameid);
+    if($mygametype != 'normal') /* only show when needed */
+      if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
+	{
+	  echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+	    "    <div class=\"trick\" id=\"trick0\">\n";
 
-	/* get information so show the cards that have been handed over in a poverty game */
-	output_exchanged_cards();
+	  /* get information so show the cards that have been handed over in a poverty game */
+	  output_exchanged_cards();
 
-	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
-      }
+	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	}
 
     /* output tricks */
     while($r = DB_fetch_array($result))
