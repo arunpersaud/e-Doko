@@ -538,7 +538,6 @@ div.user ul li:first-child {
 }
 .user .turn {
     padding-left: 1em;
-    float: left;
     width: 20em;
 }
 
