@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2010-04-26 22:33-0700\n"
-"PO-Revision-Date: 2010-05-04 19:36-0700\n"
+"POT-Creation-Date: 2010-09-21 19:52-0700\n"
+"PO-Revision-Date: 2010-09-21 20:09-0700\n"
 "Last-Translator: BK <birgit75@email.de>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -76,7 +76,7 @@ msgstr "Ansage"
 msgid "lowtrump"
 msgstr "Trumpfarmut"
 
-#: include/game.php:242 include/game.php:1916
+#: include/game.php:242 include/game.php:1918
 msgid "Score"
 msgstr "Punkte"
 
@@ -90,7 +90,7 @@ msgstr "naechstes Spiel"
 
 #: include/game.php:431 include/game.php:453 include/game.php:588
 #: include/game.php:907 include/game.php:971 include/game.php:1239
-#: include/game.php:1984 include/game.php:2016
+#: include/game.php:1986 include/game.php:2018
 msgid "Your cards are"
 msgstr "Deine Karten sind"
 
@@ -166,36 +166,36 @@ msgstr ""
 msgid "Game"
 msgstr "Spiel"
 
-#: include/game.php:1335 include/game.php:1342 include/game.php:1605
+#: include/game.php:1337 include/game.php:1344 include/game.php:1607
 msgid "Trick"
 msgstr "Stich"
 
-#: include/game.php:1907
+#: include/game.php:1909
 msgid "please wait until it's your turn!"
 msgstr "Bitte warte bis Du dran bist!"
 
-#: include/game.php:1973
+#: include/game.php:1975
 msgid "prev"
 msgstr "zurueck"
 
-#: include/game.php:1974
+#: include/game.php:1976
 msgid "next"
 msgstr "vor"
 
-#: include/game.php:2026
+#: include/game.php:2028
 msgid "Your cards were"
 msgstr "Deine Karten waren"
 
-#: include/game.php:2064
+#: include/game.php:2066
 msgid "The game is over for you... other people still need to play though"
 msgstr ""
 "Das Spiel ist fuer dich vorbei... andere muessen aber noch eine Karte spielen"
 
-#: include/game.php:2111
+#: include/game.php:2113
 msgid "A short comment"
 msgstr "Ein kurzer Kommentar"
 
-#: include/game.php:2124 include/output.php:361
+#: include/game.php:2126 include/output.php:361
 msgid "submit"
 msgstr "abschicken"
 
@@ -218,7 +218,7 @@ msgstr "Waehle Spieler aus (beachte: du musst einer der Spieler sein)"
 
 #: include/output.php:102
 msgid "Gameplay-related"
-msgstr ""
+msgstr "Spielbezogen"
 
 #: include/output.php:103
 msgid "Ten of hearts"
@@ -226,7 +226,7 @@ msgstr "Herzzehn"
 
 #: include/output.php:106
 msgid "just normal non-trump"
-msgstr ""
+msgstr "kein Trumpf"
 
 #: include/output.php:107
 msgid "first ten of hearts wins the trick"
@@ -243,37 +243,42 @@ msgstr "Keine"
 
 #: include/output.php:115
 msgid "both become highest trump (automatic call at beginning of the game)"
-msgstr ""
+msgstr "Beide werden zu dem hoechsten Trumpf"
 
 #: include/output.php:116
 msgid "first one normal, second one becomes highest (call during the game)"
 msgstr ""
+"erster Fuchs normal, zweiter als hoechster Trumpf (Ansage waehrend dem Spiel)"
 
 #: include/output.php:117
 msgid "second one become highest only in case re/contra was announced"
-msgstr ""
+msgstr "Zweiter Fuchs wird nur hoechster Trumpf nach Ansage (re/contra)"
 
 #: include/output.php:121
 msgid "Call Re/Contra, etc."
-msgstr ""
+msgstr "Ansagen"
 
 #: include/output.php:124
 msgid ""
 "Can call re/contra on the first <strong>own</strong> card played, 90 on the "
 "second, etc."
 msgstr ""
+"Re/Contra mit der ersten <strong>eigenen</strong> Karte, U90 mit der "
+"zweiten, etc. "
 
 #: include/output.php:125
 msgid ""
 "Can call re/contra until 5th card is played, 90 until 9th card is played, "
 "etc."
-msgstr ""
+msgstr "Re/Contra bis zur fuenften Karte, U90 bis zur 9ten, etc."
 
 #: include/output.php:126
 msgid ""
 "Can call re/contra until 5th card is played, 90 if player still has 9 cards, "
 "etc."
 msgstr ""
+"Re/Contra bis die fuenfte Karte gespielt ist, U90 solange der Spieler noch 9 "
+"KKarten auf der Hand hat, etc."
 
 #: include/output.php:129
 msgid "Low trump"
@@ -283,10 +288,12 @@ msgstr "Niedrige Trumpf"
 msgid ""
 "Player can't trump a fox, that is none of his trump is higher than a fox."
 msgstr ""
+"Spieler kann keinen Fuchs stechen, dh. keine Karte ist hoeher als ein Fuchs."
 
 #: include/output.php:133
 msgid "The trump will be treated as poverty and offered to another player."
 msgstr ""
+"Die Trumpfkarten werde als Armut behandelt und an andere Spieler angeboten."
 
 #: include/output.php:134
 msgid "The game will be canceled unless there is a solo."
@@ -294,15 +301,15 @@ msgstr "Das Spiel wird annuliert, es sei denn, jemand spielt ein Solo."
 
 #: include/output.php:135
 msgid "Bad luck, the player needs to play a normal game."
-msgstr ""
+msgstr "Pech gehabt, der Spieler muss ein normales Spiel spielen."
 
 #: include/output.php:138
 msgid "Scoring-related"
-msgstr ""
+msgstr "Punktezaehlung"
 
 #: include/output.php:139
 msgid "(not yet implemented)"
-msgstr ""
+msgstr "(noch nicht implementiert)"
 
 #: include/output.php:140
 msgid "start game"
@@ -316,18 +323,47 @@ msgstr "Danke, dass du am Spiel teilnimmst"
 msgid "Do you want to play solo?"
 msgstr "Willst du Solo spielen?"
 
+#: include/output.php:223
+msgid "trumpless"
+msgstr "fleischlos"
+
+#: include/output.php:224
+msgid "trump"
+msgstr "Trumpf"
+
+#: include/output.php:225
+msgid "queen"
+msgstr "Damen"
+
+#: include/output.php:226
+msgid "jack"
+msgstr "Buben"
+
+#: include/output.php:227
+msgid "club"
+msgstr "Kreuz"
+
+#: include/output.php:228
+msgid "spade"
+msgstr "Pik"
+
+#: include/output.php:229
+msgid "heart"
+msgstr "Herz"
+
 #: include/output.php:233
 msgid "Wedding?"
 msgstr "Hochzeit?"
 
 #: include/output.php:236 include/output.php:247 include/output.php:258
-#: include/output.php:275 include/output.php:357
+#: include/output.php:275 include/output.php:357 include/preferences.php:447
 msgid "yes"
 msgstr "Ja"
 
 #: include/output.php:237 include/output.php:241 include/output.php:248
 #: include/output.php:252 include/output.php:259 include/output.php:263
 #: include/output.php:276 include/output.php:280 include/output.php:358
+#: include/preferences.php:453
 msgid "no"
 msgstr "Nein"
 
@@ -341,11 +377,11 @@ msgstr "Hast du zuviele Neuner?"
 
 #: include/output.php:269
 msgid "Do you have low trump (cancel game)?"
-msgstr ""
+msgstr "Hast du zu niedrige Trumpf (Spiel abbrechen)?"
 
 #: include/output.php:271
 msgid "Do you have low trump (poverty)?"
-msgstr ""
+msgstr "Hast du zu niedrige Trump (Armut)?"
 
 #: include/output.php:287
 msgid "count me in"
@@ -355,52 +391,52 @@ msgstr "Ich bin dabei!"
 msgid "Do you want to play a game of DoKo?"
 msgstr "Willst du eine Runde DoKo spielen?"
 
-#: include/output.php:406
+#: include/output.php:418
 msgid "Welcome to E-Doko"
 msgstr "Willkommen bei E-Doko"
 
-#: include/output.php:463
+#: include/output.php:475
 msgid "mypage"
-msgstr ""
+msgstr "Hauptseite"
 
-#: include/output.php:464
+#: include/output.php:476
 msgid "settings"
 msgstr "Einstellungen"
 
-#: include/output.php:465
+#: include/output.php:477
 msgid "new game"
 msgstr "neues Spiel"
 
-#: include/output.php:466
+#: include/output.php:478
 msgid "statistics"
 msgstr "Statistik"
 
-#: include/output.php:467
+#: include/output.php:479
 msgid "wiki/bugs"
 msgstr "Wiki/Bugs"
 
-#: include/output.php:468
+#: include/output.php:480
 msgid "atom"
 msgstr "Atom"
 
-#: include/output.php:469
+#: include/output.php:481
 msgid "logout"
 msgstr "ausloggen"
 
-#: include/output.php:472
+#: include/output.php:484
 msgid "last login"
 msgstr "Letzter Login"
 
-#: include/output.php:477
+#: include/output.php:489
 msgid "login"
-msgstr ""
+msgstr "Einloggen"
 
-#: include/output.php:583
+#: include/output.php:595
 msgid "Personal notes"
 msgstr "Notizen"
 
-#: include/output.php:712 include/output.php:724 include/output.php:736
-#: include/output.php:749
+#: include/output.php:724 include/output.php:736 include/output.php:748
+#: include/output.php:761
 msgid "Trump back"
 msgstr "Trumpf zurück"
 
@@ -410,11 +446,19 @@ msgstr "Deine Einstellungen sind"
 
 #: include/preferences.php:332
 msgid "Game-related"
-msgstr ""
+msgstr "Spielbezogen"
 
 #: include/preferences.php:335
 msgid "Vacation"
 msgstr "Urlaub"
+
+#: include/preferences.php:340
+msgid "start"
+msgstr "Starte Spiel"
+
+#: include/preferences.php:345
+msgid "stop"
+msgstr "Ende"
 
 #: include/preferences.php:350
 msgid "comment:"
@@ -432,6 +476,19 @@ msgstr "geaendert"
 msgid "wrong date format"
 msgstr "Falsches Datumformat"
 
+#: include/preferences.php:354
+msgid "use YYYY-MM-DD"
+msgstr "benutze JJJJ-MM-TT"
+
+#: include/preferences.php:354
+msgid "use '-'  in start field to unset vacation"
+msgstr "benutze '-' im Anfangsfeld, um den Urlaub zu beenden"
+
+#: include/preferences.php:355
+#, fuzzy
+msgid "Notification"
+msgstr "Urlaub"
+
 #: include/preferences.php:359 include/preferences.php:364
 msgid "less emails"
 msgstr "weniger E-mails"
@@ -439,6 +496,14 @@ msgstr "weniger E-mails"
 #: include/preferences.php:360 include/preferences.php:365
 msgid "lots of emails"
 msgstr "viele E-mails"
+
+#: include/preferences.php:371
+msgid "Digest"
+msgstr ""
+
+#: include/preferences.php:377
+msgid "digest off"
+msgstr "Digest aus"
 
 #: include/preferences.php:381
 msgid "every hour"
@@ -468,6 +533,10 @@ msgstr "alle 12h"
 msgid "every 24h"
 msgstr "alle 24h"
 
+#: include/preferences.php:412
+msgid "Autosetup"
+msgstr ""
+
 #: include/preferences.php:416 include/preferences.php:421
 msgid "accept every game"
 msgstr "jedes Spiel akzeptieren"
@@ -476,91 +545,177 @@ msgstr "jedes Spiel akzeptieren"
 msgid "ask for games"
 msgstr ""
 
-#: include/user.php:136
+#: include/preferences.php:443
+#, fuzzy
+msgid "Open for new games"
+msgstr "neues Spiel"
+
+#: include/preferences.php:463 include/preferences.php:468
+msgid "German cards"
+msgstr "Franzoesisches Blatt"
+
+#: include/preferences.php:464 include/preferences.php:469
+msgid "English cards"
+msgstr "Englisches Blatt"
+
+#: include/preferences.php:477
+#, fuzzy
+msgid "Personal"
+msgstr "Notizen"
+
+#: include/preferences.php:479
+msgid "Email"
+msgstr "E-Mail"
+
+#: include/preferences.php:480
+msgid "Timezone"
+msgstr "Zeitzone"
+
+#: include/preferences.php:484
+msgid "Language"
+msgstr "Sprache"
+
+#: include/preferences.php:488
+msgid "Password(old)"
+msgstr "Passwort(alt)"
+
+#: include/preferences.php:493
+msgid "The new passwords is not long enough (you need at least 4 characters)."
+msgstr "Das neue Passwort ist nicht lange genug (mindestens 4 Zeichen)."
+
+#: include/preferences.php:496
+msgid "The new passwords don't match."
+msgstr "Die neuen Passwoerter stimmen nicht ueberein."
+
+#: include/preferences.php:499
+msgid "The old password is not correct."
+msgstr "Das alte Passwort stimmt nicht."
+
+#: include/preferences.php:506
+msgid "Password(new)"
+msgstr "Passwort(neu)"
+
+#: include/preferences.php:509
+msgid "Password(new, retype)"
+msgstr "Passwort(neu, wiederholen)"
+
+#: include/preferences.php:515
+msgid "OpenID"
+msgstr "Open-Id"
+
+#: include/preferences.php:534
+msgid "add OpenID"
+msgstr "Open-Id hinzufuegen"
+
+#: include/preferences.php:537
+msgid "Deleted some OpenIDs!"
+msgstr "Open-ID loeschen"
+
+#: include/preferences.php:539
+#, fuzzy
+msgid "Submit"
+msgstr "abschicken"
+
+#: include/preferences.php:541
+msgid ""
+"E-DoKo uses <a href=\\\"http://www.gravatar.org\\\">gravatars</a> as icons."
+msgstr ""
+"E-DoKo benutzt <a href=\\\"http://www.gravatar.org\\\">gravatars</a> als "
+"Icons."
+
+#: include/user.php:60
+msgid "Ok, I will send you a new password."
+msgstr "Ok, ich werde Dir ein neues Passwort zuschicken."
+
+#: include/user.php:64
+msgid ""
+"The new password will be valid for one day, make sure you reset it to "
+"something else."
+msgstr ""
+"Das neue Passwort wird fuer einen Tag gueltig sein, bitte setze in dieser "
+"Zeit ein neues."
+
+#: include/user.php:88
+msgid ""
+"Sorry you already tried 5 times during the last 24h.<br />You need to use "
+"one of those passwords or wait to get a new one."
+msgstr ""
+
+#: include/user.php:138
 msgid ""
 "Enjoy your vacation (don't forgot to change your settings once you're back)."
 msgstr ""
+"Viel Spass beim Urlaub (und nicht vergessen die Urlaubseinstellung wieder "
+"auszustellen, wenn du wieder zurueck bist)."
 
-#: include/user.php:140
+#: include/user.php:142
 msgid "These are all your games"
 msgstr "Hier sind alle deine Spiele"
 
-#: include/user.php:142
+#: include/user.php:144
 msgid "Games"
 msgstr "Spiele"
 
-#: include/user.php:143
+#: include/user.php:145
 msgid "pre-game phase"
 msgstr "Anfangsphase"
 
-#: include/user.php:144
+#: include/user.php:146
 msgid "game in progess"
 msgstr "Spiel laeuft"
 
-#: include/user.php:145
+#: include/user.php:147
 msgid "game over (N people played the same hand)"
-msgstr ""
+msgstr "Spiel beendet (N Spieler haben dieses Blatt schon gespielt)"
 
-#: include/user.php:146
+#: include/user.php:148
 msgid "Reminder: canceling a game can't be reversed!"
 msgstr ""
+"Erinnerung: Abbrechen eines Spieles kann nicht rueckgaengig gemacht werden!"
 
-#: include/user.php:229
+#: include/user.php:231
 msgid "your turn"
 msgstr "Du bist dran"
 
-#: include/user.php:247
+#: include/user.php:249
 msgid "Send a reminder?"
-msgstr ""
+msgstr "eine Erinnerungsemail schicken?"
 
-#: include/user.php:258
-msgid "(hide/show) old"
-msgstr ""
+#: include/user.php:260
+msgid "show old"
+msgstr "zeige alte"
 
-#: include/user.php:299
+#: include/user.php:261
+msgid "hide old"
+msgstr "verstecke alte"
+
+#: include/user.php:302
 msgid "show all"
 msgstr "zeige alle"
 
-#: include/user.php:299
+#: include/user.php:302
 msgid "hide all"
-msgstr ""
+msgstr "verstecke alle"
 
-#: include/user.php:301
-msgid "hide/show inactive"
-msgstr ""
+#: include/user.php:304
+msgid "show inactive"
+msgstr "zeige inaktive"
 
-#: include/user.php:306
+#: include/user.php:304
+msgid "hide inactive"
+msgstr "verstecke inaktive"
+
+#: include/user.php:309
 msgid "You can start new games using the link in the top right corner!"
-msgstr ""
+msgstr "Du kannst neue Runden mit dem Link oben rechts starten!"
 
-#: include/user.php:310
+#: include/user.php:313
 msgid "New Players"
 msgstr "Neue Mitspieler"
 
-#: include/user.php:315
+#: include/user.php:318
 msgid "Players last logged in"
 msgstr "Zuletzt eingeloggt"
 
 #~ msgid "No"
 #~ msgstr "Nein"
-
-#~ msgid "trumpless"
-#~ msgstr "fleischlos"
-
-#~ msgid "trump"
-#~ msgstr "Trumpf"
-
-#~ msgid "queen"
-#~ msgstr "Damen"
-
-#~ msgid "jack"
-#~ msgstr "Buben"
-
-#~ msgid "club"
-#~ msgstr "Kreuz"
-
-#~ msgid "spade"
-#~ msgstr "Pik"
-
-#~ msgid "heart"
-#~ msgstr "Herz"
