@@ -1990,6 +1990,38 @@ switch($mystatus)
 	if(have_suit($mycards,$firstcard))
 	  $followsuit = 1;
 
+	/* count how many cards we can play, so that we can pre-select it if there is only one */
+	$howmanycards = 0;
+	foreach($mycards as $card)
+	  {
+	    if($howmanycard>1)
+	      break;
+
+	    /* display only cards that the player is allowed to play as links, the rest just display normal
+	     * also check if we have both schweinchen, in that case only display on of them as playable
+	     */
+	    if( ($followsuit && !same_type($card,$firstcard)) ||
+		( (int)($card)==19 &&
+		  !$GAME['schweinchen-first'] &&
+		  ( $RULES['schweinchen']=='second' ||
+		    ( $RULES['schweinchen']=='secondaftercall' &&
+		     (DB_get_call_by_hash($GAME['schweinchen-who']) ||
+		      DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
+		    )
+		  ) &&
+		  $GAME['schweinchen-who']==$me &&
+		  in_array($gametype,array('normal','wedding','trump','silent'))
+		  )
+		)
+	      continue ;
+	    else
+	      $howmanycards++;
+	  }
+	if($howmanycards==1)
+	  $howmanycards=1;
+	else
+	  $howmanycards=0;
+
 	foreach($mycards as $card)
 	  {
 	    /* display only cards that the player is allowed to play as links, the rest just display normal
@@ -2010,7 +2042,7 @@ switch($mystatus)
 		)
 	      display_card($card,$PREF['cardset']);
 	    else
-	      display_link_card($card,$PREF['cardset']);
+	      display_link_card($card,$PREF['cardset'],$selected=$howmanycards);
 	  }
       }
     else if($mystatus=='play' )

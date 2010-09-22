@@ -202,12 +202,15 @@ function display_card($card,$dir="english")
   return;
 }
 
-function display_link_card($card,$dir="english",$type="card")
+function display_link_card($card,$dir="english",$type="card", $selected=0)
 {
+  if($selected)
+    $selected = 'selected="selected"';
+
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"".DB_get_card_name($card)."\" /></div>\n";
+    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" $selected /><img src=\"cards/".$dir."/".$card.".png\" alt=\"".DB_get_card_name($card)."\" /></div>\n";
   else
-    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"".DB_get_card_name($card-1)."\" /></div>\n";
+    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" $selected /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"".DB_get_card_name($card-1)."\" /></div>\n";
   return;
 }
 
