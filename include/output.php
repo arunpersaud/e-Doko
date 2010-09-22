@@ -202,12 +202,15 @@ function display_card($card,$dir="english")
   return;
 }
 
-function display_link_card($card,$dir="english",$type="card")
+function display_link_card($card,$dir="english",$type="card", $selected=0)
 {
+  if($selected)
+    $selected = 'selected="selected"';
+
   if( $card/2 - (int)($card/2) == 0.5)
-    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".$card.".png\" alt=\"".DB_get_card_name($card)."\" /></div>\n";
+    echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" $selected /><img src=\"cards/".$dir."/".$card.".png\" alt=\"".DB_get_card_name($card)."\" /></div>\n";
   else
-    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"".DB_get_card_name($card-1)."\" /></div>\n";
+    echo "<div class=\"cardinput\" ><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" $selected /><img src=\"cards/".$dir."/".($card-1).".png\" alt=\"".DB_get_card_name($card-1)."\" /></div>\n";
   return;
 }
 
@@ -219,14 +222,14 @@ function output_check_for_sickness($me,$mycards)
   echo '';
   echo '    '._('Do you want to play solo?').'';
   echo '    <select name="solo" size="1">';
-  echo '      <option selected="selected">'.'No'.'</option>';
-  echo '      <option>'.'trumpless'.'</option>';
-  echo '      <option>'.'trump'.'</option>';
-  echo '      <option>'.'queen'.'</option>';
-  echo '      <option>'.'jack'.'</option>';
-  echo '      <option>'.'club'.'</option>';
-  echo '      <option>'.'spade'.'</option>';
-  echo '      <option>'.'heart'.'</option>';
+  echo '      <option value="No" selected="selected">'.'No'.'</option>';
+  echo '      <option value="trumpless">'._('trumpless').'</option>';
+  echo '      <option value="trump">'._('trump').'</option>';
+  echo '      <option value="queen">'._('queen').'</option>';
+  echo '      <option value="jack">'._('jack').'</option>';
+  echo '      <option value="club">'._('club').'</option>';
+  echo '      <option valvue="spade">'._('spade').'</option>';
+  echo '      <option value="hear">'._('heart').'</option>';
   echo '    </select>';
   echo '    <br />';
 
@@ -376,24 +379,36 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard025.css" />
-     <script type="text/javascript" src="include/game.js"> </script>
+     <link rel="stylesheet" type="text/css" href="css/standard028.css" />
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
+     <script type="text/javascript" src="include/game.js"> </script>
      <script type="text/javascript">
         $(document).ready(function()
 	   {
               $("#ScoreTable").tablesorter({ widgets: ['zebra']});
 
 	      $(".gameshidesession").click( function () {
-		  $(this).parent().children(".gamessession").toggle(300);
+		  $(this).parent().children(".gamessession").hide(300);
+		  $(this).parent().children(".gamesshowsession").show();
+		  $(this).hide();
+		});
+
+	      $(".gamesshowsession").click( function () {
+		  $(this).parent().children(".gamessession").show(300);
+		  $(this).parent().children(".gameshidesession").show();
+		  $(this).hide();
 		});
 
 	      $(".gameshowall").click( function () {
 		  $(".gamessession").show(300);
+		  $(".gamesshowsession").hide();
+		  $(".gameshidesession").show();
 		});
 	      $(".gamehideall").click( function () {
 		  $(".gamessession").hide(300);
+		  $(".gamesshowsession").show();
+		  $(".gameshidesession").hide();
 		});
 
 
@@ -414,11 +429,11 @@ function output_header()
 
 function output_footer()
 {
-  global $REV,$PREF;
+  global $REV, $PREF, $INDEX;
 
   echo "</div>\n\n";
   echo "<div class=\"footer\">\n";
-  echo "  <p class=\"left\"> copyright 2006,2007,2008,2009,2010 Arun Persaud, Lance Thornton(graphics),  Jeff Zerger(database support) <br />\n".
+  echo "  <p class=\"left\"> copyright 2006,2007,2008,2009,2010 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
     "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";

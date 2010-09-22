@@ -531,7 +531,7 @@ switch($mystatus)
     $mycards = DB_get_hand($me);
     $mycards = mysort($mycards,$gametype);
 
-    /* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+    /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
     echo "\n<ul class=\"tricks\">\n";
     echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
     echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
@@ -1291,17 +1291,19 @@ switch($mystatus)
     echo '  <li class="nohighlight"> '._('Game').' '.DB_format_gameid($gameid).": </li>\n";
 
     /* output vorbehalte */
-    $mygametype =  DB_get_gametype_by_gameid($gameid);
-    if($mygametype != 'normal' && $mygametype != 'silent') /* only show when needed */
-      {
-	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	     "    <div class=\"trick\" id=\"trick0\">\n";
+    $mygametype = DB_get_gametype_by_gameid($gameid);
+    $mygamesolo = DB_get_solo_by_gameid($gameid);
+    if($mygametype != 'normal') /* only show when needed */
+      if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
+	{
+	  echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+	    "    <div class=\"trick\" id=\"trick0\">\n";
 
-	/* get information so show the cards that have been handed over in a poverty game */
-	output_exchanged_cards();
+	  /* get information so show the cards that have been handed over in a poverty game */
+	  output_exchanged_cards();
 
-	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
-      }
+	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	}
 
     /* output tricks */
     while($r = DB_fetch_array($result))
@@ -1988,6 +1990,38 @@ switch($mystatus)
 	if(have_suit($mycards,$firstcard))
 	  $followsuit = 1;
 
+	/* count how many cards we can play, so that we can pre-select it if there is only one */
+	$howmanycards = 0;
+	foreach($mycards as $card)
+	  {
+	    if($howmanycard>1)
+	      break;
+
+	    /* display only cards that the player is allowed to play as links, the rest just display normal
+	     * also check if we have both schweinchen, in that case only display on of them as playable
+	     */
+	    if( ($followsuit && !same_type($card,$firstcard)) ||
+		( (int)($card)==19 &&
+		  !$GAME['schweinchen-first'] &&
+		  ( $RULES['schweinchen']=='second' ||
+		    ( $RULES['schweinchen']=='secondaftercall' &&
+		     (DB_get_call_by_hash($GAME['schweinchen-who']) ||
+		      DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
+		    )
+		  ) &&
+		  $GAME['schweinchen-who']==$me &&
+		  in_array($gametype,array('normal','wedding','trump','silent'))
+		  )
+		)
+	      continue ;
+	    else
+	      $howmanycards++;
+	  }
+	if($howmanycards==1)
+	  $howmanycards=1;
+	else
+	  $howmanycards=0;
+
 	foreach($mycards as $card)
 	  {
 	    /* display only cards that the player is allowed to play as links, the rest just display normal
@@ -2008,7 +2042,7 @@ switch($mystatus)
 		)
 	      display_card($card,$PREF['cardset']);
 	    else
-	      display_link_card($card,$PREF['cardset']);
+	      display_link_card($card,$PREF['cardset'],$selected=$howmanycards);
 	  }
       }
     else if($mystatus=='play' )

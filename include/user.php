@@ -25,20 +25,22 @@ if(!isset($HOST))
   exit;
 
 /* test id and password, should really be done in one step */
-if(!isset($_SESSION["name"]))
+if(!isset($_SESSION['name']))
   {
-    $email     = $_REQUEST["email"];
-    $password  = $_REQUEST["password"];
+    $email     = $_REQUEST['email'];
+    $password  = $_REQUEST['password'];
   }
 else
   {
-    $name = $_SESSION["name"];
+    $name = $_SESSION['name'];
     $email     = DB_get_email('name',$name);
     $password  = DB_get_passwd_by_name($name);
   };
 
+global  $ADMIN_NAME;
+
 /* user has forgotten his password */
-if(myisset("forgot"))
+if(myisset('forgot'))
   {
     /* check if player is in the database */
     $ok = 1;
@@ -55,16 +57,16 @@ if(myisset("forgot"))
 	/* if less than N recent ones, add a new one and send out email */
 	if( $number < 5 )
 	  {
-	    echo "Ok, I send you a new password. <br />";
+	    echo _('Ok, I will send you a new password.').' <br />';
 	    if($number >1)
 	      echo "N.B. You tried this already $number times during the last day and it will only work ".
 		" 5 times during a day.<br />";
-	    echo "The new password will be valid for one day, make sure you reset it to something else.<br />";
+	    echo _('The new password will be valid for one day, make sure you reset it to something else.').'<br />';
 	    echo "Back to the  <a href=\"$INDEX\">main page</a>.";
 
 	    /* create temporary password, use the fist 8 letters of a md5 hash */
 	    $TIME  = (string) time(); /* to avoid collisions */
-	    $hash  = md5("Anewpassword".$email.$TIME);
+	    $hash  = md5('Anewpassword'.$email.$TIME);
 	    $newpw = substr($hash,1,8);
 
 	    $message = "Someone (hopefully you) requested a new password. \n".
@@ -83,8 +85,8 @@ if(myisset("forgot"))
 	  {
 	    /* make it so that people (or a robot) can request thousands of passwords within a short time
 	     * and spam a user this way */
-	    echo "Sorry you already tried 5 times during the last 24h.<br />".
-	      "You need to use one of those passwords or wait to get a new one.<br />";
+	    echo _('Sorry you already tried 5 times during the last 24h.<br />'.
+		   'You need to use one of those passwords or wait to get a new one.').'<br />';
 	    echo "Back to the <a href=\"$INDEX\">main page</a>.";
 	  }
       }
@@ -97,7 +99,7 @@ if(myisset("forgot"))
 	    "Please try <a href=\"$INDEX\">again</a>.";
 	else /* default error message */
 	  echo "Couldn't find a player with this email! <br />".
-	    "Please contact Arun, if you think this is a mistake <br />".
+	    "Please contact $ADMIN_NAME, if you think this is a mistake <br />".
 	    "or else try <a href=\"$INDEX\">again</a>.";
       }
   }
@@ -117,7 +119,7 @@ else
       {
 	/* user information is ok */
 	$myname = DB_get_name('email',$email);
-	$_SESSION["name"] = $myname;
+	$_SESSION['name'] = $myname;
 
 	$PREF = DB_get_PREF($myid);
 
@@ -126,7 +128,7 @@ else
 	display_user_menu($myid);
 
 	/* display all games the user has played */
-	echo "<div class=\"user\">";
+	echo '<div class="user">';
 
 	if($myvacation = check_vacation($myid))
 	  {
@@ -255,7 +257,8 @@ else
 
 			if($maxgame>1)
 			  {
-			    $output_active .= ' <span class="gameshidesession link">'._('(hide/show) old').'</span><br />'."\n";
+			    $output_active .= ' <span class="gamesshowsession"><a href="#">'._('show old').'</a></span>'.
+			      '  <span class="gameshidesession"><a href="#">'._('hide old').'</a></span><br />'."\n";
 			    $output_active .= ' <span class="gamessession">'.$sessionoutput.'</span>';
 			  }
 
@@ -296,9 +299,9 @@ else
 	  }
 
 	echo "<ul>\n ";
-	echo ' <li><span class="gameshowall link">'._('show all').'</span> <span class="gamehideall link">'._('hide all')."</span></li>\n";
+	echo ' <li><span class="gameshowall"><a href="#">'._('show all').'</a></span> <span class="gamehideall"><a href="#">'._('hide all')."</a></span></li>\n";
 	echo $output_active;
-	echo ' <li><span class="gameshidesession link">'._('hide/show inactive').'</span><ul class="gamessession">'."$output_inactive </ul></li>";
+	echo ' <li><span class="gamesshowsession"><a href="#">'._('show inactive').'</a></span><span class="gameshidesession"><a href="#">'._('hide inactive').'</a></span><ul class="gamessession">'."$output_inactive </ul></li>";
 	echo "</ul>\n";
 
 	/* give a hint for new players */
@@ -326,7 +329,7 @@ else
       }
     else
       {
-	echo "<div class=\"message\">Sorry email and password don't match. Please <a href=\"$INDEX\">try again</a>. </div>";
+	echo '<div class="message">'."Sorry email and password don't match. Please <a href=\"$INDEX\">try again</a>.".' </div>';
       }
   };
 ?>

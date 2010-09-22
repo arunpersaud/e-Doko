@@ -337,12 +337,12 @@ if($PREF['vacation_start'])
   $value = substr($PREF['vacation_start'],0,10);
  else
    $value = '';
-echo "            <td>start:<input type=\"text\" id=\"vacation_start\" name=\"vacation_start\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
+echo "            <td>"._('start').":<input type=\"text\" id=\"vacation_start\" name=\"vacation_start\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
 if($PREF['vacation_stop'])
   $value = substr($PREF['vacation_stop'],0,10);
  else
    $value = '';
-echo "            <td>stop:<input type=\"text\" id=\"vacation_stop\" name=\"vacation_stop\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
+echo "            <td>"._('stop').":<input type=\"text\" id=\"vacation_stop\" name=\"vacation_stop\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
 if($PREF['vacation_comment'])
   $value = $PREF['vacation_comment'];
 else
@@ -351,8 +351,8 @@ echo '            <td>'._('comment:')."<input type=\"text\" id=\"vacation_commen
 if($changed_vacation == 1) echo _('changed');
 if($changed_vacation == -1) echo _('wrong date format');
 echo "</td></tr>\n";
-echo "<tr><td></td><td>use YYYY-MM-DD</td><td>use '-'  in start field to unset vacation</td></tr>\n";
-echo "        <tr><td>Notification:          </td><td>\n";
+echo '<tr><td></td><td>'._('use YYYY-MM-DD').'</td><td>'._("use '-'  in start field to unset vacation")."</td></tr>\n";
+echo '        <tr><td>'._('Notification').":          </td><td>\n";
 echo "          <select id=\"notify\" name=\"notify\" size=\"1\">\n";
 if($PREF['email']=="emailaddict")
   {
@@ -368,13 +368,13 @@ echo "          </select>";
 if($changed_notify) echo _('changed');
 echo " </td></tr>\n";
 
-echo "        <tr><td>Digest:          </td><td>\n";
+echo '        <tr><td>'._('Digest').":          </td><td>\n";
 echo "          <select id=\"digest\" name=\"digest\" size=\"1\">\n";
 
 $selected = "selected=\"selected\"";
 echo "            <option value=\"digest-off\"";
 if($PREF['digest']=="digest-off") echo $selected;
-echo ">digest off</option>\n";
+echo '>'._('digest off')."</option>\n";
 
 echo "            <option value=\"digest-1h\" ";
 if($PREF['digest']=="digest-1h") echo $selected;
@@ -409,7 +409,7 @@ if($changed_digest) echo _('changed');
 echo " </td></tr>\n";
 
 
-echo "        <tr><td>Autosetup:          </td><td>\n";
+echo '        <tr><td>'._('Autosetup').":          </td><td>\n";
 echo "          <select id=\"autosetup\" name=\"autosetup\" size=\"1\">\n";
 if($PREF['autosetup']=="yes")
   {
@@ -440,33 +440,33 @@ if($PREF['sorting']=="high-low")
 echo "         </select>";
 if($changed_sorting) echo _('changed');
 echo " </td></tr>\n";
-echo "        <tr><td>Open for new games:          </td><td>\n";
+echo '        <tr><td>'._('Open for new games').":          </td><td>\n";
 echo "         <select id=\"open_for_games\" name=\"open_for_games\" size=\"1\">\n";
 if($PREF['open_for_games']=="no")
   {
-    echo "           <option value=\"yes\">yes</option>\n";
+    echo "           <option value=\"yes\">"._('yes')."</option>\n";
     echo "           <option value=\"no\" selected=\"selected\">no</option>\n";
   }
  else /* default */
    {
      echo "           <option value=\"yes\" selected=\"selected\">yes</option>\n";
-     echo "           <option value=\"no\">no</option>\n";
+     echo "           <option value=\"no\">"._('no')."</option>\n";
    }
 echo "         </select>";
 if($changed_openforgames) echo _('changed');
 echo " </td></tr>\n";
 
-echo "    <tr><td>Card set:              </td><td>\n";
+echo '    <tr><td>'.('Card set').":              </td><td>\n";
 echo "         <select id=\"cards\" name=\"cards\" size=\"1\">\n";
 if($PREF['cardset']=="altenburg")
   {
-    echo "           <option value=\"altenburg\" selected=\"selected\">German cards</option>\n";
-    echo "           <option value=\"english\">English cards</option>\n";
+    echo "           <option value=\"altenburg\" selected=\"selected\">"._('German cards')."</option>\n";
+    echo "           <option value=\"english\">"._('English cards')."</option>\n";
   }
  else
    {
-     echo "           <option value=\"altenburg\">German cards</option>\n";
-     echo "           <option value=\"english\" selected=\"selected\">English cards</option>\n";
+     echo "           <option value=\"altenburg\">"._('German cards')."</option>\n";
+     echo "           <option value=\"english\" selected=\"selected\">"._('English cards')."</option>\n";
    }
 echo "         </select>";
 if($changed_cards) echo _('changed');
@@ -474,45 +474,45 @@ echo " </td></tr>\n";
 echo "      </table>\n";
 echo "    </fieldset>\n";
 echo "    <fieldset>\n";
-echo "      <legend>Personal</legend>\n";
+echo '      <legend>'._('Personal')."</legend>\n";
 echo "      <table>\n";
-echo "        <tr><td>Email:                 </td><td> $email    </td></tr>\n";
-echo "        <tr><td>Timezone:              </td><td>\n";
+echo '        <tr><td>'._('Email').":                 </td><td> $email    </td></tr>\n";
+echo '        <tr><td>'._('Timezone').":              </td><td>\n";
 output_select_timezone("timezone",$timezone);
 if($changed_timezone) echo _('changed');
 echo "</td></tr>\n";
-echo "        <tr><td>Language:              </td><td>\n";
+echo '        <tr><td>'._('Language').":              </td><td>\n";
 output_select_language("language",$PREF['language']);
 if($changed_language == 1) echo _('changed');
 echo "</td></tr>\n";
-echo "        <tr><td>Password(old):         </td><td>",
+echo '        <tr><td>'._('Password(old)').":         </td><td>",
   "<input type=\"password\" id=\"password0\" name=\"password0\" size=\"20\" maxlength=\"30\" />";
 switch($changed_password)
   {
   case '-3':
-    echo "The new passwords is not long enough (you need at least 4 characters).";
+    echo _('The new passwords is not long enough (you need at least 4 characters).');
     break;
   case '-2':
-    echo "The new passwords don't match.";
+    echo _('The new passwords don\'t match.');
     break;
   case '-1':
-    echo "The old password is not correct.";
+    echo _('The old password is not correct.');
     break;
   case '1':
     echo _('changed');
     break;
   }
 echo " </td></tr>\n";
-echo "        <tr><td>Password(new):         </td><td>",
+echo '        <tr><td>'._('Password(new)').":         </td><td>",
   "<input type=\"password\" id=\"password1\" name=\"password1\" size=\"20\" maxlength=\"30\" />",
   " </td></tr>\n";
-echo "        <tr><td>Password(new, retype): </td><td>",
+echo '        <tr><td>'._('Password(new, retype)').": </td><td>",
   "<input type=\"password\" id=\"password2\" name=\"password2\" size=\"20\" maxlength=\"30\" />",
   " </td></tr>\n";
 echo "      </table>\n";
 echo "    </fieldset>\n";
 echo "    <fieldset>\n";
-echo "      <legend>OpenID</legend>\n";
+echo '      <legend>'._('OpenID')."</legend>\n";
 
 $openids = array();
 $openids = DB_GetOpenIDsByUser($myid);
@@ -531,14 +531,14 @@ if(sizeof($openids))
     echo "     </table>\n";
   }
 
-echo "        add OpenID: ",
+echo '        '._('add OpenID').': ',
   "<input type=\"text\" id=\"openid_url\" name=\"openid_url\" size=\"20\" maxlength=\"50\" />";
 if($changed_openid)
-  echo "   Deleted some OpenIDs! <br />\n";
+  echo '   '._('Deleted some OpenIDs!')." <br />\n";
 echo "    </fieldset>\n";
-echo "    <fieldset><legend>Submit</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
+echo '    <fieldset><legend>'._('Submit')."</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
 echo "  </form>\n";
-echo " <p>E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons.</p>";
+echo ' <p>'._('E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons.').'</p>';
 echo "</div>\n";
 
 return;
