@@ -1994,7 +1994,7 @@ switch($mystatus)
 	$howmanycards = 0;
 	foreach($mycards as $card)
 	  {
-	    if($howmanycard>1)
+	    if($howmanycards>1)
 	      break;
 
 	    /* display only cards that the player is allowed to play as links, the rest just display normal
@@ -2013,10 +2013,11 @@ switch($mystatus)
 		  in_array($gametype,array('normal','wedding','trump','silent'))
 		  )
 		)
-	      continue ;
+	      continue;
 	    else
 	      $howmanycards++;
 	  }
+
 	if($howmanycards==1)
 	  $howmanycards=1;
 	else
@@ -2042,7 +2043,7 @@ switch($mystatus)
 		)
 	      display_card($card,$PREF['cardset']);
 	    else
-	      display_link_card($card,$PREF['cardset'],$selected=$howmanycards);
+	      display_link_card($card,$PREF['cardset'],$type='card',$selected=$howmanycards);
 	  }
       }
     else if($mystatus=='play' )

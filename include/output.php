@@ -205,7 +205,7 @@ function display_card($card,$dir="english")
 function display_link_card($card,$dir="english",$type="card", $selected=0)
 {
   if($selected)
-    $selected = 'selected="selected"';
+    $selected = 'checked="checked"';
 
   if( $card/2 - (int)($card/2) == 0.5)
     echo "<div class=\"cardinput\"><input type=\"radio\" name=\"".$type."\" value=\"".$card."\" $selected /><img src=\"cards/".$dir."/".$card.".png\" alt=\"".DB_get_card_name($card)."\" /></div>\n";
