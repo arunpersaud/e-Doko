@@ -440,8 +440,8 @@ function output_footer()
  echo " <p class=\"right\"> See the latest changes <a href=\"http://nubati.net/cgi-bin/gitweb.cgi?p=e-DoKo.git;a=summary\">\n".
     "  via git </a> <br />or download the source via <br />\n'git clone http://nubati.net/git/e-DoKo.git' <br />\n".
     "  <a href=\"http://www.dreamhost.com/green.cgi\">\n".
-    "  <img  border=\"0\" alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
-    "src=\"https://secure.newdream.net/green1.gif\" height=\"32\" width=\"100\" /></a>\n".
+    "  <img alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
+    " src=\"https://secure.newdream.net/green1.gif\" height=\"32\" width=\"100\" /></a>\n".
     "  </p> \n";
   echo "\n";
   echo "</div>\n";

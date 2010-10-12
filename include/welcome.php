@@ -99,7 +99,7 @@ if($done==0)
 <?php
   if($OPENIDPATH)
     {?>
-    <hr>
+    <hr />
     <p> Have an OpenID account? Sign in below <br />
     <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" />
     <input type="submit" class="submitbutton" name="login" value="Sign in" /><br />

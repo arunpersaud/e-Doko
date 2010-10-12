@@ -938,7 +938,7 @@ function display_table ()
       $lastlogin = strtotime($r[6]);
       date_default_timezone_set($timezone);
       $timenow   = strtotime(date("Y-m-d H:i:s"));
-      $gravatar = "$name<br /><img class=\"gravatar\" title=\"$name\" src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" />";
+      $gravatar = "$name<br /><img class=\"gravatar\" title=\"$name\" src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" alt=\"$name's gravatar\" />";
 
 
       echo "  <div class=\"table".($pos-1)."\">\n";
@@ -971,12 +971,12 @@ function display_table ()
 	    $cards    = DB_get_all_hand($userhash);
 	    $trumpNR  = count_trump($cards,'all');
 	    if($trumpNR)
-	      echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" title=\"poverty - trump back\" />";
+	      echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty - trump back\" title=\"poverty - trump back\" />";
 	    else
-	      echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" title=\"poverty - no trump back\" />";
+	      echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty - no trump back\" title=\"poverty - no trump back\" />";
 	  }
 	else
-	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" title=\"poverty partner\" />";
+	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty partner\" title=\"poverty partner\" />";
 
       if($GT=="dpoverty")
 	if($party=="re")
