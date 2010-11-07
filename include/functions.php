@@ -856,12 +856,12 @@ function can_call($what,$hash)
 	}
       else if ( 9 == ($NRcards + $offset))
 	{
-	  if( ($mincall>=0 && $mincall==120) )
+	  if( ($mincall>=0 && $mincall<=120 && $what<=90 ) )
 	    return 2;
 	}
       else if ( 9 < ($NRcards + $offset))
 	{
-	  if( ($mincall>=0 && $mincall==120) )
+	  if( ($mincall>=0 && $mincall<=120 && $what<=90 ) )
 	    return 1;
 	}
       else if ( 6 == ($NRcards + $offset))
