@@ -86,7 +86,7 @@ if(myisset('vacation_start','vacation_stop','vacation_comment') &&
       $changed_vacation = -1;
 
     /* test if we should delete the entry */
-    if($vacation_start == '- 00:00:00')
+    if($_REQUEST['vacation_start'] == $_REQUEST['vacation_stop'])
       {
 	$result = DB_query("DELETE FROM User_Prefs".
 			   " WHERE user_id='$myid' AND pref_key='vacation start'" );
@@ -337,12 +337,12 @@ if($PREF['vacation_start'])
   $value = substr($PREF['vacation_start'],0,10);
  else
    $value = '';
-echo "            <td>"._('start').":<input type=\"text\" id=\"vacation_start\" name=\"vacation_start\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
+echo "            <td>"._('start').":<input type=\"date\" class=\"date\" name=\"vacation_start\" value=\"$value\" /></td>\n";
 if($PREF['vacation_stop'])
   $value = substr($PREF['vacation_stop'],0,10);
  else
    $value = '';
-echo "            <td>"._('stop').":<input type=\"text\" id=\"vacation_stop\" name=\"vacation_stop\" size=\"10\" maxlength=\"10\" value=\"$value\" /></td>\n";
+echo "            <td>"._('stop').":<input type=\"date\" class=\"date\" name=\"vacation_stop\" value=\"$value\" /></td>\n";
 if($PREF['vacation_comment'])
   $value = $PREF['vacation_comment'];
 else
@@ -351,7 +351,7 @@ echo '            <td>'._('comment:')."<input type=\"text\" id=\"vacation_commen
 if($changed_vacation == 1) echo _('changed');
 if($changed_vacation == -1) echo _('wrong date format');
 echo "</td></tr>\n";
-echo '<tr><td></td><td>'._('use YYYY-MM-DD').'</td><td>'._("use '-'  in start field to unset vacation")."</td></tr>\n";
+echo '<tr><td></td><td colspan="2">'._("set both dates to the same day to end vacation")."</td></tr>\n";
 echo '        <tr><td>'._('Notification').":          </td><td>\n";
 echo "          <select id=\"notify\" name=\"notify\" size=\"1\">\n";
 if($PREF['email']=="emailaddict")
@@ -540,6 +540,21 @@ echo '    <fieldset><legend>'._('Submit')."</legend><input type=\"submit\"  name
 echo "  </form>\n";
 echo ' <p>'._('E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons.').'</p>';
 echo "</div>\n";
+
+// add jquery date picker if html5 is not available
+?>
+<script>
+  var i = document.createElement("input");
+  i.setAttribute("type", "date");
+  if (i.type == "text") {
+    $(":date").dateinput({
+
+        format: 'yyyy-mm-dd',
+      });
+  }
+</script>
+<?php
+
 
 return;
 ?>
