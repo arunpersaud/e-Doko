@@ -326,6 +326,7 @@ switch($mystatus)
       {
 	/* asks the player, if he wants to join the game */
 	output_check_want_to_play($me);
+	echo '<div class="mycards"></div>';
 	break;
       }
     else
@@ -520,6 +521,7 @@ switch($mystatus)
 
 	    /* move on to the next stage*/
 	    DB_set_hand_status_by_hash($me,'check');
+	    $mystatus='check';
 	  };
       };
 
@@ -834,6 +836,12 @@ switch($mystatus)
 	      }
 	  }
 	echo "</div>\n";
+	/* show cards */
+	echo '<div class="mycards">'._('Your cards are').": <br />\n";
+	foreach($mycards as $card)
+	  display_card($card,$PREF['cardset']);
+	echo "</div>\n";
+
 	break;
       }
 
