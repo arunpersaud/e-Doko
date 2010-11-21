@@ -91,7 +91,12 @@ if($done==0)
   <form action="index.php?action=login" method="post">
   <fieldset>
     <label for="email">Email:</label>
-    <input type="text" id="email" name="email" size="20" maxlength="30" /> <br />
+    <input type="text" id="email" name="email" size="20" maxlength="30" autofocus /> <br />
+    <script>
+    if (!("autofocus" in document.createElement("input"))) {
+      document.getElementById("email").focus();
+    }
+    </script>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" size="20" maxlength="30" /> <br />
     <input type="submit" class="submitbutton" name="login" value="login" />
