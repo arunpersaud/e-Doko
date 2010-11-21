@@ -1706,8 +1706,8 @@ switch($mystatus)
 		 */
 
 		/* get calls from re/contra */
-		$call_re     = NULL;
-		$call_contra = NULL;
+		$call_re     = -1;
+		$call_contra = -1;
 		foreach($userids as $user)
 		  {
 		    $hash  = DB_get_hash_from_gameid_and_userid($gameid,$user);
@@ -1720,14 +1720,14 @@ switch($mystatus)
 
 			if($party=='re')
 			  {
-			    if($call_re==NULL)
+			    if($call_re== -1)
 			      $call_re = $call;
 			    else if( $call < $call_re)
 			      $call_re = $call;
 			  }
 			else if($party=='contra')
 			  {
-			    if($call_contra==NULL)
+			    if($call_contra== -1)
 			      $call_contra = $call;
 			    else if( $call < $call_contra)
 			      $call_contra = $call;
@@ -1738,7 +1738,7 @@ switch($mystatus)
 		/* figure out who one */
 		$winning_party = NULL;
 
-		if($call_re == NULL && $call_contra==NULL)
+		if($call_re == -1 && $call_contra == -1)
 		  {
 		    /* nobody made a call, so it's easy to figure out who won */
 		    if($re>120)
@@ -1752,7 +1752,7 @@ switch($mystatus)
 		     * if only one party made a call, the other one wins,
 		     * if the first one didn't make it
 		     */
-		    if($call_re)
+		    if($call_re != -1)
 		      {
 			$offset = 120 - $call_re;
 			if($call_re == 0)
@@ -1760,11 +1760,11 @@ switch($mystatus)
 
 			if($re > 120+$offset)
 			  $winning_party='re';
-			else if ($call_contra == NULL )
+			else if ($call_contra == -1 )
 			  $winning_party='contra';
 		      }
 
-		    if($call_contra)
+		    if($call_contra != -1)
 		      {
 			$offset = 120 - $call_contra;
 			if($call_contra == 0)
@@ -1772,7 +1772,7 @@ switch($mystatus)
 
 			if($contra > 120+$offset)
 			  $winning_party='contra';
-			else if ($call_re == NULL )
+			else if ($call_re == -1 )
 			  $winning_party='re';
 		      }
 		  }
@@ -1780,7 +1780,7 @@ switch($mystatus)
 		/* one point for each call of the other party in case the other party didn't win
 		 * and one point each in case the party made more than points than one of the calls
 		 */
-		if($winning_party!='contra' && $call_contra!=NULL)
+		if($winning_party!='contra' && $call_contra!= -1)
 		  {
 		    for( $p=$call_contra;$p<=120; $p+=30 )
 		      {
@@ -1795,7 +1795,7 @@ switch($mystatus)
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
 			}
 		    }
-		  if($winning_party!='re' and $call_re!=NULL)
+		  if($winning_party!='re' and $call_re!= -1)
 		    {
 		      for( $p=$call_re;$p<=120; $p+=30 )
 			{
@@ -1824,7 +1824,7 @@ switch($mystatus)
 		      foreach(array(120,150,180,210,240) as $p)
 			{
 			  $offset = 0;
-			  if($p==240 || $call_contra!=NULL)
+			  if($p==240 || $call_contra != -1)
 			    $offset = 1;
 
 			  if($re>$p-$offset)
@@ -1834,7 +1834,7 @@ switch($mystatus)
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
-			  if($call_re!=NULL && $call_re<$p+1)
+			  if($call_re!= -1 && $call_re<$p+1)
 			    DB_query("INSERT INTO Score".
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
 			}
@@ -1844,7 +1844,7 @@ switch($mystatus)
 		      foreach(array(120,150,180,210,240) as $p)
 			{
 			  $offset = 0;
-			  if($p==240 || $call_re!=NULL)
+			  if($p==240 || $call_re != -1)
 			    $offset = 1;
 
 			  if($contra>$p-$offset)
@@ -1854,7 +1854,7 @@ switch($mystatus)
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
-			  if($call_contra!=NULL && $call_contra<$p+1)
+			  if($call_contra != -1 && $call_contra<$p+1)
 			    DB_query("INSERT INTO Score".
 				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
 			}
