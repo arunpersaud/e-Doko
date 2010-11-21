@@ -379,7 +379,7 @@ function output_header()
      <title>e-Doko</title>
      <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
      <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard028.css" />
+     <link rel="stylesheet" type="text/css" href="css/standard.css?v=29" />
      <link rel="stylesheet" type="text/css" href="css/dateinput.css?v=1"/>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>

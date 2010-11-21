@@ -643,7 +643,7 @@ table.stats thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
   padding-top: 1em;
 }
 
-.login p, {
+.login p {
   padding: 0.1em 0.1em 0.15em;
 }
 .login h4 {
