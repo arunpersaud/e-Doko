@@ -59,7 +59,7 @@ echo "<p> If you want to play a game of Doppelkopf, you found the right place ;)
 if($pre == 0)
   echo "<p> At the moment there are no games that are being started ";
  else if($pre==1)
-   echo "<p> At the moment there is one games that is being started ";
+   echo "<p> At the moment there is one game that is being started ";
  else
    echo "<p> At the moment there are $pre games that are being started ";
 
