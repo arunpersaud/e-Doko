@@ -79,6 +79,9 @@ if( $gamestatus == 'pre' )
   {
     /* always need to use Schweinchen to figure out for example who has poverty */
     $ok=1;
+    /* unless the gametype is set and we know that we are in poverty were schweinchen is not valid */
+    if( in_array( $gametype,array('poverty','dpoverty') ))
+      $ok=0;
   }
 else
   {
