@@ -945,6 +945,7 @@ switch($mystatus)
 	  }
 	else
 	  echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
+	echo '<div class="mycards"></div>'."\n"; /* needed to make sure the message area is in the right position */
       }
 
     /* the following is part A) of what needs to be done */
