@@ -62,8 +62,7 @@ if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
     $userids = DB_get_all_userid_by_gameid($gameid);
     foreach($userids as $user)
       {
-	$subject = "Game ".DB_format_gameid($gameid)." canceled (timed out)";
-	mymail($user,$subject,$message);
+	mymail($user,$gameid, GAME_CANCELED_TIMEOUT, $message);
       }
 
     /* set gamestatus to canceled */

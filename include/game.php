@@ -344,8 +344,7 @@ switch($mystatus)
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
 	      {
-		$subject = 'Game '.DB_format_gameid($gameid).' canceled';
-		mymail($user,$subject,$message);
+		mymail($user,$gameid,GAME_CANCELED,$message);
 	      }
 
 	    /* update game status */
@@ -394,7 +393,7 @@ switch($mystatus)
 
 		     $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		     "Use this link to go the game: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		     mymail($who,"Ready, set, go... (game ".DB_format_gameid($gameid).") ",$message);
+		     mymail($who, $gameid, GAME_READY,$message);
 		    */
 		  }
 	      }
@@ -669,8 +668,7 @@ switch($mystatus)
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
 	      {
-		$subject = 'Game '.DB_format_gameid($gameid).' canceled';
-		mymail($user,$subject,$message);
+		mymail($user,$gameid, GAME_CANCELED, $message);
 	      }
 
 	    echo "</div>\n"; /* end div message */
@@ -807,8 +805,7 @@ switch($mystatus)
 		    /* email startplayer */
 		    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		    $subject = 'Ready, set, go... (game '.DB_format_gameid($gameid).')';
-		    mymail($who,$subject,$message);
+		    mymail($who,$gameid,GAME_READY,$message);
 		  }
 	      }
 	    else
@@ -833,8 +830,7 @@ switch($mystatus)
 		    /* email player for poverty */
 		    $message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
-		    $subject = 'Poverty (game '.DB_format_gameid($gameid).') ';
-		    mymail($whoid,$subject,$message);
+		    mymail($whoid,$gameid,GAME_POVERTY,$message);
 		  }
 	      }
 	  }
@@ -939,8 +935,7 @@ switch($mystatus)
 		/* email startplayer */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		$subject = 'Ready, set, go... (game '.DB_format_gameid($gameid).') ';
-		mymail($who,$subject,$message);
+		mymail($who,$gameid,GAME_READY,$message);
 	      }
 	  }
 	else
@@ -1023,8 +1018,7 @@ switch($mystatus)
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		foreach($userids as $user)
 		  {
-		    $subject = 'Game '.DB_format_gameid($gameid).' canceled (poverty not resolved)';
-		    mymail($user,$subject,$message);
+		    mymail($user, $gameid, GAME_CANCELED_POVERTY, $message);
 		  }
 
 		/* update game status */
@@ -1044,8 +1038,7 @@ switch($mystatus)
 
 		$message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
 		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-		$subject = 'Poverty (game '.DB_format_gameid($gameid).')';
-		mymail($userid,$subject,$message);
+		mymail($userid,$gameid, GAME_POVERTY, $message);
 	      }
 	  }
 	else
@@ -1136,8 +1129,7 @@ switch($mystatus)
 
 		    $message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
 		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-		    $subject = 'Double poverty (game '.DB_format_gameid($gameid).')';
-		    mymail($userid,$subject,$message);
+		    mymail($userid,$gameid, GAME_DPOVERTY, $message);
 		  }
 	      }
 	    echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
@@ -1210,8 +1202,7 @@ switch($mystatus)
 		/* email startplayer) */
 		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		$subject = 'Ready, set, go... (game '.DB_format_gameid($gameid).')';
-		mymail($who,$subject,$message);
+		mymail($who,$gameid, GAME_READY, $message);
 	      }
 	  }
       }
@@ -1664,8 +1655,7 @@ switch($mystatus)
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
 		if( DB_get_email_pref_by_uid($who)!='emailaddict' )
 		  {
-		    $subject = 'A card has been played in game '.DB_format_gameid($gameid);
-		    mymail($who,$subject,$message);
+		    mymail($who,$gameid, GAME_YOUR_TURN, $message);
 		  }
 	      }
 	    else /* send out final email */
@@ -1907,8 +1897,7 @@ switch($mystatus)
 		      $message .= $link;
 		    }
 		  $message .= "\n\n (you can use reply all on this email to reach all the players.)\n\n";
-		  $subject = ' Game over (game '.DB_format_gameid($gameid).') ';
-		  mymail($userids,$subject,$message);
+		  mymail($userids,$gameid, GAME_OVER, $message);
 	      }
 	  }
 	else

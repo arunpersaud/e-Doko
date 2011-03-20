@@ -67,8 +67,7 @@ if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week
     else
       {
 	DB_set_reminder($r[1],$gameid);
-	$subject ='Reminder: game '.DB_format_gameid($gameid)." it's your turn";
-	mymail($r[1],$subject,$message);
+	mymail($r[1],$gameid, GAME_REMINDER, $message);
 
 	echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
 	  ": an email has been sent out.<br /><br /></p>";

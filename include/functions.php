@@ -73,7 +73,20 @@ function config_check()
   return;
 }
 
-function mymail($uid,$subject,$message)
+/* define possible status for email subsjects */
+define("GAME_CANCELED",         0);
+define("GAME_CANCELED_POVERTY", 1);
+define("GAME_CANCELED_TIMEOUT", 2);
+define("GAME_YOUR_TURN",        3);
+define("GAME_READY",            4);
+define("GAME_POVERTY",          5);
+define("GAME_DPOVERTY",         6);
+define("GAME_OVER",             7);
+define("GAME_RECOVERY",         8);
+define("GAME_REMINDER",         9);
+define("GAME_NEW",             10);
+
+function mymail($uid,$gameid=0,$type,$message)
 {
   global $EmailName,$WIKI;
 
@@ -81,7 +94,50 @@ function mymail($uid,$subject,$message)
   $send_now = 1;
 
   /* add standard header and footer */
-  $subject = "$EmailName".$subject;
+  $subject = "$EmailName ";
+  if($gameid)
+    $game = DB_format_gameid($gameid);
+  else
+    $game = '';
+
+  switch($type)
+    {
+    case GAME_CANCELED:
+      $subject.="Game $game canceled";
+      break;
+    case GAME_CANCELED_POVERTY:
+      $subject.="Game $game canceled (poverty not resolved)";
+      break;
+    case GAME_CANCELED_TIMEOUT:
+      $subject.="Game $game canceled (timed out)";
+      break;
+    case GAME_YOUR_TURN:
+      $subject.="A card has been played in game $game";
+      break;
+    case GAME_READY:
+      $subject.="Ready, set, go... (game $game)";
+      break;
+    case GAME_POVERTY:
+      $subject.="Poverty (game $game)";
+      break;
+    case GAME_DPOVERTY:
+      $subject.="Double poverty (game $game)";
+      break;
+    case GAME_OVER:
+      $subject.="Game over (game $game)";
+      break;
+    case GAME_RECOVERY:
+      $subject.="Recovery";
+      break;
+    case GAME_REMINDER:
+      $subject.="Reminder: game $game it's your turn";
+      break;
+    case GAME_NEW:
+      $subject.="You are invited to a game of DoKo (game $game)";
+      break;
+    default:
+      $subject.="Problem with email, contact admin (errorcode $gameid)";
+    }
 
   /* standard goodbye */
   $footer  = "\nHave a nice day\n".
