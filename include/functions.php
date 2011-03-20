@@ -103,40 +103,40 @@ function mymail($uid,$gameid=0,$type,$message)
   switch($type)
     {
     case GAME_CANCELED:
-      $subject.="Game $game canceled";
+      $subject.=sprintf(_("Game %s canceled"),$game);
       break;
     case GAME_CANCELED_POVERTY:
-      $subject.="Game $game canceled (poverty not resolved)";
+      $subject.=sprintf(_("Game %s canceled (poverty not resolved)"),$game);
       break;
     case GAME_CANCELED_TIMEOUT:
-      $subject.="Game $game canceled (timed out)";
+      $subject.=sprintf(_("Game %s canceled (timed out)"),$game);
       break;
     case GAME_YOUR_TURN:
-      $subject.="A card has been played in game $game";
+      $subject.=sprintf(_("A card has been played in game %s"),$game);
       break;
     case GAME_READY:
-      $subject.="Ready, set, go... (game $game)";
+      $subject.=sprintf(_("Ready, set, go... (game %s)"),$game);
       break;
     case GAME_POVERTY:
-      $subject.="Poverty (game $game)";
+      $subject.=sprintf(_("Poverty (game %s)"),$game);
       break;
     case GAME_DPOVERTY:
-      $subject.="Double poverty (game $game)";
+      $subject.=sprintf(_("Double poverty (game %s)"),$game);
       break;
     case GAME_OVER:
-      $subject.="Game over (game $game)";
+      $subject.=sprintf(_("Game over (game %s)"),$game);
       break;
     case GAME_RECOVERY:
-      $subject.="Recovery";
+      $subject.=_("Recovery");
       break;
     case GAME_REMINDER:
-      $subject.="Reminder: game $game it's your turn";
+      $subject.=sprintf(_("Reminder: game %s it's your turn"),$game);
       break;
     case GAME_NEW:
-      $subject.="You are invited to a game of DoKo (game $game)";
+      $subject.=sprintf(_("You are invited to a game of DoKo (game %s)"),$game);
       break;
     default:
-      $subject.="Problem with email, contact admin (errorcode $gameid)";
+      $subject.=sprintf(_("Problem with email, contact admin (errorcode %d)"),$gameid);
     }
 
   /* standard goodbye */
