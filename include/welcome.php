@@ -124,7 +124,6 @@ echo "<p> Play Doppelkopf online.</p>".
 ?>
 	       </td>
               </tr><tr>
-              </tr><tr>
 <?php
               /* random number to select robotproof question */
 	      $rand_number = mt_rand(0,3); /* to get numbers between 0 and 4  */
@@ -132,7 +131,7 @@ echo "<p> Play Doppelkopf online.</p>".
 ?>
 		<td><label for="Robotproof">Please answer this question: <?php echo output_robotproof($rand_number); ?></label></td>
 <?php
-	 echo "<td><input type=\"text\" id=\"$Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /></td>\n";
+	 echo "<td><input type=\"text\" id=\"Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /></td>\n";
 ?>
               </tr><tr>
                <td colspan="2"> <input type="submit" value="register" /></td>
@@ -140,7 +139,7 @@ echo "<p> Play Doppelkopf online.</p>".
              </table>
 <?php		     if($openid_url=='')
        echo "<p><br /><strong> IMPORTANT: passwords are going over the net as clear text, so pick an easy password. ".
-	 "No need to pick anything complicated here ;)</strong><p/>";
+	 "No need to pick anything complicated here ;)</strong></p>";
 
      echo "<p> <strong>N.B. Your email address will be exposed to other players whom you play games with. ";
      echo "</strong></p>";

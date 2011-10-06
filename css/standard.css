@@ -655,7 +655,7 @@ ul.loginregister {
   width: 24em;
   margin: 0.25em auto;
   margin-top: 1.0em;
-  padding: 0.0 em;
+  padding: 0.0em;
   padding-top:0.5em;
   text-align: right;
   z-index: 1;
@@ -679,7 +679,7 @@ ul.loginregister li:hover {background-color: #aaa; }
 .login fieldset{
   width: 24em;
   margin: 0.0em auto;
-  margin-bottom: 0.5 em;
+  margin-bottom: 0.5em;
   padding: 0.5em 0.5em  1.5em;
   text-align: center;
 }
