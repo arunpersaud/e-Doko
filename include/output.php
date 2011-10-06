@@ -572,13 +572,13 @@ function output_password_recovery($email,$password)
        <legend>Password recovery</legend>
         <table>
          <tr>
-            <td><label for="email">Old password:</label></td>
+            <td><label for="password0">Old password:</label></td>
             <td><input type="password" id="password0" name="password0" size="20" maxlength="30" /> </td>
          </tr><tr>
-            <td><label for="password">New password:</label></td>
+            <td><label for="password1">New password:</label></td>
             <td><input type="password" id="password1" name="password1" size="20" maxlength="30" /></td>
          </tr><tr>
-            <td><label for="password">Retype:</label></td>
+            <td><label for="password2">Retype:</label></td>
             <td><input type="password" id="password2" name="password2" size="20" maxlength="30" /></td>
          </tr><tr>
            <td></td>
