@@ -42,7 +42,7 @@ body { background-color: #ddd; }
 
 
 /* the header, footer, etc */
-.header {
+header {
   background-color: #fff;
   text-align:       center;
   height:           4em;
@@ -66,7 +66,7 @@ body { background-color: #ddd; }
   min-height: 40em;
 }
 
-.footer {
+footer {
   background-color: #fff;
   margin-left: 3em;
   margin-right: 3em;
@@ -75,8 +75,8 @@ body { background-color: #ddd; }
   clear:both;
   height: 8em;
 }
-.footer .right { float:right;   font-size:smaller;}
-.footer .left  { float:left;  font-size:smaller; }
+footer .right { float:right;   font-size:smaller;}
+footer .left  { float:left;  font-size:smaller; }
 
 .status {
   position:absolute;

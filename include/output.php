@@ -371,16 +371,14 @@ function output_header()
 {
    global $REV;
 ?>
-<!DOCTYPE html PUBLIC
-    "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN"
-    "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <head>
      <title>e-Doko</title>
-     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
-     <link rel="shortcut icon" type="image/x-icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" type="text/css" href="css/standard.css?v=29" />
-     <link rel="stylesheet" type="text/css" href="css/dateinput.css?v=1"/>
+     <meta charset="utf-8" />
+     <link rel="shortcut icon" href="pics/edoko-favicon.png" />
+     <link rel="stylesheet" href="css/standard.css?v=30" />
+     <link rel="stylesheet" href="css/dateinput.css?v=1"/>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
      <script type="text/javascript" src="include/jquery.tools.min.js"></script>
@@ -422,11 +420,11 @@ function output_header()
      </script>
   </head>
 <body onload="high_last();">
-<div class="header">
+<header>
 <?php
   echo '<h1> '._('Welcome to E-Doko').' </h1>';
 ?>
-</div>
+</header>
 <?php
 
   echo "<div class=\"main\">";
@@ -438,7 +436,7 @@ function output_footer()
   global $REV, $PREF, $INDEX;
 
   echo "</div>\n\n";
-  echo "<div class=\"footer\">\n";
+  echo "<footer>\n";
   echo "  <p class=\"left\"> copyright 2006,2007,2008,2009,2010 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
@@ -450,7 +448,7 @@ function output_footer()
     " src=\"https://secure.newdream.net/green1.gif\" height=\"32\" width=\"100\" /></a>\n".
     "  </p> \n";
   echo "\n";
-  echo "</div>\n";
+  echo "</footer>\n";
 
   echo "</body>\n";
   echo "</html>\n";
