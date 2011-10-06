@@ -413,6 +413,10 @@ function output_header()
 		  $(".gameshidesession").hide();
 		});
 
+	      $("ul.loginregister").click(function () {
+		  $(".dologin").slideToggle();
+		  $(".doregister").slideToggle();
+		});
 
            });
      </script>
@@ -487,12 +491,6 @@ function output_status()
       echo "</div>\n";
 
       echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n";
-    }
-  else
-    {
-      echo "\n<div class=\"status\">\n";
-      echo "<a href=\"".$INDEX."\">"._('login')."</a>\n";
-      echo "</div>\n";
     }
   return;
 }

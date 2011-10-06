@@ -51,10 +51,105 @@ $avgage	= $avgage[0];
 
 echo "\n\n<div class=\"login\">\n";
 
-echo "<p> If you want to play a game of Doppelkopf, you found the right place ;)</p>".
-"<p> For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>".
-"<h4>Some statistics:</h4>";
+echo "<p> Play Doppelkopf online.</p>".
+"<p> For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>";
+?>
+  <ul class="loginregister">
+  <li> Login </li>
+  <li> Register </li>
+  </ul>
+  <form class="dologin" action="index.php?action=login" method="post">
+  <fieldset>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" size="20" maxlength="30" autofocus /> <br />
+    <script>
+    if (!("autofocus" in document.createElement("input"))) {
+      document.getElementById("email").focus();
+    }
+    </script>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" size="20" maxlength="30" /> <br />
+    <input type="submit" class="submitbutton" name="login" value="login" />
+    <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" />
+<?php
+  if($OPENIDPATH)
+    {?>
+    <hr />
+    <label for="openid_url">Openid:</label>
+    <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" placeholder="http://username.openid.net"/> <br />
+    <p>See <a href="http://openid.net">openid.net</a> for more information.</p>
+    <input type="submit" class="submitbutton" name="login" value="Sign in" /><br />
+<?php }?>
+  </fieldset>
+  </form>
+<?php
+     /* check for openid information */
+     $openid_url = '';
+     $name	 = '';
+     $email	 = '';
+     if(myisset('openid_url'))
+       $openid_url = $_REQUEST['openid_url'];
+     if(myisset('openidname'))
+       $name       = $_REQUEST['openidname'];
+     if(myisset('openidemail'))
+       $email      = $_REQUEST['openidemail'];
 
+     echo '<div class="doregister">'; echo "\n";
+     echo '        <form action="index.php?action=register" method="post">'; echo "\n";
+     echo '          <fieldset>'; echo "\n";
+     echo '             <table>'; echo "\n";
+     echo '              <tr>'; echo "\n";
+     echo '               <td><label for="Rfullname">Full name:</label></td>'; echo "\n";
+     echo "	       <td><input type=\"text\" id=\"Rfullname\" name=\"Rfullname\" size=\"20\" maxlength=\"30\" value=\"$name\" /> </td>"; echo "\n";
+     echo '              </tr><tr>'; echo "\n";
+     echo '               <td><label for="Remail">Email:</label></td>'; echo "\n";
+     echo "	       <td><input type=\"text\" id=\"Remail\" name=\"Remail\" size=\"20\" maxlength=\"30\" value=\"$email\" /></td>"; echo "\n";
+     echo '              </tr><tr>'; echo "\n";
+     if($openid_url=='')
+       {
+	 echo '	       <td><label for="Rpassword">Password:</label></td>'; echo "\n";
+	 echo '               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxlength="30" /></td>'; echo "\n";
+	 echo '              </tr><tr>'; echo "\n";
+       }
+     else
+       {
+	 echo '	       <td><label for="Ropenid">OpenId:</label></td>'; echo "\n";
+	 echo '               <td><input type="text" id="Ropenid" name="Ropenid" size="20" maxlength="50" value="'.htmlentities($openid_url).'" /></td>'; echo "\n";
+	 echo '              </tr><tr>'; echo "\n";
+       }
+     echo '	       <td><label for="Rtimezone">Timezone:</label></td>'; echo "\n";
+     echo '               <td>';echo "\n";
+
+     output_select_timezone("Rtimezone");
+?>
+	       </td>
+              </tr><tr>
+              </tr><tr>
+<?php
+              /* random number to select robotproof question */
+	      $rand_number = mt_rand(0,3); /* to get numbers between 0 and 4  */
+              $Robotproof = "Robotproof".$rand_number;
+?>
+		<td><label for="Robotproof">Please answer this question: <?php echo output_robotproof($rand_number); ?></label></td>
+<?php
+	 echo "<td><input type=\"text\" id=\"$Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /></td>\n";
+?>
+              </tr><tr>
+               <td colspan="2"> <input type="submit" value="register" /></td>
+              </tr>
+             </table>
+<?php		     if($openid_url=='')
+       echo "<p><br /><strong> IMPORTANT: passwords are going over the net as clear text, so pick an easy password. ".
+	 "No need to pick anything complicated here ;)</strong><p/>";
+
+     echo "<p> <strong>N.B. Your email address will be exposed to other players whom you play games with. ";
+     echo "</strong></p>";
+?>
+          </fieldset>
+        </form>
+      </div>
+<?php
+echo "<h4>Some statistics:</h4>";
 
 if($pre == 0)
   echo "<p> At the moment there are no games that are being started ";
@@ -80,36 +175,7 @@ if($done==0)
    echo "One game has been completed on this server. </p>";
  else
    echo "$done games have been completed on this server. Average time of a game: $avgage days</p>";
+
 ?>
 
-  <h4> Login/Register:</h4>
-  <p>
-  Please <a href="index.php?action=register">register</a>, in case you have not done that yet  <br />
-  or login with you email-address or name and password here:
-  </p>
-
-  <form action="index.php?action=login" method="post">
-  <fieldset>
-    <label for="email">Email:</label>
-    <input type="text" id="email" name="email" size="20" maxlength="30" autofocus /> <br />
-    <script>
-    if (!("autofocus" in document.createElement("input"))) {
-      document.getElementById("email").focus();
-    }
-    </script>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" size="20" maxlength="30" /> <br />
-    <input type="submit" class="submitbutton" name="login" value="login" />
-    <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" />
-<?php
-  if($OPENIDPATH)
-    {?>
-    <hr />
-    <p> Have an OpenID account? Sign in below <br />
-    <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" />
-    <input type="submit" class="submitbutton" name="login" value="Sign in" /><br />
-     e.g. http://username.openid.net. See <a href="http://openid.net">openid.net</a> for more information.</p>
-<?php }?>
-  </fieldset>
-  </form>
 </div>

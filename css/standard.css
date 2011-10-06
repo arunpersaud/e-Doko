@@ -650,10 +650,36 @@ table.stats thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
   padding: 0.3em 0.3em 0.45em;
 }
 
-/* the login form */
-.login form{
+/* the login/register form */
+ul.loginregister {
   width: 24em;
-  margin: 0.5em auto;
+  margin: 0.25em auto;
+  margin-top: 1.0em;
+  padding: 0.0 em;
+  padding-top:0.5em;
+  text-align: right;
+  z-index: 1;
+ }
+
+ul.loginregister li {
+  display:inline;
+  border: 0px;
+  border-top: 2px solid #000;
+  border-left: 2px solid #000;
+  padding: 0.5em 0.75em;
+  padding-bottom: 0.25em;
+  background-color: #eee;
+}
+
+ul.loginregister li:last-child { border-right: 2px solid #000;}
+ul.loginregister li:hover {background-color: #aaa; }
+
+.doregister {display: none;}
+
+.login fieldset{
+  width: 24em;
+  margin: 0.0em auto;
+  margin-bottom: 0.5 em;
   padding: 0.5em 0.5em  1.5em;
   text-align: center;
 }
@@ -662,6 +688,10 @@ fieldset {
   border: 2px solid #000;
   padding: 0.5em 0.5em 0.75em;
   background-color: #eee;
+}
+
+fieldset p {
+  font-size:smaller;
 }
 
 .login label, .login input{ margin: 0.5em 0.5em 0.75em;}

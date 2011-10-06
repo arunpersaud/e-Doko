@@ -48,6 +48,12 @@ if(myisset("Rfullname","Remail","Rtimezone") )
 	echo "I need either a Password or an Openid url.<br />";
 	$ok=0;
       }
+    /* check for password length */
+    if(myisset('Rpassword') && strlen(trim($_REQUEST['Rpassword']))==0 )
+      {
+	echo "Password can't be empty!<br />";
+	$ok=0;
+      }
 
     /* check against robots */
     $robots=0; /* at least one anti-robot question needs to be answered */
@@ -133,75 +139,11 @@ if(myisset("Rfullname","Remail","Rtimezone") )
       }
     else
       {
-	echo "Couldn't register you. Please <a href=\"index.php?action=register\">try again</a>! </br />\n";
+	echo "Couldn't register you. Please <a href=\"index.php\">try again</a>! </br />\n";
       }
   }
- else
-   {
-     /* No information for new user given, ouput a page for registration */
-
-     /* check for openid information */
-     $openid_url = '';
-     $name	 = '';
-     $email	 = '';
-     if(myisset('openid_url'))
-       $openid_url = $_REQUEST['openid_url'];
-     if(myisset('openidname'))
-       $name       = $_REQUEST['openidname'];
-     if(myisset('openidemail'))
-       $email      = $_REQUEST['openidemail'];
-
-     if($openid_url=='')
-       echo "<p><br /><strong> IMPORTANT: passwords are going over the net as clear text, so pick an easy password. ".
-	 "No need to pick anything complicated here ;)<br />";
-     echo "N.B. Your email address will be exposed to other players whom you play games with. ";
-     echo "<br /><br /></strong></p>";
-     echo '        <form action="index.php?action=register" method="post">';
-     echo '          <fieldset>';
-     echo '            <legend>Register</legend>';
-     echo '             <table>';
-     echo '              <tr>';
-     echo '               <td><label for="Rfullname">Full name:</label></td>';
-     echo "	       <td><input type=\"text\" id=\"Rfullname\" name=\"Rfullname\" size=\"20\" maxlength=\"30\" value=\"$name\" /> </td>";
-     echo '              </tr><tr>';
-     echo '               <td><label for="Remail">Email:</label></td>';
-     echo "	       <td><input type=\"text\" id=\"Remail\" name=\"Remail\" size=\"20\" maxlength=\"30\" value=\"$email\" /></td>";
-     echo '              </tr><tr>';
-     if($openid_url=='')
-       {
-	 echo '	       <td><label for="Rpassword">Password(will be displayed in cleartext on the next page):</label></td>';
-	 echo '               <td><input type="password" id="Rpassword" name="Rpassword" size="20" maxlength="30" /></td>';
-	 echo '              </tr><tr>';
-       }
-     else
-       {
-	 echo '	       <td><label for="Ropenid">OpenId:</label></td>';
-	 echo '               <td><input type="text" id="Ropenid" name="Ropenid" size="20" maxlength="50" value="'.htmlentities($openid_url).'" /></td>';
-	 echo '              </tr><tr>';
-       }
-     echo '	       <td><label for="Rtimezone">Timezone:</label></td>';
-     echo '               <td>';
-
-     output_select_timezone("Rtimezone");
-?>
-	       </td>
-              </tr><tr>
-              </tr><tr>
-<?php
-              /* random number to select robotproof question */
-	      $rand_number = mt_rand(0,3); /* to get numbers between 0 and 4  */
-              $Robotproof = "Robotproof".$rand_number;
-?>
-		<td><label for="Robotproof">Please answer this question: <?php echo output_robotproof($rand_number); ?></label></td>
-<?php
-	 echo "<td><input type=\"text\" id=\"$Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /></td>\n";
-?>
-              </tr><tr>
-               <td colspan="2"> <input type="submit" value="register" /></td>
-              </tr>
-             </table>
-          </fieldset>
-        </form>
-<?php
-   }
+else
+  {
+    echo "Test test test... hmm, this page shouldn't really be here, should it? <a href=\"index.php\">Go back here :)</a> </br />\n";
+  }
 ?>
