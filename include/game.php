@@ -121,7 +121,7 @@ set_gametype('normal');
 echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 
 /* handle user notes (only possible while game is running)*/
-if( $mystatus!='gameover'  )
+if( $mystatus!='gameover' )
   if(myisset('note'))
     {
       $note = $_REQUEST['note'];
@@ -129,15 +129,6 @@ if( $mystatus!='gameover'  )
       if($note != '')
 	DB_insert_note($note,$gameid,$myid);
     };
-
-/* make sure that we don't show the notes to the wrong person
- * (e.g. other people looking at an old game)
- */
-if( $mystatus != 'gameover' ||
-    (  $mystatus == 'gameover' &&
-       isset($_SESSION['id'])  &&
-       $myid == $_SESSION['id']))
-  output_user_notes($myid,$gameid,$mystatus);
 
 /* handle calls, output a comment to show when the call was made */
 /* initialize comments */
@@ -2176,6 +2167,15 @@ if(sizeof($other_game_ids)>0 && $mystatus=='gameover')
   }
 
 echo "</div>\n"; /* end gameinfo */
+
+/* make sure that we don't show the notes to the wrong person
+ * (e.g. other people looking at an old game)
+ */
+if( $mystatus != 'gameover' ||
+    (  $mystatus == 'gameover' &&
+       isset($_SESSION['id'])  &&
+       $myid == $_SESSION['id']))
+  output_user_notes($myid,$gameid,$mystatus);
 
 echo "</form>\n";
 

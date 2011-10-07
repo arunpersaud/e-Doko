@@ -378,6 +378,7 @@ function output_header()
      <meta charset="utf-8" />
      <link rel="shortcut icon" href="pics/edoko-favicon.png" />
      <link rel="stylesheet" href="css/standard.css?v=30" />
+     <link rel="stylesheet" media="screen and (max-width: 600px)" href="css/narrow.css?v=1" />
      <link rel="stylesheet" href="css/dateinput.css?v=1"/>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
