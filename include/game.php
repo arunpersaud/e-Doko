@@ -274,16 +274,20 @@ if($session)
     else
       $next = NULL;
 
+    /* check for solo, add game type to session number */
+    echo "Game $session.$j";
+    if($GT !='normal')
+      echo " ($GT)";
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
       {
 	if($previous)
-	  echo "<a href=\"{$INDEX}?action=game&amp;me=$previous\">"._('previous game')."</a>&nbsp;&nbsp;&nbsp; \n";
-	echo "This is game number $j of <a href=\"{$INDEX}?action=game&amp;me=$lasthash\">$i</a> in session $session.\n";
+	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$previous\">"._('previous')."</a> \n";
 	if($next)
-	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$next\">"._('next game')."</a> \n";
+	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$next\">"._('next')."</a> \n";
       }
-    else
-      echo "This is game number $j of $i in session $session.";
+    if($j != $i )
+      echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$lasthash\">last</a> \n";
+
     echo "\n</div>\n";
   }
 
@@ -399,7 +403,6 @@ switch($mystatus)
       {
 	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
 	echo "\n<ul class=\"tricks\">\n";
-	echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
 	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
 	  "    <div class=\"trick\" id=\"trick0\">\n";
 
@@ -528,7 +531,6 @@ switch($mystatus)
 
     /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
     echo "\n<ul class=\"tricks\">\n";
-    echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
     echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
       "    <div class=\"trick\" id=\"trick0\">\n";
 
@@ -882,7 +884,6 @@ switch($mystatus)
     if($myparty=='re' || $myparty=='contra')
       {
 	echo "\n<ul class=\"tricks\">\n";
-	echo "  <li class=\"nohighlight\"> Game ".DB_format_gameid($gameid).": </li>\n";
 
 	$mygametype =  DB_get_gametype_by_gameid($gameid);
 
@@ -1282,7 +1283,6 @@ switch($mystatus)
     $firstcard = ''; /* first card in a trick */
 
     echo "\n<ul class=\"tricks\">\n";
-    echo '  <li class="nohighlight"> '._('Game').' '.DB_format_gameid($gameid).": </li>\n";
 
     /* output vorbehalte */
     $mygametype = DB_get_gametype_by_gameid($gameid);
