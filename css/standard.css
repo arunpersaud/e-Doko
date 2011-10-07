@@ -211,10 +211,6 @@ div.table div {
   text-align:center;
   z-index:20;
 }
-div.table div img{
-  /*background-color:green;*/
-  width:20%;
-}
 
 div.table div.table0 {
   top:45%;
@@ -562,13 +558,8 @@ div.user ul li:first-child {
   position:relative;
   border: 1px solid #000;
 }
-
 .cardinput img { width: 4em;}
-
 .cardinput:hover{ background-color:red;}
-
-div span img.button { width: 2em;}
-div span img.tinybutton { width: 1.4em;}
 
 .gamestatuspre {
   padding: 0 0.3em;
@@ -732,6 +723,11 @@ div.table div img.gravatar, img.gravatar  {
     width:  4em;
     height: 4em;
     border: 3px solid #aaa;
+}
+
+div img.button {
+    float: right;
+    width: 2em;
 }
 
 .highcall {

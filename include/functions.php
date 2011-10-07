@@ -994,8 +994,8 @@ function display_table ()
       $lastlogin = strtotime($r[6]);
       date_default_timezone_set($timezone);
       $timenow   = strtotime(date("Y-m-d H:i:s"));
-      $gravatar = "$name<br /><img class=\"gravatar\" title=\"$name\" src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" alt=\"$name's gravatar\" />";
-
+      $gravatar = "$name<br />\n       <img class=\"gravatar\" title=\"$name\" src=\"http://www.gravatar.com/avatar/".
+	md5(strtolower(trim($email)))."?d=identicon\" alt=\"$name's gravatar\" />";
 
       echo "  <div class=\"table".($pos-1)."\">\n";
 
@@ -1013,7 +1013,7 @@ function display_table ()
       else
 	echo "   $gravatar \n";
       if($debug)
-	echo"</a>\n";
+	echo"   </a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
       if( $gametype != "solo")
@@ -1027,12 +1027,15 @@ function display_table ()
 	    $cards    = DB_get_all_hand($userhash);
 	    $trumpNR  = count_trump($cards,'all');
 	    if($trumpNR)
-	      echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty - trump back\" title=\"poverty - trump back\" />";
+	      echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" ".
+		"alt=\"poverty - trump back\" title=\"poverty - trump back\" />\n";
 	    else
-	      echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty - no trump back\" title=\"poverty - no trump back\" />";
+	      echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" ".
+		"alt=\"poverty - no trump back\" title=\"poverty - no trump back\" />\n";
 	  }
 	else
-	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty partner\" title=\"poverty partner\" />";
+	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" ".
+	    "alt=\"poverty partner\" title=\"poverty partner\" />\n";
 
       if($GT=="dpoverty")
 	if($party=="re")
@@ -1042,12 +1045,15 @@ function display_table ()
 	      $cards    = DB_get_all_hand($userhash);
 	      $trumpNR  = count_trump($cards,'all');
 	      if($trumpNR)
-		echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" alt=\"poverty < trump back\" title=\"poverty - trump back\" />";
+		echo "   <img src=\"pics/button/poverty_trump_button.png\" class=\"button\" ".
+		  "alt=\"poverty < trump back\" title=\"poverty - trump back\" />\n";
 	      else
-		echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" alt=\"poverty <\" title=\"poverty - no trump back\" />";
+		echo "   <img src=\"pics/button/poverty_notrump_button.png\" class=\"button\" ".
+		  "alt=\"poverty <\" title=\"poverty - no trump back\" />\n";
 	    }
 	  else
-	    echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" alt=\"poverty >\" title=\"poverty partner\" />";
+	    echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" ".
+	      "alt=\"poverty >\" title=\"poverty partner\" />\n";
 	else
 	  if($sickness=="poverty"  || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	    {
@@ -1055,83 +1061,85 @@ function display_table ()
 	      $cards    = DB_get_all_hand($userhash);
 	      $trumpNR  = count_trump($cards,'all');
 	      if($trumpNR)
-		echo "   <img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" alt=\"poverty2 < trump back\" title=\"poverty2 - trump back\"/>";
+		echo "   <img src=\"pics/button/poverty2_trump_button.png\" class=\"button\" ".
+		  "alt=\"poverty2 < trump back\" title=\"poverty2 - trump back\"/>\n";
 	      else
-		echo "   <img src=\"pics/button/poverty2_notrump_button.png\" class=\"button\" alt=\"poverty2 <\" title=\"poverty2 - no trump back\" />";
+		echo "   <img src=\"pics/button/poverty2_notrump_button.png\" class=\"button\" ".
+		  "alt=\"poverty2 <\" title=\"poverty2 - no trump back\" />\n";
 	    }
 	  else
-	    echo "   <img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" alt=\"poverty2 >\" title=\"poverty2 partner\" />";
+	    echo "   <img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" ".
+	      "alt=\"poverty2 >\" title=\"poverty2 partner\" />\n";
 
       if($GT=="wedding" && $party=="re")
 	if($sickness=="wedding")
-	  echo "   <img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" title=\"wedding\" />";
+	  echo "   <img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" title=\"wedding\" />\n";
 	else
-	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" alt=\"wedding partner\" title=\"wedding partner\" />";
+	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" ".
+	    "alt=\"wedding partner\" title=\"wedding partner\" />\n";
 
       if( (strpos($GT,"solo")!==false) && $party=="re")
 	{
 	  if(strpos($GT,"queen")!==false)
-	    echo "   <img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Queen solo\" />";
+	    echo "   <img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Queen solo\" />\n";
 	  else if(strpos($GT,"jack")!==false)
-	    echo "   <img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Jack solo\" />";
+	    echo "   <img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Jack solo\" />\n";
 	  else if(strpos($GT,"club")!==false)
-	    echo "   <img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Club solo\" />";
+	    echo "   <img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Club solo\" />\n";
 	  else if(strpos($GT,"spade")!==false)
-	    echo "   <img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Spade solo\" />";
+	    echo "   <img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Spade solo\" />\n";
 	  else if(strpos($GT,"heart")!==false)
-	    echo "   <img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Heart solo\" />";
+	    echo "   <img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Heart solo\" />\n";
 	  else if(strpos($GT,"trumpless")!==false)
-	    echo "   <img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trumpless solo\" />";
+	    echo "   <img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trumpless solo\" />\n";
 	  else if(strpos($GT,"trump")!==false)
-	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trump solo\" />";
+	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trump solo\" />\n";
 	}
 
       /* add point calls */
       if($call!=NULL)
 	{
 	  if($party=="re")
-	    echo "  <img src=\"pics/button/re_button.png\" class=\"button\" alt=\"re\" title=\"Re\" />";
+	    echo "   <img src=\"pics/button/re_button.png\" class=\"button\" alt=\"re\" title=\"Re\" />\n";
 	  else
-	    echo "  <img src=\"pics/button/contra_button.png\" class=\"button\" alt=\"contra\" title=\"Contra\" />";
+	    echo "   <img src=\"pics/button/contra_button.png\" class=\"button\" alt=\"contra\" title=\"Contra\" />\n";
 	  switch($call)
 	    {
 	    case "0":
-	      echo "   <img src=\"pics/button/0_button.png\" class=\"button\" alt=\"0\" title=\"Call 0\" />";
+	      echo "   <img src=\"pics/button/0_button.png\" class=\"button\" alt=\"0\" title=\"Call 0\" />\n";
 	      break;
 	    case "30":
-	      echo "   <img src=\"pics/button/30_button.png\" class=\"button\" alt=\"30\" title=\"Call 30\" />";
+	      echo "   <img src=\"pics/button/30_button.png\" class=\"button\" alt=\"30\" title=\"Call 30\" />\n";
 	      break;
 	    case "60":
-	      echo "   <img src=\"pics/button/60_button.png\" class=\"button\" alt=\"60\" title=\"Call 60\" />";
+	      echo "   <img src=\"pics/button/60_button.png\" class=\"button\" alt=\"60\" title=\"Call 60\" />\n";
 	      break;
 	    case "90":
-	      echo "   <img src=\"pics/button/90_button.png\" class=\"button\" alt=\"90\" title=\"Call 90\" />";
+	      echo "   <img src=\"pics/button/90_button.png\" class=\"button\" alt=\"90\" title=\"Call 90\" />\n";
 	      break;
 	    }
 	}
 
-      echo "    <br />\n";
-      echo "    <span title=\"local time: ".date("Y-m-d H:i:s",$timenow).  " ".
-	                     "last login: ".date("Y-m-d H:i:s",$lastlogin)."\">".
-			     "<img src=\"pics/button/time-info.png\" class=\"tinybutton\" alt=\"time info\" />".
-			     "</span>\n";
+      echo "   <img src=\"pics/button/time-info.png\" class=\"button\" alt=\"time info\" ".
+	"title=\"local time: ".date("Y-m-d H:i:s",$timenow).  " ".
+	"last login: ".date("Y-m-d H:i:s",$lastlogin)."\" />";
 
       /* show how many tricks the person made */
       switch($wins)
 	{
 	case 0:
-	  echo "#tricks 0"; break;
+	  echo "#tricks 0\n"; break;
 	case 1:
-	  echo "#tricks 1"; break;
+	  echo "#tricks 1\n"; break;
 	case 2:
 	case 3:
 	case 4:
-	  echo "#tricks few"; break;
+	  echo "#tricks few\n"; break;
 	default:
-	  echo "#tricks many"; break;
+	  echo "#tricks many\n"; break;
 	}
 
-      echo "   </div>\n";
+      echo "  </div>\n";
 
     }
   echo  "</div>\n"; /* end output table */
