@@ -1124,21 +1124,22 @@ function display_table ()
 	"title=\"local time: ".date("Y-m-d H:i:s",$timenow).  " ".
 	"last login: ".date("Y-m-d H:i:s",$lastlogin)."\" />";
 
+      echo "   <span class=\"numberoftricks\">";
       /* show how many tricks the person made */
       switch($wins)
 	{
 	case 0:
-	  echo "#tricks 0\n"; break;
+	  echo "#tricks 0"; break;
 	case 1:
-	  echo "#tricks 1\n"; break;
+	  echo "#tricks 1"; break;
 	case 2:
 	case 3:
 	case 4:
-	  echo "#tricks few\n"; break;
+	  echo "#tricks few"; break;
 	default:
-	  echo "#tricks many\n"; break;
+	  echo "#tricks many"; break;
 	}
-
+      echo "</span>\n";
       echo "  </div>\n";
 
     }

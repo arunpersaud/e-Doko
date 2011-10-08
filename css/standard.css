@@ -184,7 +184,7 @@ div.table img.table {
 div.table div {
   /*background-color:green;*/
   position:absolute;
-  width:12.5%;
+  width:10.5%;
   text-align:center;
   z-index:20;
 }
@@ -702,11 +702,18 @@ div.table div img.gravatar, img.gravatar  {
     width:  4em;
     height: 4em;
     border: 3px solid #aaa;
+    float:left;
 }
 
 div img.button {
     float: right;
     width: 2em;
+}
+
+div span.numberoftricks {
+    text-align:center;
+    clear:both;
+    display:block;
 }
 
 .highcall {
