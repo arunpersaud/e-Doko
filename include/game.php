@@ -179,46 +179,49 @@ unset($comment);
 if($session)
   {
     echo "<div class=\"session\">\n";
-    echo '  <div class="sessionrules">'._('Rules').': ';
+    echo "  <div class=\"sessionrules\">\n    "._('Rules').":\n";
     switch($RULES['dullen'])
       {
       case 'none':
-	echo "  <img class=\"rulesicon\" alt=\""._('no ten of hearts')."\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
+	echo "    <img class=\"rulesicon\" alt=\""._('no ten of hearts').
+	  "\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
       case 'firstwins':
-	echo "  <img class=\"rulesicon\" alt=\""._('ten of hearts')."\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
+	echo "    <img class=\"rulesicon\" alt=\""._('ten of hearts').
+	  "\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
       case 'secondwins':
-	echo "  <img class=\"rulesicon\" alt=\""._('second ten of hearts')."\" src=\"pics/button/second-ten-of-hearts.png\"/>\n"; break;
+	echo "    <img class=\"rulesicon\" alt=\""._('second ten of hearts').
+	  "\" src=\"pics/button/second-ten-of-hearts.png\"/>\n"; break;
       }
     switch($RULES['schweinchen'])
       {
       case 'none':
-	echo "  <img class=\"rulesicon\" alt=\""._('no schweinchen')."\" ".
+	echo "    <img class=\"rulesicon\" alt=\""._('no schweinchen')."\" ".
 	  "src=\"pics/button/no-schweinchen.png\"/>\n"; break;
       case 'both':
-	echo "  <img class=\"rulesicon\" alt=\""._('two schweinchen')."\" ".
+	echo "    <img class=\"rulesicon\" alt=\""._('two schweinchen')."\" ".
 	  "src=\"pics/button/two-schweinchen.png\"/>\n"; break;
       case 'second':
-	echo "  <img class=\"rulesicon\" alt=\"".('second schweinchen')."\" ".
+	echo "    <img class=\"rulesicon\" alt=\"".('second schweinchen')."\" ".
 	  "src=\"pics/button/second-schweinchen.png\"/>\n"; break;
       case 'secondaftercall':
-	echo "  <img class=\"rulesicon\" alt=\""._('second schweinchen after call')."\" ".
+	echo "    <img class=\"rulesicon\" alt=\""._('second schweinchen after call')."\" ".
 	  "src=\"pics/button/second-schweinchen-after-call.png\"/>\n"; break;
       }
     switch($RULES['call'])
       {
       case '1st-own-card':
-	echo "  <img class=\"rulesicon\" alt=\""._('1st-own-card')."\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
+	echo "    <img class=\"rulesicon\" alt=\""._('1st-own-card')."\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
       case '5th-card':
-	echo "  <img class=\"rulesicon\" alt=\""._('5th-card')."\" src=\"pics/button/5th-card.png\"/>\n"; break;
+	echo "    <img class=\"rulesicon\" alt=\""._('5th-card')."\" src=\"pics/button/5th-card.png\"/>\n"; break;
       case '9-cards':
-	echo "  <img class=\"rulesicon\" alt=\""._('9-cards')."\" src=\"pics/button/9-cards.png\"/>\n"; break;
+	echo "    <img class=\"rulesicon\" alt=\""._('9-cards')."\" src=\"pics/button/9-cards.png\"/>\n"; break;
       }
-    echo "  <div>\n";
-    echo '       '._('10ofhearts').":  {$RULES['dullen']}      <br />\n";
-    echo '       '._('schweinchen').": {$RULES['schweinchen']} <br />\n";
-    echo '       '._('call').":        {$RULES['call']}        <br />\n";
-    echo '       '._('lowtrump').":    {$RULES['lowtrump']}    <br />\n";
-    echo "  </div>\n  </div>\n";
+    echo "    <div>\n";
+    echo '         '._('10ofhearts').":  {$RULES['dullen']}      <br />\n";
+    echo '         '._('schweinchen').": {$RULES['schweinchen']} <br />\n";
+    echo '         '._('call').":        {$RULES['call']}        <br />\n";
+    echo '         '._('lowtrump').":    {$RULES['lowtrump']}    <br />\n";
+    echo "    </div>\n  </div>\n";
 
     /* show score */
 
@@ -275,7 +278,7 @@ if($session)
       $next = NULL;
 
     /* check for solo, add game type to session number */
-    echo "Game $session.$j";
+    echo "    Game $session.$j";
     if($GT !='normal')
       echo " ($GT)";
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)

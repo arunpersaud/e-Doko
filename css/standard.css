@@ -485,6 +485,7 @@ ul.tricks li div div span.comment span{
 
 div.user ul {
   list-style:none;
+  padding: 0px;
 }
 
 div.user ul li {
