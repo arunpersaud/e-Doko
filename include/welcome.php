@@ -126,8 +126,7 @@ echo "  <p> Play Doppelkopf online.</p>\n".
 	 echo "  <p><strong> IMPORTANT: passwords are going over the net as clear text, so pick an easy password. ".
 	   "No need to pick anything complicated here ;)</strong></p>\n";
 
-     echo "  <p><strong>N.B. Your email address will be exposed to other players whom you play games with.";
-     echo "</strong></p>\n";
+     echo "  <p><strong>N.B. Your email address will be visible to players you play games with.</strong></p>\n";
 ?>
   </fieldset>
   </form>
