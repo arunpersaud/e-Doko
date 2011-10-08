@@ -377,6 +377,7 @@ function output_header()
      <title>e-Doko</title>
      <meta charset="utf-8" />
      <link rel="shortcut icon" href="pics/edoko-favicon.png" />
+     <link rel="stylesheet" href="css/normalize.css?v=1" />
      <link rel="stylesheet" href="css/standard.css?v=31" />
      <link rel="stylesheet" media="screen and (max-width: 600px)" href="css/narrow.css?v=1" />
      <link rel="stylesheet" href="css/dateinput.css?v=1"/>

@@ -17,29 +17,7 @@
  *
  */
 
-/* reset CSS (taken from blueprint and modified a bit) */
-
-html, body, div, span,
-h1, h2, h3, h4, h5, h6, p,
-a,img,  dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, tbody, tfoot, thead, tr, th, td {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  vertical-align: baseline;
-}
-table { border-collapse: separate; border-spacing: 0; }
-caption, th, td { text-align: left; font-weight: normal; }
-table, td, th { vertical-align: middle; }
-
-/*  end reset */
-
-/* some general layout */
-h1, h2, h3, h4, h5, h6, p {margin: 2px; padding: 1px;}
-
 body { background-color: #ddd; }
-
 
 /* the header, footer, etc */
 header {
