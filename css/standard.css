@@ -666,6 +666,8 @@ ul.loginregister li:last-child { border-right: 2px solid #000;}
 ul.loginregister li:hover {background-color: #aaa; }
 
 .doregister {display: none;}
+.dologin label,.doregister label {float:left; width: 6em; }
+
 
 .login fieldset{
   width: 24em;
@@ -765,6 +767,3 @@ div img.button {
 .about .translation {
     background-color: #fce94f;
 }
-
-
-
