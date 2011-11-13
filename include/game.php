@@ -43,7 +43,9 @@ if(!$myid)
 
 global $GAME,$RULES,$CARDS;
 
-/* get some information from the DB */
+/**************************************
+ * get some information from the DB
+ **************************************/
 $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
 $mystatus = DB_get_status_by_hash($me);
@@ -117,9 +119,6 @@ if($ok)
  */
 set_gametype('normal');
 
-/* put everyting in a form */
-echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
-
 /* handle user notes (only possible while game is running)*/
 if( $mystatus!='gameover' )
   if(myisset('note'))
@@ -133,6 +132,17 @@ if( $mystatus!='gameover' )
 /* handle calls, output a comment to show when the call was made */
 /* initialize comments */
 $comment  =  '';
+
+/* get information needed to submit comment */
+$playid = DB_get_current_playid($gameid);
+
+/* set comment */
+if($comment != '')
+  DB_insert_comment($comment,$playid,$myid);
+/* clear up */
+unset($comment);
+/* end check for calls */
+
 
 /* check for calls, set comment */
 if(myisset('call')  && $_REQUEST['call']  == '120' && can_call(120,$me))
@@ -164,21 +174,15 @@ if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
     $comment .= "Zero";
   }
 
-/* get information needed to submit comment */
-$playid = DB_get_current_playid($gameid);
 
-/* set comment */
-if($comment != '')
-  DB_insert_comment($comment,$playid,$myid);
-/* clear up */
-unset($comment);
-/* end check for calls */
-
-
-/* output extra division in case this game is part of a session */
+/*****************************************************************
+ * output extra division in case this game is part of a session
+ *****************************************************************/
 if($session)
   {
     echo "<div class=\"session\">\n";
+
+    /* output rule set */
     echo "  <div class=\"sessionrules\">\n    "._('Rules').":\n";
     switch($RULES['dullen'])
       {
@@ -294,6 +298,23 @@ if($session)
     echo "\n</div>\n";
   }
 
+/* the user has done something, update the timestamp. Use $myid in
+ * active games and check for session-id in old games (myid might be wrong in that case)
+ */
+if($mystatus!='gameover')
+  DB_update_user_timestamp($myid);
+ else
+   if(isset($_SESSION['id']))
+     DB_update_user_timestamp($_SESSION['id']);
+
+
+/******************************************************************************
+ * Output tricks played, table, messages, and cards (depending on game status)
+ ******************************************************************************/
+
+/* put everyting in a form */
+echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
+
 /* display the table and the names */
 display_table();
 
@@ -307,18 +328,13 @@ display_table();
  * gameover: are we revisiting a game
  */
 
-/* the user has done something, update the timestamp. Use $myid in
- * active games and check for session-id in old games (myid might be wrong in that case)
- */
-if($mystatus!='gameover')
-  DB_update_user_timestamp($myid);
- else
-   if(isset($_SESSION['id']))
-     DB_update_user_timestamp($_SESSION['id']);
-
 switch($mystatus)
   {
   case 'start':
+    /****************************************
+     * ask if player wants to join the game *
+     ****************************************/
+
     /* don't ask if user has autosetup set to yest */
     $skip = 0;
     if($PREF['autosetup']=='yes') $skip = 1;
@@ -336,13 +352,13 @@ switch($mystatus)
 	if(!$skip && $_REQUEST['in'] == 'no' )
 	  {
 	    /* cancel the game */
-	    $message = "Hello, \n\n".
+	    $email_message = "Hello, \n\n".
 	      "the game has been canceled due to the request of one of the players.\n\n";
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
 	      {
-		mymail($user,$gameid,GAME_CANCELED,$message);
+		mymail($user,$gameid,GAME_CANCELED,$email_message);
 	      }
 
 	    /* update game status */
@@ -359,9 +375,8 @@ switch($mystatus)
 
 	    DB_set_hand_status_by_hash($me,'init');
 
-	    /* check if everyone has reached this stage, send out email */
+	    /* check if everyone has reached this stage, set player in game-table to the next player */
 	    $userids = DB_get_all_userid_by_gameid($gameid);
-	    $ok = 1;
 	    foreach($userids as $user)
 	      {
 		$userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
@@ -369,36 +384,16 @@ switch($mystatus)
 		  {
 		    /* whos turn is it? */
 		    DB_set_player_by_gameid($gameid,$user);
-		    $ok = 0;
 		    break;
 		  }
 	      };
-	    if($ok)
-	      {
-		/* all done, send out email unless this player is the startplayer */
-		$startplayer = DB_get_startplayer_by_gameid($gameid);
-		if($mypos == $startplayer)
-		  {
-		    /* do nothing, go to next stage */
-		  }
-		else
-		  {
-		    /* email startplayer */
-		    /*
-		     $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-		     $who         = DB_get_userid('hash',$hash);
-		     DB_set_player_by_gameid($gameid,$who);
-
-		     $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		     "Use this link to go the game: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		     mymail($who, $gameid, GAME_READY,$message);
-		    */
-		  }
-	      }
 	  }
       }
   case 'init':
-    /* here we ask the player if he is sick */
+    /***************************
+     * check if player is sick *
+     ***************************/
+
     $mycards = DB_get_hand($me);
     $mycards = mysort($mycards,$gametype);
 
@@ -590,7 +585,6 @@ switch($mystatus)
 	      display_card($card,$PREF['cardset']);
 	    echo "</div>\n";
 	  }
-	break;
       }
     else
       {
@@ -636,7 +630,7 @@ switch($mystatus)
 	    /* cancel game */
 	    if($cancelsick == 'nines')
 	      {
-		$message = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		$email_message = "The game has been canceled because ".DB_get_name('userid',$cancel).
 		  " has five or more nines and nobody is playing solo.\n\n".
 		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
 		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
@@ -649,7 +643,7 @@ switch($mystatus)
 	      }
 	    else if ($cancelsick == 'lowtrump')
 	      {
-		$message = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		$email_message = "The game has been canceled because ".DB_get_name('userid',$cancel).
 		  " has low trump and nobody is playing solo.\n\n".
 		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
 		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
@@ -664,7 +658,7 @@ switch($mystatus)
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
 	      {
-		mymail($user,$gameid, GAME_CANCELED, $message);
+		mymail($user,$gameid, GAME_CANCELED, $email_message);
 	      }
 
 	    echo "</div>\n"; /* end div message */
@@ -799,9 +793,9 @@ switch($mystatus)
 		if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 		  {
 		    /* email startplayer */
-		    $message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		    $email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		    mymail($who,$gameid,GAME_READY,$message);
+		    mymail($who,$gameid,GAME_READY,$email_message);
 		  }
 	      }
 	    else
@@ -824,9 +818,9 @@ switch($mystatus)
 		if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 		  {
 		    /* email player for poverty */
-		    $message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		    $email_message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
-		    mymail($whoid,$gameid,GAME_POVERTY,$message);
+		    mymail($whoid,$gameid,GAME_POVERTY,$email_message);
 		  }
 	      }
 	  }
@@ -836,9 +830,8 @@ switch($mystatus)
 	foreach($mycards as $card)
 	  display_card($card,$PREF['cardset']);
 	echo "</div>\n";
-
-	break;
       }
+    break;
 
   case 'poverty':
     /* user only gets here in a poverty game, several things have to be handled here:
@@ -928,9 +921,9 @@ switch($mystatus)
 	    if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer */
-		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		mymail($who,$gameid,GAME_READY,$message);
+		mymail($who,$gameid,GAME_READY,$email_message);
 	      }
 	  }
 	else
@@ -1007,13 +1000,13 @@ switch($mystatus)
 	    /* no more people to ask, need to cancel the game */
 	    if($mypos+$next>4)
 	      {
-		$message = "Hello, \n\n".
+		$email_message = "Hello, \n\n".
 		  "Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n\n";
 
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		foreach($userids as $user)
 		  {
-		    mymail($user, $gameid, GAME_CANCELED_POVERTY, $message);
+		    mymail($user, $gameid, GAME_CANCELED_POVERTY, $email_message);
 		  }
 
 		/* update game status */
@@ -1031,9 +1024,9 @@ switch($mystatus)
 		DB_set_player_by_gameid($gameid,$userid);
 		DB_set_hand_status_by_hash($userhash,'poverty');
 
-		$message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+		$email_message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
 		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-		mymail($userid,$gameid, GAME_POVERTY, $message);
+		mymail($userid,$gameid, GAME_POVERTY, $email_message);
 	      }
 	  }
 	else
@@ -1122,9 +1115,9 @@ switch($mystatus)
 		    DB_set_player_by_gameid($gameid,$userid);
 		    DB_set_hand_status_by_hash($userhash,'poverty');
 
-		    $message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+		    $email_message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
 		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
-		    mymail($userid,$gameid, GAME_DPOVERTY, $message);
+		    mymail($userid,$gameid, GAME_DPOVERTY, $email_message);
 		  }
 	      }
 	    echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
@@ -1195,9 +1188,9 @@ switch($mystatus)
 	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer) */
-		$message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
+		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		mymail($who,$gameid, GAME_READY, $message);
+		mymail($who,$gameid, GAME_READY, $email_message);
 	      }
 	  }
       }
@@ -1644,12 +1637,12 @@ switch($mystatus)
 		$who       = DB_get_userid('hash',$next_hash);
 		DB_set_player_by_gameid($gameid,$who);
 
-		$message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
+		$email_message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		  "It's your turn  now.\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
 		if( DB_get_email_pref_by_uid($who)!='emailaddict' )
 		  {
-		    mymail($who,$gameid, GAME_YOUR_TURN, $message);
+		    mymail($who,$gameid, GAME_YOUR_TURN, $email_message);
 		  }
 	      }
 	    else /* send out final email */
@@ -1663,10 +1656,10 @@ switch($mystatus)
 				   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
 				   " WHERE Hand.game_id='$gameid'".
 				   " GROUP BY User.fullname" );
-		$message  = "The game is over. Thanks for playing :)\n";
-		$message .= "Final score:\n";
+		$email_message  = "The game is over. Thanks for playing :)\n";
+		$email_message .= "Final score:\n";
 		while( $r = DB_fetch_array($result) )
-		  $message .= "   ".$r[0]."(".$r[2].") ".$r[1]."\n";
+		  $email_message .= "   ".$r[0]."(".$r[2].") ".$r[1]."\n";
 
 		$result = DB_query("SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
 				   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
@@ -1676,12 +1669,12 @@ switch($mystatus)
 				   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
 				   " WHERE Hand.game_id='$gameid'".
 				   " GROUP BY Hand.party" );
-		$message .= "\nTotals:\n";
+		$email_message .= "\nTotals:\n";
 		$re     = 0;
 		$contra = 0;
 		while( $r = DB_fetch_array($result) )
 		  {
-		    $message .= "    ".$r[0]." ".$r[1]."\n";
+		    $email_message .= "    ".$r[0]." ".$r[1]."\n";
 		    if($r[0] == 're')
 		      $re = $r[1];
 		    else if($r[0] == 'contra')
@@ -1850,35 +1843,35 @@ switch($mystatus)
 
 
 		  /* add score points to email */
-		  $message .= "\n";
+		  $email_message .= "\n";
 		  $Tpoint = 0;
-		  $message .= " Points Re: \n";
+		  $email_message .= " Points Re: \n";
 		  $queryresult = DB_query("SELECT score FROM Score ".
 					  "  WHERE game_id=$gameid AND party='re'".
 					  " ");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
-		      $message .= "   ".$r[0]."\n";
+		      $email_message .= "   ".$r[0]."\n";
 		      $Tpoint ++;
 		    }
-		  $message .= " Points Contra: \n";
+		  $email_message .= " Points Contra: \n";
 		  $queryresult = DB_query("SELECT score FROM Score ".
 					  "  WHERE game_id=$gameid AND party='contra'".
 					  " ");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
-		      $message .= "   ".$r[0]."\n";
+		      $email_message .= "   ".$r[0]."\n";
 		      $Tpoint --;
 		    }
-		  $message .= " Total Points (from the Re point of view): $Tpoint\n";
-		  $message .= "\n";
+		  $email_message .= " Total Points (from the Re point of view): $Tpoint\n";
+		  $email_message .= "\n";
 
 		  $session = DB_get_session_by_gameid($gameid);
 		  $score = generate_score_table($session);
 
-		  $message .= "Score Table:\n";
-		  $message .= format_score_table_ascii($score);
-		  $message .= "\nUse these links to have a look at game ".DB_format_gameid($gameid).": \n";
+		  $email_message .= "Score Table:\n";
+		  $email_message .= format_score_table_ascii($score);
+		  $email_message .= "\nUse these links to have a look at game ".DB_format_gameid($gameid).": \n";
 
 		  /* send out final email */
 		  foreach($userids as $user)
@@ -1888,10 +1881,10 @@ switch($mystatus)
 		      $name = DB_get_name('userid',$user);
 
 		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
-		      $message .= $link;
+		      $email_message .= $link;
 		    }
-		  $message .= "\n\n (you can use reply all on this email to reach all the players.)\n\n";
-		  mymail($userids,$gameid, GAME_OVER, $message);
+		  $email_message .= "\n\n (you can use reply all on this email to reach all the players.)\n\n";
+		  mymail($userids,$gameid, GAME_OVER, $email_message);
 	      }
 	  }
 	else
@@ -2096,7 +2089,11 @@ switch($mystatus)
     break;
   default:
     myerror("error in testing the status");
-  }
+  } /*end of output: tricks, table, messages, card */
+
+/***********************************************
+ * Comments, re/contra calls, user menu
+ ***********************************************/
 
 /* output other games where it is the users turn
  * make sure that the people looking at old games don't see the wrong games here
@@ -2106,13 +2103,13 @@ if( $gamestatus != 'gameover' )
     /* game isn't over, only valid user can get here, so show menu */
     display_user_menu($myid);
   }
-else if(  $origmystatus != 'gameover' )
+else if( $origmystatus != 'gameover' )
   {
     /* user just played the very last card, game is now over, it's still ok to show the menu though */
     display_user_menu($myid);
   }
-else if(  $mystatus == 'gameover' &&
-	  isset($_SESSION['id']) )
+else if( $mystatus == 'gameover'
+	 && isset($_SESSION['id']) )
   {
     /* user is looking at someone else's game, show the menu for the correct user */
     display_user_menu($_SESSION['id']);
@@ -2181,6 +2178,10 @@ if( $mystatus != 'gameover' ||
   output_user_notes($myid,$gameid,$mystatus);
 
 echo "</form>\n";
+
+/*********************************
+ * suggest next game
+ *********************************/
 
 $gamestatus = DB_get_game_status_by_gameid($gameid);
 if($mystatus=='gameover' &&
