@@ -386,41 +386,6 @@ function output_header()
      <script type="text/javascript" src="include/jquery.tools.min.js"></script>
      <script type="text/javascript" src="include/game.js"> </script>
      <script type="text/javascript">
-        $(document).ready(function()
-	   {
-              $("#ScoreTable").tablesorter({ widgets: ['zebra']});
-
-	      $(".gameshidesession").click( function () {
-		  $(this).parent().children(".gamessession").hide(300);
-		  $(this).parent().children(".gamesshowsession").show();
-		  $(this).hide();
-		});
-
-	      $(".gamesshowsession").click( function () {
-		  $(this).parent().children(".gamessession").show(300);
-		  $(this).parent().children(".gameshidesession").show();
-		  $(this).hide();
-		});
-
-	      $(".gameshowall").click( function () {
-		  $(".gamessession").show(300);
-		  $(".gamesshowsession").hide();
-		  $(".gameshidesession").show();
-		});
-	      $(".gamehideall").click( function () {
-		  $(".gamessession").hide(300);
-		  $(".gamesshowsession").show();
-		  $(".gameshidesession").hide();
-		});
-
-	      $("ul.loginregister").click(function () {
-		  $(".dologin").slideToggle();
-		  $(".doregister").slideToggle();
-		});
-
-	      $(".message div div").parent().click ( function() { $(this).hide(); });
-
-           });
      </script>
   </head>
 <body onload="high_last();">
