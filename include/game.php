@@ -333,6 +333,12 @@ display_table();
  */
 $cards_status = CARDS_EMPTY;
 
+/* Also collect message that should be displayed to the user, so that we can show
+ * them after showing the table. This makes the html flow more consistent and easier
+ * tournament change layouts, especially for smaller displays, e.g. mobile phones
+ */
+$messages = array();
+
 switch($mystatus)
   {
   case 'start':
@@ -441,8 +447,8 @@ switch($mystatus)
 
 	if($Nsickness>1)
 	  {
-	    echo "<p class=\"message\"> You selected more than one sickness, please go back ".
-	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.</p>";
+	    $messages[] = "You selected more than one sickness, please go back ".
+	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.";
 
 	    $card_status = CARDS_SHOW;
 
@@ -451,7 +457,7 @@ switch($mystatus)
 	else
 	  {
 	    /* everything is ok, save what user said and proceed */
-	    echo "<p class=\"message\">Processing what you selected in the last step...";
+	    $messages[] = "Processing what you selected in the last step...";
 
 	    /* check if this sickness needs to be handled first */
 	    $gametype    = DB_get_gametype_by_gameid($gameid);
@@ -465,7 +471,7 @@ switch($mystatus)
 		DB_set_solo_by_hash($me,$_REQUEST['solo']);
 		DB_set_sickness_by_hash($me,'solo');
 
-		echo "<br />Seems like you want to play a {$_REQUEST['solo']} solo. Got it.<br />\n";
+		$messages[] = "<br />Seems like you want to play a {$_REQUEST['solo']} solo. Got it.<br />\n";
 
 		if($gametype == 'solo' && $startplayer<$mypos)
 		  {}/* do nothing, since someone else already is playing solo */
@@ -482,32 +488,30 @@ switch($mystatus)
 	    else if($_REQUEST['wedding'] == 'yes')
 	      {
 		/* silent solo is set further down */
-		echo _("Ok, you don't want to play a silent solo...wedding was chosen.")."<br />\n";
+		$messages[] = _("Ok, you don't want to play a silent solo...wedding was chosen.")."<br />\n";
 		DB_set_sickness_by_hash($me,'wedding');
 	      }
 	    else if($_REQUEST['poverty'] == 'yes')
 	      {
-		echo _("Don't think you can win with just a few trump...? Ok, poverty chosen.")." <br />\n";
+		$messages[] = _("Don't think you can win with just a few trump...? Ok, poverty chosen.")." <br />\n";
 		DB_set_sickness_by_hash($me,'poverty');
 	      }
 	    else if($_REQUEST['nines'] == 'yes')
 	      {
-		echo _("What? You just don't want to play a game because you have a few nines? Well, if no one".
+		$messages[] = _("What? You just don't want to play a game because you have a few nines? Well, if no one".
 		       " is playing solo, this game will be canceled.")."<br />\n";
 		DB_set_sickness_by_hash($me,'nines');
 	      }
 	    else if($_REQUEST['lowtrump'] == 'yes')
 	      {
 		if($RULES['lowtrump']=='cancel')
-		  echo _("What? You just don't want to play a game because you have low trump? Well, if no one".
+		  $messages[] = _("What? You just don't want to play a game because you have low trump? Well, if no one".
 			 " is playing solo, this game will be canceled.")."<br />\n";
 		else
-		  echo _("Don't think you can win with low trumps...? Ok, poverty chosen.")." <br />.<br />\n";
+		  $messages[] = _("Don't think you can win with low trumps...? Ok, poverty chosen.")." <br />.<br />\n";
 
 		DB_set_sickness_by_hash($me,'lowtrump');
 	      }
-
-	    echo "</p>\n";
 
 	    /* move on to the next stage*/
 	    DB_set_hand_status_by_hash($me,'check');
@@ -542,8 +546,7 @@ switch($mystatus)
     echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
     /* end displaying sickness */
 
-    echo "<div class=\"message\">\n";
-    echo '<p> '._('Checking if someone else selected solo, nines, wedding or poverty.').'</p>';
+    $messages[] = _('Checking if someone else selected solo, nines, wedding or poverty.');
 
     /* check if everyone has reached this stage */
     $userids = DB_get_all_userid_by_gameid($gameid);
@@ -561,10 +564,10 @@ switch($mystatus)
 
     if(!$ok)
       {
-	echo '<p>'._('This step can only be handled after everyone finished the last step. '.
+	$messages[] = _('This step can only be handled after everyone finished the last step. '.
 	  'Seems like this is not the case, so you need to wait a bit... '.
 	  'you will get an email once that is the case, please use the link in '.
-	  'that email to continue the game.').'</p></div>';
+	  'that email to continue the game.');
 
 	/* display cards, if player was just at the init-phase he will still see the cards from there
 	 * we can put this one here, since the last player to finish the init state won't get here and
@@ -581,7 +584,7 @@ switch($mystatus)
 	 * are playing, in case there are any solos this already
 	 * will have the correct information in it */
 
-	echo '<p>'._('Ok, everyone is done... figuring out what kind of game we are playing.').'</p>';
+	$messages[] = _('Ok, everyone is done... figuring out what kind of game we are playing.');
 
 	$gametype    = DB_get_gametype_by_gameid($gameid);
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
@@ -627,8 +630,8 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('nines',$gameid);
 
-		echo "<p>The game has been canceled because ".DB_get_name('userid',$cancel).
-		  " has five or more nines and nobody is playing solo.</p>\n";
+		$messages[] = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		  " has five or more nines and nobody is playing solo.";
 	      }
 	    else if ($cancelsick == 'lowtrump')
 	      {
@@ -640,8 +643,8 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('lowtrump',$gameid);
 
-		echo "<p>The game has been canceled because ".DB_get_name('userid',$cancel).
-		  " has low trump and nobody is playing solo.</p>\n";
+		$messages[] = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		  " has low trump and nobody is playing solo.";
 	      };
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
@@ -650,7 +653,6 @@ switch($mystatus)
 		mymail($user,$gameid, GAME_CANCELED, $email_message);
 	      }
 
-	    echo "</div>\n"; /* end div message */
 	    break;
 	  }
 	else if($poverty==1) /* one person has poverty */
@@ -694,7 +696,7 @@ switch($mystatus)
 	    $gametype = 'wedding';
 	  };
 	/* now the gametype is set correctly in the database */
-	echo '<p>'._('Got it').' :)</p>';
+	$messages[] = _('Got it').' :)';
 
 	/* loop over all players, set re/contra if possible and start the game if possible */
 	$userids = DB_get_all_userid_by_gameid($gameid);
@@ -788,7 +790,7 @@ switch($mystatus)
 		  }
 	      }
 	    else
-	      echo "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
+	      $messages[] = "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
 	  }
 	else
 	  {
@@ -798,7 +800,7 @@ switch($mystatus)
 
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
-	      echo "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br /\n";
+	      $messages[] =  "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br /\n";
 	    else
 	      {
 		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
@@ -813,7 +815,6 @@ switch($mystatus)
 		  }
 	      }
 	  }
-	echo "</div>\n";
 	$card_status = CARDS_SHOW;
       }
     break;
@@ -907,7 +908,7 @@ switch($mystatus)
 	      }
 	  }
 	else
-	  echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
+	  $messages[]= "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.";
       }
 
     /* the following is part A) of what needs to be done */
@@ -940,7 +941,7 @@ switch($mystatus)
 		  }
 	      }
 	    echo "<a href=\"index.php?action=game&amp;me=$me&amp;trump=no\">No way</a> <br />\n";
-	    echo "</div><div>\n";
+	    echo "</div>\n";
 	  }
 	break;
       }
@@ -986,7 +987,7 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('trump',$gameid);
 
-		echo "<p class=\"message\";>Game ".DB_format_gameid($gameid)." has been canceled.<br /><br /></p>";
+		$messages[] = "Game ".DB_format_gameid($gameid)." has been canceled.";
 		break;
 	      }
 	    else
@@ -1083,7 +1084,7 @@ switch($mystatus)
 			$next=2;
 
 		    if($mypos+$next>4)
-		      echo "<div class=\"message\">Error in poverty, please contact the Admin</div>\n";
+		      $messages[] = "Error in poverty, please contact the Admin";
 
 		    $userhash = DB_get_hash_from_game_and_pos($gameid,$mypos+$next);
 		    $userid   = DB_get_userid('hash',$userhash);
@@ -1096,10 +1097,9 @@ switch($mystatus)
 		    mymail($userid,$gameid, GAME_DPOVERTY, $email_message);
 		  }
 	      }
-	    echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here.</div>\n";
+	    $messages[] = "Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here";
 	  }
       }
-    echo "</div>\n";
     break;
 
   case 'play':
@@ -1112,19 +1112,19 @@ switch($mystatus)
     switch($gamestatus)
       {
       case 'cancel-noplay':
-	echo "<div class=\"message\"><p>The game has been canceled due to the request of one player.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.</p></div>";
+	$messages[] = "The game has been canceled due to the request of one player.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.";
 	break;
       case 'cancel-timedout':
-	echo "<div class=\"message\"><p>The game has been canceled because one player wasn't responding.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.</p></div>";
+	$messages[] = "The game has been canceled because one player wasn't responding.<br />If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.";
 	break;
       case 'cancel-nines':
-	echo "<div class=\"message\"><p>The game has been canceled because one player had too many nines.</p></div>";
+	$messages[] = "The game has been canceled because one player had too many nines.";
 	break;
       case 'cancel-lowtrump':
-	echo "<div class=\"message\"><p>The game has been canceled because one player had low trump.</p></div>";
+	$messages[] = "The game has been canceled because one player had low trump.";
 	break;
       case 'cancel-trump':
-	echo "<div class=\"message\"><p>The game has been canceled because nobody wanted to take the trump.</p></div>";
+	$messages[] = "The game has been canceled because nobody wanted to take the trump.";
 	break;
       }
     /* for these two types, we shouldn't show the cards, since we might want to restart the game */
@@ -1197,8 +1197,8 @@ switch($mystatus)
     /* has the game started? No, then just wait here...*/
     if($gamestatus == 'pre')
       {
-	echo '<p class="message"> '._('You finished the setup, but not everyone else finished it... '.
-	  'You need to wait for the others. Just wait for an email.').' </p>';
+	$messages[] = _('You finished the setup, but not everyone else finished it... '.
+	  'You need to wait for the others. Just wait for an email.');
 
 	$card_status = CARDS_SHOW;
 
@@ -1536,7 +1536,7 @@ switch($mystatus)
 		if($winner>0)
 		  DB_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
 		else
-		  echo "ERROR during scoring";
+		  $messages[] = "ERROR during scoring";
 
 		if($debug)
 		  echo "DEBUG: position $winner won the trick <br />";
@@ -1859,12 +1859,12 @@ switch($mystatus)
 	  }
 	else
 	  {
-	    echo "can't find that card?! <br />\n";
+	    $messages[] = "can't find that card?!";
 	  }
       }
     else if(myisset('card') && !$myturn )
       {
-	echo _("please wait until it's your turn!")."<br />\n";
+	$messages[] = _("please wait until it's your turn!");
       }
 
     if($seq!=4 && $trickNR>=1 && !(myisset('card') && $myturn) )
@@ -1972,6 +1972,7 @@ switch($mystatus)
 $mycards = DB_get_hand($me);
 $mycards = mysort($mycards,$gametype);
 
+echo "\n";
 echo '<div class="mycards">';
 switch ($card_status) {
  case CARDS_SHOW:
@@ -2090,8 +2091,21 @@ switch ($card_status) {
  default:
    break;
  }
-echo '</div>';
+echo "</div>\n";
 
+/*****************
+ * show messages *
+ *****************/
+
+if( sizeof($messages) )
+  {
+    echo "\n<div class=\"message\">\n";
+    foreach($messages as $message)
+      {
+	echo "  <div>$message <div>close</div> </div>\n";
+      }
+    echo "</div>\n\n";
+  }
 
 /***********************************************
  * Comments, re/contra calls, user menu

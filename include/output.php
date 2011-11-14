@@ -418,6 +418,8 @@ function output_header()
 		  $(".doregister").slideToggle();
 		});
 
+	      $(".message div div").parent().click ( function() { $(this).hide(); });
+
            });
      </script>
   </head>

@@ -110,7 +110,7 @@ footer .left  { float:left;  font-size:smaller; }
 }
 
 /* all kind of message that should appear in the middle of the page/table */
-.joingame,.sickness,.poverty,.total,.message {
+.message {
  position: absolute;
  background-color: #fff;
  width: 20%;
@@ -118,8 +118,26 @@ footer .left  { float:left;  font-size:smaller; }
  left:40%;
  right:40%;
  text-align: center;
- z-index:22
+ z-index:33;
 }
+.message >div { border: 2px solid black; }
+.message div div {
+    width: 100%;
+    text-align: right;
+    font-size: smaller;
+}
+
+.joingame,.sickness,.poverty,.total {
+ position: absolute;
+ background-color: #fff;
+ width: 20%;
+ top:19em;
+ left:40%;
+ right:40%;
+ text-align: center;
+ z-index:22;
+}
+
 
 .total {
     top:11em;
