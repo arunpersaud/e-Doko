@@ -2135,7 +2135,7 @@ else
     echo "<div class=\"usermenu\">\n";
     echo "It's your turn in these games:<br />\n";
     echo "Please log in to see this information.\n";
-    echo "</div>\n";
+    echo "</div>\n\n";
   }
 
 /*
@@ -2182,7 +2182,7 @@ if(sizeof($other_game_ids)>0 && $mystatus=='gameover')
     echo "  </p>\n";
   }
 
-echo "</div>\n"; /* end gameinfo */
+echo "</div>\n\n"; /* end gameinfo */
 
 /* make sure that we don't show the notes to the wrong person
  * (e.g. other people looking at an old game)

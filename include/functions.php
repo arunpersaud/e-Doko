@@ -1181,22 +1181,22 @@ function display_user_menu($id)
     {
       if($i==0)
 	{
-	  echo "<div class=\"usermenu\">\n";
+	  echo "<div class=\"usermenu\">\n  ";
 	  echo _('It\'s your turn in these games').":<br />\n";
 	}
 
       $i++;
-      echo "<a href=\"".$INDEX."?action=game&amp;me=".$r[0].
+      echo "  <a href=\"".$INDEX."?action=game&amp;me=".$r[0].
 	"\">game ".DB_format_gameid($r[1])." </a><br />\n";
       if($i>4)
 	{
-	  echo "...<br />\n";
+	  echo "  ...<br />\n";
 	  break;
 	}
     }
 
   if($i)
-    echo  "</div>\n";
+    echo  "</div>\n\n";
   return;
 }
 

@@ -451,9 +451,7 @@ function output_footer()
     "  <img alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
     " src=\"pics/green1.gif\" height=\"32\" width=\"100\" /></a>\n".
     "  </p> \n";
-  echo "\n";
-  echo "</footer>\n";
-
+  echo "</footer>\n\n";
   echo "</body>\n";
   echo "</html>\n";
 
@@ -490,9 +488,9 @@ function output_status()
       echo " | <a href=\"".$WIKI."\">"._('wiki/bugs')."</a>\n";
       echo " | <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a>\n";
       echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">"._('logout')."</a>\n";
-      echo "</div>\n";
+      echo "</div>\n\n";
 
-      echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n";
+      echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n\n";
     }
   return;
 }
@@ -600,10 +598,10 @@ function output_user_notes($userid,$gameid,$userstatus)
   echo "<div class=\"notes\"> "._('Personal notes').": <br />\n";
   $notes = DB_get_notes_by_userid_and_gameid($userid,$gameid);
   foreach($notes as $note)
-    echo "$note <hr />\n";
+    echo "  $note <hr />\n";
   if($userstatus!='gameover')
-    echo "<input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
-  echo "</div> \n";
+    echo "  <input name=\"note\" type=\"text\" size=\"15\" maxlength=\"100\" />\n";
+  echo "</div>\n\n";
 
   return;
 }
