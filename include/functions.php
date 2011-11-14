@@ -86,6 +86,21 @@ define("GAME_RECOVERY",         8);
 define("GAME_REMINDER",         9);
 define("GAME_NEW",             10);
 
+/* define possible status for showing cards */
+
+define("CARDS_EMPTY",       0); /* show player's hand*/
+define("CARDS_SHOW",        1); /* show player's hand*/
+define("CARDS_MYTURN",      2); /* show radiobuttons for cards that can be played*/
+define("CARDS_EXCHANGE",    3); /* do we need to return cards to our partner in poverty?*/
+define("CARDS_GAMEOVER_ME", 4); /* show all cards from everyone*/
+define("CARDS_GAMEOVER",    5); /* show all cards from everyone (looking at someone else's game)*/
+
+ /*   cards_status: SHOW      show our hand
+ *                 MYTURN    show radiobutton for cards that can be played
+ *                 EXCHANGE  do we need to return cards to our partner in poverty?
+ *                 GAMEOVER  show all cards from everyone
+ */
+
 function mymail($uid,$gameid=0,$type,$message)
 {
   global $EmailName,$WIKI;

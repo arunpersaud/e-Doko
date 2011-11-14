@@ -328,6 +328,11 @@ display_table();
  * gameover: are we revisiting a game
  */
 
+/* Depending on the situation we set
+ *   cards_status (see functions.php for possible options)
+ */
+$cards_status = CARDS_EMPTY;
+
 switch($mystatus)
   {
   case 'start':
@@ -343,7 +348,7 @@ switch($mystatus)
       {
 	/* asks the player, if he wants to join the game */
 	output_check_want_to_play($me);
-	echo '<div class="mycards"></div>';
+	$card_status = CARDS_EMPTY;
 	break;
       }
     else
@@ -393,13 +398,9 @@ switch($mystatus)
     /***************************
      * check if player is sick *
      ***************************/
-
-    $mycards = DB_get_hand($me);
-    $mycards = mysort($mycards,$gametype);
-
     if(!myisset('solo','wedding','poverty','nines','lowtrump') )
       {
-	/* output sickness of other playes, in case the already selected and are sitting in front of the current player */
+	/* output sickness of other playes, in case they already selected and are sitting in front of the current player */
 	echo "\n<ul class=\"tricks\">\n";
 	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
 	  "    <div class=\"trick\" id=\"trick0\">\n";
@@ -421,12 +422,10 @@ switch($mystatus)
 	echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
 	/* end displaying sickness */
 
+	$mycards = DB_get_hand($me);
 	output_check_for_sickness($me,$mycards);
 
-	echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	foreach($mycards as $card)
-	  display_card($card,$PREF['cardset']);
-	echo "</div>\n";
+	$card_status = CARDS_SHOW;
 
 	break;
       }
@@ -445,10 +444,7 @@ switch($mystatus)
 	    echo "<p class=\"message\"> You selected more than one sickness, please go back ".
 	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.</p>";
 
-	    echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	    foreach($mycards as $card)
-	      display_card($card,$PREF['cardset']);
-	    echo "</div>\n";
+	    $card_status = CARDS_SHOW;
 
 	    break;
 	  }
@@ -524,9 +520,6 @@ switch($mystatus)
      * this can therefore only be handled once all players finished the last stage
      */
 
-    $mycards = DB_get_hand($me);
-    $mycards = mysort($mycards,$gametype);
-
     /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
     echo "\n<ul class=\"tricks\">\n";
     echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
@@ -579,11 +572,7 @@ switch($mystatus)
 	 */
 	if($mystatus=='check')
 	  {
-	    /* show cards */
-	    echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	    foreach($mycards as $card)
-	      display_card($card,$PREF['cardset']);
-	    echo "</div>\n";
+	    $card_status = CARDS_SHOW;
 	  }
       }
     else
@@ -825,11 +814,7 @@ switch($mystatus)
 	      }
 	  }
 	echo "</div>\n";
-	/* show cards */
-	echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	foreach($mycards as $card)
-	  display_card($card,$PREF['cardset']);
-	echo "</div>\n";
+	$card_status = CARDS_SHOW;
       }
     break;
 
@@ -871,10 +856,6 @@ switch($mystatus)
 	  };
       }
 
-    /* update hand */
-    $mycards = DB_get_hand($me);
-    $mycards = mysort($mycards,$gametype);
-
     /* output pre-game trick in case user reloads,
      * only needs to be done when a team has been formed */
     if($myparty=='re' || $myparty=='contra')
@@ -893,17 +874,16 @@ switch($mystatus)
       }
     /* end output pre-game trick */
 
+    /* get hand */
+    $mycards = DB_get_hand($me);
+
+    /* default: show cards, will be overwritten, if we need to give back cards */
+    $card_status = CARDS_SHOW;
+
     /* check if user need to give more cards back */
     if( ($myparty=='re' || $myparty=='contra') && count($mycards)>12)
       {
-	echo '<div class="poverty"> '._('You need to get rid of a few cards')."</div>\n";
-
-	$type='exchange';
-	echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	foreach($mycards as $card)
-	  display_link_card($card,$PREF['cardset'],$type);
-	echo "  <input type=\"submit\" class=\"submitbutton\" value=\"select card to give back\" />\n";
-	echo "</div>\n";
+	$card_status = CARDS_EXCHANGE;
       }
     else if( ($myparty=='re' || $myparty=='contra') && count($mycards)==12)
       {
@@ -928,7 +908,6 @@ switch($mystatus)
 	  }
 	else
 	  echo "<div class=\"message\">Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.</div>\n";
-	echo '<div class="mycards"></div>'."\n"; /* needed to make sure the message area is in the right position */
       }
 
     /* the following is part A) of what needs to be done */
@@ -962,11 +941,6 @@ switch($mystatus)
 	      }
 	    echo "<a href=\"index.php?action=game&amp;me=$me&amp;trump=no\">No way</a> <br />\n";
 	    echo "</div><div>\n";
-
-	    echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	    foreach($mycards as $card)
-	      display_card($card,$PREF['cardset']);
-	    echo "</div></div>\n";
 	  }
 	break;
       }
@@ -1028,6 +1002,8 @@ switch($mystatus)
 		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 		mymail($userid,$gameid, GAME_POVERTY, $email_message);
 	      }
+
+	    $cards_status = CARDS_SHOW;
 	  }
 	else
 	  {
@@ -1224,13 +1200,7 @@ switch($mystatus)
 	echo '<p class="message"> '._('You finished the setup, but not everyone else finished it... '.
 	  'You need to wait for the others. Just wait for an email.').' </p>';
 
-	$mycards = DB_get_hand($me);
-	$mycards = mysort($mycards,$gametype);
-
-	echo '<div class="mycards">'._('Your cards are').": <br />\n";
-	foreach($mycards as $card)
-	  display_card($card,$PREF['cardset']);
-	echo "</div>\n";
+	$card_status = CARDS_SHOW;
 
 	break; /* not sure this works... the idea is that you can
 		* only  play a card after everyone is ready to play */
@@ -1964,117 +1934,21 @@ switch($mystatus)
     echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">"._('next')."</a></li>\n";
     echo "</ul>\n"; /* end ul tricks*/
 
-    $mycards = DB_get_hand($me);
-    $mycards = mysort($mycards,$gametype);
-    echo "<div class=\"mycards\">\n";
-
     if($myturn && !myisset('card') && $mystatus=='play' )
       {
-	echo "Hello ".$myname.", it's your turn!  <br />\n";
-	echo _('Your cards are').": <br />\n";
-
-	/* do we have to follow suite? */
-	$followsuit = 0;
-	if(have_suit($mycards,$firstcard))
-	  $followsuit = 1;
-
-	/* count how many cards we can play, so that we can pre-select it if there is only one */
-	$howmanycards = 0;
-	foreach($mycards as $card)
-	  {
-	    if($howmanycards>1)
-	      break;
-
-	    /* display only cards that the player is allowed to play as links, the rest just display normal
-	     * also check if we have both schweinchen, in that case only display on of them as playable
-	     */
-	    if( ($followsuit && !same_type($card,$firstcard)) ||
-		( (int)($card)==19 &&
-		  !$GAME['schweinchen-first'] &&
-		  ( $RULES['schweinchen']=='second' ||
-		    ( $RULES['schweinchen']=='secondaftercall' &&
-		     (DB_get_call_by_hash($GAME['schweinchen-who']) ||
-		      DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
-		    )
-		  ) &&
-		  $GAME['schweinchen-who']==$me &&
-		  in_array($gametype,array('normal','wedding','trump','silent'))
-		  )
-		)
-	      continue;
-	    else
-	      $howmanycards++;
-	  }
-
-	if($howmanycards==1)
-	  $howmanycards=1;
-	else
-	  $howmanycards=0;
-
-	foreach($mycards as $card)
-	  {
-	    /* display only cards that the player is allowed to play as links, the rest just display normal
-	     * also check if we have both schweinchen, in that case only display on of them as playable
-	     */
-	    if( ($followsuit && !same_type($card,$firstcard)) ||
-		( (int)($card)==19 &&
-		  !$GAME['schweinchen-first'] &&
-		  ( $RULES['schweinchen']=='second' ||
-		    ( $RULES['schweinchen']=='secondaftercall' &&
-		     (DB_get_call_by_hash($GAME['schweinchen-who']) ||
-		      DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
-		    )
-		  ) &&
-		  $GAME['schweinchen-who']==$me &&
-		  in_array($gametype,array('normal','wedding','trump','silent'))
-		  )
-		)
-	      display_card($card,$PREF['cardset']);
-	    else
-	      display_link_card($card,$PREF['cardset'],$type='card',$selected=$howmanycards);
-	  }
+	$card_status = CARDS_MYTURN;
       }
     else if($mystatus=='play' )
       {
-	echo _('Your cards are').": <br />\n";
-	foreach($mycards as $card)
-	  display_card($card,$PREF['cardset']);
+	$card_status = CARDS_SHOW;
       }
     else if($mystatus=='gameover')
       {
-	$oldcards = DB_get_all_hand($me);
-	$oldcards = mysort($oldcards,$gametype);
-
 	if(isset($_SESSION['id']) && $myid==$_SESSION['id'])
-	  echo _('Your cards were').": <br />\n";
+	  $card_status = CARDS_GAMEOVER_ME;
 	else
-	  {
-	    $name = DB_get_name('userid',$myid);
-	    echo "$name's were: <br />\n";
-	  }
-
-	foreach($oldcards as $card)
-	  display_card($card,$PREF['cardset']);
-
-	$userids = DB_get_all_userid_by_gameid($gameid);
-	foreach($userids as $user)
-	  {
-	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
-
-	    if($userhash!=$me)
-	      {
-		echo "<br />";
-
-		$name = DB_get_name('userid',$user);
-		$oldcards = DB_get_all_hand($userhash);
-		$oldcards = mysort($oldcards,$gametype);
-		echo "$name's cards were: <br />\n";
-		foreach($oldcards as $card)
-		  display_card($card,$PREF['cardset']);
-	      }
-	  };
+	  $card_status = CARDS_GAMEOVER;
       }
-    echo "</div>\n";
 
     /* if the game is over do some extra stuff, therefore exit the swtich statement if we are still playing*/
     if($mystatus=='play')
@@ -2090,6 +1964,134 @@ switch($mystatus)
   default:
     myerror("error in testing the status");
   } /*end of output: tricks, table, messages, card */
+
+/**************
+ * show cards *
+ **************/
+
+$mycards = DB_get_hand($me);
+$mycards = mysort($mycards,$gametype);
+
+echo '<div class="mycards">';
+switch ($card_status) {
+ case CARDS_SHOW:
+   echo _('Your cards are').": <br />\n";
+   foreach($mycards as $card)
+     display_card($card,$PREF['cardset']);
+   break;
+ case CARDS_EXCHANGE:
+   echo '<div class="poverty"> '._('You need to get rid of a few cards')."</div>\n";
+
+   echo _('Your cards are').": <br />\n";
+   $type='exchange';
+   foreach($mycards as $card)
+     display_link_card($card,$PREF['cardset'],$type);
+   echo '  <input type="submit" class="submitbutton" value="select card to give back" />'."\n";
+   break;
+ case CARDS_MYTURN:
+   echo 'Hello '.$myname.", it's your turn!  <br />\n";
+   echo _('Your cards are').": <br />\n";
+
+   /* do we have to follow suite? */
+   $followsuit = 0;
+   if(have_suit($mycards,$firstcard))
+     $followsuit = 1;
+
+   /* count how many cards we can play, so that we can pre-select it if there is only one */
+   $howmanycards = 0;
+   foreach($mycards as $card)
+     {
+       if($howmanycards>1)
+	 break;
+
+       /* display only cards that the player is allowed to play as links, the rest just display normal
+	* also check if we have both schweinchen, in that case only display on of them as playable
+	*/
+       if( ($followsuit && !same_type($card,$firstcard)) ||
+	   ( (int)($card)==19 &&
+	     !$GAME['schweinchen-first'] &&
+	     ( $RULES['schweinchen']=='second' ||
+	       ( $RULES['schweinchen']=='secondaftercall' &&
+		 (DB_get_call_by_hash($GAME['schweinchen-who']) ||
+		  DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
+		 )
+	       ) &&
+	     $GAME['schweinchen-who']==$me &&
+	     in_array($gametype,array('normal','wedding','trump','silent'))
+	     )
+	   )
+	 continue;
+       else
+	 $howmanycards++;
+     }
+
+   /* make it boolean, so that we can pass it later to display_link_card */
+   if($howmanycards!=1)
+     $howmanycards=0;
+
+   foreach($mycards as $card)
+     {
+       /* display only cards that the player is allowed to play as links, the rest just display normal
+	* also check if we have both schweinchen, in that case only display on of them as playable
+	*/
+       if( ($followsuit && !same_type($card,$firstcard)) ||
+	   ( (int)($card)==19 &&
+	     !$GAME['schweinchen-first'] &&
+	     ( $RULES['schweinchen']=='second' ||
+	       ( $RULES['schweinchen']=='secondaftercall' &&
+		 (DB_get_call_by_hash($GAME['schweinchen-who']) ||
+		  DB_get_partner_call_by_hash($GAME['schweinchen-who']) )
+		 )
+	       ) &&
+	     $GAME['schweinchen-who']==$me &&
+	     in_array($gametype,array('normal','wedding','trump','silent'))
+	     )
+	   )
+	 display_card($card,$PREF['cardset']);
+       else
+	 display_link_card($card,$PREF['cardset'],$type='card',$selected=$howmanycards);
+     }
+   break;
+ case CARDS_GAMEOVER_ME:
+ case CARDS_GAMEOVER:
+   if($card_status == CARDS_GAMEOVER_ME)
+     echo _('Your cards were').": <br />\n";
+   else
+     {
+       $name = DB_get_name('userid',$myid);
+       echo "$name's were: <br />\n";
+     }
+   $oldcards = DB_get_all_hand($me);
+   $oldcards = mysort($oldcards,$gametype);
+
+   foreach($oldcards as $card)
+     display_card($card,$PREF['cardset']);
+
+   /* display hands of everyone else */
+   $userids = DB_get_all_userid_by_gameid($gameid);
+   foreach($userids as $user)
+     {
+       $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
+
+       if($userhash!=$me)
+	 {
+	   echo "<br />";
+
+	   $name = DB_get_name('userid',$user);
+	   $oldcards = DB_get_all_hand($userhash);
+	   $oldcards = mysort($oldcards,$gametype);
+	   echo "$name's cards were: <br />\n";
+	   foreach($oldcards as $card)
+	     display_card($card,$PREF['cardset']);
+	 }
+     };
+   break;
+ case CARDS_EMPTY:
+ default:
+   break;
+ }
+echo '</div>';
+
 
 /***********************************************
  * Comments, re/contra calls, user menu
