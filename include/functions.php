@@ -1181,16 +1181,16 @@ function display_user_menu($id)
     {
       if($i==0)
 	{
-	  echo "<div class=\"usermenu\">\n  ";
-	  echo _('It\'s your turn in these games').":<br />\n";
+	  echo "\n<div class=\"usermenu\">\n  ";
+	  echo _('It\'s your turn in these games').":\n";
 	}
 
       $i++;
       echo "  <a href=\"".$INDEX."?action=game&amp;me=".$r[0].
-	"\">game ".DB_format_gameid($r[1])." </a><br />\n";
+	"\">game ".DB_format_gameid($r[1])." </a>\n";
       if($i>4)
 	{
-	  echo "  ...<br />\n";
+	  echo "  ...\n";
 	  break;
 	}
     }

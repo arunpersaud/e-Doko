@@ -49,7 +49,6 @@ global $GAME,$RULES,$CARDS;
 $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
 $mystatus = DB_get_status_by_hash($me);
-$origmystatus = DB_get_status_by_hash($me); /* to show "it's your turn" menu when game has just finished */
 $mypos    = DB_get_pos_by_hash($me);
 $myhand   = DB_get_handid('hash',$me);
 $myparty  = DB_get_party_by_hash($me);
@@ -174,6 +173,30 @@ if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
     $comment .= "Zero";
   }
 
+
+
+/*****************************************************************
+ * output other games where it is the users turn
+ * make sure that the people looking at old games don't see the wrong games here
+ *****************************************************************/
+
+if( $gamestatus != 'gameover'  && isset($_SESSION['id']) )
+  {
+    /* game isn't over, only valid user can get here, so show menu */
+    display_user_menu($myid);
+  }
+else if( $mystatus == 'gameover' && isset($_SESSION['id']) )
+  {
+    /* user is looking at someone else's game, show the menu for the correct user */
+    display_user_menu($_SESSION['id']);
+  }
+else
+  {
+    echo "<div class=\"usermenu\">\n";
+    echo "It's your turn in these games: \n";
+    echo "Please log in to see this information.\n";
+    echo "</div>\n\n";
+  }
 
 /*****************************************************************
  * output extra division in case this game is part of a session
@@ -306,7 +329,6 @@ if($mystatus!='gameover')
  else
    if(isset($_SESSION['id']))
      DB_update_user_timestamp($_SESSION['id']);
-
 
 /******************************************************************************
  * Output tricks played, table, messages, and cards (depending on game status)
@@ -2110,33 +2132,6 @@ if( sizeof($messages) )
 /***********************************************
  * Comments, re/contra calls, user menu
  ***********************************************/
-
-/* output other games where it is the users turn
- * make sure that the people looking at old games don't see the wrong games here
- */
-if( $gamestatus != 'gameover' )
-  {
-    /* game isn't over, only valid user can get here, so show menu */
-    display_user_menu($myid);
-  }
-else if( $origmystatus != 'gameover' )
-  {
-    /* user just played the very last card, game is now over, it's still ok to show the menu though */
-    display_user_menu($myid);
-  }
-else if( $mystatus == 'gameover'
-	 && isset($_SESSION['id']) )
-  {
-    /* user is looking at someone else's game, show the menu for the correct user */
-    display_user_menu($_SESSION['id']);
-  }
-else
-  {
-    echo "<div class=\"usermenu\">\n";
-    echo "It's your turn in these games:<br />\n";
-    echo "Please log in to see this information.\n";
-    echo "</div>\n\n";
-  }
 
 /*
  * display gameinfo: re/contra, comment-box, play-card button, games played by others
