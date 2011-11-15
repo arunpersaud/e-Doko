@@ -770,3 +770,81 @@ div span.numberoftricks {
 .about .translation {
     background-color: #fce94f;
 }
+
+
+/* special layout for mobile devices */
+@media only screen and (max-width: 900px) {
+.main {
+  background-color: #fff;
+  margin-left: 0em;
+  margin-right: 0em;
+  min-height: 0em;
+}
+
+header, footer {
+  margin-left: 0em;
+  margin-right: 0em;
+}
+
+
+.lastlogin {
+  position: relative;
+  left: 0em;
+  top: 0em;
+  width: 100%;
+  text-align: center;
+  border-top: 1px solid gray;
+}
+
+.session div.sessionscore div, .status {
+  right:0em;
+}
+
+.usermenu {
+  left: 0em;
+}
+
+.notes {
+  position:relative;
+  top:0em;
+  left:0;
+  margin:0.1em;
+  margin-top:0em;
+  margin-left:0em;
+
+  width: 100%;
+
+  border:    2px solid gray;
+
+  padding:0.3em;
+
+  background-color: #efefef;
+
+  height:100%;
+  overflow: auto;
+  z-index:0;
+}
+
+.user { margin-left:5%;margin-right:5%; }
+
+div.table img.table {
+  width:50%;
+}
+
+.message {
+ position: relative;
+ background-color: #fff;
+ width: 100%;
+ top:0em;
+ left:0%;
+ right:0%;
+ text-align: center;
+ z-index:1;
+}
+.message >div { border: 2px solid black; }
+.message div div {
+    width: 100%;
+    text-align: right;
+    font-size: smaller;
+}
+}
