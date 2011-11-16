@@ -971,7 +971,7 @@ function can_call($what,$hash)
   return 0;
 }
 
-function display_table ()
+function display_table_begin ()
 {
   global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
   global $RULES,$GAME,$gametype;
@@ -991,10 +991,57 @@ function display_table ()
 		     "WHERE Hand.game_id='".$gameid."' ".
 		     "ORDER BY position ASC");
 
-  echo "<div class=\"table\">\n".
-    "  <img class=\"table\" src=\"pics/table.png\" alt=\"table\" />\n";
-  while($r = DB_fetch_array($result))
-    {
+  $row0 = DB_fetch_array($result);
+  $row1 = DB_fetch_array($result);
+  $row2 = DB_fetch_array($result);
+  $row3 = DB_fetch_array($result);
+
+  echo "<div class=\"table\">\n";
+  display_single_user($row1);
+  echo "\n<div class=\"middle\">\n";
+  display_single_user($row0);
+  echo "  <img class=\"table\" src=\"pics/table.png\" alt=\"table\" />\n";
+  display_single_user($row2);
+
+  return;
+}
+function display_table_end ()
+{
+  global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
+  global $RULES,$GAME,$gametype;
+
+  $result = DB_query("SELECT  User.fullname as name,".
+		     "        Hand.position as position, ".
+		     "        User.id, ".
+		     "        Hand.party as party, ".
+		     "        Hand.sickness as sickness, ".
+		     "        Hand.point_call, ".
+		     "        User.last_login, ".
+		     "        Hand.hash,       ".
+		     "        User.timezone,    ".
+		     "        User.email       ".
+		     "FROM Hand ".
+		     "LEFT JOIN User ON User.id=Hand.user_id ".
+		     "WHERE Hand.game_id='".$gameid."' ".
+		     "ORDER BY position ASC");
+
+  $row0 = DB_fetch_array($result);
+  $row1 = DB_fetch_array($result);
+  $row2 = DB_fetch_array($result);
+  $row3 = DB_fetch_array($result);
+
+  echo "</div>\n";
+  display_single_user($row3);
+  echo "</div>\n";
+
+  return;
+}
+
+function display_single_user($r)
+{
+  global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
+  global $RULES,$GAME,$gametype;
+
       $name  = $r[0];
       $pos   = $r[1];
       $user  = $r[2];
@@ -1139,7 +1186,7 @@ function display_table ()
 	"title=\"local time: ".date("Y-m-d H:i:s",$timenow).  " ".
 	"last login: ".date("Y-m-d H:i:s",$lastlogin)."\" />";
 
-      echo "   <span class=\"numberoftricks\">";
+      echo "   <br /><span class=\"numberoftricks\">";
       /* show how many tricks the person made */
       switch($wins)
 	{
@@ -1156,12 +1203,6 @@ function display_table ()
 	}
       echo "</span>\n";
       echo "  </div>\n";
-
-    }
-  echo  "</div>\n"; /* end output table */
-
-
-  return;
 }
 
 

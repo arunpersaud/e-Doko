@@ -60,7 +60,6 @@ footer .left  { float:left;         font-size:smaller;}
 
 /* sessions */
 .session {
-  width: 100%;
   border-bottom: 1px solid #000;
   padding: 0.5em;
   text-align: center;
@@ -134,8 +133,6 @@ footer .left  { float:left;         font-size:smaller;}
  text-align: center;
  z-index:22;
 }
-
-
 .total {
     top:11em;
     width: 14%;
@@ -157,9 +154,6 @@ footer .left  { float:left;         font-size:smaller;}
  z-index:15;
 }
 
-/* output possible rules for  a new game  */
-.rules { margin-top:24em;}
-
 /* playing cards*/
 .card {
   position:absolute;
@@ -172,65 +166,88 @@ footer .left  { float:left;         font-size:smaller;}
 }
 .card img { width:8em; }
 
+form {  position: relative;}
+
 /* display the table and the names */
 div.table {
-  position:absolute;
-  width:100%;
-  height:37em;
-  margin:0;
-  left:0;
-  padding:0;
-/*  border: 3px solid blue; */
-  top: 9.2em;
+  position:relative;
   text-align:center;
+  margin: 0;
+  padding:0;
+  border-bottom:1px solid #444;
 }
 
-div.table img.table {
-  position:absolute;
-  width:25%;
-  top:20%;
-  height:22em;
-  left:37.5%;
-  z-index:5;
-  display: block;
-  margin:0;
-  padding:0;
+div.table div.table1 {
+  width:10.5%;
+  min-width: 10em;
+  text-align:center;
+  z-index:20;
+  margin: 0 auto;
 }
-div.table div {
-  /*background-color:green;*/
+div.middle {
+    position:relative;
+    min-height: 6em;
+}
+div.table div.table0 {
   position:absolute;
   width:10.5%;
+  min-width: 10em;
+  min-height: 4em;
+  top:20%;
+  right: 64.5%;
   text-align:center;
   z-index:20;
 }
-
-div.table div.table0 {
-  top:45%;
-  right:63.5%;
-}
-div.table div.table1 {
-  top:2%;
-  left:44.75%;
+div.table img.table {
+  width:25%;
+  z-index:5;
+  margin:  0 auto;
+  min-margin-left: 10xem;
+  min-margin-right: 10em;
+  min-height: 6em;
+  display: block;
+  vertical-align:middle;
 }
 div.table div.table2 {
-  top:45%;
-  left:63.5%;
+  position:absolute;
+  width:10.5%;
+  min-width: 10em;
+  min-height: 4em;
+  top:20%;
+  left:64.5%;
+  text-align:center;
+  z-index:20;
 }
 div.table div.table3 {
-  bottom:2%;
-  left: 44.75%;
+  width:10.5%;
+  min-width: 10em;
+  text-align:center;
+  z-index:20;
+  margin: 0 auto;
+}
+
+img.gravatar  {
+    width:  4em;
+    height: 4em;
+    border: 3px solid #aaa;
+}
+
+div img.button {
+    width: 2em;
+}
+
+div span.numberoftricks {
+    text-align:center;
 }
 
 /* display the card tricks */
 
 ul.tricks {
-  position:relative;
-  zoom:1; /* fixes an IE6 issue and hopefully doesn't mess up anything else */
-  list-style:none;
-  margin:3px;
-  padding:0;
-  padding-bottom:3px;
   text-align:center;
+  list-style:none;
+  margin:0px;
+  padding:3px;
+  padding-bottom:3px;
   border-bottom:1px solid #444;
 }
 ul.tricks a { text-decoration:none; color:#000;}
@@ -244,29 +261,31 @@ ul.tricks li.old {  background-color:#fff; }
 ul.tricks li:hover {  background-color: #bbb;}
 ul.tricks li.nohighlight:hover {  background-color: #fff;}
 
-ul.tricks li div.trick {
-  position:absolute;
-  width:100%;
-  height:35em;
-  top:2.2em;
+div.tricks {
+  position: absolute;
+  top: 0;
   left: 0;
-  margin:0;
-  padding:0;
-/*  border: 2px solid red;*/
-  display:block;
-}
-ul.tricks li div.trick { display:none;}
-ul.tricks li div.trick img.arrow {
-  position:absolute;
-  margin:0;
-  padding:0;
-/*  border: 5px solid blue;*/
+  right:0;
+  bottom: 0;
   text-align:center;
-  width:16%;
-  height:16em;
-  left:42%;
-  right:42%;
-  top:10em;
+  margin: 0;
+  padding:0 0;
+}
+
+div.tricks div.trick {
+  position: absolute;
+  top: 0%;
+  left: 0;
+  right:0;
+  bottom: 0%;
+  display:none;
+}
+.tricks div.trick img.arrow {
+  position:relative;
+  display:inline;
+  text-align:center;
+  height: 60%;
+  top: 20%;
   z-index:8;
 }
 
@@ -274,20 +293,18 @@ ul.tricks li div.trick img.arrow {
 
 hr {clear:both;}
 
-/*ul.tricks li:hover div.table{ display:block; }*/
-
 /* left player */
-ul.tricks li div div.card0 img,
-ul.tricks li div div.card0 .score,
+.tricks div div.card0 img,
+.tricks div div.card0 .score,
 .vorbehalt0 {
   position:absolute;
   margin:0;
   padding:0;
-  /*border: 1px solid red;*/
-  top: 40%;
+ /*border: 1px solid red;*/
+  top: 30%;
   left:37.5%;
   right:56.5%;
-  width:6%;
+  height:40%;
   z-index:30;
 }
 
@@ -297,7 +314,7 @@ ul.tricks li div div.card0 .score,
   width:10%;
   text-align:left;
 }
-ul.tricks li div div.card0 span.comment{
+.tricks div div.card0 span.comment{
   position:absolute;
   margin:0;
   padding:0;
@@ -309,17 +326,17 @@ ul.tricks li div div.card0 span.comment{
 }
 
 /* top player */
-ul.tricks li div div.card1 img,
-ul.tricks li div div.card1 .score,
+.tricks div div.card1 img,
+.tricks div div.card1 .score,
 .vorbehalt1 {
   position:absolute;
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 22%;
+  top: 0%;
   left:47%;
   right:47%;
-  width:6%;
+  height:40%;
   text-align:center;
   z-index:30;
 }
@@ -329,7 +346,7 @@ ul.tricks li div div.card1 .score,
   width:10%;
   z-index:30;
 }
-ul.tricks li div div.card1 span.comment{
+.tricks div div.card1 span.comment{
   position:absolute;
   margin:0;
   padding:0;
@@ -342,17 +359,17 @@ ul.tricks li div div.card1 span.comment{
 }
 
 /* right player */
-ul.tricks li div div.card2 img,
-ul.tricks li div div.card2 .score,
+.tricks div div.card2 img,
+.tricks div div.card2 .score,
 .vorbehalt2{
   position:absolute;
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  top: 40%;
+  top: 30%;
   right:37.5%;
   left:56.5%;
-  width:6%;
+  height:40%;
   z-index:30;
 }
 .vorbehalt2{
@@ -361,7 +378,7 @@ ul.tricks li div div.card2 .score,
   width:10%;
   text-align:right;
 }
-ul.tricks li div div.card2 span.comment{
+.tricks div div.card2 span.comment{
   position:absolute;
   margin:0;
   padding:0;
@@ -374,17 +391,17 @@ ul.tricks li div div.card2 span.comment{
 }
 
 /* bottom player */
-ul.tricks li div div.card3 img,
-ul.tricks li div div.card3 .score,
+.tricks div div.card3 img,
+.tricks div div.card3 .score,
 .vorbehalt3{
   position:absolute;
   margin:0;
   padding:0;
   /*border: 1px solid red;*/
-  bottom: 20%;
+  bottom: 0%;
   left:47%;
   right:47%;
-  width:6%;
+  height: 40%;
   text-align:center;
   z-index:30;
 }
@@ -394,7 +411,7 @@ ul.tricks li div div.card3 .score,
   width:10%;
   text-align:center;
 }
-ul.tricks li div div.card3 span.comment{
+.tricks div div.card3 span.comment{
   position:absolute;
   margin:0;
   padding:0;
@@ -412,7 +429,7 @@ span.comment{
  word-wrap: break-word;
 }
 
-ul.tricks li div div span.comment span{
+.tricks div div span.comment span{
   display:block;
   text-align:left;
   border-top:1px solid green;
@@ -420,7 +437,6 @@ ul.tricks li div div span.comment span{
 
 .mycards {
   margin:0;
-  margin-top:38.5em;
   padding:0;
   border-top:       2px solid gray;
 /* border-bottom:    2px solid green;*/
@@ -706,27 +722,6 @@ table.openid td, table.openid th{
     background-color: #fc3;
 }
 
-div.table div img.gravatar, img.gravatar  {
-    width:  4em;
-    height: 4em;
-    border: 3px solid #aaa;
-}
-div.table div img.gravatar {
-    float:left;
-}
-
-
-div img.button {
-    float: right;
-    width: 2em;
-}
-
-div span.numberoftricks {
-    text-align:center;
-    clear:both;
-    display:block;
-}
-
 .highcall {
     background-color: #fc3;
 }
@@ -812,10 +807,6 @@ header, footer {
 }
 
 .user { margin-left:5%;margin-right:5%; }
-
-div.table img.table {
-  width:50%;
-}
 
 .message {
  position: relative;

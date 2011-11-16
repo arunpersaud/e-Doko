@@ -330,6 +330,103 @@ if($mystatus!='gameover')
    if(isset($_SESSION['id']))
      DB_update_user_timestamp($_SESSION['id']);
 
+
+/******************************************************************************
+ * Output menu for selecting tricks
+ ******************************************************************************/
+
+switch($mystatus)
+  {
+  case 'start':
+    break;
+  case 'init':
+  case 'check':
+    /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
+    echo "\n<ul class=\"tricks\">\n";
+    echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+      "    <div class=\"trick\" id=\"trick0\">\n";
+
+    for($pos=1;$pos<5;$pos++)
+      {
+	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
+	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
+	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
+
+	if($userstatus=='start' || $userstatus=='init')
+	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br />to decide </div>\n"; /* show this to everyone */
+	else
+	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
+	  else
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
+      }
+    echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
+    /* end displaying sickness */
+    break;
+  case 'poverty':
+    /* output pre-game trick in case user reloads,
+     * only needs to be done when a team has been formed */
+    if($myparty=='re' || $myparty=='contra')
+      {
+	echo "\n<ul class=\"tricks\">\n";
+
+	$mygametype =  DB_get_gametype_by_gameid($gameid);
+
+	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
+	  "    <div class=\"trick\" id=\"trick0\">\n";
+
+	/* get information so show the cards that have been handed over in a poverty game */
+	output_exchanged_cards();
+
+	echo "    </div>\n  </li>\n</ul>\n\n";  /* end div trick, end li trick , end ul tricks */
+      }
+    /* end output pre-game trick */
+    break;
+  case 'play':
+  case 'gameover':
+
+    echo "\n<ul class=\"tricks\">\n";
+
+    /* output vorbehalte */
+    $mygametype = DB_get_gametype_by_gameid($gameid);
+    $mygamesolo = DB_get_solo_by_gameid($gameid);
+    if($mygametype != 'normal') /* only show when needed */
+      if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
+	echo "  <li onclick=\"hl('0');\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
+
+    $result = DB_query("SELECT Trick.id ".
+		       "FROM Trick ".
+		       "WHERE Trick.game_id='".$gameid."' ".
+		       "GROUP BY Trick.id ".
+		       "ORDER BY Trick.id ASC");
+    $trickNR   = 1;
+    $lasttrick = DB_get_max_trickid($gameid);
+
+    /* output tricks */
+    while($r = DB_fetch_array($result))
+      {
+	if($trick!=$lasttrick)
+	  echo "  <li onclick=\"hl('$trickNR');\" class=\"old\"><a href=\"#\">"._('Trick')." $trickNR</a></li>\n";
+	else if($trick==$lasttrick)
+	  echo "  <li onclick=\"hl('$trickNR');\" class=\"current\"><a href=\"#\">"._('Trick')." $trickNR</a></li>\n";
+	$trickNR++;
+      }
+
+    /* if game is over, also output link to Score tab */
+    if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
+      echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">"._('Score')."</a></li>\n";
+
+    /* output previous/next buttons */
+    echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">"._('prev')."</a></li>\n";
+    echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">"._('next')."</a></li>\n";
+
+    echo "</ul>\n\n";
+
+    break;
+  default:
+  }
+
+
 /******************************************************************************
  * Output tricks played, table, messages, and cards (depending on game status)
  ******************************************************************************/
@@ -338,7 +435,7 @@ if($mystatus!='gameover')
 echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 
 /* display the table and the names */
-display_table();
+display_table_begin();
 
 /* mystatus gets the player through the different stages of a game.
  * start:    does the player want to play?
@@ -360,6 +457,7 @@ $cards_status = CARDS_EMPTY;
  * tournament change layouts, especially for smaller displays, e.g. mobile phones
  */
 $messages = array();
+
 
 switch($mystatus)
   {
@@ -428,28 +526,6 @@ switch($mystatus)
      ***************************/
     if(!myisset('solo','wedding','poverty','nines','lowtrump') )
       {
-	/* output sickness of other playes, in case they already selected and are sitting in front of the current player */
-	echo "\n<ul class=\"tricks\">\n";
-	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	  "    <div class=\"trick\" id=\"trick0\">\n";
-
-	for($pos=1;$pos<5;$pos++)
-	  {
-	    $usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
-	    $userid     = DB_get_userid('gameid-position',$gameid,$pos);
-	    $userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
-
-	    if($userstatus=='start' || $userstatus=='init')
-	      echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br/ > to decide </div>\n"; /* show this to everyone */
-	    else
-	      if($usersick!=NULL && $pos<=$mypos ) /* only show this for people sitting before the player */
-		echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
-	      else if($usersick==NULL && $pos<=$mypos)
-		echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
-	  }
-	echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
-	/* end displaying sickness */
-
 	$mycards = DB_get_hand($me);
 	output_check_for_sickness($me,$mycards);
 
@@ -545,28 +621,6 @@ switch($mystatus)
     /* here we check what all players said and figure out what game we are playing
      * this can therefore only be handled once all players finished the last stage
      */
-
-    /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
-    echo "\n<ul class=\"tricks\">\n";
-    echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-      "    <div class=\"trick\" id=\"trick0\">\n";
-
-    for($pos=1;$pos<5;$pos++)
-      {
-	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
-	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
-	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
-
-	if($userstatus=='start' || $userstatus=='init')
-	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br />to decide </div>\n"; /* show this to everyone */
-	else
-	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
-	  else
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
-      }
-    echo "    </div>\n  </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
-    /* end displaying sickness */
 
     $messages[] = _('Checking if someone else selected solo, nines, wedding or poverty.');
 
@@ -878,24 +932,6 @@ switch($mystatus)
 	    DB_add_exchanged_card(DB_quote_smart($exchange),$myhand,$partnerhand);
 	  };
       }
-
-    /* output pre-game trick in case user reloads,
-     * only needs to be done when a team has been formed */
-    if($myparty=='re' || $myparty=='contra')
-      {
-	echo "\n<ul class=\"tricks\">\n";
-
-	$mygametype =  DB_get_gametype_by_gameid($gameid);
-
-	echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	  "    <div class=\"trick\" id=\"trick0\">\n";
-
-	/* get information so show the cards that have been handed over in a poverty game */
-	output_exchanged_cards();
-
-	echo "    </div>\n  </li>\n</ul>\n\n";  /* end div trick, end li trick , end ul tricks */
-      }
-    /* end output pre-game trick */
 
     /* get hand */
     $mycards = DB_get_hand($me);
@@ -1270,7 +1306,7 @@ switch($mystatus)
     $pos  = DB_get_startplayer_by_gameid($gameid)-1;
     $firstcard = ''; /* first card in a trick */
 
-    echo "\n<ul class=\"tricks\">\n";
+    echo "\n<div class=\"tricks\">\n";
 
     /* output vorbehalte */
     $mygametype = DB_get_gametype_by_gameid($gameid);
@@ -1278,14 +1314,14 @@ switch($mystatus)
     if($mygametype != 'normal') /* only show when needed */
       if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
 	{
-	  echo "  <li onclick=\"hl('0');\" class=\"current\"><a href=\"#\">Pre</a>\n".
-	    "    <div class=\"trick\" id=\"trick0\">\n";
+	  echo "    <div class=\"trick\" id=\"trick0\">\n";
 
 	  /* get information so show the cards that have been handed over in a poverty game */
 	  output_exchanged_cards();
 
-	  echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	  echo "    </div>\n";  /* end div trick, end li trick */
 	}
+
 
     /* output tricks */
     while($r = DB_fetch_array($result))
@@ -1316,15 +1352,13 @@ switch($mystatus)
 	    if($trick!=$lasttrick)
 	      {
 		/* start of an old trick? */
-		echo "  <li onclick=\"hl('$trickNR');\" class=\"old\"><a href=\"#\">"._('Trick')." $trickNR</a>\n".
-		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
+		echo  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
 		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      }
 	    else if($trick==$lasttrick)
 	      {
 		/* start of a last trick? */
-		echo "  <li onclick=\"hl('$trickNR');\" class=\"current\"><a href=\"#\">"._('Trick')." $trickNR</a>\n".
-		  "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
+		echo "    <div class=\"trick\" id=\"trick".$trickNR."\">\n".
 		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      };
 
@@ -1348,7 +1382,7 @@ switch($mystatus)
 	if($seq==4)
 	  {
 	    $winner    = get_winner($play,$gametype); /* returns the position */
-	    echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	    echo "    </div>\n";  /* end div trick, end li trick */
 	  }
       }
 
@@ -1586,8 +1620,7 @@ switch($mystatus)
 	    $pos = DB_get_pos_by_hash($me);
 	    if($sequence==1)
 	      {
-		echo "  <li onclick=\"hl('".($tricknr)."');\" class=\"current\"><a href=\"#\">"._('Trick').' '.($tricknr)."</a>\n".
-		  "    <div class=\"trick\" id=\"trick".($tricknr)."\">\n".
+		echo "    <div class=\"trick\" id=\"trick".($tricknr)."\">\n".
 		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
 	      }
 
@@ -1599,7 +1632,7 @@ switch($mystatus)
 	      echo "\n        <span class=\"comment\"> ".$comment."</span>\n";
 	    echo "      </div>\n";
 
-	    echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	    echo "    </div>\n";  /* end div trick, end li trick */
 
 	    /*check if we still have cards left, else set status to gameover */
 	    if(sizeof(DB_get_hand($me))==0)
@@ -1890,13 +1923,12 @@ switch($mystatus)
       }
 
     if($seq!=4 && $trickNR>=1 && !(myisset('card') && $myturn) )
-      echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+      echo "    </div>\n";  /* end div trick, end li trick */
 
     /* display points in case game is over */
     if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
       {
-	echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">"._('Score')."</a>\n".
-	  "    <div class=\"trick\" id=\"trick13\">\n";
+	echo "    <div class=\"trick\" id=\"trick13\">\n";
 	/* add pic for re/contra
 	 "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
 
@@ -1922,39 +1954,37 @@ switch($mystatus)
 			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
 			   " WHERE Hand.game_id='$gameid'".
 			   " GROUP BY Hand.party" );
-	echo "<div class=\"total\">\n  Totals:<br />\n";
+	echo "    <div class=\"total\">\n  Totals:<br />\n";
 	while( $r = DB_fetch_array($result))
-	  echo "  ".$r[0]." ".$r[1]."<br />\n";
+	  echo "      ".$r[0]." ".$r[1]."<br />\n";
 
 	$queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
 				" FROM Game WHERE id='$gameid'");
 	$r = DB_fetch_array($queryresult);
-	echo "  <p>This game took ".$r[0]." hours.</p>\n";
+	echo "      <p>This game took ".$r[0]." hours.</p>\n";
 
-	echo "  <div class=\"re\">\n   Points Re: <br />\n";
+	echo "      <div class=\"re\">\n   Points Re: <br />\n";
 	$queryresult = DB_query("SELECT score FROM Score ".
 				"  WHERE game_id=$gameid AND party='re'".
 				" ");
 	while($r = DB_fetch_array($queryresult) )
-	  echo "   ".$r[0]."<br />\n";
-	echo "  </div>\n";
+	  echo "       ".$r[0]."<br />\n";
+	echo "      </div>\n";
 
-	echo "  <div class=\"contra\">\n   Points Contra: <br />\n";
+	echo "      <div class=\"contra\">\n   Points Contra: <br />\n";
 	$queryresult = DB_query("SELECT score FROM Score ".
 				"  WHERE game_id=$gameid AND party='contra'".
 				" ");
 	while($r = DB_fetch_array($queryresult) )
-	  echo "   ".$r[0]."<br />\n";
-	echo "  </div>\n";
+	  echo "       ".$r[0]."<br />\n";
+	echo "      </div>\n";
 
-	echo "</div>\n";
+	echo "    </div>\n";
 
-	echo "    </div>\n  </li>\n";  /* end div trick, end li trick */
+	echo "    </div>\n";  /* end div trick, end li trick */
       }
 
-    echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">"._('prev')."</a></li>\n";
-    echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">"._('next')."</a></li>\n";
-    echo "</ul>\n"; /* end ul tricks*/
+    echo "</div>\n"; /* end ul tricks*/
 
     if($myturn && !myisset('card') && $mystatus=='play' )
       {
@@ -1986,6 +2016,9 @@ switch($mystatus)
   default:
     myerror("error in testing the status");
   } /*end of output: tricks, table, messages, card */
+
+/* display the 2nd half of table and the names */
+display_table_end();
 
 /**************
  * show cards *
