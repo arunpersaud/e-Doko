@@ -417,8 +417,8 @@ switch($mystatus)
       echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">"._('Score')."</a></li>\n";
 
     /* output previous/next buttons */
-    echo "  <li onclick=\"hl_prev();\" class=\"old\"><a href=\"#\">"._('prev')."</a></li>\n";
-    echo "  <li onclick=\"hl_next();\" class=\"old\"><a href=\"#\">"._('next')."</a></li>\n";
+    echo "  <li onclick=\"hl_prev();\" ><button>"._('prev')."</button></li>\n";
+    echo "  <li onclick=\"hl_next();\" ><button>"._('next')."</button></li>\n";
 
     echo "</ul>\n\n";
 

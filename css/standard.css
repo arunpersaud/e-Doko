@@ -258,8 +258,8 @@ ul.tricks li {
   display:inline;
 }
 ul.tricks li.old {  background-color:#fff; }
-ul.tricks li:hover {  background-color: #bbb;}
-ul.tricks li.nohighlight:hover {  background-color: #fff;}
+ul.tricks li a:hover {  background-color: #bbb;}
+ul.tricks li.nohighlight a:hover {  background-color: #fff;}
 
 div.tricks {
   position: absolute;
