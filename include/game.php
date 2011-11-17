@@ -405,6 +405,7 @@ switch($mystatus)
     /* output tricks */
     while($r = DB_fetch_array($result))
       {
+	$trick=$r[0];
 	if($trick!=$lasttrick)
 	  echo "  <li onclick=\"hl('$trickNR');\" class=\"old\"><a href=\"#\">"._('Trick')." $trickNR</a></li>\n";
 	else if($trick==$lasttrick)
