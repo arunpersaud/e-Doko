@@ -127,14 +127,12 @@ footer .left  { float:left;         font-size:smaller;}
  position: absolute;
  background-color: #fff;
  width: 20%;
- top:19em;
- left:40%;
- right:40%;
+ top: 30%;
+ margin: auto;
  text-align: center;
  z-index:22;
 }
 .total {
-    top:11em;
     width: 14%;
     left: 43%;
 }
@@ -144,6 +142,7 @@ footer .left  { float:left;         font-size:smaller;}
  left: -12em;
  top:8em;
  background-color: #eee;
+ padding: 0.3em;
  z-index:15;
 }
 .total .contra {
@@ -151,6 +150,7 @@ footer .left  { float:left;         font-size:smaller;}
  right: -14em;
  top:8em;
  background-color: #eee;
+ padding: 0.3em;
  z-index:15;
 }
 
@@ -402,13 +402,13 @@ hr {clear:both;}
   left:47%;
   right:47%;
   height: 40%;
-  text-align:center;
   z-index:30;
 }
-.vorbehalt3{
+.tricks div div.card3 .score, .vorbehalt3{
   left:45%;
   right:45%;
   width:10%;
+  height: 3em;
   text-align:center;
 }
 .tricks div div.card3 span.comment{
@@ -482,15 +482,15 @@ span.comment{
 
 .notes {
   position:absolute;
-  top:27em;
+  top:3em;
   left:0;
   margin:1em;
   margin-top:0em;
-  margin-left:3em;
+  margin-left:2em;
 
   width: 12em;
 
-  border:    2px solid gray;
+  border:  2px solid gray;
 
   padding:0.3em;
 
