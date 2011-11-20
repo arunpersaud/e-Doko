@@ -1241,7 +1241,7 @@ function display_user_menu($id, $skiphash=NULL)
 
       $i++;
       echo "  <a href=\"".$INDEX."?action=game&amp;me=".$r[0].
-	"\">game ".DB_format_gameid($r[1])." </a>\n";
+	"\"> ".DB_format_gameid($r[1])." </a>\n";
       if($i>4)
 	{
 	  echo ",  ...\n";
