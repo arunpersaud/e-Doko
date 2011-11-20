@@ -45,13 +45,13 @@ $(document).ready(
 	$("#ScoreTable").tablesorter({ widgets: ['zebra']});
 
 	$(".gameshidesession").click( function () {
-	    $(this).parenthesis().children(".gamessession").hide(300);
+	    $(this).parent().children(".gamessession").hide(300);
 	    $(this).parent().children(".gamesshowsession").show();
 	    $(this).hide();
 	});
 
 	$(".gamesshowsession").click( function () {
-	    $(this).parenthesis().children(".gamessession").show(300);
+	    $(this).parent().children(".gamessession").show(300);
 	    $(this).parent().children(".gameshidesession").show();
 	    $(this).hide();
 	});
