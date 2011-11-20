@@ -42,6 +42,7 @@ else
 
     if( !myisset("PlayerA", "PlayerB","PlayerC","PlayerD","dullen","schweinchen","callrule","lowtrump" ))
       {
+        display_user_menu($myid);
 	/* only get players that want to be in new games */
 	$names = DB_get_all_user_names_open_for_games();
 
@@ -56,7 +57,6 @@ else
 	output_form_for_new_game($names);
 	echo "</div>\n";
 
-        display_user_menu($myid);
       }
     else
       {

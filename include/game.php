@@ -183,12 +183,12 @@ if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
 if( $gamestatus != 'gameover'  && isset($_SESSION['id']) )
   {
     /* game isn't over, only valid user can get here, so show menu */
-    display_user_menu($myid);
+    display_user_menu($myid, $me);
   }
 else if( $mystatus == 'gameover' && isset($_SESSION['id']) )
   {
     /* user is looking at someone else's game, show the menu for the correct user */
-    display_user_menu($_SESSION['id']);
+    display_user_menu($_SESSION['id'],$me);
   }
 else
   {

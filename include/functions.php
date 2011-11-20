@@ -1206,16 +1206,25 @@ function display_single_user($r)
 }
 
 
-function display_user_menu($id)
+function display_user_menu($id, $skiphash=NULL)
 {
   global $WIKI,$INDEX;
 
-  $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
-		     " LEFT JOIN Game On Hand.game_id=Game.id".
-		     " WHERE Hand.user_id='$id'".
-		     " AND ( Game.player='$id' OR ISNULL(Game.player) )".
-		     " AND ( Game.status='pre' OR Game.status='play' )".
-		     " ORDER BY Game.session" );
+  if($skiphash)
+    $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
+		       " LEFT JOIN Game On Hand.game_id=Game.id".
+		       " WHERE Hand.user_id='$id'".
+		       " AND Hand.hash!='$skiphash'".
+		       " AND ( Game.player='$id' OR ISNULL(Game.player) )".
+		       " AND ( Game.status='pre' OR Game.status='play' )".
+		       " ORDER BY Game.session" );
+  else
+    $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
+		       " LEFT JOIN Game On Hand.game_id=Game.id".
+		       " WHERE Hand.user_id='$id'".
+		       " AND ( Game.player='$id' OR ISNULL(Game.player) )".
+		       " AND ( Game.status='pre' OR Game.status='play' )".
+		       " ORDER BY Game.session" );
 
   $i=0;
   while( $r = DB_fetch_array($result))
