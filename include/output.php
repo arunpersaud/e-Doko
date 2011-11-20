@@ -53,48 +53,80 @@ function output_form_for_new_game($names)
 			 * after we selected them to make sure that each name
 			 * only shows up once
 			 */
-  echo '  <form action="index.php?action=new" method="post">';
-  echo '    <h2> '._('Select players (Remember: you need to be one of the players)').' </h2>';
-  echo '   <div class="table">';
-  echo '     <img class="table" src="pics/table.png" alt="table" />';
-
-  /* ask player for names */
-
-  $i=0;
 
   /* delete players name, since he will be on position D anyway */
   unset($copy_names[array_search($_SESSION["name"],$copy_names)]);
-
   srand((float) microtime() * 10000000);
-  foreach( array("PlayerA","PlayerB","PlayerC","PlayerD") as $player)
-    {
-      /* pick 3 names at random and put the players name on position D*/
-      if($i<3)
-	{
-	  $randkey = array_rand($copy_names);
-	  $rand = $copy_names[$randkey];
-	  /* delete this name from the list of possible names */
-	  unset($copy_names[$randkey]);
-	}
-      else
-	{
-	  $rand = $_SESSION["name"];
-	}
 
-      echo  "     <div class=\"table".$i."\">\n";
-      $i++;
-      echo "       <select name=\"$player\" size=\"1\">  \n";
-      foreach($names as $name)
-	{
-	  if($name==$rand)
-	    {
-	      echo "         <option selected=\"selected\">$name</option>\n";
-	    }
-	  else
-	    echo "         <option>$name</option>\n";
-	}
-      echo "       </select>\n     </div>\n";
+
+  echo '  <form action="index.php?action=new" method="post">';
+  echo '    <h2> '._('Select players (Remember: you need to be one of the players)').' </h2>';
+
+  echo '   <div class="table">';
+
+  echo  "     <div class=\"table1\">\n";
+  $randkey = array_rand($copy_names);
+  $rand = $copy_names[$randkey];
+  /* delete this name from the list of possible names */
+  unset($copy_names[$randkey]);
+  echo "       <select name=\"PlayerB\" size=\"1\">  \n";
+  foreach($names as $name)
+    {
+      if($name==$rand)
+	echo "         <option selected=\"selected\">$name</option>\n";
+      else
+	echo "         <option>$name</option>\n";
     }
+  echo "       </select>\n     </div>\n";
+
+  echo '   <div class="middle">';
+
+  $randkey = array_rand($copy_names);
+  $rand = $copy_names[$randkey];
+  /* delete this name from the list of possible names */
+  unset($copy_names[$randkey]);
+  echo  "     <div class=\"table0\">\n";
+  echo "       <select name=\"PlayerA\" size=\"1\">  \n";
+  foreach($names as $name)
+    {
+      if($name==$rand)
+	echo "         <option selected=\"selected\">$name</option>\n";
+      else
+	echo "         <option>$name</option>\n";
+    }
+  echo "       </select>\n     </div>\n";
+
+  echo '     <img class="table" src="pics/table.png" alt="table" />';
+  $randkey = array_rand($copy_names);
+  $rand = $copy_names[$randkey];
+  /* delete this name from the list of possible names */
+  unset($copy_names[$randkey]);
+  echo  "     <div class=\"table2\">\n";
+  echo "       <select name=\"PlayerC\" size=\"1\">  \n";
+  foreach($names as $name)
+    {
+      if($name==$rand)
+	echo "         <option selected=\"selected\">$name</option>\n";
+      else
+	echo "         <option>$name</option>\n";
+    }
+  echo "       </select>\n     </div>\n";
+
+  echo '   </div>';
+  $rand = $_SESSION["name"];
+  echo  "     <div class=\"table3\">\n";
+  $i++;
+  echo "       <select name=\"PlayerD\" size=\"1\">  \n";
+  foreach($names as $name)
+    {
+      if($name==$rand)
+	echo "         <option selected=\"selected\">$name</option>\n";
+      else
+	echo "         <option>$name</option>\n";
+    }
+  echo "       </select>\n     </div>\n";
+
+  /* ask player for names */
 
     echo '    </div>';
     echo '';
