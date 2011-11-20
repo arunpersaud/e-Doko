@@ -138,12 +138,12 @@ else
 	      " Between $vac_start and $vac_stop other users will see the following message: $vac_comment.</p>\n";
 	  }
 
-	echo '<h4>'._('These are all your games').":</h4>\n";
+	echo '<h4>'._('These are your games').":</h4>\n";
 	/* output legend */
-	echo '<p>'._('Games').": \n";
-	echo '<span class="gamestatuspre"> &nbsp; </span> =  '._('pre-game phase');
-	echo '<span class="gamestatusplay"> &nbsp; </span> =  '._('game in progess');
-	echo '<span class="gamestatusover "><a>N</a> </span> = '._('game over (N people played the same hand)').' <br />';
+	echo "<p>\n";
+	echo ' <span class="gamestatuspre"> &nbsp; </span> &nbsp;'._('pre-game phase');
+	echo ' <span class="gamestatusplay"> &nbsp; </span> &nbsp;'._('game in progess');
+	echo ' <span class="gamestatusover "><a>N</a> </span> &nbsp;'._('game over (N people played this hand)').' <br />';
 	echo ' '._("Reminder: canceling a game can't be reversed!");
 	echo "</p>\n";
 
