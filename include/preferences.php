@@ -538,7 +538,7 @@ if($changed_openid)
 echo "    </fieldset>\n";
 echo '    <fieldset><legend>'._('Submit')."</legend><input type=\"submit\"  name=\"passwd\" value=\"set\" /></fieldset>\n";
 echo "  </form>\n";
-echo ' <p>'._('E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons.').'</p>';
+echo ' <p>'._('E-DoKo uses <a href="http://www.gravatar.org">gravatars</a> as icons.').'</p>';
 echo "</div>\n";
 
 // add jquery date picker if html5 is not available
