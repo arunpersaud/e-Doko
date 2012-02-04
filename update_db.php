@@ -22,6 +22,7 @@ error_reporting(E_ALL);
 
 include_once("config.php");                /* needs to be first in list, since other includes use this */
 include_once("./include/db.php");          /* database only */
+include_once("./include/output.php");   /* the rest */
 include_once("./include/functions.php");   /* the rest */
 
 /* make sure that user has set all variables in config.php */
