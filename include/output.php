@@ -678,6 +678,19 @@ function output_exchanged_cards()
   $show=1;
   for($mypos=1;$mypos<5;$mypos++)
     {
+      /* output comments */
+      if($mypos==2)
+	{
+	  /* display all comments on the top right (card1)*/
+	  $comments = DB_get_pre_comment($gameid);
+	  /* display card */
+	  echo "      <div class=\"card1\">\n";
+	  /* display comments */
+	  foreach( $comments as $comment )
+	    echo "        <span class=\"comment\">".$comment[1].": ".$comment[0]."</span>\n";
+	  echo "      </div>\n"; /* end div card */
+	}
+
       $usersick = DB_get_sickness_by_pos_and_gameid($mypos,$gameid);
       if($usersick!=NULL ||
 	 $mypos==$povertypos1 || $mypos==$partnerpos1 ||

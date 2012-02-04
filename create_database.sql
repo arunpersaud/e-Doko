@@ -88,6 +88,7 @@ CREATE TABLE `Comment` (
   `id` int(11) NOT NULL auto_increment,
   `user_id` int(11) default NULL,
   `play_id` int(11) default NULL,
+  `game_id` int(11) default NULL,
   `comment` text,
   UNIQUE KEY `id` (`id`),
   KEY `play_id` (`play_id`)

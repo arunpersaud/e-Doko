@@ -53,6 +53,7 @@ $mypos    = DB_get_pos_by_hash($me);
 $myhand   = DB_get_handid('hash',$me);
 $myparty  = DB_get_party_by_hash($me);
 $session  = DB_get_session_by_gameid($gameid);
+$playid   = DB_get_current_playid($gameid); /* might be -1 at beginning of the game */
 
 /* get prefs and save them in a variable*/
 $PREF = DB_get_PREF(isset($_SESSION['id'])?$_SESSION['id']:$myid);
@@ -128,51 +129,67 @@ if( $mystatus!='gameover' )
 	DB_insert_note($note,$gameid,$myid);
     };
 
-/* handle calls, output a comment to show when the call was made */
+/*****************************************************************
+ * handle calls part1: check what was called, set everything up
+ * we only can submit it to the database at the end, since the playid
+ * might change if a player plays a card
+ *****************************************************************/
+
 /* initialize comments */
-$comment  =  '';
-
-/* get information needed to submit comment */
-$playid = DB_get_current_playid($gameid);
-
-/* set comment */
-if($comment != '')
-  DB_insert_comment($comment,$playid,$myid);
-/* clear up */
-unset($comment);
-/* end check for calls */
-
+$commentCall = '';
 
 /* check for calls, set comment */
-if(myisset('call')  && $_REQUEST['call']  == '120' && can_call(120,$me))
+if( myisset('call') )
   {
-    $result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
-    if($myparty=='re')
-      $comment .= "Re";
-    else if($myparty=='contra')
-      $comment .= "Contra";
-  }
-if(myisset('call')  && $_REQUEST['call']  == '90' && can_call(90,$me))
-  {
-    $result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
-    $comment .= "No 90";
-  }
-if(myisset('call')  && $_REQUEST['call']  == '60' && can_call(60,$me))
-  {
-    $result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
-    $comment .= "No 60";
-  }
-if(myisset('call')  && $_REQUEST['call']  == '30' && can_call(30,$me))
-  {
-    $result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
-    $comment .= "No 30";
-  }
-if(myisset('call')  && $_REQUEST['call']  == '0' && can_call(0,$me))
-  {
-    $result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
-    $comment .= "Zero";
+    if($_REQUEST['call']  == '120' && can_call(120,$me))
+      {
+	$result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
+	if($myparty=='re')
+	  $commentCall = "Re";
+	else if($myparty=='contra')
+	  $commentCall = "Contra";
+      }
+    else if($_REQUEST['call']  == '90' && can_call(90,$me))
+      {
+	$result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
+	$commentCall = "No 90";
+      }
+    else if($_REQUEST['call']  == '60' && can_call(60,$me))
+      {
+	$result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
+	$commentCall = "No 60";
+      }
+    else if($_REQUEST['call']  == '30' && can_call(30,$me))
+      {
+	$result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
+	$commentCall = "No 30";
+      }
+    else if($_REQUEST['call']  == '0' && can_call(0,$me))
+      {
+	$result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
+	$commentCall = "Zero";
+      }
   }
 
+/**********************************************************
+ * handle comments unless we play a card at the same time *
+ * (if we play a card, we need to update playid)          *
+ **********************************************************/
+
+
+/* get time from the last action of the game */
+$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
+$gameend = time() - strtotime($r[0]);
+
+/* handle comments in case player didn't play a card, allow comments a week after the end of the game */
+if( (!myisset('card') && $mystatus!='gameover') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
+  if(myisset('comment'))
+    {
+      $comment = $_REQUEST['comment'];
+
+      if($comment != '')
+	DB_insert_comment($comment,$playid,$gameid,$myid);
+    };
 
 
 /*****************************************************************
@@ -447,15 +464,27 @@ switch($mystatus)
 	  else
 	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
       }
+
+    /* display all comments on the top right (card1)*/
+    $comments = DB_get_pre_comment($gameid);
+    /* display card */
+    echo "      <div class=\"card1\">\n";
+    /* display comments */
+    foreach( $comments as $comment )
+      echo "        <span class=\"comment\">".$comment[1].": ".$comment[0]."</span>\n";
+    echo "      </div>\n"; /* end div card */
+
+
     echo "    </div>\n  </div>\n";  /* end div trick, end li trick , end tricks*/
     /* end displaying sickness */
+
     break;
   case 'poverty':
     /* output pre-game trick in case user reloads,
      * only needs to be done when a team has been formed */
     if($myparty=='re' || $myparty=='contra')
       {
-	echo "\n<ul class=\"tricks\">\n";
+	echo "\n<div class=\"tricks\">\n";
 
 	$mygametype =  DB_get_gametype_by_gameid($gameid);
 
@@ -464,7 +493,7 @@ switch($mystatus)
 	/* get information so show the cards that have been handed over in a poverty game */
 	output_exchanged_cards();
 
-	echo "    </div>\n  </div>\n\n";  /* end div trick, end li trick , end ul tricks */
+	echo "    </div>\n </div>\n\n";  /* end div trick, end li trick , end ul tricks */
       }
     /* end output pre-game trick */
     break;
@@ -1306,22 +1335,6 @@ switch($mystatus)
 		* only  play a card after everyone is ready to play */
       }
 
-
-    /* get time from the last action of the game */
-    $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
-    $gameend = time() - strtotime($r[0]);
-
-    /* handle comments in case player didn't play a card, allow comments a week after the end of the game */
-    if( (!myisset('card') && $mystatus=='play') || ($mystatus=='gameover' && ($gameend < 60*60*24*7)) )
-      if(myisset('comment'))
-	{
-	  $comment = $_REQUEST['comment'];
-	  $playid = DB_get_current_playid($gameid);
-
-	  if($comment != '')
-	    DB_insert_comment($comment,$playid,$myid);
-	};
-
     /* get everything relevant to display the tricks */
     $result = DB_query("SELECT Hand_Card.card_id as card,".
 		       "       Hand.position as position,".
@@ -1353,6 +1366,7 @@ switch($mystatus)
     /* output vorbehalte */
     $mygametype = DB_get_gametype_by_gameid($gameid);
     $mygamesolo = DB_get_solo_by_gameid($gameid);
+    $show_pre_game_comments=1;
     if($mygametype != 'normal') /* only show when needed */
       if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
 	{
@@ -1360,10 +1374,28 @@ switch($mystatus)
 
 	  /* get information so show the cards that have been handed over in a poverty game */
 	  output_exchanged_cards();
+	  $show_pre_game_comments=0;
 
 	  echo "    </div>\n";  /* end div trick, end li trick */
 	}
+    if($show_pre_game_comments==1)
+      {
+	/* display all comments on the top right (card1)*/
+	$comments = DB_get_pre_comment($gameid);
 
+	if(sizeof($comments))
+	  {
+	    echo "    <div class=\"trick\" id=\"trick0\">\n";
+	    /* display card */
+	    echo "      <div class=\"card1\">\n";
+	    /* display comments */
+	    foreach( $comments as $comment )
+	      echo "        <span class=\"comment\">".$comment[1].": ".$comment[0]."</span>\n";
+	    echo "      </div>\n"; /* end div card */
+
+	    echo "    </div>\n";  /* end div trick, end li trick */
+	  }
+      }
 
     /* output tricks */
     while($r = DB_fetch_array($result))
@@ -1410,6 +1442,14 @@ switch($mystatus)
 
 	/* display card */
 	echo "      <div class=\"card".($pos-1)."\">\n";
+
+	/* for the first card, we also need to display calls from other players */
+	if($seq==1 && $trickNR==1)
+	  {
+	    $commentPreCalls=DB_get_pre_comment_call($gameid);
+	    foreach ($commentPreCalls as $pre )
+	      $comment .= $pre[1].": ".$pre[0]."<br/>";
+	  }
 
 	/* display comments */
 	if($comment!='')
@@ -1493,7 +1533,7 @@ switch($mystatus)
 		     (DB_get_call_by_hash($GAME['schweinchen-who']) || DB_get_partner_call_by_hash($GAME['schweinchen-who']) ))
 		  )
 		  {
-		    DB_insert_comment('Schweinchen! ',$playid,$myid);
+		    DB_insert_comment('Schweinchen! ',$playid,$gameid,$myid);
 		    $commentSchweinchen = 'Schweinchen! ';
 		  }
 		if ($debug)
@@ -1653,9 +1693,11 @@ switch($mystatus)
 	      {
 		$comment = $_REQUEST['comment'];
 		if($comment != '')
-		  DB_insert_comment($comment,$playid,$myid);
+		  DB_insert_comment($comment,$playid,$gameid,$myid);
 		if($commentSchweinchen)
 		  $comment = $commentSchweinchen . $comment;
+		if($commentCall != '')
+		  $comment = $commentCall . $comment;
 	      };
 
 	    /* display played card */
@@ -2204,6 +2246,18 @@ if( sizeof($messages) )
     echo "</div>\n\n";
   }
 
+/****************************
+ * commit commentCall to DB *
+ ****************************/
+
+if($commentCall != '')
+  {
+    /* treat before game calls special, so that we can show them on the first trick and not the pre-phase */
+    if($playid == -1)
+      $playid = -2;
+
+    DB_insert_comment($commentCall,$playid,$gameid,$myid);
+  }
 /***********************************************
  * Comments, re/contra calls, user menu
  ***********************************************/
@@ -2219,7 +2273,7 @@ $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
 $gameend = time() - strtotime($r[0]);
 
 /* comment box */
-if($gamestatus == 'play' || $gameend < 60*60*24*7)
+if($gamestatus == 'play' || $gamestatus == 'pre' || $gameend < 60*60*24*7)
   {
     echo '  '._('A short comment').":<input name=\"comment\" type=\"text\" size=\"20\" maxlength=\"100\" />\n";
   }
@@ -2232,7 +2286,7 @@ if($gamestatus == 'play' )
   }
 
 /* play-card button */
-if($gamestatus == 'play' || $gameend < 60*60*24*7)
+if($gamestatus == 'play' || $gamestatus == 'pre' || $gameend < 60*60*24*7)
   {
     echo "  <input type=\"submit\" value=\""._('submit')."\" />\n";
   }

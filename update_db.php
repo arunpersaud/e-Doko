@@ -37,7 +37,7 @@ if(isset($_SERVER['REMOTE_ADDR']))
   exit();
 
 $old_version = DB_get_version();
-$current_version = 2;
+$current_version = 3;
 
 if($old_version < $current_version)
   echo "Will upgrade your database now:\n";
@@ -68,6 +68,12 @@ switch($old_version)
 
     DB_query("UPDATE Version set version=2");
     echo "Upgraded to version 2.\n";
+  case 2:
+    DB_query("ALTER TABLE Comment".
+	     " ADD COLUMN `game_id` int(11) default NULL AFTER play_id");
+    DB_query("UPDATE Version set version=3");
+    echo "Upgraded to version 3.\n";
+
   }
 
 ?>

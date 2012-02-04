@@ -30,7 +30,7 @@ if(!isset($HOST))
 
 function DB_open()
 {
-  $version_needed = 2;
+  $version_needed = 3;
 
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
   $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
@@ -570,11 +570,29 @@ function DB_get_user_timezone($userid)
     return "Europe/London";
 }
 
-function DB_insert_comment($comment,$playid,$userid)
+function DB_insert_comment($comment,$playid,$gameid,$userid)
 {
-  DB_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid, ".DB_quote_smart($comment).")");
+  DB_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid,$gameid, ".DB_quote_smart($comment).")");
 
   return;
+}
+
+function DB_get_pre_comment($gameid)
+{
+  $r = DB_query_array_all("SELECT comment, User.fullname FROM Comment".
+			  " LEFT JOIN User ON User.id=user_id".
+			  " WHERE play_id=-1".
+			  " AND game_id=$gameid ");
+  return $r;
+}
+
+function DB_get_pre_comment_call($gameid)
+{
+  $r = DB_query_array_all("SELECT comment, User.fullname FROM Comment".
+			  " LEFT JOIN User ON User.id=user_id".
+			  " WHERE play_id=-2".
+			  " AND game_id=$gameid ");
+  return $r;
 }
 
 function DB_insert_note($comment,$gameid,$userid)
@@ -936,16 +954,17 @@ function DB_get_card_name($card)
 
 function DB_get_current_playid($gameid)
 {
+  /* return playid or -1 for pre-game phase */
   $trick = DB_get_max_trickid($gameid);
 
-  if(!$trick) return NULL;
+  if(!$trick) return -1;
 
   $r = DB_query_array("SELECT id FROM Play WHERE trick_id='$trick' ORDER BY create_date DESC LIMIT 1");
 
   if($r)
     return $r[0];
 
-  return "";
+  return -1;
 }
 
 function DB_get_call_by_hash($hash)
