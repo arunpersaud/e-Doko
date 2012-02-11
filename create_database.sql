@@ -1,4 +1,4 @@
-/* Copyright 2006, 2007, 2008, 2009, 2010 Arun Persaud <arun@nubati.net>
+/* Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012 Arun Persaud <arun@nubati.net>
  *
  *   This file is part of e-DoKo.
  *

@@ -1,5 +1,5 @@
 <?php
-/* Copyright 2006, 2007, 2008, 2009, 2010 Arun Persaud <arun@nubati.net>
+/* Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012 Arun Persaud <arun@nubati.net>
  *
  *   This file is part of e-DoKo.
  *
@@ -438,7 +438,7 @@ function output_footer()
 
   echo "</div>\n\n";
   echo "<footer>\n";
-  echo "  <p class=\"left\"> copyright 2006-2011 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
+  echo "  <p class=\"left\"> copyright 2006-2012 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
     "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
