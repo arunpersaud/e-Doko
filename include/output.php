@@ -411,7 +411,7 @@ function output_header()
      <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
      <link rel="shortcut icon" href="pics/edoko-favicon.png" />
      <link rel="stylesheet" href="css/normalize.css?v=1" />
-     <link rel="stylesheet" href="css/standard.css?v=40" />
+     <link rel="stylesheet" href="css/standard.css?v=41" />
      <link rel="stylesheet" href="css/dateinput.css?v=1"/>
      <script type="text/javascript" src="include/jquery.js"> </script>
      <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
