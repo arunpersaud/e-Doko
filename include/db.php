@@ -772,6 +772,18 @@ function DB_get_party_by_gameid_and_userid($gameid,$userid)
     return NULL;
 }
 
+function DB_get_party_by_session_and_userid($session,$userid)
+{
+  /* used in score table by index. gameids are sorted by date, so we need to sort here too! */
+  $r = DB_query_array_all("SELECT party FROM Hand".
+			  " LEFT JOIN Game ON Game.id = Hand.game_id".
+			  " WHERE Game.session=".DB_quote_smart($session).
+			  "  AND user_id=".DB_quote_smart($userid)."".
+			  "  AND Game.status='gameover' ".
+			  " ORDER BY Game.create_date ASC");
+  return $r;
+}
+
 function DB_set_party_by_hash($hash,$party)
 {
   DB_query("UPDATE Hand SET party=".DB_quote_smart($party)." WHERE hash=".DB_quote_smart($hash));
@@ -1051,48 +1063,24 @@ function DB_is_session_active($session)
     return -1;
 }
 
-function DB_get_score_by_gameid($gameid)
-{
-  /* returns the points of a game from the point of the re parth (<0 if they lost) */
-  $queryresult = DB_query("SELECT COUNT(*),party FROM Score ".
-			  "  WHERE game_id=$gameid ".
-			  "  GROUP BY party ");
-  $re     = 0;
-  $contra = 0;
-
-  while($r = DB_fetch_array($queryresult) )
-    {
-      if($r[1] == "re")
-	$re += $r[0];
-      else if ($r[1] == "contra")
-	$contra += $r[0];
-    };
-
-  return ($re - $contra);
-}
-
 function DB_get_gameids_of_finished_games_by_session($session)
 {
   $ids = array ();
 
   if($session==0) /* return all games */
-    $queryresult = DB_query("SELECT id FROM Game ".
-			    " WHERE status='gameover' ".
-			    " ORDER BY create_date ASC");
+    $queryresult = DB_query_array_all("SELECT Game.id,SUM(IF(STRCMP(Score.party,'re'),-1,1)),Game.type FROM Game ".
+				  " LEFT JOIN Score on game_id=Game.id".
+				  " WHERE status='gameover' ".
+				  " GROUP BY Game.id");
   else   /* return games in a session */
-    $queryresult = DB_query("SELECT id FROM Game ".
-			    "  WHERE session=$session ".
-			    "   AND status='gameover' ".
-			    " ORDER BY create_date ASC");
+    $queryresult = DB_query_array_all("SELECT Game.id,SUM(IF(STRCMP(Score.party,'re'),-1,1)),Game.type FROM Game ".
+				  " LEFT JOIN Score on game_id=Game.id".
+				  "  WHERE session=$session ".
+				  "   AND status='gameover' ".
+				  " GROUP BY Game.id".
+				  " ORDER BY Game.create_date ASC");
 
-  $i=0;
-  while($r = DB_fetch_array($queryresult) )
-    {
-      $ids[$i] = $r[0];
-      $i++;
-    }
-
-  return $ids;
+  return $queryresult;
 }
 
 function DB_get_card_value_by_cardid($id)

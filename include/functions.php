@@ -1265,28 +1265,33 @@ function generate_score_table($session)
   $score = array();
   $i=0;
 
-  /* get all ids */
+  /* get all ids, scores and gametypes */
   $gameids = DB_get_gameids_of_finished_games_by_session($session);
 
   if($gameids == NULL)
     return $score;
 
-  /* get player id, names... from the first game */
   $player = array();
-  $result = DB_query("SELECT User.id, User.fullname from Hand".
-		     " LEFT JOIN User On Hand.user_id=User.id".
-		     " WHERE Hand.game_id=".$gameids[0]);
+  $player_party = array();
+
+  /* get player id from the first game */
+  $result = DB_query("SELECT user_id from Hand".
+		     " WHERE Hand.game_id=".$gameids[0][0]);
   while( $r = DB_fetch_array($result))
     $player[$r[0]] = 0;
+
+  /* get party of players for each game in the session */
+  foreach($player as $id=>$points)
+    $player_party[$id]=DB_get_party_by_session_and_userid($session,$id);
 
   /* get points and generate table */
   foreach($gameids as $gameid)
     {
-      $re_score = DB_get_score_by_gameid($gameid);
-      $gametype = DB_get_gametype_by_gameid($gameid);
+      $re_score = $gameid[1];
+      $gametype = $gameid[2];
       foreach($player as $id=>$points)
 	{
-	  $party = DB_get_party_by_gameid_and_userid($gameid,$id);
+	  $party = $player_party[$id][$i][0];
 	  if($party == "re")
 	    if($gametype=="solo")
 	      $player[$id] += 3*$re_score;
@@ -1295,7 +1300,7 @@ function generate_score_table($session)
 	  else if ($party == "contra")
 	    $player[$id] -= $re_score;
 	}
-      $score[$i]['gameid']  = $gameid ;
+      $score[$i]['gameid']  = $gameid[0] ;
       $score[$i]['players'] = $player;
       $score[$i]['points']  = abs($re_score);
       $score[$i]['solo']    = ($gametype=="solo");
@@ -1310,14 +1315,14 @@ function generate_global_score_table()
 {
   $return = array();
 
-  /* get all ids */
+  /* get all ids, scores and gametypes */
   $gameids = DB_get_gameids_of_finished_games_by_session(0);
 
   if($gameids == NULL)
     return '';
 
-  /* get player id, names... from the User table */
   $player = array();
+  /* get player id, names... from the User table */
   $result = DB_query('SELECT User.id, User.fullname FROM User');
 
   /* save information in an array */
@@ -1328,15 +1333,15 @@ function generate_global_score_table()
   /* get points and generate table */
   foreach($gameids as $gameid)
     {
-      $re_score = DB_get_score_by_gameid($gameid);
-      $gametype = DB_get_gametype_by_gameid($gameid);
+      $re_score = $gameid[1];
+      $gametype = $gameid[2];
 
       /* get players involved in this game */
-      $result = DB_query('SELECT user_id FROM Hand WHERE game_id='.DB_quote_smart($gameid));
+      $result = DB_query('SELECT user_id FROM Hand WHERE game_id='.DB_quote_smart($gameid[0]));
       while($r = DB_fetch_array($result))
 	{
 	  $id = $r[0];
-	  $party = DB_get_party_by_gameid_and_userid($gameid,$id);
+	  $party = DB_get_party_by_gameid_and_userid($gameid[0],$id);
 	  if($party == 're')
 	    if($gametype=='solo')
 	      $player[$id]['points'] += 3*$re_score;
