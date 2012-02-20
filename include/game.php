@@ -1681,6 +1681,7 @@ switch($mystatus)
 
 		/* who is the next player? */
 		$next = $winner;
+		$firstcard = ''; /* unset firstcard, so followsuit doesn't trigger with the last trick */
 	      }
 	    else
 	      {
@@ -2070,7 +2071,8 @@ switch($mystatus)
 
     echo "</div>\n"; /* end ul tricks*/
 
-    if($myturn && !myisset('card') && $mystatus=='play' )
+    if(   ($myturn && !myisset('card') && $mystatus=='play') /* it's my turn*/
+	  || ($myturn && myisset('card') && $next==$mypos && $mystatus=='play')  /* a card has been played and player won the trick*/)
       {
 	$card_status = CARDS_MYTURN;
       }
