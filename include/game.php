@@ -520,8 +520,9 @@ switch($mystatus)
 
 /* Depending on the situation we set
  *   cards_status (see functions.php for possible options)
+ *   most of the times we need to just show the cards, so we make this the default
  */
-$cards_status = CARDS_EMPTY;
+$card_status = CARDS_SHOW;
 
 /* Also collect message that should be displayed to the user, so that we can show
  * them after showing the table. This makes the html flow more consistent and easier
@@ -545,7 +546,10 @@ switch($mystatus)
       {
 	/* asks the player, if he wants to join the game */
 	output_check_want_to_play($me);
+
+	/* don't show the cards before the user joined the game */
 	$card_status = CARDS_EMPTY;
+
 	break;
       }
     else
@@ -562,6 +566,8 @@ switch($mystatus)
 	      {
 		mymail($user,$gameid,GAME_CANCELED,$email_message);
 	      }
+
+	    $card_status = CARDS_EMPTY;
 
 	    /* update game status */
 	    cancel_game('noplay',$gameid);
@@ -588,7 +594,7 @@ switch($mystatus)
 		    DB_set_player_by_gameid($gameid,$user);
 		    break;
 		  }
-	      };
+	      }
 	  }
       }
   case 'init':
@@ -599,8 +605,6 @@ switch($mystatus)
       {
 	$mycards = DB_get_hand($me);
 	output_check_for_sickness($me,$mycards);
-
-	$card_status = CARDS_SHOW;
 
 	break;
       }
@@ -618,8 +622,6 @@ switch($mystatus)
 	  {
 	    $messages[] = "You selected more than one sickness, please go back ".
 	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.";
-
-	    $card_status = CARDS_SHOW;
 
 	    break;
 	  }
@@ -715,15 +717,6 @@ switch($mystatus)
 	  'Seems like this is not the case, so you need to wait a bit... '.
 	  'you will get an email once that is the case, please use the link in '.
 	  'that email to continue the game.');
-
-	/* display cards, if player was just at the init-phase he will still see the cards from there
-	 * we can put this one here, since the last player to finish the init state won't get here and
-	 * will still see his card anyway from the init-phase
-	 */
-	if($mystatus=='check')
-	  {
-	    $card_status = CARDS_SHOW;
-	  }
       }
     else
       {
@@ -962,7 +955,6 @@ switch($mystatus)
 		  }
 	      }
 	  }
-	$card_status = CARDS_SHOW;
       }
     break;
 
@@ -1006,9 +998,6 @@ switch($mystatus)
 
     /* get hand */
     $mycards = DB_get_hand($me);
-
-    /* default: show cards, will be overwritten, if we need to give back cards */
-    $card_status = CARDS_SHOW;
 
     /* check if user need to give more cards back */
     if( ($myparty=='re' || $myparty=='contra') && count($mycards)>12)
@@ -1328,8 +1317,6 @@ switch($mystatus)
       {
 	$messages[] = _('You finished the setup, but not everyone else finished it... '.
 	  'You need to wait for the others. Just wait for an email.');
-
-	$card_status = CARDS_SHOW;
 
 	break; /* not sure this works... the idea is that you can
 		* only  play a card after everyone is ready to play */
