@@ -537,7 +537,7 @@ switch($mystatus)
      * ask if player wants to join the game *
      ****************************************/
 
-    /* don't ask if user has autosetup set to yest */
+    /* don't ask if user has autosetup set to yes */
     $skip = 0;
     if($PREF['autosetup']=='yes') $skip = 1;
 
