@@ -428,10 +428,10 @@ function output_header()
      <link rel="stylesheet" href="<?php echo autoversion("css/normalize.css"); ?>" />
      <link rel="stylesheet" href="<?php echo autoversion("css/standard.css"); ?>" />
      <link rel="stylesheet" href="<?php echo autoversion("css/dateinput.css"); ?>"/>
-     <script type="text/javascript" src="<?php echo autoversion("include/jquery.js"); ?>"> </script>
-     <script type="text/javascript" src="<?php echo autoversion("include/jquery.tablesorter.js"); ?>"></script>
-     <script type="text/javascript" src="<?php echo autoversion("include/jquery.tools.min.js"); ?>"></script>
-     <script type="text/javascript" src="<?php echo autoversion("include/game.js"); ?>"> </script>
+     <script type="text/javascript" src="<?php echo autoversion("js/jquery.js"); ?>"> </script>
+     <script type="text/javascript" src="<?php echo autoversion("js/jquery.tablesorter.js"); ?>"></script>
+     <script type="text/javascript" src="<?php echo autoversion("js/jquery.tools.min.js"); ?>"></script>
+     <script type="text/javascript" src="<?php echo autoversion("js/game.js"); ?>"> </script>
      <script type="text/javascript">
      </script>
   </head>
