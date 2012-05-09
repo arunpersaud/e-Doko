@@ -2086,7 +2086,7 @@ switch($mystatus)
     /* check if game is over, display results */
     if(DB_get_game_status_by_gameid($gameid)=='play')
       {
-	echo _('The game is over for you... other people still need to play though');
+	$messages[] = _('The game is over for you... other people still need to play though');
       }
     break;
   default:
