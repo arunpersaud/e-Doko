@@ -55,6 +55,10 @@ Installation
        return;
     }
 
-3) Log in and enjoy ;)
+3) install .htaccess: copy htaccess.template to .htaccess and edit it to set RewriteBase.
+   If your site is at http://example.org/~test/edoko you need to set
+   RewriteBase to /~test/edoko
+
+4) Log in and enjoy ;)
 
 Arun

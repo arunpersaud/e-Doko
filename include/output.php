@@ -26,6 +26,21 @@ if(!isset($HOST))
 
 /* functions which only ouput html  */
 
+function autoversion($file)
+{
+  /* changes the file name of e.g. css/style.css to css/style.<md5>.css/js
+   * this way the browser can cache the file and will reload it if the file changed
+   * needs to have .htaccess set up correctly to link back to css/style.css */
+
+  /* only use it for file that have an absolut path */
+  if(!file_exists(dirname($_SERVER['SCRIPT_FILENAME']). '/' . $file))
+    return $file;
+
+  $md5 = md5_file(dirname($_SERVER['SCRIPT_FILENAME']). '/' . $file);
+  return preg_replace('{\\.([^./]+)$}', ".$md5.\$1", $file);
+}
+
+
 function output_ask_for_new_game($playerA,$playerB,$playerC,$playerD,$oldgameid)
 {
   global $RULES;
@@ -410,13 +425,13 @@ function output_header()
      <meta charset="utf-8" />
      <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
      <link rel="shortcut icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" href="css/normalize.css?v=1" />
-     <link rel="stylesheet" href="css/standard.css?v=41" />
-     <link rel="stylesheet" href="css/dateinput.css?v=1"/>
-     <script type="text/javascript" src="include/jquery.js"> </script>
-     <script type="text/javascript" src="include/jquery.tablesorter.js"></script>
-     <script type="text/javascript" src="include/jquery.tools.min.js"></script>
-     <script type="text/javascript" src="include/game.js"> </script>
+     <link rel="stylesheet" href="<?php echo autoversion("css/normalize.css"); ?>" />
+     <link rel="stylesheet" href="<?php echo autoversion("css/standard.css"); ?>" />
+     <link rel="stylesheet" href="<?php echo autoversion("css/dateinput.css"); ?>"/>
+     <script type="text/javascript" src="<?php echo autoversion("include/jquery.js"); ?>"> </script>
+     <script type="text/javascript" src="<?php echo autoversion("include/jquery.tablesorter.js"); ?>"></script>
+     <script type="text/javascript" src="<?php echo autoversion("include/jquery.tools.min.js"); ?>"></script>
+     <script type="text/javascript" src="<?php echo autoversion("include/game.js"); ?>"> </script>
      <script type="text/javascript">
      </script>
   </head>
