@@ -57,6 +57,9 @@ $playid   = DB_get_current_playid($gameid); /* might be -1 at beginning of the g
 
 /* get prefs and save them in a variable*/
 $PREF = DB_get_PREF(isset($_SESSION['id'])?$_SESSION['id']:$myid);
+/* set language chosen in preferences, will become active on the next reload (see index.php)*/
+$_SESSION['language'] = $PREF['language'];
+
 
 /* get rule set for this game */
 $RULES = DB_get_RULES($gameid);

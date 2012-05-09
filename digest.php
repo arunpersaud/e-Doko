@@ -45,13 +45,31 @@ global $defaulttimezone;
 foreach($users as $uid)
   {
     // get local time
-
     $zone  = DB_get_user_timezone($uid);
     date_default_timezone_set($zone);
     $time = (int)(date("H"));
 
-    // calculate mod by digest-time
+    // load users preferences
     $PREF = DB_get_PREF($uid);
+
+    // set users language preference
+    $language = $PREF['language'];
+
+    switch($language)
+      {
+      case 'de':
+	putenv("LC_ALL=de_DE");
+	setlocale(LC_ALL, "de_DE");
+	// Specify location of translation tables
+	bindtextdomain("edoko", "./locale");
+	// Choose domain
+	textdomain("edoko");
+	break;
+      default:
+	/* do nothing */
+      }
+
+    // calculate mod by digest-time
     switch($PREF['digest'])
       {
       case 'digest-off':

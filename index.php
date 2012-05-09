@@ -58,13 +58,12 @@ if($DBopen<0)
 if(myisset('language') || isset($_SESSION['language']))
   {
     $language = 'en';
-    if(isset($_SESSION['language']))
-       $language = $_SESSION['language'];
+
     if(myisset('language'))
-      {
-	$language = $_REQUEST['language'];
-	$_SESSION['language'] = $language; /* overrule preferences */
-      }
+      $language = $_REQUEST['language'];
+    else if(isset($_SESSION['language']))
+      $language = $_SESSION['language'];
+
     switch($language)
       {
       case 'de':

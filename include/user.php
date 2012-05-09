@@ -121,6 +121,8 @@ else
 	$_SESSION['name'] = $myname;
 
 	$PREF = DB_get_PREF($myid);
+	/* set language chosen in preferences, will become active on the next reload (see index.php)*/
+	$_SESSION['language'] = $PREF['language'];
 
 	DB_update_user_timestamp($myid);
 

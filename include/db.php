@@ -863,7 +863,7 @@ function DB_get_PREF($myid)
 	  break;
 	}
     }
-  $_SESSION['language'] =  $PREF['language'];
+
   return $PREF;
 }
 
