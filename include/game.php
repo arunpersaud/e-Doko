@@ -326,7 +326,7 @@ if($session)
 
     /* check for solo, add game type to session number */
     echo "    Game $session.$j";
-    if($GT !='normal')
+    if($gamestatus != 'pre' && $GT !='normal' )
       echo " ($GT)";
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
       {
