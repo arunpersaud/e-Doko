@@ -426,18 +426,18 @@ if($PREF['autosetup']=="yes")
 echo "         </select>";
 if($changed_autosetup) echo _('changed');
 echo " </td></tr>\n";
-echo "    <tr><td>Sorting:          </td><td>\n";
+echo '    <tr><td>'._('Sorting').":          </td><td>\n";
 
 echo "         <select id=\"sorting\" name=\"sorting\" size=\"1\">\n";
 if($PREF['sorting']=="high-low")
   {
-    echo "           <option value=\"high-low\" selected=\"selected\">high to low</option>\n";
-    echo "           <option value=\"low-high\">low to high</option>\n";
+    echo "           <option value=\"high-low\" selected=\"selected\">"._('high to low')."</option>\n";
+    echo "           <option value=\"low-high\">"._('low to high')."</option>\n";
   }
  else
    {
-     echo "           <option value=\"high-low\">high to low</option>\n";
-     echo "           <option value=\"low-high\" selected=\"selected\">low to high</option>\n";
+     echo "           <option value=\"high-low\">"._('high to low')."</option>\n";
+     echo "           <option value=\"low-high\" selected=\"selected\">"._('low to high')."</option>\n";
    }
 echo "         </select>";
 if($changed_sorting) echo _('changed');
@@ -446,13 +446,13 @@ echo '        <tr><td>'._('Open for new games').":          </td><td>\n";
 echo "         <select id=\"open_for_games\" name=\"open_for_games\" size=\"1\">\n";
 if($PREF['open_for_games']=="no")
   {
-    echo "           <option value=\"yes\">"._('yes')."</option>\n";
-    echo "           <option value=\"no\" selected=\"selected\">no</option>\n";
+    echo '           <option value="yes">'._('yes')."</option>\n";
+    echo '           <option value="no" selected="selected">'._('no')."</option>\n";
   }
  else /* default */
    {
-     echo "           <option value=\"yes\" selected=\"selected\">yes</option>\n";
-     echo "           <option value=\"no\">"._('no')."</option>\n";
+     echo '           <option value="yes" selected="selected">'._('yes')."</option>\n";
+     echo '           <option value="no">'._('no')."</option>\n";
    }
 echo "         </select>";
 if($changed_openforgames) echo _('changed');
@@ -522,7 +522,7 @@ $openids = DB_GetOpenIDsByUser($myid);
 if(sizeof($openids))
   {
     echo "     <table class=\"openid\">\n";
-    echo "     <thead><tr><th>Delete?</th><th>OpenId</th></tr></thead>\n";
+    echo '     <thead><tr><th>'._('Delete')."?</th><th>OpenId</th></tr></thead>\n";
     echo "     <tbody>\n";
     foreach ($openids as $ids)
       {
