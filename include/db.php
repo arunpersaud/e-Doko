@@ -30,7 +30,7 @@ if(!isset($HOST))
 
 function DB_open()
 {
-  $version_needed = 3;
+  $version_needed = 4;
 
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
   $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
@@ -1242,9 +1242,12 @@ function DB_get_number_of_tricks($gameid,$position)
   return $r[0];
 }
 
-function DB_digest_insert_email($To,$message)
+function DB_digest_insert_email($To,$message,$type,$gameid)
 {
-  DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",NULL,".DB_quote_smart($message).")");
+  if($type == GAME_YOUR_TURN)
+    DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",NULL,'your_turn',$gameid,".DB_quote_smart($message).")");
+  else
+    DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",NULL,'misc',NULL,".DB_quote_smart($message).")");
   return;
 }
 
@@ -1263,7 +1266,7 @@ function DB_get_digest_message_by_email($email)
 {
   $messages = array();
 
-  $result = DB_query("SELECT id,content FROM digest_email Where email='$email'");
+  $result = DB_query("SELECT id,content,type,game_id FROM digest_email Where email='$email'");
   while($r = DB_fetch_array($result))
     $messages[]=$r;
 

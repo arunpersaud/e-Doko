@@ -196,7 +196,7 @@ function mymail($uid,$gameid=0,$type,$message)
   else
     {
       /* store email in database */
-      DB_digest_insert_email($To,$message);
+      DB_digest_insert_email($To,$message,$type,$gameid);
     }
 }
 

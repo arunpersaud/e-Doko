@@ -105,6 +105,16 @@ foreach($users as $uid)
 	// get messages
 	$messages = DB_get_digest_message_by_email($email);
 
+	// check messages for outdated ones and delete those
+	foreach ($messages as $key=>$mess)
+	  {
+	    if($mess[2] == 'your_turn' && $uid != DB_get_player_by_gameid($mess[3]) )
+	      {
+		DB_digest_delete_message($mess[0]);
+		unset($messages[$key]);
+	      }
+	  }
+
 	// add them together
 	if(sizeof($messages))
 	  {

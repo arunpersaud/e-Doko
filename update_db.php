@@ -38,7 +38,7 @@ if(isset($_SERVER['REMOTE_ADDR']))
   exit();
 
 $old_version = DB_get_version();
-$current_version = 3;
+$current_version = 4;
 
 if($old_version < $current_version)
   echo "Will upgrade your database now:\n";
@@ -74,6 +74,13 @@ switch($old_version)
 	     " ADD COLUMN `game_id` int(11) default NULL AFTER play_id");
     DB_query("UPDATE Version set version=3");
     echo "Upgraded to version 3.\n";
+  case 3:
+    DB_query("ALTER TABLE digest_email".
+	     " ADD COLUMN `game_id` int(11) default NULL AFTER create_date");
+    DB_query("ALTER TABLE digest_email".
+	     " ADD COLUMN `type` enum('misc','your_turn') NOT NULL default 'misc' AFTER create_date");
+    DB_query("UPDATE Version set version=4");
+    echo "Upgraded to version 4.\n";
 
   }
 

@@ -492,6 +492,8 @@ create table digest_email (
   `id` int(11) NOT NULL auto_increment,
   `email` varchar(255) default null,
   `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `type` enum('misc','your_turn') NOT NULL default 'misc',
+  `game_id` int(11) default NULL,
   `content` text,
   UNIQUE KEY `id` (`id`),
   index (email)
