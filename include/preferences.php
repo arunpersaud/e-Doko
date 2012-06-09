@@ -546,14 +546,7 @@ echo "</div>\n";
 // add jquery date picker if html5 is not available
 ?>
 <script>
-  var i = document.createElement("input");
-  i.setAttribute("type", "date");
-  if (i.type == "text") {
-    $(":date").dateinput({
-
-        format: 'yyyy-mm-dd',
-      });
-  }
+  $(".date").dateinput({  format: 'yyyy-mm-dd'  });
 </script>
 <?php
 

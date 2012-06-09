@@ -611,6 +611,7 @@ table.stats thead tr .header {
     background-image: url(bg.png);
     background-repeat: no-repeat;
     background-position: center right;
+    padding-right: 15px;
     cursor: pointer;
 }
 table.stats tbody td {
