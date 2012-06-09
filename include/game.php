@@ -588,13 +588,13 @@ switch($mystatus)
 
 	    /* check if everyone has reached this stage, set player in game-table to the next player */
 	    $userids = DB_get_all_userid_by_gameid($gameid);
-	    foreach($userids as $user)
+	    foreach($userids as $userid)
 	      {
-		$userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+		$userstat = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 		if($userstat!='init')
 		  {
 		    /* whos turn is it? */
-		    DB_set_player_by_gameid($gameid,$user);
+		    DB_set_player_by_gameid($gameid,$userid);
 		    break;
 		  }
 	      }
@@ -703,13 +703,13 @@ switch($mystatus)
     /* check if everyone has reached this stage */
     $userids = DB_get_all_userid_by_gameid($gameid);
     $ok = 1;
-    foreach($userids as $user)
+    foreach($userids as $userid)
       {
-	$userstat = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+	$userstat = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 	if($userstat!='check')
 	  {
 	    $ok = 0;
-	    DB_set_player_by_gameid($gameid,$user);
+	    DB_set_player_by_gameid($gameid,$userid);
 	    break;
 	  }
       };
@@ -919,8 +919,8 @@ switch($mystatus)
 	  {
 	    $startplayer = DB_get_startplayer_by_gameid($gameid);
 	    $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-	    $who         = DB_get_userid('hash',$hash);
-	    DB_set_player_by_gameid($gameid,$who);
+	    $userid      = DB_get_userid('hash',$hash);
+	    DB_set_player_by_gameid($gameid,$userid);
 
 	    if($hash!=$me)
 	      {
@@ -929,7 +929,7 @@ switch($mystatus)
 		    /* email startplayer */
 		    $email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		    mymail($who,$gameid,GAME_READY,$email_message);
+		    mymail($userid,$gameid,GAME_READY,$email_message);
 		  }
 	      }
 	    else
@@ -1015,8 +1015,8 @@ switch($mystatus)
 	/* email start player */
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
 	$hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-	$who         = DB_get_userid('hash',$hash);
-	DB_set_player_by_gameid($gameid,$who);
+	$userid      = DB_get_userid('hash',$hash);
+	DB_set_player_by_gameid($gameid,$userid);
 
 	if($hash!=$me)
 	  {
@@ -1025,7 +1025,7 @@ switch($mystatus)
 		/* email startplayer */
 		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		mymail($who,$gameid,GAME_READY,$email_message);
+		mymail($userid,$gameid,GAME_READY,$email_message);
 	      }
 	  }
 	else
@@ -1261,13 +1261,13 @@ switch($mystatus)
       {
 	$ok = 1;
 	$userids = DB_get_all_userid_by_gameid($gameid);
-	foreach($userids as $user)
+	foreach($userids as $userid)
 	  {
-	    $userstatus = DB_get_hand_status_by_userid_and_gameid($user,$gameid);
+	    $userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 	    if($userstatus !='play' && $userstatus!='gameover')
 	      {
 		$ok = 0;
-		DB_set_player_by_gameid($gameid,$user);
+		DB_set_player_by_gameid($gameid,$userid);
 		break;
 	      }
 	  }
@@ -1279,15 +1279,15 @@ switch($mystatus)
 	    /* email startplayer */
 	    $startplayer = DB_get_startplayer_by_gameid($gameid);
 	    $hash        = DB_get_hash_from_game_and_pos($gameid,$startplayer);
-	    $who         = DB_get_userid('hash',$hash);
-	    DB_set_player_by_gameid($gameid,$who);
+	    $userid      = DB_get_userid('hash',$hash);
+	    DB_set_player_by_gameid($gameid,$userid);
 
 	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer) */
 		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
-		mymail($who,$gameid, GAME_READY, $email_message);
+		mymail($userid,$gameid, GAME_READY, $email_message);
 	      }
 	  }
       }
@@ -1734,15 +1734,15 @@ switch($mystatus)
 	    if(DB_get_game_status_by_gameid($gameid)=='play')
 	      {
 		$next_hash = DB_get_hash_from_game_and_pos($gameid,$next);
-		$who       = DB_get_userid('hash',$next_hash);
-		DB_set_player_by_gameid($gameid,$who);
+		$userid    = DB_get_userid('hash',$next_hash);
+		DB_set_player_by_gameid($gameid,$userid);
 
 		$email_message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
 		  "It's your turn  now.\n".
 		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
-		if( DB_get_email_pref_by_uid($who)!='emailaddict' )
+		if( DB_get_email_pref_by_uid($userid)!='emailaddict' )
 		  {
-		    mymail($who,$gameid, GAME_YOUR_TURN, $email_message);
+		    mymail($userid,$gameid, GAME_YOUR_TURN, $email_message);
 		  }
 	      }
 	    else /* send out final email */
