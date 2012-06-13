@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2012-05-12 18:30-0700\n"
-"PO-Revision-Date: 2012-05-12 18:54-0700\n"
+"POT-Creation-Date: 2012-06-12 20:55-0700\n"
+"PO-Revision-Date: 2012-06-12 20:56-0700\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "Language: de\n"
@@ -16,6 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: rss.php:95
+msgid "Know when it is your turn"
+msgstr "Immer auf dem Laufendem"
+
+#: rss.php:126
+msgid "game"
+msgstr "Spiel"
+
+#: rss.php:134
+msgid "Please use the link to access the game."
+msgstr "Bitte benutze den Link, um eine Karte zu spielen."
 
 #: include/functions.php:121
 #, php-format
