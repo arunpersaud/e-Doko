@@ -72,8 +72,27 @@ header("Content-Type: text/xml");
 ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 <title>E-DoKo Feed</title>
-<subtitle>Know when it is your turn</subtitle>
 <?php
+
+  /* set language */
+  $PREF = DB_get_PREF($id);
+  $lang = $PREF['language'];
+
+  switch($lang)
+    {
+    case 'de':
+      putenv("LC_ALL=de_DE");
+      setlocale(LC_ALL, "de_DE");
+      // Specify location of translation tables
+      bindtextdomain("edoko", "./locale");
+      // Choose domain
+      textdomain("edoko");
+      break;
+    default:
+      /* do nothing */
+    }
+
+echo '<subtitle>'._('Know when it is your turn')."</subtitle>\n";
 
   global $WIKI,$INDEX, $HOST;
 
@@ -104,7 +123,7 @@ echo "</author>\n\n";
   while( $r = DB_fetch_array($result))
     {
       echo "<entry>\n";
-      echo "<title>game ".DB_format_gameid($r[1])."</title>\n";
+      echo "<title>"._('game').' '.DB_format_gameid($r[1])."</title>\n";
       $url=$INDEX."?action=game&amp;me=".$r[0];
       echo "<link href=\"".$HOST.$url."\" />\n";
       $date = DB_get_game_timestamp($r[1]);
@@ -112,7 +131,7 @@ echo "</author>\n\n";
       $date = date("Y-m-d",$timestamp);
       echo "<id>tag:doko.nubati.net,$date:$url</id>\n";
       echo "<updated>".date(DATE_ATOM,$timestamp)."</updated>\n";
-      echo "<summary>Please use the link to access the game.</summary>\n";
+      echo '<summary>'._('Please use the link to access the game.')."</summary>\n";
       echo "</entry>\n\n";
     }
 
