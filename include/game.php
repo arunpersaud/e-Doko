@@ -438,79 +438,6 @@ echo "<form action=\"index.php?action=game&amp;me=$me\" method=\"post\">\n";
 /* display the table and the names */
 display_table_begin();
 
-
-/******************************
- * Output pre-trick if needed *
- ******************************/
-
-switch($mystatus)
-  {
-  case 'start':
-    break;
-  case 'init':
-  case 'check':
-    /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
-    echo "\n<div class=\"tricks\">\n";
-    echo "    <div class=\"trick\" id=\"trick0\">\n";
-
-    for($pos=1;$pos<5;$pos++)
-      {
-	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
-	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
-	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
-
-	if($userstatus=='start' || $userstatus=='init')
-	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br />to decide </div>\n"; /* show this to everyone */
-	else
-	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
-	  else
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
-      }
-
-    /* display all comments on the top right (card1)*/
-    $comments = DB_get_pre_comment($gameid);
-    /* display card */
-    echo "      <div class=\"card1\">\n";
-    /* display comments */
-    foreach( $comments as $comment )
-      echo "        <span class=\"comment\">".$comment[1].": ".$comment[0]."</span>\n";
-    echo "      </div>\n"; /* end div card */
-
-
-    echo "    </div>\n  </div>\n";  /* end div trick, end li trick , end tricks*/
-    /* end displaying sickness */
-
-    break;
-  case 'poverty':
-    /* output pre-game trick in case user reloads,
-     * only needs to be done when a team has been formed */
-    if($myparty=='re' || $myparty=='contra')
-      {
-	echo "\n<div class=\"tricks\">\n";
-
-	$mygametype =  DB_get_gametype_by_gameid($gameid);
-
-	echo "    <div class=\"trick\" id=\"trick0\">\n";
-
-	/* get information so show the cards that have been handed over in a poverty game */
-	output_exchanged_cards();
-
-	echo "    </div>\n </div>\n\n";  /* end div trick, end li trick , end ul tricks */
-      }
-    /* end output pre-game trick */
-    break;
-  case 'play':
-  case 'gameover':
-
-    /* taken care further down */
-    break;
-  default:
-  }
-
-
-
-
 /* mystatus gets the player through the different stages of a game.
  * start:    does the player want to play?
  * init:     check for sickness
@@ -2094,6 +2021,77 @@ switch($mystatus)
   } /*end of output: tricks, table, messages, card */
 
 /* display the 2nd half of table and the names */
+
+/***********************************
+ * Output pre-trick if needed      *
+ * this outputs status of healthy, *
+ * sick, etc during pre-game phase *
+ **********************************/
+switch($mystatus)
+  {
+  case 'start':
+    break;
+  case 'init':
+  case 'check':
+    /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
+    echo "\n<div class=\"tricks\">\n";
+    echo "    <div class=\"trick\" id=\"trick0\">\n";
+
+    for($pos=1;$pos<5;$pos++)
+      {
+	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
+	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
+	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
+
+	if($userstatus=='start' || $userstatus=='init')
+	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br />to decide </div>\n"; /* show this to everyone */
+	else
+	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
+	  else
+	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
+      }
+
+    /* display all comments on the top right (card1)*/
+    $comments = DB_get_pre_comment($gameid);
+    /* display card */
+    echo "      <div class=\"card1\">\n";
+    /* display comments */
+    foreach( $comments as $comment )
+      echo "        <span class=\"comment\">".$comment[1].": ".$comment[0]."</span>\n";
+    echo "      </div>\n"; /* end div card */
+
+
+    echo "    </div>\n  </div>\n";  /* end div trick, end li trick , end tricks*/
+    /* end displaying sickness */
+
+    break;
+  case 'poverty':
+    /* output pre-game trick in case user reloads,
+     * only needs to be done when a team has been formed */
+    if($myparty=='re' || $myparty=='contra')
+      {
+	echo "\n<div class=\"tricks\">\n";
+
+	$mygametype =  DB_get_gametype_by_gameid($gameid);
+
+	echo "    <div class=\"trick\" id=\"trick0\">\n";
+
+	/* get information so show the cards that have been handed over in a poverty game */
+	output_exchanged_cards();
+
+	echo "    </div>\n </div>\n\n";  /* end div trick, end li trick , end ul tricks */
+      }
+    /* end output pre-game trick */
+    break;
+  case 'play':
+  case 'gameover':
+
+    /* already taken care of */
+    break;
+  default:
+  }
+
 display_table_end();
 
 /**************
