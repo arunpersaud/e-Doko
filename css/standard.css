@@ -185,6 +185,7 @@ div.table div.table1 {
   z-index:20;
   margin: 0 auto;
 }
+
 div.middle {
     position:relative;
     min-height: 6em;
@@ -199,6 +200,13 @@ div.table div.table0 {
   text-align:center;
   z-index:20;
 }
+div.table div.table0 .start {
+  background-color: #f00;
+  border-radius: 5px;
+  padding: 3px;
+  margin: 3px;
+}
+
 div.table img.table {
   width:25%;
   z-index:5;

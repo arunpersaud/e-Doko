@@ -1002,7 +1002,7 @@ function display_table_begin ()
   echo "<div class=\"table\">\n";
   display_single_user($row1);
   echo "\n<div class=\"middle\">\n";
-  display_single_user($row0);
+  display_single_user($row0,1); /* mark starting player in case re/contra is not set yet */
   echo "  <img class=\"table\" src=\"pics/table.png\" alt=\"table\" />\n";
   display_single_user($row2);
 
@@ -1040,8 +1040,10 @@ function display_table_end ()
   return;
 }
 
-function display_single_user($r)
+function display_single_user($r,$start=0)
 {
+  /* start=1, mark starting player, default=0, so the player on the left is not marked */
+
   global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
   global $RULES,$GAME,$gametype;
 
@@ -1063,6 +1065,10 @@ function display_single_user($r)
 	md5(strtolower(trim($email)))."?d=identicon\" alt=\"$name's gravatar\" />";
 
       echo "  <div class=\"table".($pos-1)."\">\n";
+
+      /* mark starting player */
+      if($start && ! ($party=="re" || $party=="contra"))
+	echo '   <span class="start">'._('Starting Player')."</span> <br />\n";
 
       if($debug)
 	echo "   <a href=\"".$INDEX."?action=game&amp;me=".$hash."\">";
