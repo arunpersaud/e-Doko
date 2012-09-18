@@ -148,29 +148,29 @@ if( myisset('call') )
       {
 	$result = DB_query("UPDATE Hand SET point_call='120' WHERE hash='$me' ");
 	if($myparty=='re')
-	  $commentCall = "Re";
+	  $commentCall = 'Re';
 	else if($myparty=='contra')
-	  $commentCall = "Contra";
+	  $commentCall = 'Contra';
       }
     else if($_REQUEST['call']  == '90' && can_call(90,$me))
       {
 	$result = DB_query("UPDATE Hand SET point_call='90'  WHERE hash='$me' ");
-	$commentCall = "No 90";
+	$commentCall = 'No 90';
       }
     else if($_REQUEST['call']  == '60' && can_call(60,$me))
       {
 	$result = DB_query("UPDATE Hand SET point_call='60'  WHERE hash='$me' ");
-	$commentCall = "No 60";
+	$commentCall = 'No 60';
       }
     else if($_REQUEST['call']  == '30' && can_call(30,$me))
       {
 	$result = DB_query("UPDATE Hand SET point_call='30'  WHERE hash='$me' ");
-	$commentCall = "No 30";
+	$commentCall = 'No 30';
       }
     else if($_REQUEST['call']  == '0' && can_call(0,$me))
       {
 	$result = DB_query("UPDATE Hand SET point_call='0'   WHERE hash='$me' ");
-	$commentCall = "Zero";
+	$commentCall = 'Zero';
       }
   }
 
@@ -230,38 +230,38 @@ if($session)
     switch($RULES['dullen'])
       {
       case 'none':
-	echo "    <img class=\"rulesicon\" alt=\""._('no ten of hearts').
+	echo '    <img class="rulesicon" alt="'._('no ten of hearts').
 	  "\" src=\"pics/button/no-ten-of-hearts.png\"/>\n"; break;
       case 'firstwins':
-	echo "    <img class=\"rulesicon\" alt=\""._('ten of hearts').
+	echo '    <img class="rulesicon" alt="'._('ten of hearts').
 	  "\" src=\"pics/button/ten-of-hearts.png\"/>\n"; break;
       case 'secondwins':
-	echo "    <img class=\"rulesicon\" alt=\""._('second ten of hearts').
+	echo '    <img class="rulesicon" alt="'._('second ten of hearts').
 	  "\" src=\"pics/button/second-ten-of-hearts.png\"/>\n"; break;
       }
     switch($RULES['schweinchen'])
       {
       case 'none':
-	echo "    <img class=\"rulesicon\" alt=\""._('no schweinchen')."\" ".
+	echo '    <img class="rulesicon" alt="'._('no schweinchen').'" '.
 	  "src=\"pics/button/no-schweinchen.png\"/>\n"; break;
       case 'both':
-	echo "    <img class=\"rulesicon\" alt=\""._('two schweinchen')."\" ".
+	echo '    <img class="rulesicon" alt="'._('two schweinchen').'" '.
 	  "src=\"pics/button/two-schweinchen.png\"/>\n"; break;
       case 'second':
-	echo "    <img class=\"rulesicon\" alt=\"".('second schweinchen')."\" ".
+	echo '    <img class="rulesicon" alt="'.('second schweinchen').'" '.
 	  "src=\"pics/button/second-schweinchen.png\"/>\n"; break;
       case 'secondaftercall':
-	echo "    <img class=\"rulesicon\" alt=\""._('second schweinchen after call')."\" ".
+	echo '    <img class="rulesicon" alt="'._('second schweinchen after call').'" '.
 	  "src=\"pics/button/second-schweinchen-after-call.png\"/>\n"; break;
       }
     switch($RULES['call'])
       {
       case '1st-own-card':
-	echo "    <img class=\"rulesicon\" alt=\""._('1st-own-card')."\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
+	echo '    <img class="rulesicon" alt="'._('1st-own-card')."\" src=\"pics/button/1st-own-card.png\"/>\n"; break;
       case '5th-card':
-	echo "    <img class=\"rulesicon\" alt=\""._('5th-card')."\" src=\"pics/button/5th-card.png\"/>\n"; break;
+	echo '    <img class="rulesicon" alt="'._('5th-card')."\" src=\"pics/button/5th-card.png\"/>\n"; break;
       case '9-cards':
-	echo "    <img class=\"rulesicon\" alt=\""._('9-cards')."\" src=\"pics/button/9-cards.png\"/>\n"; break;
+	echo '    <img class="rulesicon" alt="'._('9-cards')."\" src=\"pics/button/9-cards.png\"/>\n"; break;
       }
     echo "    <div>\n";
     echo '         '._('10ofhearts').":  {$RULES['dullen']}      <br />\n";
@@ -287,13 +287,13 @@ if($session)
 	foreach($finalscore as $user=>$value)
 	  {
 	    $name = DB_get_name('userid',$user);
-	    echo " ".substr($name,0,2).": $value ";
+	    echo ' '.substr($name,0,2).": $value ";
 	  }
       }
     else
       {
 	/* first game, no score yet */
-	echo "&nbsp;";
+	echo '&nbsp;';
       }
 
     /* output all games for the score table */
@@ -394,11 +394,11 @@ switch($mystatus)
       if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
 	echo "  <li onclick=\"hl('0');\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
 
-    $result = DB_query("SELECT Trick.id ".
-		       "FROM Trick ".
+    $result = DB_query('SELECT Trick.id '.
+		       'FROM Trick '.
 		       "WHERE Trick.game_id='".$gameid."' ".
-		       "GROUP BY Trick.id ".
-		       "ORDER BY Trick.id ASC");
+		       'GROUP BY Trick.id '.
+		       'ORDER BY Trick.id ASC');
     $trickNR   = 1;
     $lasttrick = DB_get_max_trickid($gameid);
 
@@ -418,8 +418,8 @@ switch($mystatus)
       echo "  <li onclick=\"hl('13');\" class=\"current\"><a href=\"#\">"._('Score')."</a></li>\n";
 
     /* output previous/next buttons */
-    echo "  <li onclick=\"hl_prev();\" ><button>"._('prev')."</button></li>\n";
-    echo "  <li onclick=\"hl_next();\" ><button>"._('next')."</button></li>\n";
+    echo '  <li onclick="hl_prev();" ><button>'._('prev')."</button></li>\n";
+    echo '  <li onclick="hl_next();" ><button>'._('next')."</button></li>\n";
 
     echo "</ul>\n\n";
 
@@ -493,9 +493,7 @@ switch($mystatus)
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
-	      {
-		mymail($user,$gameid,GAME_CANCELED,$email_message);
-	      }
+	      mymail($user,$gameid,GAME_CANCELED,$email_message);
 
 	    $card_status = CARDS_EMPTY;
 
@@ -550,7 +548,7 @@ switch($mystatus)
 
 	if($Nsickness>1)
 	  {
-	    $messages[] = "You selected more than one sickness, please go back ".
+	    $messages[] = 'You selected more than one sickness, please go back '.
 	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.";
 
 	    break;
@@ -558,7 +556,7 @@ switch($mystatus)
 	else
 	  {
 	    /* everything is ok, save what user said and proceed */
-	    $messages[] = "Processing what you selected in the last step...";
+	    $messages[] = 'Processing what you selected in the last step...';
 
 	    /* check if this sickness needs to be handled first */
 	    $gametype    = DB_get_gametype_by_gameid($gameid);
@@ -600,14 +598,14 @@ switch($mystatus)
 	    else if($_REQUEST['nines'] == 'yes')
 	      {
 		$messages[] = _("What? You just don't want to play a game because you have a few nines? Well, if no one".
-		       " is playing solo, this game will be canceled.")."<br />\n";
+		       ' is playing solo, this game will be canceled.')."<br />\n";
 		DB_set_sickness_by_hash($me,'nines');
 	      }
 	    else if($_REQUEST['lowtrump'] == 'yes')
 	      {
 		if($RULES['lowtrump']=='cancel')
 		  $messages[] = _("What? You just don't want to play a game because you have low trump? Well, if no one".
-			 " is playing solo, this game will be canceled.")."<br />\n";
+			 ' is playing solo, this game will be canceled.')."<br />\n";
 		else
 		  $messages[] = _("Don't think you can win with low trumps...? Ok, poverty chosen.")." <br />.<br />\n";
 
@@ -692,7 +690,7 @@ switch($mystatus)
 	    /* cancel game */
 	    if($cancelsick == 'nines')
 	      {
-		$email_message = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		$email_message = 'The game has been canceled because '.DB_get_name('userid',$cancel).
 		  " has five or more nines and nobody is playing solo.\n\n".
 		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
 		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
@@ -700,12 +698,12 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('nines',$gameid);
 
-		$messages[] = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		$messages[] = 'The game has been canceled because '.DB_get_name('userid',$cancel).
 		  " has five or more nines and nobody is playing solo.";
 	      }
 	    else if ($cancelsick == 'lowtrump')
 	      {
-		$email_message = "The game has been canceled because ".DB_get_name('userid',$cancel).
+		$email_message = 'The game has been canceled because '.DB_get_name('userid',$cancel).
 		  " has low trump and nobody is playing solo.\n\n".
 		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
 		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
@@ -713,8 +711,8 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('lowtrump',$gameid);
 
-		$messages[] = "The game has been canceled because ".DB_get_name('userid',$cancel).
-		  " has low trump and nobody is playing solo.";
+		$messages[] = 'The game has been canceled because '.DB_get_name('userid',$cancel).
+		  ' has low trump and nobody is playing solo.';
 	      };
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
@@ -880,7 +878,7 @@ switch($mystatus)
 		  {
 		    /* email player for poverty */
 		    $email_message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
+		      'Use this link to play a card: '.$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
 		    mymail($whoid,$gameid,GAME_POVERTY,$email_message);
 		  }
 	      }
@@ -951,7 +949,7 @@ switch($mystatus)
 	      {
 		/* email startplayer */
 		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		  'Use this link to play a card: '.$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		mymail($userid,$gameid,GAME_READY,$email_message);
 	      }
 	  }
@@ -1024,7 +1022,7 @@ switch($mystatus)
 	    if($mypos+$next>4)
 	      {
 		$email_message = "Hello, \n\n".
-		  "Game ".DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n\n";
+		  'Game '.DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n\n";
 
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		foreach($userids as $user)
@@ -1035,7 +1033,7 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('trump',$gameid);
 
-		$messages[] = "Game ".DB_format_gameid($gameid)." has been canceled.";
+		$messages[] = 'Game '.DB_format_gameid($gameid).' has been canceled.';
 		break;
 	      }
 	    else
@@ -1132,7 +1130,7 @@ switch($mystatus)
 			$next=2;
 
 		    if($mypos+$next>4)
-		      $messages[] = "Error in poverty, please contact the Admin";
+		      $messages[] = "Error in poverty, please contact the Admin ($ADMIN_NAME at $ADMIN_EMAIL)";
 
 		    $userhash = DB_get_hash_from_game_and_pos($gameid,$mypos+$next);
 		    $userid   = DB_get_userid('hash',$userhash);
@@ -1166,13 +1164,13 @@ switch($mystatus)
 	$messages[] = "The game has been canceled because one player wasn't responding.<br />If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.";
 	break;
       case 'cancel-nines':
-	$messages[] = "The game has been canceled because one player had too many nines.";
+	$messages[] = 'The game has been canceled because one player had too many nines.';
 	break;
       case 'cancel-lowtrump':
-	$messages[] = "The game has been canceled because one player had low trump.";
+	$messages[] = 'The game has been canceled because one player had low trump.';
 	break;
       case 'cancel-trump':
-	$messages[] = "The game has been canceled because nobody wanted to take the trump.";
+	$messages[] = 'The game has been canceled because nobody wanted to take the trump.';
 	break;
       }
     /* for these two types, we shouldn't show the cards, since we might want to restart the game */
@@ -1213,7 +1211,7 @@ switch($mystatus)
 	      {
 		/* email startplayer) */
 		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		  'Use this link to play a card: '.$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		mymail($userid,$gameid, GAME_READY, $email_message);
 	      }
 	  }
@@ -1253,23 +1251,23 @@ switch($mystatus)
       }
 
     /* get everything relevant to display the tricks */
-    $result = DB_query("SELECT Hand_Card.card_id as card,".
-		       "       Hand.position as position,".
-		       "       Play.sequence as sequence, ".
-		       "       Trick.id, ".
+    $result = DB_query('SELECT Hand_Card.card_id as card,'.
+		       '       Hand.position as position,'.
+		       '       Play.sequence as sequence, '.
+		       '       Trick.id, '.
 		       "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>')".
 		       "                    SEPARATOR '\n' ), ".
-		       "       Play.create_date, ".
-		       "       Hand.user_id ".
-		       "FROM Trick ".
-		       "LEFT JOIN Play ON Trick.id=Play.trick_id ".
-		       "LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id ".
-		       "LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id ".
-		       "LEFT JOIN Comment ON Play.id=Comment.play_id ".
-		       "LEFT JOIN User On User.id=Comment.user_id ".
+		       '       Play.create_date, '.
+		       '       Hand.user_id '.
+		       'FROM Trick '.
+		       'LEFT JOIN Play ON Trick.id=Play.trick_id '.
+		       'LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id '.
+		       'LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id '.
+		       'LEFT JOIN Comment ON Play.id=Comment.play_id '.
+		       'LEFT JOIN User On User.id=Comment.user_id '.
 		       "WHERE Trick.game_id='".$gameid."' ".
-		       "GROUP BY Trick.id, sequence ".
-		       "ORDER BY Trick.id, sequence  ASC");
+		       'GROUP BY Trick.id, sequence '.
+		       'ORDER BY Trick.id, sequence ASC');
     $trickNR   = 0;
     $lasttrick = DB_get_max_trickid($gameid);
 
@@ -1622,11 +1620,11 @@ switch($mystatus)
 	    $pos = DB_get_pos_by_hash($me);
 	    if($sequence==1)
 	      {
-		echo "    <div class=\"trick\" id=\"trick".($tricknr)."\">\n".
-		  "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";
+		echo '    <div class="trick" id="trick'.($tricknr)."\">\n".
+		  '      <img class="arrow" src="pics/arrow'.($pos-1).".png\" alt=\"table\" />\n";
 	      }
 
-	    echo "      <div class=\"card".($pos-1)."\">\n        ";
+	    echo '      <div class="card'.($pos-1)."\">\n        ";
 
 	    /* display comments */
 	    display_card($card,$PREF['cardset']);
@@ -1664,9 +1662,9 @@ switch($mystatus)
 		$userid    = DB_get_userid('hash',$next_hash);
 		DB_set_player_by_gameid($gameid,$userid);
 
-		$email_message = "A card has been played in game ".DB_format_gameid($gameid).".\n\n".
+		$email_message = 'A card has been played in game '.DB_format_gameid($gameid).".\n\n".
 		  "It's your turn  now.\n".
-		  "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$next_hash."\n\n" ;
+		  'Use this link to play a card: '.$HOST.$INDEX.'?action=game&me='.$next_hash."\n\n" ;
 		if( DB_get_email_pref_by_uid($userid)!='emailaddict' )
 		  {
 		    mymail($userid,$gameid, GAME_YOUR_TURN, $email_message);
@@ -1675,33 +1673,33 @@ switch($mystatus)
 	    else /* send out final email */
 	      {
 		/* individual score */
-		$result = DB_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand".
-				   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				   " LEFT JOIN User ON User.id=Hand.user_id".
-				   " LEFT JOIN Play ON Trick.id=Play.trick_id".
-				   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+		$result = DB_query('SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party FROM Hand'.
+				   ' LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id'.
+				   ' LEFT JOIN User ON User.id=Hand.user_id'.
+				   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
+				   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
+				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 				   " WHERE Hand.game_id='$gameid'".
-				   " GROUP BY User.fullname" );
+				   ' GROUP BY User.fullname' );
 		$email_message  = "The game is over. Thanks for playing :)\n";
 		$email_message .= "Final score:\n";
 		while( $r = DB_fetch_array($result) )
-		  $email_message .= "   ".$r[0]."(".$r[2].") ".$r[1]."\n";
+		  $email_message .= '   '.$r[0].'('.$r[2].') '.$r[1]."\n";
 
-		$result = DB_query("SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
-				   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-				   " LEFT JOIN User ON User.id=Hand.user_id".
-				   " LEFT JOIN Play ON Trick.id=Play.trick_id".
-				   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-				   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+		$result = DB_query('SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand'.
+				   ' LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id'.
+				   ' LEFT JOIN User ON User.id=Hand.user_id'.
+				   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
+				   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
+				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 				   " WHERE Hand.game_id='$gameid'".
-				   " GROUP BY Hand.party" );
+				   ' GROUP BY Hand.party' );
 		$email_message .= "\nTotals:\n";
 		$re     = 0;
 		$contra = 0;
 		while( $r = DB_fetch_array($result) )
 		  {
-		    $email_message .= "    ".$r[0]." ".$r[1]."\n";
+		    $email_message .= '    '.$r[0].' '.$r[1]."\n";
 		    if($r[0] == 're')
 		      $re = $r[1];
 		    else if($r[0] == 'contra')
@@ -1792,14 +1790,14 @@ switch($mystatus)
 		  {
 		    for( $p=$call_contra;$p<=120; $p+=30 )
 		      {
-			  DB_query("INSERT INTO Score".
+			  DB_query('INSERT INTO Score'.
 				   " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'against$p')");
 			}
 
 		      for( $p=$call_contra; $p<120; $p+=30)
 			{
 			  if( $re >= $p )
-			    DB_query("INSERT INTO Score".
+			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
 			}
 		    }
@@ -1807,14 +1805,14 @@ switch($mystatus)
 		    {
 		      for( $p=$call_re;$p<=120; $p+=30 )
 			{
-			  DB_query("INSERT INTO Score".
+			  DB_query('INSERT INTO Score'.
 				   " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'against$p')");
 			}
 
 		      for( $p=$call_re; $p<120; $p+=30)
 			{
 			  if( $contra>=$p )
-			    DB_query("INSERT INTO Score".
+			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'made$p')");
 			}
 		    }
@@ -1822,7 +1820,7 @@ switch($mystatus)
 		  /* point in case contra won */
 		  if($winning_party=='contra')
 		    {
-		      DB_query("INSERT INTO Score".
+		      DB_query('INSERT INTO Score'.
 			       " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
 		    }
 
@@ -1836,14 +1834,14 @@ switch($mystatus)
 			    $offset = 1;
 
 			  if($re>$p-$offset)
-			    DB_query("INSERT INTO Score".
+			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
 			}
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
 			  if($call_re!= -1 && $call_re<$p+1)
-			    DB_query("INSERT INTO Score".
+			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
 			}
 		    }
@@ -1856,14 +1854,14 @@ switch($mystatus)
 			    $offset = 1;
 
 			  if($contra>$p-$offset)
-			    DB_query("INSERT INTO Score".
+			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
 			}
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
 			  if($call_contra != -1 && $call_contra<$p+1)
-			    DB_query("INSERT INTO Score".
+			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
 			}
 		    }
@@ -1873,21 +1871,19 @@ switch($mystatus)
 		  $email_message .= "\n";
 		  $Tpoint = 0;
 		  $email_message .= " Points Re: \n";
-		  $queryresult = DB_query("SELECT score FROM Score ".
-					  "  WHERE game_id=$gameid AND party='re'".
-					  " ");
+		  $queryresult = DB_query('SELECT score FROM Score '.
+					  "  WHERE game_id=$gameid AND party='re'");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
-		      $email_message .= "   ".$r[0]."\n";
+		      $email_message .= '   '.$r[0]."\n";
 		      $Tpoint ++;
 		    }
 		  $email_message .= " Points Contra: \n";
-		  $queryresult = DB_query("SELECT score FROM Score ".
-					  "  WHERE game_id=$gameid AND party='contra'".
-					  " ");
+		  $queryresult = DB_query('SELECT score FROM Score '.
+					  "  WHERE game_id=$gameid AND party='contra'");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
-		      $email_message .= "   ".$r[0]."\n";
+		      $email_message .= '   '.$r[0]."\n";
 		      $Tpoint --;
 		    }
 		  $email_message .= " Total Points (from the Re point of view): $Tpoint\n";
@@ -1934,51 +1930,49 @@ switch($mystatus)
 	/* add pic for re/contra
 	 "      <img class=\"arrow\" src=\"pics/arrow".($pos-1).".png\" alt=\"table\" />\n";*/
 
-	$result = DB_query("SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand".
-			   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-			   " LEFT JOIN User ON User.id=Hand.user_id".
-			   " LEFT JOIN Play ON Trick.id=Play.trick_id".
-			   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+	$result = DB_query('SELECT User.fullname, IFNULL(SUM(Card.points),0), Hand.party,Hand.position FROM Hand'.
+			   ' LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id'.
+			   ' LEFT JOIN User ON User.id=Hand.user_id'.
+			   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
+			   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
+			   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 			   " WHERE Hand.game_id='$gameid'".
-			   " GROUP BY User.fullname" );
+			   ' GROUP BY User.fullname' );
 	while( $r = DB_fetch_array($result))
-	  echo "      <div class=\"card".($r[3]-1)."\">\n".
-	    "        <div class=\"score\">".$r[2]."<br /> ".$r[1]."</div>\n".
+	  echo '      <div class="card'.($r[3]-1)."\">\n".
+	    '        <div class="score">'.$r[2].'<br /> '.$r[1]."</div>\n".
 	    "      </div>\n";
 
 	/* display totals */
-	$result = DB_query("SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand".
-			   " LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id".
-			   " LEFT JOIN User ON User.id=Hand.user_id".
-			   " LEFT JOIN Play ON Trick.id=Play.trick_id".
-			   " LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id".
-			   " LEFT JOIN Card ON Card.id=Hand_Card.card_id".
+	$result = DB_query('SELECT Hand.party, IFNULL(SUM(Card.points),0) FROM Hand'.
+			   ' LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id'.
+			   ' LEFT JOIN User ON User.id=Hand.user_id'.
+			   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
+			   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
+			   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 			   " WHERE Hand.game_id='$gameid'".
-			   " GROUP BY Hand.party" );
+			   ' GROUP BY Hand.party' );
 	echo "    <div class=\"total\">\n  Totals:<br />\n";
 	while( $r = DB_fetch_array($result))
-	  echo "      ".$r[0]." ".$r[1]."<br />\n";
+	  echo '      '.$r[0].' '.$r[1]."<br />\n";
 
-	$queryresult = DB_query("SELECT timediff(mod_date,create_date) ".
+	$queryresult = DB_query('SELECT timediff(mod_date,create_date) '.
 				" FROM Game WHERE id='$gameid'");
 	$r = DB_fetch_array($queryresult);
-	echo "      <p>This game took ".$r[0]." hours.</p>\n";
+	echo '      <p>This game took '.$r[0]." hours.</p>\n";
 
 	echo "      <div class=\"re\">\n   Points Re: <br />\n";
-	$queryresult = DB_query("SELECT score FROM Score ".
-				"  WHERE game_id=$gameid AND party='re'".
-				" ");
+	$queryresult = DB_query('SELECT score FROM Score '.
+				"  WHERE game_id=$gameid AND party='re'");
 	while($r = DB_fetch_array($queryresult) )
-	  echo "       ".$r[0]."<br />\n";
+	  echo '       '.$r[0]."<br />\n";
 	echo "      </div>\n";
 
 	echo "      <div class=\"contra\">\n   Points Contra: <br />\n";
-	$queryresult = DB_query("SELECT score FROM Score ".
-				"  WHERE game_id=$gameid AND party='contra'".
-				" ");
+	$queryresult = DB_query('SELECT score FROM Score '.
+				"  WHERE game_id=$gameid AND party='contra'");
 	while($r = DB_fetch_array($queryresult) )
-	  echo "       ".$r[0]."<br />\n";
+	  echo '       '.$r[0]."<br />\n";
 	echo "      </div>\n";
 
 	echo "    </div>\n";
@@ -2017,7 +2011,7 @@ switch($mystatus)
       }
     break;
   default:
-    myerror("error in testing the status");
+    myerror('error in testing the status');
   } /*end of output: tricks, table, messages, card */
 
 /* display the 2nd half of table and the names */
@@ -2278,7 +2272,7 @@ if($gamestatus == 'play' )
 /* play-card button */
 if($gamestatus == 'play' || $gamestatus == 'pre' || $gameend < 60*60*24*7)
   {
-    echo "  <input type=\"submit\" value=\""._('submit')."\" />\n";
+    echo '  <input type="submit" value="'._('submit')."\" />\n";
   }
 
 /* has this hand been played by others? */
@@ -2319,10 +2313,10 @@ if($mystatus=='gameover' &&
    isset($_SESSION['id']) && $_SESSION['id']==$myid)
   {
     $session = DB_get_session_by_gameid($gameid);
-    $result  = DB_query("SELECT id,create_date FROM Game".
+    $result  = DB_query('SELECT id,create_date FROM Game'.
 			" WHERE session=$session".
-			" ORDER BY create_date DESC".
-			" LIMIT 1");
+			' ORDER BY create_date DESC'.
+			' LIMIT 1');
     $r = -1;
     if($result)
       $r = DB_fetch_array($result);
