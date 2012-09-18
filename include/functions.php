@@ -566,6 +566,9 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
 
   if($debug)
     {
+      /* fix the hands; makes debugging easier; the following hands have lots of sicknesses,
+       * to make testing easier
+       */
       $r[ 0]=1;     $r[12]=47;   $r[24]=13;       $r[36]=37;
       $r[ 1]=2;     $r[13]=23;   $r[25]=14;	  $r[37]=38;
       $r[ 2]=3;     $r[14]=27;   $r[26]=15;	  $r[38]=39;
@@ -582,7 +585,7 @@ function  create_array_of_random_numbers($useridA,$useridB,$useridC,$useridD)
   else
     {
       /* check if we can find a game were non of the player was involved and return
-       * cards insted
+       * cards instead
        */
       $userstr = "'".implode("','",array($useridA,$useridB,$useridC,$useridD))."'";
       $randomnumbers = DB_get_unused_randomnumbers($userstr);
