@@ -2034,8 +2034,8 @@ switch($mystatus)
   case 'init':
   case 'check':
     /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
-    echo "\n<div class=\"tricks\">\n";
-    echo "    <div class=\"trick\" id=\"trick0\">\n";
+    echo "\n".'<div class="tricks">'."\n";
+    echo '    <div class="trick" id="trick0">'."\n";
 
     for($pos=1;$pos<5;$pos++)
       {
@@ -2044,21 +2044,21 @@ switch($mystatus)
 	$userstatus = DB_get_hand_status_by_userid_and_gameid($userid,$gameid);
 
 	if($userstatus=='start' || $userstatus=='init')
-	  echo " <div class=\"vorbehalt".($pos-1)."\"> still needs <br />to decide </div>\n"; /* show this to everyone */
+	  echo ' <div class="vorbehalt'.($pos-1).'">'._('still needs <br />to decide')."</div>\n"; /* show this to everyone */
 	else
 	  if($usersick!=NULL) /* in the init-phase we only showed players with $pos<$mypos, now we can show all */
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> sick </div>\n";
+	    echo ' <div class="vorbehalt'.($pos-1).'">'._('sick')."</div>\n";
 	  else
-	    echo " <div class=\"vorbehalt".($pos-1)."\"> healthy </div>\n";
+	    echo ' <div class="vorbehalt'.($pos-1).'">'._('healthy')."</div>\n";
       }
 
     /* display all comments on the top right (card1)*/
     $comments = DB_get_pre_comment($gameid);
     /* display card */
-    echo "      <div class=\"card1\">\n";
+    echo '      <div class="card1">'."\n";
     /* display comments */
     foreach( $comments as $comment )
-      echo "        <span class=\"comment\">".$comment[1].": ".$comment[0]."</span>\n";
+      echo '        <span class="comment">'.$comment[1].': '.$comment[0]."</span>\n";
     echo "      </div>\n"; /* end div card */
 
 
