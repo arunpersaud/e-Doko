@@ -59,7 +59,7 @@ footer .left  { float:left;         font-size:smaller;}
 }
 
 .WIP {
-  background-color: #eee;
+  background-color: #efaaaa;
   text-size: larger;
   text-align: center;
   margin: 30px 10% ;
@@ -212,7 +212,7 @@ div.table div.table0 {
   z-index:20;
 }
 div.table div.table0 .start {
-  background-color: #f00;
+  background-color: #efaaaa;
   border-radius: 5px;
   padding: 3px;
   padding-bottom: 1px;
