@@ -46,20 +46,20 @@ function config_check()
   if(!isset($ADMIN_EMAIL))
     {
       output_header();
-      echo "<h1>Setup not completed</h1>";
-      echo "You need to set \$ADMIN_EMAIL in config.php. ".
-	"If something goes wrong an email will be send to this address.";
+      echo '<h1>Setup not completed</h1>';
+      echo 'You need to set $ADMIN_EMAIL in config.php. '.
+	'If something goes wrong an email will be send to this address.';
       output_footer();
       exit();
     }
   if(!isset($DB_work))
     {
       output_header();
-      echo "<h1>Setup not completed</h1>";
-      echo "You need to set \$DB_work in config.php. ".
-	"If this is set to anything else than 0, the game will be suspended and one can work safely on the database. ".
-	"A message will be displayed that it will probably take about N minutes, with N being the number \$DB_work is set to. ".
-	"The default should be 0 for the game to work.";
+      echo '<h1>Setup not completed</h1>';
+      echo 'You need to set $DB_work in config.php. '.
+	'If this is set to anything else than 0, the game will be suspended and one can work safely on the database. '.
+	'A message will be displayed that it will probably take about N minutes, with N being the number $DB_work is set to. '.
+	'The default should be 0 for the game to work.';
       output_footer();
       exit();
     }
