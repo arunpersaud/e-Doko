@@ -280,61 +280,61 @@ function output_check_for_sickness($me,$mycards)
   echo '    </select>';
   echo '    <br />';
 
-  echo _('Wedding?');
   if(check_wedding($mycards))
      {
+       echo _('Do you want to call Wedding?');
        echo ' '._('yes')."<input type=\"radio\" name=\"wedding\" value=\"yes\" checked=\"checked\" />";
        echo ' '._('no')." <input type=\"radio\" name=\"wedding\" value=\"no\" /> <br />\n";
      }
    else
      {
-       echo ' '._('no')." <input type=\"hidden\" name=\"wedding\" value=\"no\" /> <br />\n";
+       echo "  <input type=\"hidden\" name=\"wedding\" value=\"no\" />\n";
      };
 
-  echo _('Do you have poverty?');
   if(count_trump($mycards)<4)
     {
+      echo _('Do you want to call poverty?');
       echo ' '._('yes')."<input type=\"radio\" name=\"poverty\" value=\"yes\" checked=\"checked\" />";
       echo ' '._('no')." <input type=\"radio\" name=\"poverty\" value=\"no\" /> <br />\n";
     }
   else
     {
-      echo ' '._('no')." <input type=\"hidden\" name=\"poverty\" value=\"no\" /> <br />\n";
+      echo "  <input type=\"hidden\" name=\"poverty\" value=\"no\" />\n";
     };
 
-  echo _('Do you have too many nines?');
   if(count_nines($mycards)>4)
      {
+       echo _('Do you want to call too many nines?');
        echo ' '._('yes')."<input type=\"radio\" name=\"nines\" value=\"yes\" checked=\"checked\" />";
        echo ' '._('no')." <input type=\"radio\" name=\"nines\" value=\"no\" /> <br />\n";
      }
    else
      {
-       echo ' '._('no')." <input type=\"hidden\" name=\"nines\" value=\"no\" /> <br />\n";
+       echo "  <input type=\"hidden\" name=\"nines\" value=\"no\" />\n";
      };
 
   if($RULES['lowtrump']=='cancel' || $RULES['lowtrump']=='poverty')
     {
-      if($RULES['lowtrump']=='cancel')
-	echo _('Do you have low trump (cancel game)?');
-      else
-	echo _('Do you have low trump (poverty)?');
-
       if(check_low_trump($mycards))
 	{
+          if($RULES['lowtrump']=='cancel')
+            echo _('Do you want to call low trump (cancel game)?');
+          else
+	    echo _('Do you want to call low trump (poverty)?');
+
 	  echo ' '._('yes')."<input type=\"radio\" name=\"lowtrump\" value=\"yes\" checked=\"checked\" />";
 	  echo ' '._('no')." <input type=\"radio\" name=\"lowtrump\" value=\"no\" /> <br />\n";
 	}
       else
 	{
-	  echo ' '._('no')." <input type=\"hidden\" name=\"lowtrump\" value=\"no\" /> <br />\n";
+	  echo "  <input type=\"hidden\" name=\"lowtrump\" value=\"no\" />\n";
 	};
     }
   else
-    echo "<input type=\"hidden\" name=\"lowtrump\" value=\"no\" />";
+    echo "  <input type=\"hidden\" name=\"lowtrump\" value=\"no\" />";
 
    echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
-   echo "<input type=\"submit\" value=\""._('count me in')."\" />\n";
+   echo "<br /><input type=\"submit\" value=\""._('count me in')."\" />\n";
 
    echo "</div>\n";
 
@@ -404,7 +404,7 @@ function output_check_want_to_play($me)
 {
   echo ' <div class="joingame">';
   echo '   '._('Do you want to play a game of DoKo?').' <br />';
-  echo '   '._('yes').'<input type="radio" name="in" value="yes" />';
+  echo '   '._('yes').'<input type="radio" name="in" value="yes" checked="checked" />';
   echo '   '._('no').'<input type="radio" name="in" value="no" /> <br />';
   echo "<input type=\"hidden\" name=\"me\" value=\"$me\" />\n";
   echo "\n";
