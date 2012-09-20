@@ -45,7 +45,7 @@ if($DBopen<0)
       echo "Database error, can't connect... Please wait a while and try again. ".
 	"If the problem doesn't go away feel free to contact $ADMIN_NAME at $ADMIN_EMAIL.";
     else if ($DBopen == -2)
-      echo "Wrong database version, please update your database using the update.php script.";
+      echo 'Wrong database version, please update your database using the update.php script.';
 
     output_footer();
     exit();

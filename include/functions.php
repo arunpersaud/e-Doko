@@ -30,16 +30,16 @@ function config_check()
 
   /* check if some variables are set in the config file, else set defaults */
   if(!isset($EmailName))
-    $EmailName="[DoKo] ";
+    $EmailName='[DoKo] ';
   if(isset($EMAIL_REPLY))
     {
-      ini_set("sendmail_from",$EMAIL_REPLY);
+      ini_set('sendmail_from',$EMAIL_REPLY);
     }
   if(!isset($ADMIN_NAME))
     {
       output_header();
-      echo "<h1>Setup not completed</h1>";
-      echo "You need to set \$ADMIN_NAME in config.php.";
+      echo '<h1>Setup not completed</h1>';
+      echo 'You need to set $ADMIN_NAME in config.php.';
       output_footer();
       exit();
     }
