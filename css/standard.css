@@ -58,6 +58,16 @@ footer .left  { float:left;         font-size:smaller;}
   font-size: smaller;
 }
 
+.WIP {
+  background-color: #eee;
+  text-size: larger;
+  text-align: center;
+  margin: 30px 10% ;
+  border-radius: 5px;
+  border: 2px solid red;
+  padding: 10px;
+}
+
 /* sessions */
 .session {
   border-bottom: 1px solid #000;

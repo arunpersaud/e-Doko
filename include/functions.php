@@ -57,7 +57,8 @@ function config_check()
       output_header();
       echo "<h1>Setup not completed</h1>";
       echo "You need to set \$DB_work in config.php. ".
-	"If this is set to 1, the game will be suspended and one can work safely on the database.".
+	"If this is set to anything else than 0, the game will be suspended and one can work safely on the database. ".
+	"A message will be displayed that it will probably take about N minutes, with N being the number \$DB_work is set to. ".
 	"The default should be 0 for the game to work.";
       output_footer();
       exit();
@@ -65,7 +66,9 @@ function config_check()
   if($DB_work)
     {
       output_header();
-      echo "Working on the database...please check back later.";
+      echo '<div class="WIP">'.
+	_("Working on some aspect of e-DoKo... This will probably take max. $DB_work minutes. It could be over in a few seconds too though ;)").
+	'</div>';
       output_footer();
       exit();
     }
