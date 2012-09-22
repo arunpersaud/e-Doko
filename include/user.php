@@ -25,12 +25,7 @@ if(!isset($HOST))
   exit;
 
 /* test id and password, should really be done in one step */
-if(!isset($_SESSION['name']))
-  {
-    $email     = $_REQUEST['email'];
-    $password  = $_REQUEST['password'];
-  }
-else
+if(isset($_SESSION['name']))
   {
     $name = $_SESSION['name'];
     $email     = DB_get_email('name',$name);
@@ -106,8 +101,6 @@ else
   { /* normal user page */
 
     /* verify password and email */
-    if(strlen($password)!=32)
-      $password = md5($password);
 
     $ok  = 1;
     $myid = DB_get_userid('email-password',$email,$password);

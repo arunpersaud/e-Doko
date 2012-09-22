@@ -38,7 +38,7 @@ if(isset($_SERVER['REMOTE_ADDR']))
   exit();
 
 $old_version = DB_get_version();
-$current_version = 4;
+$current_version = 5;
 
 if($old_version < $current_version)
   echo "Will upgrade your database now:\n";
@@ -81,6 +81,10 @@ switch($old_version)
 	     " ADD COLUMN `type` enum('misc','your_turn') NOT NULL default 'misc' AFTER create_date");
     DB_query("UPDATE Version set version=4");
     echo "Upgraded to version 4.\n";
+  case 4:
+    DB_query("ALTER TABLE User MODIFY password varchar(64)");
+    DB_query("UPDATE Version set version=5");
+    echo "Upgraded to version 5.\n";
 
   }
 

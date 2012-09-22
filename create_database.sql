@@ -38,7 +38,7 @@
 
 DROP TABLE IF EXISTS `Version`;
 CREATE TABLE `Version` (
-  `version` int NOT NULL default '0'
+  `version` int NOT NULL default '5'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -360,7 +360,7 @@ CREATE TABLE `User` (
   `id` int(11) NOT NULL auto_increment,
   `fullname` varchar(64) default NULL,
   `email` varchar(64) default NULL,
-  `password` varchar(32) default NULL,
+  `password` varchar(62) default NULL,
   `timezone` varchar(64) default 'Europe/London',
   `last_login` timestamp NOT NULL default '0000-00-00 00:00:00',
   `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',

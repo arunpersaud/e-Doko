@@ -85,21 +85,27 @@ else if(myisset('email','password'))
     $password  = $_REQUEST['password'];
 
     /* verify password and email */
-    if(strlen($password)!=32)
-      $password = md5($password);
 
     $ok  = 1;
-    $myid = DB_get_userid('email-password',$email,$password);
-    if(!$myid)
-      $ok = 0;
+    $myid = DB_get_userid('email',$email);
 
-    if($ok)
+    $result = verify_password($email, $password);
+    switch($result)
       {
-	/* user information is ok, set session variabel */
-	$myname = DB_get_name('email',$email);
+      case 0:
+	/* user information is ok, set session variable */
+	$myname         = DB_get_name('email',$email);
+	$hashedpassword = DB_get_passwd_by_userid($myid);
 	$_SESSION['name'] = $myname;
 	$_SESSION['id']   = $myid;
-	$_SESSION['pass'] = $password;
+	$_SESSION['pass'] = $hashedpassword;
+	break;
+      case 1:
+	echo "Can't find you in the database\n";
+	break;
+      case 2:
+	echo "Problem creating password hash, please contact $ADMIN at $ADMIN_EMAIL\n";
+	break;
       }
   }
 else

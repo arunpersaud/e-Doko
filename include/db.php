@@ -30,7 +30,7 @@ if(!isset($HOST))
 
 function DB_open()
 {
-  $version_needed = 4;
+  $version_needed = 5;
 
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
   $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
@@ -948,6 +948,12 @@ function DB_set_recovery_password($user,$newpw)
 {
   DB_query("INSERT INTO Recovery VALUES(NULL,".DB_quote_smart($user).
 	   ",".DB_quote_smart($newpw).",NULL)");
+  return;
+}
+
+function DB_delete_recovery_passwords($userid)
+{
+  DB_query("DELETE FROM Recovery WHERE user_id=".DB_quote_smart($userid));
   return;
 }
 

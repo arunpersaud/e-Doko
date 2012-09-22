@@ -1650,4 +1650,53 @@ function get_user_token($userid)
   return $token;
 }
 
+function verify_password($email, $password)
+{
+  /* verify password, if old password has length 32 assume it's an old md5, else use new password scheme */
+  /* return 0 if verified, else return error code
+   *        1 can't find email
+   *        2 can't calculate correct hash
+   *        3 misc error
+   */
+
+  /* check user email by getting his id */
+  $userid = DB_get_userid('email',$email);
+  if(!$userid)
+    return 1;
+
+  /* test for temporary passwords, only valid for one date (tested in the DB) */
+  $tmppasswd = md5($password);
+  if(DB_check_recovery_passwords($tmppasswd,$email))
+    return 0;
+
+  /* get saved password */
+  $existingpassword =  DB_get_passwd_by_userid($userid);
+
+  if(strlen($existingpassword)==32) /* old password type */
+    {
+      if ($existingpassword == md5($password))
+	{
+	  /* update password to new crypt version */
+	  // create a password hash using the crypt function, need php 5.3 for this
+	  // create and random salt
+	  $salt = substr(str_replace('+', '.', base64_encode(sha1(microtime(true), true))), 0, 22);
+	  // hash incoming password using 12 rounds of blowfish
+	  $hash = crypt($password, '$2y$12$' . $salt);
+	  if(strlen($hash)>13)
+	    DB_query("UPDATE User SET password='$hash' where id='$userid'");
+	  else
+	    return 2;
+
+	  return 0;
+	}
+    }
+  else
+    {
+      if ($existingpassword == crypt($password, $existingpassword))
+	return 0;
+    };
+
+  return 3;
+}
+
 ?>

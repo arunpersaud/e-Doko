@@ -273,9 +273,9 @@ if(myisset("password0","password1","password2") &&  $_REQUEST["password0"]!="" &
     $changed_password = 1;
 
     /* check if old password matches */
-    $oldpasswd = md5($_REQUEST["password0"]);
-    $password  = DB_get_passwd_by_userid($myid);
-    if(!( ($password == $oldpasswd) || DB_check_recovery_passwords($oldpasswd,$email) ))
+    $result = verify_password($email, $_REQUEST["password0"]);
+
+    if( $result!=0 )
       $changed_password = -1;
 
     /* check if new password has been typed in correctly */
@@ -288,8 +288,19 @@ if(myisset("password0","password1","password2") &&  $_REQUEST["password0"]!="" &
 
     if($changed_password==1)
       {
-	DB_query("UPDATE User SET password='".md5($_REQUEST["password1"]).
+	// create a password hash using the crypt function, need php 5.3 for this
+	// create and random salt
+	$salt = substr(str_replace('+', '.', base64_encode(sha1(microtime(true), true))), 0, 22);
+	// hash incoming password using 12 rounds of blowfish
+	$hash = crypt($_REQUEST["password1"], '$2y$12$' . $salt);
+
+	DB_query("UPDATE User SET password='".$hash.
 		 "' WHERE id=".DB_quote_smart($myid));
+
+	/* in case this was done using a recovery password delete that password */
+	$tmppasswd = md5($_REQUEST["password0"]);
+	if(DB_check_recovery_passwords($tmppasswd,$email))
+	  DB_delete_recovery_passwords($myid);
       }
     /* error output below */
   }

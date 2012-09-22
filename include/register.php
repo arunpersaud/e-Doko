@@ -94,7 +94,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
       }
     if($robot==0)
       {
-	echo _('You answered the math question wrong.').' <br />\n';
+	echo _('You answered the math question wrong.').' <br />'."\n";
 	$ok=0;
       }
     /* everything ok, go ahead and create user */
@@ -102,10 +102,21 @@ if(myisset('Rfullname','Remail','Rtimezone') )
       {
 	if(myisset('Rpassword'))
 	  {
-	    $r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
-			','.DB_quote_smart($_REQUEST['Remail']).
-			','.DB_quote_smart(md5($_REQUEST['Rpassword'])).
-			','.DB_quote_smart($_REQUEST['Rtimezone']).',NULL,NULL)');
+	    // create a password hash using the crypt function, need php 5.3 for this
+	    // create a random salt
+	    $salt = substr(str_replace('+', '.', base64_encode(sha1(microtime(true), true))), 0, 22);
+	    // hash incoming password using 12 rounds of blowfish
+	    $hash = crypt($_REQUEST['Rpassword'], '$2y$12$' . $salt);
+
+	    if(strlen($hash)>13)
+	      {
+		$r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
+			    ','.DB_quote_smart($_REQUEST['Remail']).
+			    ','.DB_quote_smart($hash).
+			    ','.DB_quote_smart($_REQUEST['Rtimezone']).',NULL,NULL)');
+	      }
+	    else /* hash function didn't work */
+	      $r=0;
 	  }
 	else if(myisset('Ropenid'))
 	  {
@@ -113,7 +124,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
 	    $r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
 			','.DB_quote_smart($_REQUEST['Remail']).
 			','.DB_quote_smart(md5($password)).
-			','.DB_quote_smart($_REQUEST['Rtimezone').',NULL,NULL)');
+			','.DB_quote_smart($_REQUEST['Rtimezone']).',NULL,NULL)');
 	    if($r)
 	      {
 		include_once('openid.php');
@@ -139,7 +150,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
       }
     else
       {
-	echo 'Could not register you. Please <a href="index.php">try again</a>! </br />\n';
+	echo '<br />Could not register you. Please <a href="index.php">try again</a>! </br />'."\n";
       }
   }
 else
