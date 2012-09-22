@@ -25,7 +25,7 @@ if(!isset($HOST))
   exit;
 
 /* new user wants to register */
-if(myisset("Rfullname","Remail","Rtimezone") )
+if(myisset('Rfullname','Remail','Rtimezone') )
   {
     global $HOST,$INDEX;
 
@@ -33,25 +33,25 @@ if(myisset("Rfullname","Remail","Rtimezone") )
     $ok=1;
     if(DB_get_userid('name',$_REQUEST['Rfullname']))
       {
-	echo "please chose another name<br />";
+	echo 'please chose another name<br />';
 	$ok=0;
       }
     /* check if email address is already used */
     if(DB_get_userid('email',$_REQUEST['Remail']))
       {
-	echo "this email address is already used ?!<br />";
+	echo 'this email address is already used ?!<br />';
 	$ok=0;
       }
     /* need either openid or password */
     if(!myisset('Rpassword')  &&  !myisset('Ropenid'))
       {
-	echo "I need either a Password or an Openid url.<br />";
+	echo 'I need either a Password or an Openid url.<br />';
 	$ok=0;
       }
     /* check for password length */
     if(myisset('Rpassword') && strlen(trim($_REQUEST['Rpassword']))==0 )
       {
-	echo "Password can't be empty!<br />";
+	echo 'Password cannot be empty!<br />';
 	$ok=0;
       }
 
@@ -94,7 +94,7 @@ if(myisset("Rfullname","Remail","Rtimezone") )
       }
     if($robot==0)
       {
-	echo "You answered the math question wrong. <br />\n";
+	echo 'You answered the math question wrong. <br />\n';
 	$ok=0;
       }
     /* everything ok, go ahead and create user */
@@ -102,18 +102,18 @@ if(myisset("Rfullname","Remail","Rtimezone") )
       {
 	if(myisset('Rpassword'))
 	  {
-	    $r=DB_query("INSERT INTO User VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
-			",".DB_quote_smart($_REQUEST["Remail"]).
-			",".DB_quote_smart(md5($_REQUEST["Rpassword"])).
-			",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL,NULL)");
+	    $r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
+			','.DB_quote_smart($_REQUEST['Remail']).
+			','.DB_quote_smart(md5($_REQUEST['Rpassword'])).
+			','.DB_quote_smart($_REQUEST['Rtimezone']).',NULL,NULL)');
 	  }
 	else if(myisset('Ropenid'))
 	  {
-	    $password = $_REQUEST["Rfullname"].preg_replace('/([ ])/e', 'chr(rand(33,122))', '               ');
-	    $r=DB_query("INSERT INTO User VALUES(NULL,".DB_quote_smart($_REQUEST["Rfullname"]).
-			",".DB_quote_smart($_REQUEST["Remail"]).
-			",".DB_quote_smart(md5($password)).
-			",".DB_quote_smart($_REQUEST["Rtimezone"]).",NULL,NULL)");
+	    $password = $_REQUEST['Rfullname'].preg_replace('/([ ])/e', 'chr(rand(33,122))', '               ');
+	    $r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
+			','.DB_quote_smart($_REQUEST['Remail']).
+			','.DB_quote_smart(md5($password)).
+			','.DB_quote_smart($_REQUEST['Rtimezone').',NULL,NULL)');
 	    if($r)
 	      {
 		include_once('openid.php');
@@ -129,17 +129,17 @@ if(myisset("Rfullname","Remail","Rtimezone") )
 	  {
 	    /* Set session, so that new user doesn't need to log in */
 	    $myname = DB_get_name('email',$_REQUEST['Remail']);
-	    $_SESSION["name"] = $myname;
+	    $_SESSION['name'] = $myname;
 
-	    echo " Welcome to e-DoKo, you are now registered, please visit the".
-	      " <a href=\"".$HOST.$INDEX."\">homepage</a> to continue.";
+	    echo ' Welcome to e-DoKo, you are now registered, please visit the'.
+	      ' <a href="'.$HOST.$INDEX.'">homepage</a> to continue.';
 	  }
 	else
 	  echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
       }
     else
       {
-	echo "Couldn't register you. Please <a href=\"index.php\">try again</a>! </br />\n";
+	echo 'Could not register you. Please <a href="index.php">try again</a>! </br />\n';
       }
   }
 else
