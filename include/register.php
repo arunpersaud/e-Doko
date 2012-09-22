@@ -33,25 +33,25 @@ if(myisset('Rfullname','Remail','Rtimezone') )
     $ok=1;
     if(DB_get_userid('name',$_REQUEST['Rfullname']))
       {
-	echo 'please chose another name<br />';
+	echo _('Please chose another name').'<br />';
 	$ok=0;
       }
     /* check if email address is already used */
     if(DB_get_userid('email',$_REQUEST['Remail']))
       {
-	echo 'this email address is already used ?!<br />';
+	echo _('This email address is already used?!').'<br />';
 	$ok=0;
       }
     /* need either openid or password */
     if(!myisset('Rpassword')  &&  !myisset('Ropenid'))
       {
-	echo 'I need either a Password or an Openid url.<br />';
+	echo _('I need either a Password or an Openid url.').'<br />';
 	$ok=0;
       }
     /* check for password length */
     if(myisset('Rpassword') && strlen(trim($_REQUEST['Rpassword']))==0 )
       {
-	echo 'Password cannot be empty!<br />';
+	echo _('Password cannot be empty!').'<br />';
 	$ok=0;
       }
 
@@ -94,7 +94,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
       }
     if($robot==0)
       {
-	echo 'You answered the math question wrong. <br />\n';
+	echo _('You answered the math question wrong.').' <br />\n';
 	$ok=0;
       }
     /* everything ok, go ahead and create user */
@@ -135,7 +135,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
 	      ' <a href="'.$HOST.$INDEX.'">homepage</a> to continue.';
 	  }
 	else
-	  echo " something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
+	  echo " Something went wrong, couldn't add you to the database, please contact $ADMIN_NAME at $ADMIN_EMAIL.";
       }
     else
       {
