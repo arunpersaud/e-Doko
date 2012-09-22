@@ -71,7 +71,10 @@ $GT         = $gametype;
 if($gametype=='solo')
   {
     $gametype = DB_get_solo_by_gameid($gameid);
-    $GT  = $gametype.' '.$GT;
+    if($gametype=='silent')
+      $GT = 'normal';
+    else
+      $GT = $gametype.' '.$GT;
   }
 
 /* do we need to worry about Schweinchen?
