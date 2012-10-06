@@ -138,7 +138,7 @@ switch($action)
 /* ask for login or display login info, needs to go at the end, so that we have the
  * session-variable already set.
  */
-output_status();
+output_navbar();
 
 output_footer();
 

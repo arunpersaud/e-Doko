@@ -431,11 +431,6 @@ function output_header()
      <script src="js/less.min.js" type="text/javascript"></script>
   </head>
 <body onload="high_last();">
-<header>
-<?php
-  echo '<h1> '._('Welcome to E-Doko').' </h1>';
-?>
-</header>
 <?php
 
   echo "<div class=\"main\">";
@@ -464,6 +459,7 @@ function output_footer()
   echo '<script src="'.autoversion('js/jquery.tablesorter.min.js'). '"></script>';
   echo '<script src="'.autoversion('js/jquery.tools.min.js').       '"></script>';
   echo '<script src="'.autoversion('js/bootstrap.min.js').          '"></script>';
+  echo '<script src="'.autoversion('js/layout.js').                 '"></script>';
   echo '<script src="'.autoversion('js/game.js').                   '"></script>';
 
   echo "</body>\n";
@@ -472,7 +468,7 @@ function output_footer()
   return;
 }
 
-function output_status()
+function output_navbar()
 {
   global $defaulttimezone, $INDEX, $WIKI, $RSS;
 
@@ -493,15 +489,27 @@ function output_status()
       $token = get_user_token($myid);
 
       /* logout info */
-      echo "\n<div class=\"status\">\n";
-      echo $name,"\n";
-      echo " | <a href=\"".$INDEX."\">"._('mypage')."</a>\n";
-      echo " | <a href=\"".$INDEX."?action=prefs\">"._('settings')."</a>\n";
-      echo " | <a href=\"".$INDEX."?action=new\">"._('new game')."</a>\n";
-      echo " | <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a>\n";
-      echo " | <a href=\"".$WIKI."\">"._('wiki/bugs')."</a>\n";
-      echo " | <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a>\n";
-      echo " |&nbsp;&nbsp;&nbsp; <a href=\"".$INDEX."?action=logout\">"._('logout')."</a>\n";
+      echo "\n<div class=\"navbar navbar-fixed-top\">\n";
+      echo "  <div class=\"navbar-inner\">\n";
+      echo "    <span class=\"brand\" href=\"#\">E-DoKo</span>\n";
+      echo "    <ul class=\"nav\">";
+      echo "       <li><a href=\"#\">$name</a> </li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$INDEX."\">"._('mypage')."</a></li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$INDEX."?action=prefs\">"._('settings')."</a></li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$INDEX."?action=new\">"._('new game')."</a></li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a></li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$WIKI."\">"._('wiki/bugs')."</a></li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a></li>\n";
+      echo "       <li class=\"divider-vertical\"></li>\n";
+      echo " <li> <a href=\"".$INDEX."?action=logout\">"._('logout')."</a></li>\n";
+      echo "    </ul>\n";
+      echo "  </div>\n";
       echo "</div>\n\n";
 
       echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n\n";

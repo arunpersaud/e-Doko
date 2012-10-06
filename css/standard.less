@@ -17,7 +17,7 @@
  *
  */
 
-body { background-color: #ddd; }
+body { background-color: #ddd; padding-top:40px}
 
 /* the header, footer, etc */
 header {
@@ -50,13 +50,6 @@ footer {
 }
 footer .right { text-align:right;   font-size:smaller;}
 footer .left  { float:left;         font-size:smaller;}
-
-.status {
-  position:absolute;
-  right:4em;
-  top:0.1em;
-  font-size: smaller;
-}
 
 .WIP {
   background-color: #efaaaa;
@@ -262,25 +255,6 @@ div span.numberoftricks {
 }
 
 /* display the card tricks */
-
-ul.tricks {
-  text-align:center;
-  list-style:none;
-  margin:0px;
-  padding:3px;
-  padding-bottom:3px;
-  border-bottom:1px solid #444;
-}
-ul.tricks a { text-decoration:none; color:#000;}
-ul.tricks li {
-  /*background-color:blue;*/
-  padding:0.1em;
-  margin:0.2em 0.5em;
-  display:inline;
-}
-ul.tricks li.old {  background-color:#fff; }
-ul.tricks li a:hover {  background-color: #bbb;}
-ul.tricks li.nohighlight a:hover {  background-color: #fff;}
 
 div.tricks {
   position: absolute;
@@ -806,7 +780,7 @@ header, footer {
   border-top: 1px solid gray;
 }
 
-.session div.sessionscore div, .status {
+.session div.sessionscore div {
   right:0em;
 }
 
@@ -849,4 +823,7 @@ header, footer {
     text-align: right;
     font-size: smaller;
 }
+}
+.pagination {
+  text-align:center;
 }

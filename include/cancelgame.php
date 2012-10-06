@@ -24,9 +24,6 @@
 if(!isset($HOST))
   exit;
 
-/* display the menu */
-output_status();
-
 /* you should only get here from a game page, so $me should be set */
 if(!myisset("me"))
   {

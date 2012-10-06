@@ -5,9 +5,30 @@ var current=0;
 /* do the higlighting */
 function hl(num) {
     var i;
-    for(i=0;i<14;i++){	$("#trick"+i).hide(); }
+    for(i=0;i<14;i++){	$("#trick"+i).hide(); $("#tricks"+i).removeClass('active'); }
     $("#trick"+num).css('display', 'block');
+    $("#tricks"+num).addClass('active');
     current=num;
+
+    if(document.getElementById("tricks0"))
+	min=0;
+    else
+	min=1;
+
+    if(document.getElementById("tricks13"))
+	max=13;
+    else
+	min=12;
+
+    if(current==min)
+	$("#prevtr").addClass('disabled');
+    else
+	$("#prevtr").removeClass('disabled');
+    if(current==max)
+	$("#nexttr").addClass('disabled');
+    else
+	$("#nexttr").removeClass('disabled');
+
 }
 
 /* highlight the last trick, useful when a page is called the first time*/
