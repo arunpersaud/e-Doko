@@ -337,9 +337,10 @@ if($session)
 	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$previous\">"._('previous')."</a> \n";
 	if($next)
 	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$next\">"._('next')."</a> \n";
+
+	if($j != $i )
+	  echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$lasthash\">"._('last')."</a> \n";
       }
-    if($j != $i )
-      echo "&nbsp;&nbsp;&nbsp;<a href=\"{$INDEX}?action=game&amp;me=$lasthash\">last</a> \n";
 
     echo "\n</div>\n";
   }
