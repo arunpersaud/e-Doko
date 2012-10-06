@@ -6,5 +6,5 @@ RewriteBase   /<web path to your files>
 # hide git directory (and others)
 RedirectMatch 404 \.(git|cvs|svn|bzr|hg)(/.*|$)
 
-# use autoversioning of js and css files
-RewriteRule ^(.*)\.[[:xdigit:]]{32}\.(css|js)$ $1.$2 [L]
+# use autoversioning of js, less, and css files
+RewriteRule ^(.*)\.[[:xdigit:]]{32}\.(css|js|less)$ $1.$2 [L]
