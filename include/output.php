@@ -425,15 +425,9 @@ function output_header()
      <meta charset="utf-8" />
      <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
      <link rel="shortcut icon" href="pics/edoko-favicon.png" />
-     <link rel="stylesheet" href="<?php echo autoversion("css/normalize.css"); ?>" />
+     <link rel="stylesheet" href="<?php echo autoversion("css/bootstrap.min.css"); ?>" />
      <link rel="stylesheet" href="<?php echo autoversion("css/standard.css"); ?>" />
      <link rel="stylesheet" href="<?php echo autoversion("css/dateinput.css"); ?>"/>
-     <script type="text/javascript" src="<?php echo autoversion("js/jquery.js"); ?>"> </script>
-     <script type="text/javascript" src="<?php echo autoversion("js/jquery.tablesorter.js"); ?>"></script>
-     <script type="text/javascript" src="<?php echo autoversion("js/jquery.tools.min.js"); ?>"></script>
-     <script type="text/javascript" src="<?php echo autoversion("js/game.js"); ?>"> </script>
-     <script type="text/javascript">
-     </script>
   </head>
 <body onload="high_last();">
 <header>
@@ -464,6 +458,13 @@ function output_footer()
     " src=\"pics/green1.gif\" height=\"32\" width=\"100\" /></a>\n".
     "  </p> \n";
   echo "</footer>\n\n";
+
+  echo '<script src="'.autoversion('js/jquery.min.js').             '"></script>';
+  echo '<script src="'.autoversion('js/jquery.tablesorter.min.js'). '"></script>';
+  echo '<script src="'.autoversion('js/jquery.tools.min.js').       '"></script>';
+  echo '<script src="'.autoversion('js/bootstrap.min.js').          '"></script>';
+  echo '<script src="'.autoversion('js/game.js').                   '"></script>';
+
   echo "</body>\n";
   echo "</html>\n";
 
