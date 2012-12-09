@@ -443,16 +443,16 @@ function output_footer()
 
   echo "</div>\n\n";
   echo "<footer>\n";
-  echo "  <p class=\"left\"> copyright 2006-2012 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
-    "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
-    "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
-    "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
   echo " <p class=\"right\"> See the latest changes <a href=\"http://nubati.net/cgi-bin/gitweb.cgi?p=e-DoKo.git;a=summary\">\n".
     "  via git </a> <br />or download the source via <br />\n'git clone http://nubati.net/git/e-DoKo.git' <br />\n".
     "  <a href=\"http://www.dreamhost.com/green.cgi\">\n".
     "  <img alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
     " src=\"pics/green1.gif\" height=\"32\" width=\"100\" /></a>\n".
     "  </p> \n";
+  echo "  <p class=\"left\"> copyright 2006-2012 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
+    "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
+    "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
+    "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
   echo "</footer>\n\n";
 
   echo '<script src="'.autoversion('js/jquery.min.js').             '"></script>';
@@ -474,7 +474,8 @@ function output_navbar()
 
   if(isset($_SESSION['name']))
     {
-      $name = $_SESSION['name'];
+      $name  = $_SESSION['name'];
+      $email = DB_get_email('name',$name);
 
       /* last logon time */
       $myid  = DB_get_userid('name',$name);
@@ -489,28 +490,23 @@ function output_navbar()
       $token = get_user_token($myid);
 
       /* logout info */
-      echo "\n<div class=\"navbar navbar-fixed-top\">\n";
-      echo "  <div class=\"navbar-inner\">\n";
-      echo "    <span class=\"brand\" href=\"#\">E-DoKo</span>\n";
-      echo "    <ul class=\"nav\">";
-      echo "       <li><a href=\"#\">$name</a> </li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$INDEX."\">"._('mypage')."</a></li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$INDEX."?action=prefs\">"._('settings')."</a></li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$INDEX."?action=new\">"._('new game')."</a></li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a></li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$WIKI."\">"._('wiki/bugs')."</a></li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a></li>\n";
-      echo "       <li class=\"divider-vertical\"></li>\n";
-      echo " <li> <a href=\"".$INDEX."?action=logout\">"._('logout')."</a></li>\n";
-      echo "    </ul>\n";
-      echo "  </div>\n";
-      echo "</div>\n\n";
+      echo "\n<div class=\"navigation\">\n";
+      echo "  <span class=\"brand\" href=\"#\">E-DoKo</span>\n";
+      echo "  <ul class=\"nav\">";
+      echo "     <li>\n";
+      echo "         <img title=\"$name\" ";
+      echo             "src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" />\n";
+      echo "     </li>\n";
+      echo "     <li> <a href=\"".$INDEX."\"><i class=\"icon-home\"></i><span class=\"navhide\">"._('Home')."</span></a></li>\n";
+      echo "     <li> <a href=\"".$INDEX."?action=prefs\"><i class=\"icon-cog\"></i><span class=\"navhide\">".
+	_('settings')."</span></a></li>\n";
+      echo "     <li> <a href=\"".$INDEX."?action=new\">"._('new game')."</a></li>\n";
+      echo "     <li> <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a></li>\n";
+      echo "     <li> <a href=\"".$WIKI."\">"._('wiki/bugs')."</a></li>\n";
+      echo "     <li> <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a></li>\n";
+      echo "     <li> <a href=\"".$INDEX."?action=logout\"><i class=\"icon-off\"></i><span class=\"navhide\">"._('logout')."</span></a></li>\n";
+      echo "  </ul>\n";
+      echo "</div>\n";
 
       echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n\n";
     }

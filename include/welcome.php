@@ -51,33 +51,40 @@ $avgage	= $avgage[0];
 
 echo "\n\n<div class=\"login\">\n";
 
-echo "  <p> Play Doppelkopf online.</p>\n".
-"  <p> For more information please visit our <a href=\"$WIKI\">wiki</a>. </p>\n";
 ?>
-  <ul class="loginregister">
-  <li> Login </li>
-  <li> Register </li>
+  <div class="hero-unit">
+  <h1>E-DoKo</h1>
+  <p>Play Doppelkopf online</p>
+  <p> For more information please visit our <a href="<?php $WIKI ?>">wiki</a> or just log in. </p>
+  </div>
+
+
+  <ul class="loginregister nav nav-tabs">
+  <li class="active"><a href="#login" data-toggle="tab"> Login </a></li>
+  <li><a href="#register" data-toggle="tab"> Register</a> </li>
   </ul>
 
-  <form class="dologin" action="index.php?action=login" method="post">
+  <div class="tab-content">
+  <div class="tab-pane active" id="login">
+  <form class="loginregister form-inline" action="index.php?action=login" method="post">
   <fieldset>
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" size="20" maxlength="30" autofocus /> <br />
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" size="20" maxlength="30" /> <br />
-    <input type="submit" class="submitbutton" name="login" value="login" />
-    <input type="submit" class="submitbutton" name="forgot" value="Forgot your password?" />
+      <input type="email"    id="email"    name="email"    size="20" maxlength="30" placeholder="email" autofocus />
+      <input type="password" id="password" name="password" size="20" maxlength="30" placeholder="password"/>
 <?php
   if($OPENIDPATH)
     {?>
+    <br /> or use openid <br />
+    <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" placeholder="http://username.openid.net"/>
+         <span class="help-bloc">See <a href="http://openid.net">openid.net</a> for more information</span>.
     <hr />
-    <label for="openid_url">Openid:</label>
-    <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" placeholder="http://username.openid.net"/> <br />
-    <p>See <a href="http://openid.net">openid.net</a> for more information.</p>
-    <input type="submit" class="submitbutton" name="login" value="Sign in" /><br />
+    <input type="submit" class="submitbutton" name="login"  value="login" />
+    <input type="submit" class="button"       name="forgot" value="Forgot your password?" />
 <?php }?>
   </fieldset>
   </form>
+   </div>
+
+  <div class="tab-pane" id="register">
 
 <?php
      /* check for openid information */
@@ -91,7 +98,7 @@ echo "  <p> Play Doppelkopf online.</p>\n".
      if(myisset('openidemail'))
        $email      = $_REQUEST['openidemail'];
 
-     echo '  <form class="doregister" action="index.php?action=register" method="post">'; echo "\n";
+     echo '  <form class="loginregister form-horizontal doregister" action="index.php?action=register" method="post">'; echo "\n";
      echo '  <fieldset>'; echo "\n";
      echo '     <label for="Rfullname">Full name:</label>'; echo "\n";
      echo "     <input type=\"text\" id=\"Rfullname\" name=\"Rfullname\" size=\"20\" maxlength=\"30\" value=\"$name\" /> <br />\n";
@@ -114,12 +121,12 @@ echo "  <p> Play Doppelkopf online.</p>\n".
      $rand_number = mt_rand(0,3); /* to get numbers between 0 and 4  */
      $Robotproof = "Robotproof".$rand_number;
 ?>
-    <p style="float: left">Please answer this anti-spam question:</p>
+    Please answer this anti-spam question:<br />
     <label for="Robotproof">  <?php echo output_robotproof($rand_number); ?></label>
 <?php
 	 echo "    <input type=\"text\" id=\"Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /> <br />\n";
 ?>
-    <input type="submit" value="register" />
+    <input type="submit" class="submitbutton" value="register" />
 
 <?php
        if($openid_url=='')
@@ -130,8 +137,11 @@ echo "  <p> Play Doppelkopf online.</p>\n".
 ?>
   </fieldset>
   </form>
+   </div>
+   </div>
 
 <?php
+  echo "<hr />";
 echo "<h4>Some statistics:</h4>\n";
 
 if($pre == 0)

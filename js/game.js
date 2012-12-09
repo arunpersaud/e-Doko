@@ -88,11 +88,6 @@ $(document).ready(
 	    $(".gameshidesession").hide();
 	});
 
-	$("ul.loginregister").click(function () {
-	    $(".dologin").slideToggle();
-	    $(".doregister").slideToggle();
-	});
-
 	$(".message div div").parent().click ( function() { $(this).hide(); });
 
     });
