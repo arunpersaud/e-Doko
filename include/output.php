@@ -130,7 +130,6 @@ function output_form_for_new_game($names)
   echo '   </div>';
   $rand = $_SESSION["name"];
   echo  "     <div class=\"table3\">\n";
-  $i++;
   echo "       <select name=\"PlayerD\" size=\"1\">  \n";
   foreach($names as $name)
     {
