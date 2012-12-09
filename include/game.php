@@ -367,7 +367,7 @@ switch($mystatus)
   case 'check':
     /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
     echo "\n<ul class=\"tricks\">\n";
-    echo "  <li onclick=\"hl('0');\" class=\"active\" id=\"tricks0\"><a href=\"#\">Pre</a>\n";
+    echo "  <li onclick=\"hl(0);\" class=\"active\" id=\"tricks0\"><a href=\"#\">Pre</a>\n";
 
     echo "    </li>\n</ul>\n";  /* end div trick, end li trick , end tricks*/
     /* end displaying sickness */
@@ -381,7 +381,7 @@ switch($mystatus)
 
 	$mygametype =  DB_get_gametype_by_gameid($gameid);
 
-	echo "  <li onclick=\"hl('0');\" class=\"active\"><a href=\"#\">Pre</a>\n";
+	echo "  <li onclick=\"hl(0);\" class=\"active\"><a href=\"#\">Pre</a>\n";
 	echo "  </li>\n</ul>\n\n";  /* end div trick, end li trick , end ul tricks */
       }
     /* end output pre-game trick */
@@ -396,7 +396,7 @@ switch($mystatus)
     $mygamesolo = DB_get_solo_by_gameid($gameid);
     if($mygametype != 'normal') /* only show when needed */
       if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
-	echo "  <li onclick=\"hl('0');\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
+	echo "  <li onclick=\"hl(0);\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
 
     $result = DB_query('SELECT Trick.id '.
 		       'FROM Trick '.
@@ -411,19 +411,19 @@ switch($mystatus)
       {
 	$trick=$r[0];
 	if($trick!=$lasttrick)
-	  echo "  <li onclick=\"hl('$trickNR');\" id=\"tricks$trickNR\"><a href=\"#\">"._('Trick')." $trickNR</a></li>\n";
+	  echo "  <li onclick=\"hl($trickNR);\" id=\"tricks$trickNR\"><a href=\"#\">$trickNR</a></li>\n";
 	else if($trick==$lasttrick)
-	  echo "  <li onclick=\"hl('$trickNR');\" id=\"tricks$trickNR\" class=\"active\"><a href=\"#\">"._('Trick')." $trickNR</a></li>\n";
+	  echo "  <li onclick=\"hl($trickNR);\" id=\"tricks$trickNR\" class=\"active\"><a href=\"#\">$trickNR</a></li>\n";
 	$trickNR++;
       }
 
     /* if game is over, also output link to Score tab */
     if($mystatus=='gameover' && DB_get_game_status_by_gameid($gameid)=='gameover' )
-      echo "  <li onclick=\"hl('13');\" id=\"tricks13\" class=\"active\"><a href=\"#\">"._('Score')."</a></li>\n";
+      echo "  <li onclick=\"hl(13);\" id=\"tricks13\" class=\"active\"><a href=\"#\">"._('Score')."</a></li>\n";
 
     /* output previous/next buttons */
-    echo '  <li onclick="hl_prev();" id=\"prevtr\"><a href="#">'._('prev')."</a></li>\n";
-    echo '  <li onclick="hl_next();" id=\"nexttr\"><a href="#">'._('next')."</a></li>\n";
+    echo '  <li onclick="hl_prev();" id="prevtr"><a href="#">'._('prev')."</a></li>\n";
+    echo '  <li onclick="hl_next();" id="nexttr"><a href="#">'._('next')."</a></li>\n";
 
     echo "</ul>\n\n";
 
