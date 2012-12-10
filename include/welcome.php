@@ -55,7 +55,7 @@ echo "\n\n<div class=\"login\">\n";
   <div class="hero-unit">
   <h1>E-DoKo</h1>
   <p>Play Doppelkopf online</p>
-  <p> For more information please visit our <a href="<?php $WIKI ?>">wiki</a> or just log in. </p>
+  <p> For more information please visit our <a href="<?php echo "$WIKI"; ?>">wiki</a> or just log in. </p>
   </div>
 
 
