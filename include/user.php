@@ -101,10 +101,14 @@ else
   { /* normal user page */
 
     /* verify password and email */
-
     $ok  = 1;
-    $myid = DB_get_userid('email-password',$email,$password);
-    if(!$myid)
+    if(isset($email, $password))
+      {
+	$myid = DB_get_userid('email-password',$email,$password);
+        if(!$myid)
+	  $ok = 0;
+      }
+    else
       $ok = 0;
 
     if($ok)
