@@ -24,3 +24,5 @@ $(".doregister div").addClass('control-group');
 $(".doregister label").wrap('<div class="control-label">');
 $(".doregister input").wrap('<div class="controls">');
 $(".doregister select").wrap('<div class="controls">');
+
+$(".gravatar").addClass('img-polaroid');
