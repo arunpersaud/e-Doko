@@ -18,7 +18,7 @@ function hl(num) {
     if(document.getElementById("tricks13"))
 	max=13;
     else
-	min=12;
+	max=12;
 
     if(current==min)
 	$("#prevtr").addClass('disabled');
