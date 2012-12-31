@@ -53,21 +53,7 @@ foreach($users as $uid)
     $PREF = DB_get_PREF($uid);
 
     // set users language preference
-    $language = $PREF['language'];
-
-    switch($language)
-      {
-      case 'de':
-	putenv("LC_ALL=de_DE");
-	setlocale(LC_ALL, "de_DE");
-	// Specify location of translation tables
-	bindtextdomain("edoko", "./locale");
-	// Choose domain
-	textdomain("edoko");
-	break;
-      default:
-	/* do nothing */
-      }
+    set_language($PREF['language']);
 
     // calculate mod by digest-time
     switch($PREF['digest'])

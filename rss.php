@@ -74,23 +74,9 @@ header("Content-Type: text/xml");
 <title>E-DoKo Feed</title>
 <?php
 
-  /* set language */
-  $PREF = DB_get_PREF($id);
-  $lang = $PREF['language'];
-
-  switch($lang)
-    {
-    case 'de':
-      putenv("LC_ALL=de_DE");
-      setlocale(LC_ALL, "de_DE");
-      // Specify location of translation tables
-      bindtextdomain("edoko", "./locale");
-      // Choose domain
-      textdomain("edoko");
-      break;
-    default:
-      /* do nothing */
-    }
+/* set language */
+$PREF = DB_get_PREF($id);
+set_language($PREF['language']);
 
 echo '<subtitle>'._('Know when it is your turn')."</subtitle>\n";
 

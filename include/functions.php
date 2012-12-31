@@ -1699,4 +1699,32 @@ function verify_password($email, $password)
   return 3;
 }
 
+/* language functions */
+function detectlanguage()
+{
+	/* read out browser's prefered language, taken from php-manual*/
+	$langcode = explode(";", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+	$langcode = explode(",", $langcode['0']);
+	return $langcode['0'];
+}
+
+function set_language($language)
+{
+    switch($language)
+      {
+      case 'de':
+	putenv("LC_ALL=de_DE");
+	setlocale(LC_ALL, "de_DE");
+	// Specify location of translation tables
+	bindtextdomain("edoko", "./locale");
+	// Choose domain
+	textdomain("edoko");
+	break;
+      default:
+	/* do nothing */
+      }
+
+    return;
+}
+
 ?>

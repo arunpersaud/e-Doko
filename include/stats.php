@@ -37,6 +37,7 @@ if(!$myid)
 $PREF = DB_get_PREF($myid);
 /* set language chosen in preferences, will become active on the next reload (see index.php)*/
 $_SESSION['language'] = $PREF['language'];
+set_language($PREF['language']);
 
 DB_update_user_timestamp($myid);
 

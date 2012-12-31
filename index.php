@@ -51,33 +51,28 @@ if($DBopen<0)
     exit();
   }
 
-/* localization */
+/**** localization ****/
 /* needs to be in front of output_header, but we don't know the users preferences at this time,
  * so we go by the session variable or if language is set
  */
-if(myisset('language') || isset($_SESSION['language']))
-  {
-    $language = 'en';
+/* set default */
+$language =  detectlanguage();
 
-    if(myisset('language'))
-      $language = $_REQUEST['language'];
-    else if(isset($_SESSION['language']))
-      $language = $_SESSION['language'];
+/* check if default in array of supported languages, else default to english */
+$supported_languages = array ('en','de');
 
-    switch($language)
-      {
-      case 'de':
-	putenv("LC_ALL=de_DE");
-	setlocale(LC_ALL, "de_DE");
-	// Specify location of translation tables
-	bindtextdomain("edoko", "./locale");
-	// Choose domain
-	textdomain("edoko");
-	break;
-      default:
-	/* do nothing */
-      }
-  }
+if ( !in_array($language, $supported_languages) )
+   $language = 'en';
+
+/* override with explicit request from user */
+if(myisset('language'))
+  $language = $_REQUEST['language'];
+else if(isset($_SESSION['language']))
+  $language = $_SESSION['language'];
+
+/* set it */
+set_language($language);
+/**** end language ****/
 
 /* done major error checking, output header of HTML page */
 output_header();
