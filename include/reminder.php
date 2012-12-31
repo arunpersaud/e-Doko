@@ -51,28 +51,31 @@ $myname   = DB_get_name('hash',$me);
 $r = DB_query_array("SELECT mod_date,player,status from Game WHERE id='$gameid' " );
 if( (time()-strtotime($r[0]) > 60*60*24*7)  && ($r[2]!='gameover') ) /* = 1 week */
   {
-    $name = DB_get_name('userid',$r[1]);
-    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$r[1]);
-
-    $message = "It's your turn in game ".DB_format_gameid($gameid)." \n".
-      "Actually everyone else is waiting for you for more than a week now ;)\n\n".
-      "Please visit this link now to continue: \n".
-      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
+    $uid  = $r[1];
+    $name = DB_get_name('userid',$uid);
+    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$uid);
 
     /* make sure we don't send too many reminders to one person */
-    if(DB_get_reminder($r[1],$gameid)>0)
+    if(DB_get_reminder($uid,$gameid)>0)
       {
-	echo "<p>An email has already been sent out.</p>\n";
+	echo '<p>'._('An email has already been sent out.')."</p>\n";
       }
     else
       {
-	DB_set_reminder($r[1],$gameid);
-	mymail($r[1],$gameid, GAME_REMINDER, $message);
+        set_language($uid,'uid');
+        $message = _("It's your turn in game ").DB_format_gameid($gameid)." \n".
+	  _("Actually everyone else is waiting for you for more than a week now ;)")."\n\n".
+	  _("Please visit this link now to continue").": \n".
+	  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 
-	echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
-	  ": an email has been sent out.<br /><br /></p>";
+	DB_set_reminder($uid,$gameid);
+	mymail($r[1],$gameid, GAME_REMINDER, $message);
+        set_language($myid,'uid');
+
+	echo '<p>'._('Game')." ".DB_format_gameid($gameid).': '.
+	  _('an email has been sent out.')."<br /><br /></p>\n";
       }
   }
  else
-   echo '<p>You need to wait longer before you can send out a reminder...</p>\n';
+   echo '<p>'._('You need to wait longer before you can send out a reminder...')."</p>\n";
 ?>

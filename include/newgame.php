@@ -27,7 +27,7 @@ if(!isset($HOST))
 /* user needs to be logged in to do this */
 if(! isset($_SESSION["name"]) )
   {
-    echo "<div class=\"message\">Please <a href=\"$INDEX\">log in</a>.</div>";
+    echo '<div class="message">'._('Please')." <a href=\"$INDEX\">"._('log in')."</a>.</div>\n";
   }
 else
   {
@@ -72,7 +72,7 @@ else
 	/* the person who sets up the game has to be one of the players */
 	if(!in_array($name,array($PlayerA,$PlayerB,$PlayerC,$PlayerD)))
 	  {
-	    echo "<div class=\"message\">You need to be one of the players to start a <a href=\"$INDEX?action=new\">new game</a>.</div>";
+	    echo '<div class="message">'."You need to be one of the players to start a <a href=\"$INDEX?action=new\">new game</a>.</div>\n";
 	    return;
 	  }
 
@@ -91,7 +91,7 @@ else
 	/* this is used to check if the player names are all ok */
 	if($EmailA=="" || $EmailB=="" || $EmailC=="" || $EmailD=="")
 	  {
-	    echo "couldn't find one of the names, please start a new game";
+	    echo _("couldn't find one of the names, please start a new game");
 	    return;
 	  }
 
@@ -190,22 +190,26 @@ else
 	  DB_query("INSERT INTO Hand_Card VALUES (NULL, '$hand_idD', '".$randomNR[$i]."', 'false')");
 
 	/* send out email, TODO: check for error with email */
-	$message = "You are invited to play a game of DoKo.\n".
-	  "Please, place comments and bug reports here:\n$WIKI\n\n".
-	  "The whole round would consist of the following players:\n".
-	  "$PlayerA\n".
-	  "$PlayerB\n".
-	  "$PlayerC\n".
-	  "$PlayerD\n\n".
-	  "If you want to join this game, please follow this link:\n".
-	  "".$HOST.$INDEX."?action=game&me=";
 
-	mymail($useridA, $gameid, GAME_NEW, $message.$hashA."\n\n");
-	mymail($useridB, $gameid, GAME_NEW, $message.$hashB."\n\n");
-	mymail($useridC, $gameid, GAME_NEW, $message.$hashC."\n\n");
-	mymail($useridD, $gameid, GAME_NEW, $message.$hashD."\n\n");
+	$users =  array( $useridA => $hashA, $useridB => $hashB, $useridC => $hashC, $useridD => $hashD );
+	foreach ( $users as $uid => $hash )
+	  {
+	     set_language($uid,'uid');
+	     $message = _('You are invited to play a game of DoKo.')."\n".
+	       _('Please, place comments and bug reports here:')."\n$WIKI\n\n".
+	       _('The whole round would consist of the following players:')."\n".
+	       "$PlayerA\n".
+	       "$PlayerB\n".
+	       "$PlayerC\n".
+	       "$PlayerD\n\n".
+	       _('If you want to join this game, please follow this link:')."\n".
+	       "".$HOST.$INDEX."?action=game&me=";
 
-	echo "<div class=\"message\">You started a new game. The emails have been sent out!</div>\n";
+	     mymail($uid, $gameid, GAME_NEW, $message.$hash."\n\n");
+	  };
+        set_language($myid,'uid');
+
+	echo '<div class="message">'._('You started a new game. The emails have been sent out!')."</div>\n";
         display_user_menu($myid);
       }
   }

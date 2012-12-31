@@ -492,12 +492,15 @@ switch($mystatus)
 	if(!$skip && $_REQUEST['in'] == 'no' )
 	  {
 	    /* cancel the game */
-	    $email_message = "Hello, \n\n".
-	      "the game has been canceled due to the request of one of the players.\n\n";
-
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
+	    {
+	      set_language($user,'uid');
+	      $email_message = _("Hello, \n\n".
+	        "the game has been canceled due to the request of one of the players.")."\n\n";
 	      mymail($user,$gameid,GAME_CANCELED,$email_message);
+	    };
+	    set_language($myid,'uid');
 
 	    $card_status = CARDS_EMPTY;
 
@@ -694,36 +697,47 @@ switch($mystatus)
 	    /* cancel game */
 	    if($cancelsick == 'nines')
 	      {
-		$email_message = 'The game has been canceled because '.DB_get_name('userid',$cancel).
-		  " has five or more nines and nobody is playing solo.\n\n".
-		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
-		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
-
 		/* update game status */
 		cancel_game('nines',$gameid);
 
-		$messages[] = 'The game has been canceled because '.DB_get_name('userid',$cancel).
-		  " has five or more nines and nobody is playing solo.";
+		$messages[] = sprintf(_('The game has been canceled because %s'.
+		  ' has five or more nines and nobody is playing solo.'),DB_get_name('userid',$cancel) );
 	      }
 	    else if ($cancelsick == 'lowtrump')
 	      {
-		$email_message = 'The game has been canceled because '.DB_get_name('userid',$cancel).
-		  " has low trump and nobody is playing solo.\n\n".
-		  "To redeal either start a new game or, in case the game was part of a tournament,\n".
-		  "go to the last game and use the link at the bottom of the page to redeal.\n\n";
-
 		/* update game status */
 		cancel_game('lowtrump',$gameid);
 
-		$messages[] = 'The game has been canceled because '.DB_get_name('userid',$cancel).
-		  ' has low trump and nobody is playing solo.';
+		$messages[] = sprintf(('The game has been canceled because %s'.
+		  ' has low trump and nobody is playing solo.'),DB_get_name('userid',$cancel));
 	      };
 
 	    $userids = DB_get_all_userid_by_gameid($gameid);
 	    foreach($userids as $user)
 	      {
+	        set_language($user,'uid');
+	        if($cancelsick == 'nines')
+	        {
+		  $email_message = sprintf(_('The game has been canceled because %s'.
+		    ' has five or more nines and nobody is playing solo.'),DB_get_name('userid',$cancel) ).
+		    "\n\n".
+		    _("To redeal either start a new game or, in case the game was part of a tournament,\n".
+		    "go to the last game and use the link at the bottom of the page to redeal.").
+		    "\n\n";
+		}
+	        else if ($cancelsick == 'lowtrump')
+	        {
+		  $email_message = sprintf(_('The game has been canceled because %s'.
+		    " has low trump and nobody is playing solo."),DB_get_name('userid',$cancel)).
+		    "\n\n".
+		    _("To redeal either start a new game or, in case the game was part of a tournament,\n".
+		    "go to the last game and use the link at the bottom of the page to redeal.").
+		    "\n\n";
+		};
+
 		mymail($user,$gameid, GAME_CANCELED, $email_message);
 	      }
+	      set_language($myid,'uid');
 
 	    break;
 	  }
@@ -856,9 +870,11 @@ switch($mystatus)
 		if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 		  {
 		    /* email startplayer */
-		    $email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      "Use this link to play a card: ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		    set_language($userid,'uid');
+		    $email_message = sprintf(_("It's your turn now in game %s.\n".
+		      "Use this link to play a card:"),DB_format_gameid($gameid))." ".$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		    mymail($userid,$gameid,GAME_READY,$email_message);
+		    set_language($myid,'uid');
 		  }
 	      }
 	    else
@@ -881,9 +897,11 @@ switch($mystatus)
 		if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 		  {
 		    /* email player for poverty */
-		    $email_message = "Poverty: It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		      'Use this link to play a card: '.$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
+		    set_language($whoid,'uid');
+		    $email_message = sprintf(_("Poverty: It's your turn now in game %s.\n".
+		      'Use this link to play a card: '),DB_format_gameid($gameid)).$HOST.$INDEX."?action=game&me=".$whohash."\n\n" ;
 		    mymail($whoid,$gameid,GAME_POVERTY,$email_message);
+		    set_language($myid,'uid');
 		  }
 	      }
 	  }
@@ -952,9 +970,11 @@ switch($mystatus)
 	    if(DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer */
-		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  'Use this link to play a card: '.$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		set_language($userid,'uid');
+		$email_message = sprintf(_("It's your turn now in game %s.\n".
+		  'Use this link to play a card: '),DB_format_gameid($gameid)).$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		mymail($userid,$gameid,GAME_READY,$email_message);
+		set_language($myid,'uid');
 	      }
 	  }
 	else
@@ -1025,14 +1045,16 @@ switch($mystatus)
 	    /* no more people to ask, need to cancel the game */
 	    if($mypos+$next>4)
 	      {
-		$email_message = "Hello, \n\n".
-		  'Game '.DB_format_gameid($gameid)." has been canceled since nobody wanted to take the trump.\n\n";
-
 		$userids = DB_get_all_userid_by_gameid($gameid);
 		foreach($userids as $user)
 		  {
+		    set_language($user,'uid');
+		    $email_message = sprintf("Hello, \n\n".
+		      'Game %s has been canceled since nobody wanted to take the trump.',DB_format_gameid($gameid)).
+		      "\n\n";
 		    mymail($user, $gameid, GAME_CANCELED_POVERTY, $email_message);
 		  }
+		set_language($myid,'uid');
 
 		/* update game status */
 		cancel_game('trump',$gameid);
@@ -1049,9 +1071,11 @@ switch($mystatus)
 		DB_set_player_by_gameid($gameid,$userid);
 		DB_set_hand_status_by_hash($userhash,'poverty');
 
-		$email_message = "Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+		set_language($userid,'uid');
+		$email_message = _("Someone has poverty, it's your turn to decide, if you want to take the trump. Please visit:").
 		  " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 		mymail($userid,$gameid, GAME_POVERTY, $email_message);
+		set_language($myid,'uid');
 	      }
 
 	    $cards_status = CARDS_SHOW;
@@ -1142,9 +1166,11 @@ switch($mystatus)
 		    DB_set_player_by_gameid($gameid,$userid);
 		    DB_set_hand_status_by_hash($userhash,'poverty');
 
-		    $email_message = "Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:".
+		    set_langauge($userid,'uid');
+		    $email_message = _("Two people have poverty, it's your turn to decide, if you want to take the trump. Please visit:").
 		      " ".$HOST.$INDEX."?action=game&me=".$userhash."\n\n" ;
 		    mymail($userid,$gameid, GAME_DPOVERTY, $email_message);
+		    set_language($myid,'uid');
 		  }
 	      }
 	    $messages[] = "Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here";
@@ -1214,9 +1240,11 @@ switch($mystatus)
 	    if($hash!=$me && DB_get_email_pref_by_hash($hash)!='emailaddict')
 	      {
 		/* email startplayer) */
-		$email_message = "It's your turn now in game ".DB_format_gameid($gameid).".\n".
-		  'Use this link to play a card: '.$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
+		set_language($userid,'uid');
+		$email_message = sprintf(_("It's your turn now in game %s.\n".
+		  'Use this link to play a card: '),DB_format_gameid($gameid)).$HOST.$INDEX."?action=game&me=".$hash."\n\n" ;
 		mymail($userid,$gameid, GAME_READY, $email_message);
+		set_language($myid,'uid');
 	      }
 	  }
       }
@@ -1666,12 +1694,14 @@ switch($mystatus)
 		$userid    = DB_get_userid('hash',$next_hash);
 		DB_set_player_by_gameid($gameid,$userid);
 
-		$email_message = 'A card has been played in game '.DB_format_gameid($gameid).".\n\n".
-		  "It's your turn  now.\n".
-		  'Use this link to play a card: '.$HOST.$INDEX.'?action=game&me='.$next_hash."\n\n" ;
 		if( DB_get_email_pref_by_uid($userid)!='emailaddict' )
 		  {
+		    set_language($userid,'uid');
+		    $email_message = sprintf(_("A card has been played in game %s.\n\n".
+		      "It's your turn  now.\n".
+		      'Use this link to play a card: '),DB_format_gameid($gameid)).$HOST.$INDEX.'?action=game&me='.$next_hash."\n\n" ;
 		    mymail($userid,$gameid, GAME_YOUR_TURN, $email_message);
+		    set_language($myid,'uid');
 		  }
 	      }
 	    else /* send out final email */

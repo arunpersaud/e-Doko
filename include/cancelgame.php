@@ -52,22 +52,24 @@ $myname   = DB_get_name('hash',$me);
 $r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
 if(time()-strtotime($r[0]) > 60*60*24*30) /* = 1 month */
   {
-    $message = "Game ".DB_format_gameid($gameid).
-      " has been canceled since nothing happend for a while and $myname requested it.\n\n";
-
     /* email to all players */
     $userids = DB_get_all_userid_by_gameid($gameid);
     foreach($userids as $user)
       {
+        set_language($user, 'uid');
+	$message = sprintf(_('Game %s has been canceled since nothing happend for a while and %s requested it.'),DB_format_gameid($gameid),$myname)."\n\n";
+
 	mymail($user,$gameid, GAME_CANCELED_TIMEOUT, $message);
       }
+    set_language($myid, 'uid');
 
     /* set gamestatus to canceled */
     cancel_game('timedout',$gameid);
 
-    echo "<p style=\"background-color:red\";>Game ".DB_format_gameid($gameid).
-      " has been canceled.<br /><br /></p>";
+    echo '<p style="background-color:red";>'.
+      sprintf(_('Game %s has been canceled.'),DB_format_gameid($gameid)).
+      "<br /><br /></p>\n";
   }
  else /* game can't be canceled yet */
-   echo "<p>You need to wait longer before you can cancel a game...</p>\n";
+   echo "<p>"._('You need to wait longer before you can cancel a game...')."</p>\n";
 ?>

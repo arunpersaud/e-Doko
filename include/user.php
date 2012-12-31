@@ -64,12 +64,12 @@ if(myisset('forgot'))
 	    $hash  = md5('Anewpassword'.$email.$TIME);
 	    $newpw = substr($hash,1,8);
 
-	    $message = "Someone (hopefully you) requested a new password. \n".
-	      "You can use this email and the following password: \n".
-	      "   $newpw    \n".
+	    $message = sprintf( _("Someone (hopefully you) requested a new password.\n".
+	      "You can use this email and the following password:\n".
+	      "   %s\n".
 	      "to log into the server. The new password is valid for 24h, so make\n".
 	      "sure you reset your password to something new. Your old password will\n".
-	      "also still be valid until you set a new one.\n";
+	      "also still be valid until you set a new one.\n"), $newpw);
 	    mymail($myid,0, GAME_RECOVERY, $message);
 
 	    /* we save these in the database */
