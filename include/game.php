@@ -57,10 +57,9 @@ $playid   = DB_get_current_playid($gameid); /* might be -1 at beginning of the g
 
 /* get prefs and save them in a variable*/
 $PREF = DB_get_PREF(isset($_SESSION['id'])?$_SESSION['id']:$myid);
-/* set language chosen in preferences, will become active on the next reload (see index.php)*/
+/* set language chosen in preferences */
 $_SESSION['language'] = $PREF['language'];
 set_language($PREF['language']);
-
 
 /* get rule set for this game */
 $RULES = DB_get_RULES($gameid);
@@ -1911,7 +1910,7 @@ switch($mystatus)
 		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
 		      $email_message .= $link;
 		    }
-		  $email_message .= "\n\n (you can use reply all on this email to reach all the players.)\n\n";
+		  $email_message .= "\n\n (use in-game comments to reach all players)\n\n";
 		  mymail($userids,$gameid, GAME_OVER, $email_message);
 	      }
 	  }

@@ -75,8 +75,7 @@ header("Content-Type: text/xml");
 <?php
 
 /* set language */
-$PREF = DB_get_PREF($id);
-set_language($PREF['language']);
+set_language($id,'uid');
 
 echo '<subtitle>'._('Know when it is your turn')."</subtitle>\n";
 

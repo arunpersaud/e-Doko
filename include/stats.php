@@ -35,7 +35,7 @@ if(!$myid)
   return;
 
 $PREF = DB_get_PREF($myid);
-/* set language chosen in preferences, will become active on the next reload (see index.php)*/
+/* set language chosen in preferences*/
 $_SESSION['language'] = $PREF['language'];
 set_language($PREF['language']);
 

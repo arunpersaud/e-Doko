@@ -106,82 +106,25 @@ define("CARDS_GAMEOVER",    5); /* show all cards from everyone (looking at some
 
 function mymail($uid,$gameid=0,$type,$message)
 {
-  global $EmailName,$WIKI;
+  global $EmailName,$WIKI,$PREF;
 
-  /* do we send the email right away or save it in the database? */
-  $send_now = 1;
-
-  /* add standard header and footer */
-  $subject = "$EmailName ";
-  if($gameid)
-    $game = DB_format_gameid($gameid);
-  else
-    $game = '';
-
-  switch($type)
+  /* uid can be either a single uid or an array, convert everything to
+   *  an array, so that we can loop over it */
+  if(!is_array($uid))
     {
-    case GAME_CANCELED:
-      $subject.=sprintf(_("Game %s canceled"),$game);
-      break;
-    case GAME_CANCELED_POVERTY:
-      $subject.=sprintf(_("Game %s canceled (poverty not resolved)"),$game);
-      break;
-    case GAME_CANCELED_TIMEOUT:
-      $subject.=sprintf(_("Game %s canceled (timed out)"),$game);
-      break;
-    case GAME_YOUR_TURN:
-      $subject.=sprintf(_("A card has been played in game %s"),$game);
-      break;
-    case GAME_READY:
-      $subject.=sprintf(_("Ready, set, go... (game %s)"),$game);
-      break;
-    case GAME_POVERTY:
-      $subject.=sprintf(_("Poverty (game %s)"),$game);
-      break;
-    case GAME_DPOVERTY:
-      $subject.=sprintf(_("Double poverty (game %s)"),$game);
-      break;
-    case GAME_OVER:
-      $subject.=sprintf(_("Game over (game %s)"),$game);
-      break;
-    case GAME_RECOVERY:
-      $subject.=_("Recovery");
-      break;
-    case GAME_REMINDER:
-      $subject.=sprintf(_("Reminder: game %s it's your turn"),$game);
-      break;
-    case GAME_NEW:
-      $subject.=sprintf(_("You are invited to a game of DoKo (game %s)"),$game);
-      break;
-    default:
-      $subject.=sprintf(_("Problem with email, contact admin (errorcode %d)"),$gameid);
+      $to_uid=$uid;
+      $uid = array();
+      $uid[]=$to_uid;
     }
 
-  /* standard goodbye */
-  $footer  = "\nHave a nice day\n".
-    "   your E-Doko service department\n\n".
-    "-- \n".
-    "You can change your mail delivery mode in the preference menu.\n".
-    'web: http://doko.nubati.net   '.
-    "help, bugs, etc.: $WIKI";
-
-  if(is_array($uid))
+  foreach($uid as $user)
     {
-      /* send email to more than one person */
+      /* do we send the email right away or save it in the database? */
+      $send_now = 1;
 
-      $header  = "Hello all\n\n";
-
-      foreach($uid as $user)
-	{
-	  $all[] = DB_get_email('userid',$user);
-	}
-      $To = implode(",",$all);
-    }
-  else
-    {
-      /* standard greeting */
       $name    = DB_get_name('userid',$uid);
-      $header  = "Hello $name\n\n";
+      $header  = sprintf(_('Hello %s'),$name);
+      $header .= "\n\n";
 
       $To = DB_get_email('userid',$uid);
 
@@ -189,18 +132,79 @@ function mymail($uid,$gameid=0,$type,$message)
        * the database for later delivery
        */
 
-      $PREF = DB_get_PREF($uid);
-      if( $PREF['digest'] != 'digest-off' )
-	$send_now = 0;
-    }
+      $uidPREF = DB_get_PREF($uid);
+      if( $uidPREF['digest'] != 'digest-off' )
+        $send_now = 0;
+      /* use local language */
+      set_language($uidPREF['language']);
 
-  if($send_now)
-    sendmail($To,$subject,$header.$message.$footer);
-  else
-    {
-      /* store email in database */
-      DB_digest_insert_email($To,$message,$type,$gameid);
+      /* add standard header and footer */
+      $subject = "$EmailName ";
+      if($gameid)
+        $game = DB_format_gameid($gameid);
+      else
+        $game = '';
+
+      switch($type)
+        {
+        case GAME_CANCELED:
+          $subject.=sprintf(_('Game %s canceled'),$game);
+          break;
+        case GAME_CANCELED_POVERTY:
+          $subject.=sprintf(_('Game %s canceled (poverty not resolved)'),$game);
+          break;
+        case GAME_CANCELED_TIMEOUT:
+          $subject.=sprintf(_('Game %s canceled (timed out)'),$game);
+          break;
+        case GAME_YOUR_TURN:
+          $subject.=sprintf(_('A card has been played in game %s'),$game);
+          break;
+        case GAME_READY:
+          $subject.=sprintf(_('Ready, set, go... (game %s)'),$game);
+          break;
+        case GAME_POVERTY:
+          $subject.=sprintf(_('Poverty (game %s)'),$game);
+          break;
+        case GAME_DPOVERTY:
+          $subject.=sprintf(_('Double poverty (game %s)'),$game);
+          break;
+        case GAME_OVER:
+          $subject.=sprintf(_('Game over (game %s)'),$game);
+          break;
+        case GAME_RECOVERY:
+          $subject.=_('Recovery');
+          break;
+        case GAME_REMINDER:
+          $subject.=sprintf(_("Reminder: game %s it's your turn"),$game);
+          break;
+        case GAME_NEW:
+          $subject.=sprintf(_('You are invited to a game of DoKo (game %s)'),$game);
+          break;
+        default:
+          $subject.=sprintf(_('Problem with email, contact admin (errorcode %d)'),$gameid);
+        }
+
+      /* standard goodbye */
+      $footer  = "\n"._("Have a nice day\n   your E-Doko service department").
+        "\n\n".
+        "-- \n".
+        _('You can change your mail delivery mode in the preference menu.').
+	"\n".
+        _('web').': http://doko.nubati.net   '.
+        _('help, bugs, etc.').": $WIKI";
+
+      if($send_now)
+        sendmail($To,$subject,$header.$message.$footer);
+      else
+        {
+          /* store email in database */
+          DB_digest_insert_email($To,$message,$type,$gameid);
+        }
     }
+  /* reset language to original user*/
+  set_language($PREF['language']);
+
+  return;
 }
 
 function sendmail($To,$Subject,$message)
@@ -1708,9 +1712,15 @@ function detectlanguage()
 	return $langcode['0'];
 }
 
-function set_language($language)
+function set_language($l,$type='lang')
 {
-    switch($language)
+   if($type=='uid')
+     {
+       $userPREF = DB_get_PREF($l);
+       $l = $userPREF['language'];
+     };
+
+    switch($l)
       {
       case 'de':
 	putenv("LC_ALL=de_DE");
