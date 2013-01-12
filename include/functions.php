@@ -1727,6 +1727,7 @@ function set_language($l,$type='lang')
 	setlocale(LC_ALL, "de_DE");
 	// Specify location of translation tables
 	bindtextdomain("edoko", "./locale");
+	bind_textdomain_codeset("edoko", 'UTF-8');
 	// Choose domain
 	textdomain("edoko");
 	break;

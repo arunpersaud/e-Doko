@@ -18,6 +18,6 @@ msgmerge de.po messages.pot -o de.po
 
 Start editing and then after updating a po run:
 
-msgconv -t ISO-8859-1 de.po > de.po.new && mv de.po.new de.po
+msgconv -t utf-8 de.po > de.po.new && mv de.po.new de.po
 msgfmt -cv -o de.mo de.po
 mv de.mo ../locale/de/LC_MESSAGES/edoko.mo
