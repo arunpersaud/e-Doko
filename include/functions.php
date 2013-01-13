@@ -122,17 +122,17 @@ function mymail($uid,$gameid=0,$type,$message)
       /* do we send the email right away or save it in the database? */
       $send_now = 1;
 
-      $name    = DB_get_name('userid',$uid);
+      $name    = DB_get_name('userid',$user);
       $header  = sprintf(_('Hello %s'),$name);
       $header .= "\n\n";
 
-      $To = DB_get_email('userid',$uid);
+      $To = DB_get_email('userid',$user);
 
       /* check if user wants email right away or if we should save it in
        * the database for later delivery
        */
 
-      $uidPREF = DB_get_PREF($uid);
+      $uidPREF = DB_get_PREF($user);
       if( $uidPREF['digest'] != 'digest-off' )
         $send_now = 0;
       /* use local language */
