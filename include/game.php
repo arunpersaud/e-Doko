@@ -328,7 +328,7 @@ if($session)
       $next = NULL;
 
     /* check for solo, add game type to session number */
-    echo "    Game $session.$j";
+    echo '    '._('Game')." $session.$j";
     if($gamestatus != 'pre' && $GT !='normal' )
       echo " ($GT)";
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
@@ -2238,7 +2238,8 @@ switch ($card_status) {
 	   $name = DB_get_name('userid',$user);
 	   $oldcards = DB_get_all_hand($userhash);
 	   $oldcards = mysort($oldcards,$gametype);
-	   echo "$name's cards were: <br />\n";
+	   echo sprintf(_("%s's cards were:"),$name);
+	   echo " <br />\n";
 	   foreach($oldcards as $card)
 	     display_card($card,$PREF['cardset']);
 	 }

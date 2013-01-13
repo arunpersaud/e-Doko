@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2013-01-12 15:05-0800\n"
+"POT-Creation-Date: 2013-01-12 17:10-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,6 +131,22 @@ msgstr ""
 msgid "Starting Player"
 msgstr ""
 
+#: include/functions.php:1210
+msgid "#tricks 0"
+msgstr ""
+
+#: include/functions.php:1212
+msgid "#tricks 1"
+msgstr ""
+
+#: include/functions.php:1216
+msgid "#tricks few"
+msgstr ""
+
+#: include/functions.php:1218
+msgid "#tricks many"
+msgstr ""
+
 #: include/functions.php:1251
 msgid "It's your turn in these games"
 msgstr ""
@@ -193,6 +209,10 @@ msgstr ""
 
 #: include/game.php:289 include/game.php:422
 msgid "Score"
+msgstr ""
+
+#: include/game.php:331 include/reminder.php:75
+msgid "Game"
 msgstr ""
 
 #: include/game.php:337
@@ -363,11 +383,16 @@ msgstr ""
 msgid "Your cards were"
 msgstr ""
 
-#: include/game.php:2296
+#: include/game.php:2241
+#, php-format
+msgid "%s's cards were:"
+msgstr ""
+
+#: include/game.php:2297
 msgid "A short comment"
 msgstr ""
 
-#: include/game.php:2309 include/output.php:410
+#: include/game.php:2310 include/output.php:410
 msgid "submit"
 msgstr ""
 
@@ -585,44 +610,44 @@ msgstr ""
 msgid "Do you want to play a game of DoKo?"
 msgstr ""
 
-#: include/output.php:498
+#: include/output.php:502
 msgid "Home"
 msgstr ""
 
-#: include/output.php:500
+#: include/output.php:504
 msgid "settings"
 msgstr ""
 
-#: include/output.php:501
+#: include/output.php:505
 msgid "new game"
 msgstr ""
 
-#: include/output.php:502
+#: include/output.php:506
 msgid "statistics"
 msgstr ""
 
-#: include/output.php:503
+#: include/output.php:507
 msgid "wiki/bugs"
 msgstr ""
 
-#: include/output.php:504
+#: include/output.php:508
 msgid "atom"
 msgstr ""
 
-#: include/output.php:505
+#: include/output.php:509
 msgid "logout"
 msgstr ""
 
-#: include/output.php:509
+#: include/output.php:513
 msgid "last login"
 msgstr ""
 
-#: include/output.php:614
+#: include/output.php:618
 msgid "Personal notes"
 msgstr ""
 
-#: include/output.php:756 include/output.php:768 include/output.php:780
-#: include/output.php:793
+#: include/output.php:760 include/output.php:772 include/output.php:784
+#: include/output.php:797
 msgid "Trump back"
 msgstr ""
 
@@ -848,10 +873,6 @@ msgstr ""
 
 #: include/reminder.php:68
 msgid "Please visit this link now to continue"
-msgstr ""
-
-#: include/reminder.php:75
-msgid "Game"
 msgstr ""
 
 #: include/reminder.php:76

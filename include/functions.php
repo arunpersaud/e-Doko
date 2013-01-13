@@ -1207,15 +1207,15 @@ function display_single_user($r,$start=0)
       switch($wins)
 	{
 	case 0:
-	  echo "#tricks 0"; break;
+	  echo _('#tricks 0'); break;
 	case 1:
-	  echo "#tricks 1"; break;
+	  echo _('#tricks 1'); break;
 	case 2:
 	case 3:
 	case 4:
-	  echo "#tricks few"; break;
+	  echo _('#tricks few'); break;
 	default:
-	  echo "#tricks many"; break;
+	  echo _('#tricks many'); break;
 	}
       echo "</span>\n";
       echo "  </div>\n";
