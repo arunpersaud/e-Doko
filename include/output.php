@@ -424,10 +424,14 @@ function output_header()
      <meta charset="utf-8" />
      <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
      <link rel="shortcut icon" href="pics/edoko-favicon.png" />
+     <link rel="stylesheet" media="all" href="<?php echo autoversion("css/bootstrap.css"); ?>" />
+     <link rel="stylesheet" href="<?php echo autoversion("css/standard.css"); ?>" />
+     <link rel="stylesheet" href="<?php echo autoversion("css/dateinput.css"); ?>"/>
+<!--
      <link rel="stylesheet/less" media="all" href="<?php echo autoversion("css/bootstrap.less"); ?>" />
      <link rel="stylesheet/less" href="<?php echo autoversion("css/standard.less"); ?>" />
-     <link rel="stylesheet" href="<?php echo autoversion("css/dateinput.css"); ?>"/>
      <script src="js/less.min.js" type="text/javascript"></script>
+!-->
   </head>
 <body onload="high_last();">
 <?php
