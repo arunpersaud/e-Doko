@@ -142,6 +142,7 @@ echo "\n\n<div class=\"login\">\n";
 
 <?php
   echo "<hr />";
+echo "<div class=\"welcomestats\">\n";
 echo "<h4>Some statistics:</h4>\n";
 
 if($pre == 0)
@@ -169,5 +170,5 @@ if($done==0)
  else
    echo "$done games have been completed on this server. Average time of a game: $avgage days</p>\n";
 ?>
-
+</div>
 </div>

@@ -26,3 +26,5 @@ $(".doregister input").wrap('<div class="controls">');
 $(".doregister select").wrap('<div class="controls">');
 
 $(".gravatar").addClass('img-polaroid');
+
+$(".welcomestats").addClass('offset1');
