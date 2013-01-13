@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2013-01-12 17:10-0800\n"
-"PO-Revision-Date: 2013-01-12 19:09-0800\n"
+"POT-Creation-Date: 2013-01-13 15:32-0800\n"
+"PO-Revision-Date: 2013-01-13 15:33-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "Language: de\n"
@@ -706,11 +706,11 @@ msgstr "Notizen"
 #: include/output.php:760 include/output.php:772 include/output.php:784
 #: include/output.php:797
 msgid "Trump back"
-msgstr "Trumpf zurÃ¼ck"
+msgstr "Trumpf zurück"
 
 #: include/preferences.php:344
-msgid "Your settings are"
-msgstr "Deine Einstellungen sind"
+msgid "Your settings"
+msgstr "Deine Einstellungen"
 
 #: include/preferences.php:346
 msgid "Game-related"
@@ -895,8 +895,7 @@ msgstr "abschicken"
 #: include/preferences.php:555
 msgid "E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons."
 msgstr ""
-"E-DoKo benutzt <a href=\\\"http://www.gravatar.org\\\">gravatars</a> als "
-"Icons."
+"E-DoKo benutzt <a href=\"http://www.gravatar.org\">gravatars</a> als Icons."
 
 #: include/register.php:36
 msgid "Please chose another name"
@@ -947,6 +946,15 @@ msgstr ""
 msgid "Ok, I will send you a new password."
 msgstr "Ok, ich werde Dir ein neues Passwort zuschicken."
 
+#: include/user.php:57
+#, php-format
+msgid ""
+"N.B. You tried this already %s times during the last day and it will only "
+"work 5 times during a day."
+msgstr ""
+"PS Dies ist dein %s Versuch in den letzten 24 Stunden und du hast nur 5 "
+"Versuche pro Tag."
+
 #: include/user.php:59
 msgid ""
 "The new password will be valid for one day, make sure you reset it to "
@@ -954,6 +962,11 @@ msgid ""
 msgstr ""
 "Das neue Passwort wird für einen Tag gültig sein, bitte setze in dieser Zeit "
 "ein neues."
+
+#: include/user.php:60 include/user.php:84
+#, php-format
+msgid "Back to the <a href=\"%s\">main page</a>."
+msgstr "Zurück zur <a href=\"%s\">Hauptseite</a>."
 
 #: include/user.php:67
 #, php-format
@@ -979,8 +992,30 @@ msgid ""
 "Sorry you already tried 5 times during the last 24h.<br />You need to use "
 "one of those passwords or wait to get a new one."
 msgstr ""
-"Du hast schon 5mal innerhalb der letzten 24h probiert <br /> Benutzte eines\n"
-"der PasswÃ¶rter oder warte, um ein neues zu beantrage."
+"Du hast schon 5mal innerhalb der letzten 24h probiert.<br />Benutzte eines\n"
+"der Passwörter oder warte, um ein neues zu beantragen."
+
+#: include/user.php:92
+msgid "You need to give me an email address!"
+msgstr "Ich brauch eine E-mailadresse!"
+
+#: include/user.php:93
+#, php-format
+msgid "Please try <a href=\"%s\">again</a>."
+msgstr "Bitte versuche <a href=\"%s\">erneut</a>."
+
+#: include/user.php:95
+msgid "Couldn't find a player with this email!"
+msgstr "Konnte keinen Spieler mit dieser E-mailaddresse finden!"
+
+#: include/user.php:96
+#, php-format
+msgid ""
+"Please contact %s, if you think this is a mistake or else try <a href=\"%s"
+"\">again</a>."
+msgstr ""
+"Bitte kontaktiere %s, falls du glaubst, dass dies ein Fehler ist. Ansonsten "
+"versuche <a href=\"%s\"> erneut</a>."
 
 #: include/user.php:137
 msgid ""
@@ -1014,45 +1049,70 @@ msgstr ""
 msgid "your turn"
 msgstr "Du bist dran"
 
-#: include/user.php:248
-msgid "Send a reminder?"
-msgstr "eine Erinnerungsemail schicken?"
+#: include/user.php:239
+msgid "begin:"
+msgstr "Start:"
 
-#: include/user.php:259
+#: include/user.php:239
+msgid "end:"
+msgstr "Ende:"
+
+#: include/user.php:241 include/user.php:244
+#, php-format
+msgid "%s's turn"
+msgstr "%s ist dran"
+
+#: include/user.php:249
+msgid "Send a reminder?"
+msgstr "Erinnerungsemail schicken?"
+
+#: include/user.php:255
+msgid "Cancel?"
+msgstr "Abbrechen?"
+
+#: include/user.php:260
 msgid "show old"
 msgstr "zeige alte"
 
-#: include/user.php:260
+#: include/user.php:261
 msgid "hide old"
 msgstr "verstecke alte"
 
-#: include/user.php:301
+#: include/user.php:302
 msgid "show all"
 msgstr "zeige alle"
 
-#: include/user.php:301
+#: include/user.php:302
 msgid "hide all"
 msgstr "verstecke alle"
 
-#: include/user.php:303
+#: include/user.php:304
 msgid "show inactive"
 msgstr "zeige inaktive"
 
-#: include/user.php:303
+#: include/user.php:304
 msgid "hide inactive"
 msgstr "verstecke inaktive"
 
-#: include/user.php:308
+#: include/user.php:309
 msgid "You can start new games using the link in the top right corner!"
 msgstr "Du kannst neue Runden mit dem Link oben rechts starten!"
 
-#: include/user.php:312
+#: include/user.php:313
 msgid "New Players"
 msgstr "Neue Mitspieler"
 
-#: include/user.php:317
+#: include/user.php:318
 msgid "Players last logged in"
 msgstr "Zuletzt eingeloggt"
+
+#: include/user.php:335
+#, php-format
+msgid ""
+"Sorry email and password don't match. Please <a href=\"%s\">try again</a>."
+msgstr ""
+"E-mail und Passwort stimmen nicht überein. Bitte <a href=\"%s\">versuche es "
+"erneut</a>."
 
 #~ msgid "Trick"
 #~ msgstr "Stich"
