@@ -341,7 +341,7 @@ $timezone = DB_get_user_timezone($myid);
 
 echo "<div class=\"user\">\n";
 echo "  <form action=\"index.php?action=prefs\" method=\"post\">\n";
-echo '  <h2>'._('Your settings are')."</h2>\n";
+echo '  <h2>'._('Your settings')."</h2>\n";
 echo "    <fieldset>\n";
 echo '    <legend>'._('Game-related')."</legend>\n";
 echo "      <table>\n";

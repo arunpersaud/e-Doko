@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
 "POT-Creation-Date: 2013-01-12 17:10-0800\n"
-"PO-Revision-Date: 2013-01-12 17:10-0800\n"
+"PO-Revision-Date: 2013-01-12 19:09-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "Language: de\n"
@@ -854,7 +854,7 @@ msgstr "Passwort(alt)"
 
 #: include/preferences.php:507
 msgid "The new passwords is not long enough (you need at least 4 characters)."
-msgstr "Das neue Passwort ist nicht lange genug (mindestens 4 Zeichen)."
+msgstr "Das neue Passwort ist nicht lang genug (mindestens 4 Zeichen)."
 
 #: include/preferences.php:510
 msgid "The new passwords don't match."
