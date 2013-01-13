@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2013-01-12 15:05-0800\n"
-"PO-Revision-Date: 2013-01-12 15:58-0800\n"
+"POT-Creation-Date: 2013-01-12 17:10-0800\n"
+"PO-Revision-Date: 2013-01-12 17:10-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "Language: de\n"
@@ -137,6 +137,22 @@ msgstr "Hilfe, Bugs, etc."
 msgid "Starting Player"
 msgstr "Startspieler"
 
+#: include/functions.php:1210
+msgid "#tricks 0"
+msgstr "#Stiche 0"
+
+#: include/functions.php:1212
+msgid "#tricks 1"
+msgstr "#Stiche 1"
+
+#: include/functions.php:1216
+msgid "#tricks few"
+msgstr "#Stiche ein paar"
+
+#: include/functions.php:1218
+msgid "#tricks many"
+msgstr "#Stiche viele"
+
 #: include/functions.php:1251
 msgid "It's your turn in these games"
 msgstr "In diesen Spielen bist Du dran"
@@ -200,6 +216,10 @@ msgstr "Trumpfarmut"
 #: include/game.php:289 include/game.php:422
 msgid "Score"
 msgstr "Punkte"
+
+#: include/game.php:331 include/reminder.php:75
+msgid "Game"
+msgstr "Spiel"
 
 #: include/game.php:337
 msgid "previous"
@@ -409,11 +429,16 @@ msgstr "Du musst noch ein paar Karten zurückgeben"
 msgid "Your cards were"
 msgstr "Deine Karten waren"
 
-#: include/game.php:2296
+#: include/game.php:2241
+#, php-format
+msgid "%s's cards were:"
+msgstr "%ss Karten waren:"
+
+#: include/game.php:2297
 msgid "A short comment"
 msgstr "Ein kurzer Kommentar"
 
-#: include/game.php:2309 include/output.php:410
+#: include/game.php:2310 include/output.php:410
 msgid "submit"
 msgstr "abschicken"
 
@@ -642,44 +667,44 @@ msgstr "Ich bin dabei!"
 msgid "Do you want to play a game of DoKo?"
 msgstr "Willst du eine Runde DoKo spielen?"
 
-#: include/output.php:498
+#: include/output.php:502
 msgid "Home"
 msgstr "Heim"
 
-#: include/output.php:500
+#: include/output.php:504
 msgid "settings"
 msgstr "Einstellungen"
 
-#: include/output.php:501
+#: include/output.php:505
 msgid "new game"
 msgstr "Neues Spiel"
 
-#: include/output.php:502
+#: include/output.php:506
 msgid "statistics"
 msgstr "Statistik"
 
-#: include/output.php:503
+#: include/output.php:507
 msgid "wiki/bugs"
 msgstr "Wiki/Bugs"
 
-#: include/output.php:504
+#: include/output.php:508
 msgid "atom"
 msgstr "Atom"
 
-#: include/output.php:505
+#: include/output.php:509
 msgid "logout"
 msgstr "ausloggen"
 
-#: include/output.php:509
+#: include/output.php:513
 msgid "last login"
 msgstr "Letzter Login"
 
-#: include/output.php:614
+#: include/output.php:618
 msgid "Personal notes"
 msgstr "Notizen"
 
-#: include/output.php:756 include/output.php:768 include/output.php:780
-#: include/output.php:793
+#: include/output.php:760 include/output.php:772 include/output.php:784
+#: include/output.php:797
 msgid "Trump back"
 msgstr "Trumpf zurÃ¼ck"
 
@@ -908,10 +933,6 @@ msgstr "Die anderen Spieler warten schon über eine Woche auf Dich ;)"
 #: include/reminder.php:68
 msgid "Please visit this link now to continue"
 msgstr "Bitte, folge diesem Link, um fortzufahren"
-
-#: include/reminder.php:75
-msgid "Game"
-msgstr "Spiel"
 
 #: include/reminder.php:76
 msgid "an email has been sent out."
