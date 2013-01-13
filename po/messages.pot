@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2013-01-12 17:10-0800\n"
+"POT-Creation-Date: 2013-01-13 15:32-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -652,7 +652,7 @@ msgid "Trump back"
 msgstr ""
 
 #: include/preferences.php:344
-msgid "Your settings are"
+msgid "Your settings"
 msgstr ""
 
 #: include/preferences.php:346
@@ -887,10 +887,22 @@ msgstr ""
 msgid "Ok, I will send you a new password."
 msgstr ""
 
+#: include/user.php:57
+#, php-format
+msgid ""
+"N.B. You tried this already %s times during the last day and it will only "
+"work 5 times during a day."
+msgstr ""
+
 #: include/user.php:59
 msgid ""
 "The new password will be valid for one day, make sure you reset it to "
 "something else."
+msgstr ""
+
+#: include/user.php:60 include/user.php:84
+#, php-format
+msgid "Back to the <a href=\"%s\">main page</a>."
 msgstr ""
 
 #: include/user.php:67
@@ -908,6 +920,26 @@ msgstr ""
 msgid ""
 "Sorry you already tried 5 times during the last 24h.<br />You need to use "
 "one of those passwords or wait to get a new one."
+msgstr ""
+
+#: include/user.php:92
+msgid "You need to give me an email address!"
+msgstr ""
+
+#: include/user.php:93
+#, php-format
+msgid "Please try <a href=\"%s\">again</a>."
+msgstr ""
+
+#: include/user.php:95
+msgid "Couldn't find a player with this email!"
+msgstr ""
+
+#: include/user.php:96
+#, php-format
+msgid ""
+"Please contact %s, if you think this is a mistake or else try <a href=\"%s"
+"\">again</a>."
 msgstr ""
 
 #: include/user.php:137
@@ -939,42 +971,65 @@ msgstr ""
 msgid "your turn"
 msgstr ""
 
-#: include/user.php:248
+#: include/user.php:239
+msgid "begin:"
+msgstr ""
+
+#: include/user.php:239
+msgid "end:"
+msgstr ""
+
+#: include/user.php:241 include/user.php:244
+#, php-format
+msgid "%s's turn"
+msgstr ""
+
+#: include/user.php:249
 msgid "Send a reminder?"
 msgstr ""
 
-#: include/user.php:259
-msgid "show old"
+#: include/user.php:255
+msgid "Cancel?"
 msgstr ""
 
 #: include/user.php:260
+msgid "show old"
+msgstr ""
+
+#: include/user.php:261
 msgid "hide old"
 msgstr ""
 
-#: include/user.php:301
+#: include/user.php:302
 msgid "show all"
 msgstr ""
 
-#: include/user.php:301
+#: include/user.php:302
 msgid "hide all"
 msgstr ""
 
-#: include/user.php:303
+#: include/user.php:304
 msgid "show inactive"
 msgstr ""
 
-#: include/user.php:303
+#: include/user.php:304
 msgid "hide inactive"
 msgstr ""
 
-#: include/user.php:308
+#: include/user.php:309
 msgid "You can start new games using the link in the top right corner!"
 msgstr ""
 
-#: include/user.php:312
+#: include/user.php:313
 msgid "New Players"
 msgstr ""
 
-#: include/user.php:317
+#: include/user.php:318
 msgid "Players last logged in"
+msgstr ""
+
+#: include/user.php:335
+#, php-format
+msgid ""
+"Sorry email and password don't match. Please <a href=\"%s\">try again</a>."
 msgstr ""

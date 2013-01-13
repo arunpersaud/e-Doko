@@ -54,10 +54,10 @@ if(myisset('forgot'))
 	  {
 	    echo _('Ok, I will send you a new password.').' <br />';
 	    if($number >1)
-	      echo "N.B. You tried this already $number times during the last day and it will only work ".
-		" 5 times during a day.<br />";
+	      echo sprintf(_("N.B. You tried this already %s times during the last day and it will only work".
+			     " 5 times during a day."),$number)."<br />\n";
 	    echo _('The new password will be valid for one day, make sure you reset it to something else.').'<br />';
-	    echo "Back to the  <a href=\"$INDEX\">main page</a>.";
+	    echo sprintf(_('Back to the <a href="%s">main page</a>.'),$INDEX);
 
 	    /* create temporary password, use the fist 8 letters of a md5 hash */
 	    $TIME  = (string) time(); /* to avoid collisions */
@@ -81,7 +81,7 @@ if(myisset('forgot'))
 	     * and spam a user this way */
 	    echo _('Sorry you already tried 5 times during the last 24h.<br />'.
 		   'You need to use one of those passwords or wait to get a new one.').'<br />';
-	    echo "Back to the <a href=\"$INDEX\">main page</a>.";
+	    echo sprintf(_('Back to the <a href="%s">main page</a>.'),$INDEX);
 	  }
       }
     else
@@ -89,12 +89,12 @@ if(myisset('forgot'))
 
 	/* no email given? */
 	if($email=="")
-	  echo "You need to give me an email address! <br />".
-	    "Please try <a href=\"$INDEX\">again</a>.";
+	  echo _('You need to give me an email address!')." <br />".
+	    sprintf(_('Please try <a href="%s">again</a>.'),$INDEX);
 	else /* default error message */
-	  echo "Couldn't find a player with this email! <br />".
-	    "Please contact $ADMIN_NAME, if you think this is a mistake <br />".
-	    "or else try <a href=\"$INDEX\">again</a>.";
+	  echo _("Couldn't find a player with this email!")."<br />".
+	    sprintf(_('Please contact %s, if you think this is a mistake '.
+		      'or else try <a href="%s">again</a>.'),$ADMIN_NAME, $INDEX );
       }
   }
 else
@@ -134,8 +134,8 @@ else
 	    $vac_start   = $myvacation[0];
 	    $vac_stop    = $myvacation[1];
 	    $vac_comment = $myvacation[2];
-	    echo '<p class="vacation">'._("Enjoy your vacation (don't forgot to change your settings once you're back).").
-	      " Between $vac_start and $vac_stop other users will see the following message: $vac_comment.</p>\n";
+	    echo '<p class="vacation">'._("Enjoy your vacation (don't forgot to change your settings once you're back).")." ".
+	      _("Between $vac_start and $vac_stop other users will see the following message: $vac_comment.")."</p>\n";
 	  }
 
 	echo '<h4>'._('These are your games').":</h4>\n";
@@ -236,11 +236,12 @@ else
 				if($vacation=check_vacation($userid))
 				  {
 				    $stop = substr($vacation[1],0,10);
-				    $title = 'begin:'.substr($vacation[0],0,10).' end:'.$vacation[1].' '.$vacation[2];
-				    $output_active .= " <span class=\"vacation\" title=\"$title\">$name's (on vacation until $stop)</span> turn\n";
+				    $title = _('begin:').substr($vacation[0],0,10).' '._('end:').$vacation[1].' '.$vacation[2];
+				    $output_active .= " <span class=\"vacation\" title=\"$title\">".
+				      sprintf(_("%s's turn"),$name).' '._("(on vacation until $stop)")."</span>\n";
 				  }
 				else
-				  $output_active .= "$name's turn\n";
+				  $output_active .= sprintf(_("%s's turn"),$name)."\n";
 
 				/* check if we need to send out a reminder */
 				if(DB_get_reminder($userid,$gameid)==0)
@@ -251,7 +252,7 @@ else
 			    $output_active .= '</span>';
 
 			    if(time()-strtotime($gamemoddate) > 60*60*24*30)
-			      $output_active .= "<a href=\"$INDEX?action=cancel&amp;me=".$myhash."\">Cancel?</a> ";
+			      $output_active .= "<a href=\"$INDEX?action=cancel&amp;me=".$myhash."\">"._('Cancel?').'</a> ';
 			  }
 
 			if($maxgame>1)
@@ -320,7 +321,9 @@ else
 	$emails = DB_get_emails_of_last_logins(7);
 	for($i=0;$i<7;$i++)
 	  {
-	    echo "<img class=\"gravatar\" title=\"".$names[$i]."\" src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($emails[$i])))."?d=identicon\" />\n";
+	    echo '<img class="gravatar" title="'.$names[$i].
+	      '" src="http://www.gravatar.com/avatar/'.
+	      md5(strtolower(trim($emails[$i])))."?d=identicon\" />\n";
 	  }
 	echo "</p>\n";
 
@@ -328,7 +331,9 @@ else
       }
     else
       {
-	echo '<div class="message">'."Sorry email and password don't match. Please <a href=\"$INDEX\">try again</a>.".' </div>';
+	echo '<div class="message">'."\n";
+	echo  sprintf(_("Sorry email and password don't match. Please <a href=\"%s\">try again</a>."),$INDEX);
+	echo '</div>'."\n";
       }
   };
 ?>
