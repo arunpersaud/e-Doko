@@ -116,14 +116,14 @@ foreach($users as $uid)
 
 	    // add header, footer, sent out
 	    $name    = DB_get_name('userid',$uid);
-	    $header  = "Hello $name\n\nHere is a digest of the latest emails:\n\n";
+	    $header  = _("Hello")." $name\n\n"._("Here is a digest of the latest emails:")."\n\n";
 
-	    $footer  = "\nHave a nice day\n".
-	      "   your E-Doko digester\n\n".
+	    $footer  = "\n"._('Have a nice day')."\n".
+	      "   ".('your E-Doko digester')."\n\n".
 	      "-- \n".
-	      "You can change your mail delivery mode in the preference menu.\n".
-	      'web: http://doko.nubati.net   '.
-	      "help, bugs, etc.: $WIKI";
+	      _('You can change your mail delivery mode in the preference menu.')."\n".
+	      _('web').': http://doko.nubati.net   '.
+	      _('help, bugs, etc.').": $WIKI";
 
 	    $subject = "$EmailName Digest";
 

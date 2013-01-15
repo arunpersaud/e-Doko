@@ -18,7 +18,7 @@
  *
  */
 
-/* make sure that we are not called from outside the scripts, 
+/* make sure that we are not called from outside the scripts,
  * use a variable defined in config.php to check this
  */
 if(!isset($HOST))
@@ -42,6 +42,7 @@ if(!$myid)
   }
 
 DB_update_user_timestamp($myid);
+set_language($myid,'uid');
 
 /* get some information from the DB */
 $gameid   = DB_get_gameid_by_hash($me);

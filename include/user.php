@@ -46,6 +46,8 @@ if(myisset('forgot'))
 
     if($ok)
       {
+	set_language($myid,'uid');
+
 	/* check how many entries in recovery table */
 	$number = DB_get_number_of_passwords_recovery($myid);
 

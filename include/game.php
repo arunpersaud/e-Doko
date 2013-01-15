@@ -1698,7 +1698,7 @@ switch($mystatus)
 		  {
 		    set_language($userid,'uid');
 		    $email_message = sprintf(_("A card has been played in game %s.\n\n".
-		      "It's your turn  now.\n".
+		      "It's your turn now.\n".
 		      'Use this link to play a card: '),DB_format_gameid($gameid)).$HOST.$INDEX.'?action=game&me='.$next_hash."\n\n" ;
 		    mymail($userid,$gameid, GAME_YOUR_TURN, $email_message);
 		    set_language($myid,'uid');
@@ -1942,6 +1942,7 @@ switch($mystatus)
 		    }
 		  $email_message .= "\n\n (use in-game comments to reach all players)\n\n";
 		  mymail($userids,$gameid, GAME_OVER, $email_message);
+		  set_language($myid,'uid');
 	      }
 	  }
 	else

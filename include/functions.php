@@ -122,11 +122,8 @@ function mymail($uid,$gameid=0,$type,$message)
       /* do we send the email right away or save it in the database? */
       $send_now = 1;
 
-      $name    = DB_get_name('userid',$user);
-      $header  = sprintf(_('Hello %s'),$name);
-      $header .= "\n\n";
-
-      $To = DB_get_email('userid',$user);
+      $name = DB_get_name('userid',$user);
+      $To   = DB_get_email('userid',$user);
 
       /* check if user wants email right away or if we should save it in
        * the database for later delivery
@@ -137,6 +134,9 @@ function mymail($uid,$gameid=0,$type,$message)
         $send_now = 0;
       /* use local language */
       set_language($uidPREF['language']);
+
+      $header  = sprintf(_('Hello %s'),$name);
+      $header .= "\n\n";
 
       /* add standard header and footer */
       $subject = "$EmailName ";
@@ -185,7 +185,7 @@ function mymail($uid,$gameid=0,$type,$message)
         }
 
       /* standard goodbye */
-      $footer  = "\n"._("Have a nice day\n   your E-Doko service department").
+      $footer  = "\n"._('Have a nice day')."\n   "._('your E-Doko service department').
         "\n\n".
         "-- \n".
         _('You can change your mail delivery mode in the preference menu.').
@@ -201,6 +201,7 @@ function mymail($uid,$gameid=0,$type,$message)
           DB_digest_insert_email($To,$message,$type,$gameid);
         }
     }
+
   /* reset language to original user*/
   set_language($PREF['language']);
 
