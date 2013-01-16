@@ -1726,15 +1726,18 @@ function set_language($l,$type='lang')
       case 'de':
 	putenv("LC_ALL=de_DE");
 	setlocale(LC_ALL, "de_DE");
-	// Specify location of translation tables
-	bindtextdomain("edoko", "./locale");
-	bind_textdomain_codeset("edoko", 'UTF-8');
-	// Choose domain
-	textdomain("edoko");
 	break;
       default:
-	/* do nothing */
+	putenv("LC_ALL=en_US");
+	setlocale(LC_ALL, "en_US");
+	break;
       }
+
+    // Specify location of translation tables
+    bindtextdomain("edoko", "./locale");
+    bind_textdomain_codeset("edoko", 'UTF-8');
+    // Choose domain
+    textdomain("edoko");
 
     return;
 }
