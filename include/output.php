@@ -451,7 +451,7 @@ function output_footer()
     "  <a href=\"http://www.dreamhost.com/green.cgi\"><p>\n".
     "  <img class=\"right\" alt=\"Green Web Hosting! This site hosted by DreamHost.\"".
     " src=\"pics/green1.gif\" height=\"32\" width=\"100\" /></a>\n";
-  echo "  <p class=\"left\"> copyright 2006-2012 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
+  echo "  <p class=\"left\"> copyright 2006-2013 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n".
     "  Verwendung der [deutschen] Kartenbilder mit Genehmigung <br />der Spielkartenfabrik Altenburg GmbH,(c) ASS Altenburger <br />\n".
     "  - ASS Altenburger Spielkarten - Spielkartenfabrik Altenburg GmbH <br />\n".
     "  a Carta Mundi Company Email: info@spielkarten.com Internet: www.spielkarten.com</p>\n";
