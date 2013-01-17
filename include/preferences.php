@@ -472,16 +472,7 @@ echo " </td></tr>\n";
 
 echo '    <tr><td>'.('Card set').":              </td><td>\n";
 echo "         <select id=\"cards\" name=\"cards\" size=\"1\">\n";
-if($PREF['cardset']=="altenburg")
-  {
-    echo "           <option value=\"altenburg\" selected=\"selected\">"._('German cards')."</option>\n";
-    echo "           <option value=\"english\">"._('English cards')."</option>\n";
-  }
- else
-   {
-     echo "           <option value=\"altenburg\">"._('German cards')."</option>\n";
-     echo "           <option value=\"english\" selected=\"selected\">"._('English cards')."</option>\n";
-   }
+echo "           <option value=\"english\" selected=\"selected\">"._('English cards')."</option>\n";
 echo "         </select>";
 if($changed_cards) echo _('changed');
 echo " </td></tr>\n";
