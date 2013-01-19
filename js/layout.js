@@ -28,3 +28,10 @@ $(".doregister select").wrap('<div class="controls">');
 $(".gravatar").addClass('img-polaroid');
 
 $(".welcomestats").addClass('offset1');
+
+// about
+$('div.about').addClass('row-fluid');
+$('div.code').addClass('offset2 span2');
+$('div.database').addClass('span2');
+$('div.graphics').addClass('span2');
+$('div.translation').addClass('span2');
