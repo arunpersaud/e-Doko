@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2013-01-14 18:36-0800\n"
-"PO-Revision-Date: 2013-01-14 18:38-0800\n"
+"POT-Creation-Date: 2013-01-19 12:40-0800\n"
+"PO-Revision-Date: 2013-01-19 12:50-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language-Team: English\n"
 "Language: de\n"
@@ -62,7 +62,7 @@ msgstr ""
 "Spiel %s wurde beendet, da seit einiger Zeit nichts passiert ist und %s "
 "einen Abbruch gewünscht hat."
 
-#: include/cancelgame.php:70
+#: include/cancelgame.php:70 include/game.php:1066
 #, php-format
 msgid "Game %s has been canceled."
 msgstr "Spiel %s wurde abgesagt"
@@ -141,29 +141,41 @@ msgstr ""
 msgid "your E-Doko service department"
 msgstr "eure E-DoKo Serviceabteilung"
 
-#: include/functions.php:1079
+#: include/functions.php:1080
 msgid "Starting Player"
 msgstr "Startspieler"
 
-#: include/functions.php:1211
+#: include/functions.php:1090 include/user.php:241
+msgid "begin:"
+msgstr "Start:"
+
+#: include/functions.php:1090 include/user.php:241
+msgid "end:"
+msgstr "Ende:"
+
+#: include/functions.php:1212
 msgid "#tricks 0"
 msgstr "#Stiche 0"
 
-#: include/functions.php:1213
+#: include/functions.php:1214
 msgid "#tricks 1"
 msgstr "#Stiche 1"
 
-#: include/functions.php:1217
+#: include/functions.php:1218
 msgid "#tricks few"
 msgstr "#Stiche ein paar"
 
-#: include/functions.php:1219
+#: include/functions.php:1220
 msgid "#tricks many"
 msgstr "#Stiche viele"
 
-#: include/functions.php:1252
+#: include/functions.php:1253
 msgid "It's your turn in these games"
 msgstr "In diesen Spielen bist Du dran"
+
+#: include/functions.php:1453
+msgid "(table truncated to last 6 games)"
+msgstr "(Tabelle zeigt nur die letzten 6 Spiele)"
 
 #: include/game.php:232 include/output.php:147
 msgid "Rules"
@@ -255,17 +267,35 @@ msgstr ""
 "\n"
 "das Spiel wurde auf Wunsch eines Spielers abgebrochen."
 
-#: include/game.php:597
+#: include/game.php:558
+#, php-format
+msgid ""
+"You selected more than one sickness, please go back and answer the <a href="
+"\"%s\">question</a> again."
+msgstr ""
+"Du hast mehr als einen Vorbehalt ausgewählt, bitte benutze diesen <a href="
+"\"%s\"> Link</a>, um die Frage erneut zu beantworten."
+
+#: include/game.php:566
+msgid "Processing what you selected in the last step..."
+msgstr "Bearbeite, was du im letzten Schritt ausgewählt hast..."
+
+#: include/game.php:581
+#, php-format
+msgid "Seems like you want to play a %s solo. Got it."
+msgstr "Du willst also einen %s Solo spielen. OK."
+
+#: include/game.php:599
 msgid "Ok, you don't want to play a silent solo...wedding was chosen."
 msgstr "Ok, du willst also keine stille Hochzeit spielen... Hochzeit ist es."
 
-#: include/game.php:602
+#: include/game.php:604
 msgid "Don't think you can win with just a few trump...? Ok, poverty chosen."
 msgstr ""
 "Du glaubst also, dass du mit den paar Trümpfen kein Spiel gewinnen "
 "kannst...? Ok, Armut reklamiert."
 
-#: include/game.php:607
+#: include/game.php:609
 msgid ""
 "What? You just don't want to play a game because you have a few nines? Well, "
 "if no one is playing solo, this game will be canceled."
@@ -273,7 +303,7 @@ msgstr ""
 "Was? Wegen den paar Neunern gleich das ganze Spiel kippen? Ok, wenn keiner "
 "Solo spielt, wird das Spiel annuliert."
 
-#: include/game.php:614
+#: include/game.php:616
 msgid ""
 "What? You just don't want to play a game because you have low trump? Well, "
 "if no one is playing solo, this game will be canceled."
@@ -281,17 +311,17 @@ msgstr ""
 "Was? Nur weil du keine hohen Trumpf hast, gleich das ganze Spiel kippen? "
 "Naja, wenn keiner Solo spielt, wird es annuliert."
 
-#: include/game.php:617
+#: include/game.php:619
 msgid "Don't think you can win with low trumps...? Ok, poverty chosen."
 msgstr ""
 "Du glaubst also nicht mit ein paar niedrigen Trumpf gewinnen zu können...? "
 "Ok, Armut ausgewählt."
 
-#: include/game.php:633
+#: include/game.php:635
 msgid "Checking if someone else selected solo, nines, wedding or poverty."
 msgstr "Prüfe, ob jemande Solo, Armut oder Hochzeit ausgewählt hat."
 
-#: include/game.php:651
+#: include/game.php:653
 msgid ""
 "This step can only be handled after everyone finished the last step. Seems "
 "like this is not the case, so you need to wait a bit... you will get an "
@@ -303,11 +333,11 @@ msgstr ""
 "noch etwas warten... du bekommst eine Email, sobald du wieder aktiv werden "
 "kannst. Nutze den Link in der Email, um das Spiel fortzusetzen."
 
-#: include/game.php:662
+#: include/game.php:664
 msgid "Ok, everyone is done... figuring out what kind of game we are playing."
 msgstr "Ok, alle sind fertig... überprüfe was für ein Spiel gespielt wird."
 
-#: include/game.php:703 include/game.php:721
+#: include/game.php:705 include/game.php:723
 #, php-format
 msgid ""
 "The game has been canceled because %s has five or more nines and nobody is "
@@ -316,7 +346,7 @@ msgstr ""
 "Das Spiel wurde beendet, da %s fünf oder mehr Neuner hat und niemand Solo "
 "spielt."
 
-#: include/game.php:724 include/game.php:733
+#: include/game.php:726 include/game.php:735
 msgid ""
 "To redeal either start a new game or, in case the game was part of a "
 "tournament,\n"
@@ -326,7 +356,7 @@ msgstr ""
 "der Seite des letzten Spieles,\n"
 "falls dieses Spiel Teil einer Runde ist."
 
-#: include/game.php:730
+#: include/game.php:732
 #, php-format
 msgid ""
 "The game has been canceled because %s has low trump and nobody is playing "
@@ -334,11 +364,11 @@ msgid ""
 msgstr ""
 "Das Spiel wurde annuliert, da %s Armut hat und niemand Solo spielen wollte."
 
-#: include/game.php:785
+#: include/game.php:787
 msgid "Got it"
 msgstr "Hab's."
 
-#: include/game.php:874
+#: include/game.php:876
 #, php-format
 msgid ""
 "It's your turn now in game %s.\n"
@@ -347,7 +377,12 @@ msgstr ""
 "Du bist dran im Spiel %s.\n"
 "Benutze folgenden Link, um eine Karte zu spielen:"
 
-#: include/game.php:901
+#: include/game.php:883 include/game.php:894 include/game.php:985
+#, php-format
+msgid "Please, <a href=\"%s\">start</a> the game."
+msgstr "Bitte, <a href=\"%s\">starte</a> das Spiel."
+
+#: include/game.php:905
 #, php-format
 msgid ""
 "Poverty: It's your turn now in game %s.\n"
@@ -356,7 +391,7 @@ msgstr ""
 "Armut: Du bist dran im Spiel %s.\n"
 "Benutze folgenden Link, um eine Karte zu spielen: "
 
-#: include/game.php:974 include/game.php:1244
+#: include/game.php:978 include/game.php:1248
 #, php-format
 msgid ""
 "It's your turn now in game %s.\n"
@@ -365,7 +400,7 @@ msgstr ""
 "Du bist dran im Spiel %s.\n"
 "Benutze folgenden Link, um eine Karte zu spielen:"
 
-#: include/game.php:1075
+#: include/game.php:1079
 msgid ""
 "Someone has poverty, it's your turn to decide, if you want to take the "
 "trump. Please visit:"
@@ -374,7 +409,7 @@ msgstr ""
 "nehmen willst. \n"
 "Bitte gehe zu:"
 
-#: include/game.php:1170
+#: include/game.php:1174
 msgid ""
 "Two people have poverty, it's your turn to decide, if you want to take the "
 "trump. Please visit:"
@@ -383,7 +418,26 @@ msgstr ""
 "nehmen willst.\n"
 "Bitte gehe zu:"
 
-#: include/game.php:1278
+#: include/game.php:1180
+#, php-format
+msgid "Please, <a href=\"%s\">continue</a> here"
+msgstr "Bitte, folge <a href=\"%s\">diesem Link</a>, um fortzufahren."
+
+#: include/game.php:1201
+msgid "The game has been canceled because one player had too many nines."
+msgstr "Das Spiel wurde annuliert, da ein Spieler zu viele Neuner hat."
+
+#: include/game.php:1204
+msgid "The game has been canceled because one player had low trump."
+msgstr "Das Spiel wurde annuliert, da ein Spieler Armut hat."
+
+#: include/game.php:1207
+msgid "The game has been canceled because nobody wanted to take the trump."
+msgstr ""
+"Das Spiel wurde annuliert, da ein Spieler Armut hat und niemand die Trumpf "
+"nehmen wollte."
+
+#: include/game.php:1282
 msgid ""
 "You finished the setup, but not everyone else finished it... You need to "
 "wait for the others. Just wait for an email."
@@ -391,7 +445,7 @@ msgstr ""
 "Du hast die Anfangsphase abgeschlossen, andere allerdings noch nicht... Du "
 "musst auf die Anderen warten. Warte einfach auf die E-Mail."
 
-#: include/game.php:1700
+#: include/game.php:1704
 #, php-format
 msgid ""
 "A card has been played in game %s.\n"
@@ -404,49 +458,93 @@ msgstr ""
 "Du bist nun dran.\n"
 "Benutze folgenden Link, um eine Karte zu spielen: "
 
-#: include/game.php:1955
+#: include/game.php:1722
+msgid "The game is over. Thanks for playing :)"
+msgstr "Das Spiel ist vorbei. Danke fürs mitspielen :)"
+
+#: include/game.php:1723
+msgid "Final score:"
+msgstr "Punkte:"
+
+#: include/game.php:1735
+msgid "Totals:"
+msgstr "Auswertung:"
+
+#: include/game.php:1911
+msgid "Points Re:"
+msgstr "Punkte Re:"
+
+#: include/game.php:1919
+msgid "Points Contra:"
+msgstr "Punkte Kontra:"
+
+#: include/game.php:1927
+msgid "Total Points (from the Re point of view):"
+msgstr "Spielwertung (aus Sicht von Re):"
+
+#: include/game.php:1933
+msgid "Score Table:"
+msgstr "Spielstand:"
+
+#: include/game.php:1935
+msgid "Use these links to have a look at game"
+msgstr "Bitte benutze diese Links für Spiel"
+
+#: include/game.php:1947
+msgid "(use in-game comments to reach all players)"
+msgstr "(benutze Kommentare im Spiel, um alle Spieler zu erreichen)"
+
+#: include/game.php:1954
+msgid "can't find that card?!"
+msgstr "Kann diese Karte nicht finden?!"
+
+#: include/game.php:1959
 msgid "please wait until it's your turn!"
 msgstr "Bitte warte bis Du dran bist!"
 
-#: include/game.php:2045
+#: include/game.php:2049
 msgid "The game is over for you... other people still need to play though"
 msgstr ""
-"Das Spiel ist für dich vorbei... andere muessen aber noch eine Karte spielen"
+"Das Spiel ist für dich vorbei... Andere müssen aber noch eine Karte spielen"
 
-#: include/game.php:2076
+#: include/game.php:2080
 msgid "still needs <br />to decide"
 msgstr "hat noch nicht <br /> entschieden"
 
-#: include/game.php:2079
+#: include/game.php:2083
 msgid "sick"
 msgstr "krank"
 
-#: include/game.php:2081
+#: include/game.php:2085
 msgid "healthy"
 msgstr "gesund"
 
-#: include/game.php:2137 include/game.php:2144 include/game.php:2152
+#: include/game.php:2141 include/game.php:2148 include/game.php:2156
 msgid "Your cards are"
 msgstr "Deine Karten sind"
 
-#: include/game.php:2142
+#: include/game.php:2146
 msgid "You need to get rid of a few cards"
 msgstr "Du musst noch ein paar Karten zurückgeben"
 
-#: include/game.php:2217
+#: include/game.php:2221
 msgid "Your cards were"
 msgstr "Deine Karten waren"
 
-#: include/game.php:2242
+#: include/game.php:2246
 #, php-format
 msgid "%s's cards were:"
 msgstr "%ss Karten waren:"
 
-#: include/game.php:2298
+#: include/game.php:2268
+msgid "close"
+msgstr "schließen"
+
+#: include/game.php:2302
 msgid "A short comment"
 msgstr "Ein kurzer Kommentar"
 
-#: include/game.php:2311 include/output.php:410
+#: include/game.php:2315 include/output.php:410
 msgid "submit"
 msgstr "abschicken"
 
@@ -607,6 +705,10 @@ msgstr "Danke, dass du am Spiel teilnimmst"
 msgid "Do you want to play solo?"
 msgstr "Willst du Solo spielen?"
 
+#: include/output.php:271
+msgid "No"
+msgstr "Nein"
+
 #: include/output.php:272
 msgid "trumpless"
 msgstr "fleischlos"
@@ -675,44 +777,44 @@ msgstr "Ich bin dabei!"
 msgid "Do you want to play a game of DoKo?"
 msgstr "Willst du eine Runde DoKo spielen?"
 
-#: include/output.php:502
+#: include/output.php:499
 msgid "Home"
 msgstr "Übersicht"
 
-#: include/output.php:504
+#: include/output.php:501
 msgid "settings"
 msgstr "Einstellungen"
 
-#: include/output.php:505
+#: include/output.php:502
 msgid "new game"
 msgstr "Neues Spiel"
 
-#: include/output.php:506
+#: include/output.php:503
 msgid "statistics"
 msgstr "Statistik"
 
-#: include/output.php:507
+#: include/output.php:504
 msgid "wiki/bugs"
 msgstr "Wiki/Bugs"
 
-#: include/output.php:508
+#: include/output.php:505
 msgid "atom"
 msgstr "Atom"
 
-#: include/output.php:509
+#: include/output.php:506
 msgid "logout"
 msgstr "Ausloggen"
 
-#: include/output.php:513
+#: include/output.php:510
 msgid "last login"
 msgstr "Letzter Login"
 
-#: include/output.php:618
+#: include/output.php:615
 msgid "Personal notes"
 msgstr "Notizen"
 
-#: include/output.php:760 include/output.php:772 include/output.php:784
-#: include/output.php:797
+#: include/output.php:757 include/output.php:769 include/output.php:781
+#: include/output.php:794
 msgid "Trump back"
 msgstr "Trumpf zurück"
 
@@ -743,8 +845,8 @@ msgstr "Kommentar:"
 #: include/preferences.php:365 include/preferences.php:382
 #: include/preferences.php:422 include/preferences.php:439
 #: include/preferences.php:455 include/preferences.php:470
-#: include/preferences.php:486 include/preferences.php:496
-#: include/preferences.php:500 include/preferences.php:516
+#: include/preferences.php:477 include/preferences.php:487
+#: include/preferences.php:491 include/preferences.php:507
 msgid "changed"
 msgstr "geändert"
 
@@ -832,75 +934,71 @@ msgstr "niedrig nach hoch"
 msgid "Open for new games"
 msgstr "Offen für neue Spiele"
 
-#: include/preferences.php:477 include/preferences.php:482
-msgid "German cards"
-msgstr "Französisches Blatt"
-
-#: include/preferences.php:478 include/preferences.php:483
+#: include/preferences.php:475
 msgid "English cards"
 msgstr "Englisches Blatt"
 
-#: include/preferences.php:491
+#: include/preferences.php:482
 msgid "Personal"
 msgstr "Zur Person"
 
-#: include/preferences.php:493
+#: include/preferences.php:484
 msgid "Email"
 msgstr "E-Mail"
 
-#: include/preferences.php:494
+#: include/preferences.php:485
 msgid "Timezone"
 msgstr "Zeitzone"
 
-#: include/preferences.php:498
+#: include/preferences.php:489
 msgid "Language"
 msgstr "Sprache"
 
-#: include/preferences.php:502
+#: include/preferences.php:493
 msgid "Password(old)"
 msgstr "Passwort(alt)"
 
-#: include/preferences.php:507
+#: include/preferences.php:498
 msgid "The new passwords is not long enough (you need at least 4 characters)."
 msgstr "Das neue Passwort ist nicht lang genug (mindestens 4 Zeichen)."
 
-#: include/preferences.php:510
+#: include/preferences.php:501
 msgid "The new passwords don't match."
 msgstr "Die neuen Passwörter stimmen nicht überein."
 
-#: include/preferences.php:513
+#: include/preferences.php:504
 msgid "The old password is not correct."
 msgstr "Das alte Passwort stimmt nicht."
 
-#: include/preferences.php:520
+#: include/preferences.php:511
 msgid "Password(new)"
 msgstr "Passwort(neu)"
 
-#: include/preferences.php:523
+#: include/preferences.php:514
 msgid "Password(new, retype)"
 msgstr "Passwort(neu, wiederholen)"
 
-#: include/preferences.php:529
+#: include/preferences.php:520
 msgid "OpenID"
 msgstr "Open-Id"
 
-#: include/preferences.php:537
+#: include/preferences.php:528
 msgid "Delete"
 msgstr "Lösche"
 
-#: include/preferences.php:548
+#: include/preferences.php:539
 msgid "add OpenID"
 msgstr "Open-Id hinzufügen"
 
-#: include/preferences.php:551
+#: include/preferences.php:542
 msgid "Deleted some OpenIDs!"
 msgstr "Open-ID löschen"
 
-#: include/preferences.php:553
+#: include/preferences.php:544
 msgid "Submit"
 msgstr "abschicken"
 
-#: include/preferences.php:555
+#: include/preferences.php:546
 msgid "E-DoKo uses <a href=\"http://www.gravatar.org\">gravatars</a> as icons."
 msgstr ""
 "E-DoKo benutzt <a href=\"http://www.gravatar.org\">gravatars</a> als Icons."
@@ -1057,14 +1155,6 @@ msgstr ""
 msgid "your turn"
 msgstr "Du bist dran"
 
-#: include/user.php:241
-msgid "begin:"
-msgstr "Start:"
-
-#: include/user.php:241
-msgid "end:"
-msgstr "Ende:"
-
 #: include/user.php:243 include/user.php:246
 #, php-format
 msgid "%s's turn"
@@ -1122,6 +1212,9 @@ msgstr ""
 "E-mail und Passwort stimmen nicht überein. Bitte <a href=\"%s\">versuche es "
 "erneut</a>."
 
+#~ msgid "German cards"
+#~ msgstr "Französisches Blatt"
+
 #~ msgid "Trick"
 #~ msgstr "Stich"
 
@@ -1151,6 +1244,3 @@ msgstr ""
 
 #~ msgid "Games"
 #~ msgstr "Spiele"
-
-#~ msgid "No"
-#~ msgstr "Nein"
