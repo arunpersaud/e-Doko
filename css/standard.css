@@ -1,110 +1,737 @@
-body{background-color:#ddd;padding-top:25px;}
-header{background-color:#fff;text-align:center;padding-top:1.5em;border-bottom:3px solid gray;}
-.lastlogin{position:absolute;top:0;left:3em;}
-.lastlogin span{font-size:smaller;}
-.main{background-color:#fff;padding:1px 0em;padding-bottom:1em;}
-footer{background-color:#fff;padding:0em 0.2em;border-top:2px solid gray;}
-footer .right{float:right;margin-top:1em;line-height:90%;font-size:smaller;margin-right:1em;}
-footer .left{text-align:left;line-height:90%;font-size:smaller;margin-left:1em;}
-.WIP{background-color:#efaaaa;text-size:larger;text-align:center;margin:30px 10% ;border-radius:5px;border:2px solid red;padding:10px;}
-.session{border-bottom:1px solid #000;padding:0.5em;text-align:center;}
-.session div.sessionrules{width:19em;float:left;text-align:left;}
-.session div.sessionrules div{display:none;background-color:#fff;border:1px solid #000;position:absolute;z-index:30;padding:0.5em;}
-.session div.sessionrules:hover div{display:block;}
-.session div.sessionscore{width:19em;float:right;text-align:right;}
-.session div.sessionscore div{position:absolute;right:1em;display:none;background-color:#fff;border:1px solid #000;z-index:30;}
-.session div.sessionscore:hover div{display:block;}
-.session img.rulesicon{height:1em;}
-.session .scoretable{height:20em;width:16em;overflow:auto;}
-.session table.score{margin:0.5em;width:10em;border-collapse:collapse;}
-.message{position:absolute;background-color:#fff;width:20%;top:19em;left:40%;right:40%;text-align:center;z-index:33;}
-.message>div{border:2px solid black;}
-.message div div{width:100%;text-align:right;font-size:smaller;}
-.joingame,.sickness,.poverty,.total{position:absolute;background-color:#fff;border-radius:5px;width:20%;top:30%;left:40%;margin:auto;text-align:center;z-index:42;}
-.total{width:14%;left:43%;}
-.total .re{position:absolute;left:-12em;top:8em;background-color:#eee;padding:0.3em;z-index:15;}
-.total .contra{position:absolute;right:-14em;top:8em;background-color:#eee;padding:0.3em;z-index:15;}
-.card{position:absolute;z-index:20;top:18em;left:28em;text-align:center;background-color:#fff;border:2px solid gray;}
-.card img{width:8em;}
-form{position:relative;}
-div.table{position:relative;text-align:center;margin:0;padding:0;border-bottom:1px solid #444;}
-div.table div.table1{width:10.5%;min-width:10em;text-align:center;z-index:20;margin:0 auto;}
-div.middle{position:relative;min-height:6em;}
-div.table div.table0{position:absolute;width:10.5%;min-width:10em;min-height:4em;top:20%;right:64.5%;text-align:center;z-index:20;}
-div.table div.table0 .start{background-color:#efaaaa;border-radius:5px;padding:3px;padding-bottom:1px;margin:3px;}
-div.table img.table{width:25%;z-index:5;margin:0 auto;min-margin-left:10xem;min-margin-right:10em;min-height:6em;display:block;vertical-align:middle;}
-div.table div.table2{position:absolute;width:10.5%;min-width:10em;min-height:4em;top:20%;left:64.5%;text-align:center;z-index:20;}
-div.table div.table3{width:10.5%;min-width:10em;text-align:center;z-index:20;margin:0 auto;}
-img.gravatar{width:4em;height:4em;}
-div img.button{width:2em;}
-div span.numberoftricks{text-align:center;}
-div.tricks{position:absolute;top:0;left:0;right:0;bottom:0;text-align:center;margin:0;padding:0 0;}
-div.tricks div.trick{position:absolute;top:0%;left:0;right:0;bottom:0%;display:none;}
-.tricks div.trick img.arrow{position:relative;display:inline;text-align:center;height:60%;top:20%;z-index:8;}
-#trick0 img{float:left;width:3em;}
-hr{clear:both;}
-.tricks div div.card0 img,.tricks div div.card0 .score,.vorbehalt0{position:absolute;margin:0;padding:0;top:30%;left:37.5%;right:56.5%;height:40%;z-index:30;}
-.vorbehalt0{left:33.5%;right:59.5%;width:10%;text-align:left;}
-.tricks div div.card0 span.comment{position:absolute;margin:0;padding:0;top:5%;right:66.5%;left:17.5%;width:16%;}
-.tricks div div.card1 img,.tricks div div.card1 .score,.vorbehalt1{position:absolute;margin:0;padding:0;top:0%;left:47%;right:47%;height:40%;text-align:center;z-index:30;}
-.vorbehalt1{left:45%;right:45%;width:10%;z-index:30;}
-.tricks div div.card1 span.comment{position:absolute;margin:0;padding:0;top:5%;left:66.5%;right:17.5%;width:16%;text-align:center;}
-.tricks div div.card2 img,.tricks div div.card2 .score,.vorbehalt2{position:absolute;margin:0;padding:0;top:30%;right:37.5%;left:56.5%;height:40%;z-index:30;}
-.vorbehalt2{left:56%;right:34%;width:10%;text-align:right;}
-.tricks div div.card2 span.comment{position:absolute;margin:0;padding:0;top:85%;left:66.5%;right:17.5%;width:16%;text-align:center;}
-.tricks div div.card3 img,.tricks div div.card3 .score,.vorbehalt3{position:absolute;margin:0;padding:0;bottom:0%;left:47%;right:47%;height:40%;z-index:30;}
-.tricks div div.card3 .score,.vorbehalt3{left:45%;right:45%;width:10%;height:3em;text-align:center;}
-.tricks div div.card3 span.comment{position:absolute;margin:0;padding:0;top:85%;right:66.5%;left:17.5%;width:16%;}
-span.comment{border:3px solid green;max-height:6em;overflow:auto;word-wrap:break-word;}
-.tricks div div span.comment span{display:block;text-align:left;border-top:1px solid green;}
-.mycards{margin:0;padding:0;border-top:2px solid gray;background-color:#faffc7;text-align:center;}
-.mycards img{height:6em;}
-.exchange{clear:both;margin:0;padding:0;border:1px solid red;background-color:yellow;}
-.exchange img{height:6em;}
-.line{clear:both;border-top:2px solid gray;margin:0;padding:0;}
-.gameinfo{position:relative;top:0em;margin:0em;padding:0em;width:100%;border-top:2px solid gray;background-color:#efaaaa;text-align:center;}
-.usermenu{text-align:center;padding:0.7em;border-bottom:1px solid black;}
-.notes{position:absolute;top:3em;left:0;margin:1em;margin-top:0em;margin-left:2em;width:12em;border:2px solid gray;padding:0.3em;background-color:#efefef;height:10em;overflow:auto;z-index:50;}
-.user{margin-left:25%;margin-right:5%;}
-div.user ul{list-style:none;padding:0px;}
-div.user ul li{position:relative;padding:3px;margin:0px;width:80%;min-height:1.2em;border-left:2px solid #babdb6 ;border-right:2px solid #babdb6 ;border-bottom:2px solid #babdb6 ;}
-div.user ul li:first-child{border-top:2px solid #babdb6 ;}
-.gamessession{display:none;}
-.user .gameid{float:left;width:5em;}
-.user .turn{padding-left:1em;width:20em;}
-.user .gameshidesession{display:none;}
-.user .gameshidesession,.user .gamesshowsession{float:right;width:10em;}
-.wide{margin-left:5%;margin-right:5%;}
-.over{text-align:center;margin-bottom:0.1em;}
-.cardinput{display:inline;position:relative;border:1px solid #000;}
-.cardinput img{width:4em;}
-.cardinput:hover{background-color:red;}
-.gamestatuspre{padding:0 0.3em;background-color:#f57900;}
-.gamestatusover{padding:0 0.3em;background-color:#e9b96e ;color:#fff;}
-.gamestatusplay{padding:0 0.3em;background-color:#8ae234;}
-caption{text-align:center;margin:0.5em;padding:0.5em;padding-bottom:0em;margin-bottom:0;}
-table.stats{margin:0.5em 1em;border:solid 0.2em #aeaeae;-moz-border-radius:0.5em ;float:left;}
-table.stats tbody tr.odd td{background-color:#aeaeae;}
-table.stats tbody tr.even td{background-color:#eaeaea;}
-table.stats td,table.stats th{margin-left:0.2em;margin-right:0.2em;padding-left:0.2em;padding-right:0.2em;border-right:solid 0.1em #000;}
-table.stats tr td:last-child,table.stats tr th:last-child{border-right:solid 0 #000;}
-table.stats th{border-bottom:solid 0.2em #000000;}
-table.stats thead tr .header{background-image:url(bg.png);background-repeat:no-repeat;background-position:center right;padding-right:15px;cursor:pointer;}
-table.stats tbody td{padding:4px;background-color:#eaeaea;vertical-align:top;}
-table.stats thead tr .headerSortUp{background-image:url(asc.png);}
-table.stats thead tr .headerSortDown{background-image:url(desc.png);}
-table.stats thead tr .headerSortDown,table.tablesorter thead tr .headerSortUp{background-color:#8dbdd8;}
-#openid_url{background:#ffffff url('openid-icon-small.gif') no-repeat scroll 0pt 50%;padding-left:18px;}
-table.openid td,table.openid th{padding:0.0em 0.3em;}
-.newbiehint{background-color:#fee;}
-.vacation{color:#666;background-color:#fc3;}
-.highcall{background-color:#fc3;}
-.about{margin-left:20%;margin-right:20%;padding-top:10%;}
-.about ul{margin-left:2em;}
-.about div{width:12em;height:6em;margin:2em;padding:1em;float:left;border:1px solid black;}
-.about .code{background-color:#729fcf;}
-.about .database{background-color:#8ae234;}
-.about .graphics{background-color:#e9b96e;}
-.about .translation{background-color:#fce94f;}
-@media only screen and (max-width:600px){.nav>li>a .navhide{display:none;} .lastlogin{position:relative;left:0em;top:0em;width:100%;text-align:center;border-top:1px solid gray;} .session div.sessionscore div{right:0em;} .notes{position:relative;top:0em;left:0;margin:0.1em;margin-top:0em;margin-left:0em;width:100%;border:2px solid gray;padding:0.3em;background-color:#efefef;height:100%;overflow:auto;z-index:0;} .user{margin-left:5%;margin-right:5%;} .message{position:relative;background-color:#fff;width:100%;top:0em;left:0%;right:0%;text-align:center;z-index:1;} .message>div{border:2px solid black;} .message div div{width:100%;text-align:right;font-size:smaller;}}.pagination{text-align:center;}
-.nav>li>img{height:16.666666666666668px;}
+/* Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Arun Persaud <arun@nubati.net>
+ *
+ *   This file is part of e-DoKo.
+ *
+ *   e-DoKo is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   e-DoKo is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with e-DoKo.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+body {
+  background-color: #ddd;
+  padding-top: 25px;
+}
+/* the header, footer, etc */
+header {
+  background-color: #fff;
+  text-align: center;
+  padding-top: 1.5em;
+  border-bottom: 3px solid gray;
+}
+.lastlogin {
+  position: absolute;
+  top: 0;
+  left: 3em;
+}
+.lastlogin span {
+  font-size: smaller;
+}
+.main {
+  background-color: #fff;
+  padding: 1px 0em;
+  padding-bottom: 1em;
+}
+footer {
+  background-color: #fff;
+  padding: 0.2em 0.2em;
+  border-top: 2px solid gray;
+}
+footer .right {
+  text-align: right;
+  margin-top: 1em;
+  line-height: 90%;
+  font-size: smaller;
+  margin-right: 1em;
+}
+footer .left {
+  float: left;
+  margin-top: 1em;
+  line-height: 90%;
+  font-size: smaller;
+  margin-left: 1em;
+}
+.WIP {
+  background-color: #efaaaa;
+  text-size: larger;
+  text-align: center;
+  margin: 30px 10% ;
+  border-radius: 5px;
+  border: 2px solid red;
+  padding: 10px;
+}
+/* sessions */
+.session {
+  border-bottom: 1px solid #000;
+  padding: 0.5em;
+  text-align: center;
+}
+.session div.sessionrules {
+  width: 19em;
+  float: left;
+  text-align: left;
+}
+.session div.sessionrules div {
+  display: none;
+  background-color: #fff;
+  border: 1px solid #000;
+  position: absolute;
+  z-index: 30;
+  padding: 0.5em;
+}
+.session div.sessionrules:hover div {
+  display: block;
+}
+.session div.sessionscore {
+  width: 19em;
+  float: right;
+  text-align: right;
+}
+.session div.sessionscore div {
+  position: absolute;
+  right: 1em;
+  display: none;
+  background-color: #fff;
+  border: 1px solid #000;
+  z-index: 30;
+}
+.session div.sessionscore:hover div {
+  display: block;
+}
+.session img.rulesicon {
+  height: 1em;
+}
+.session .scoretable {
+  height: 20em;
+  width: 16em;
+  overflow: auto;
+}
+.session table.score {
+  margin: 0.5em;
+  width: 10em;
+  border-collapse: collapse;
+}
+/* all kind of message that should appear in the middle of the page/table */
+.message {
+  position: absolute;
+  background-color: #fff;
+  width: 20%;
+  top: 19em;
+  left: 40%;
+  right: 40%;
+  text-align: center;
+  z-index: 33;
+}
+.message > div {
+  border: 2px solid black;
+}
+.message div div {
+  width: 100%;
+  text-align: right;
+  font-size: smaller;
+}
+.joingame,
+.sickness,
+.poverty,
+.total {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 5px;
+  width: 20%;
+  top: 30%;
+  left: 40%;
+  margin: auto;
+  text-align: center;
+  z-index: 42;
+}
+.total {
+  width: 14%;
+  left: 43%;
+}
+/* scoring */
+.total .re {
+  position: absolute;
+  left: -12em;
+  top: 8em;
+  background-color: #eee;
+  padding: 0.3em;
+  z-index: 15;
+}
+.total .contra {
+  position: absolute;
+  right: -14em;
+  top: 8em;
+  background-color: #eee;
+  padding: 0.3em;
+  z-index: 15;
+}
+/* playing cards*/
+.card {
+  position: absolute;
+  z-index: 20;
+  top: 18em;
+  left: 28em;
+  text-align: center;
+  background-color: #fff;
+  border: 2px solid gray;
+}
+.card img {
+  width: 8em;
+}
+form {
+  position: relative;
+}
+/* display the table and the names */
+div.table {
+  position: relative;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #444;
+}
+div.table div.table1 {
+  width: 10.5%;
+  min-width: 10em;
+  text-align: center;
+  z-index: 20;
+  margin: 0 auto;
+}
+div.middle {
+  position: relative;
+  min-height: 6em;
+}
+div.table div.table0 {
+  position: absolute;
+  width: 10.5%;
+  min-width: 10em;
+  min-height: 4em;
+  top: 20%;
+  right: 64.5%;
+  text-align: center;
+  z-index: 20;
+}
+div.table div.table0 .start {
+  background-color: #efaaaa;
+  border-radius: 5px;
+  padding: 3px;
+  padding-bottom: 1px;
+  margin: 3px;
+}
+div.table img.table {
+  width: 25%;
+  z-index: 5;
+  margin: 0 auto;
+  min-margin-left: 10xem;
+  min-margin-right: 10em;
+  min-height: 6em;
+  display: block;
+  vertical-align: middle;
+}
+div.table div.table2 {
+  position: absolute;
+  width: 10.5%;
+  min-width: 10em;
+  min-height: 4em;
+  top: 20%;
+  left: 64.5%;
+  text-align: center;
+  z-index: 20;
+}
+div.table div.table3 {
+  width: 10.5%;
+  min-width: 10em;
+  text-align: center;
+  z-index: 20;
+  margin: 0 auto;
+}
+img.gravatar {
+  width: 4em;
+  height: 4em;
+}
+div img.button {
+  width: 2em;
+}
+div span.numberoftricks {
+  text-align: center;
+}
+/* display the card tricks */
+div.tricks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  margin: 0;
+  padding: 0 0;
+}
+div.tricks div.trick {
+  position: absolute;
+  top: 0%;
+  left: 0;
+  right: 0;
+  bottom: 0%;
+  display: none;
+}
+.tricks div.trick img.arrow {
+  position: relative;
+  display: inline;
+  text-align: center;
+  height: 60%;
+  top: 20%;
+  z-index: 8;
+}
+#trick0 img {
+  float: left;
+  width: 3em;
+}
+hr {
+  clear: both;
+}
+/* left player */
+.tricks div div.card0 img,
+.tricks div div.card0 .score,
+.vorbehalt0 {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 30%;
+  left: 37.5%;
+  right: 56.5%;
+  height: 40%;
+  z-index: 30;
+}
+.vorbehalt0 {
+  left: 33.5%;
+  right: 59.5%;
+  width: 10%;
+  text-align: left;
+}
+.tricks div div.card0 span.comment {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 5%;
+  right: 66.5%;
+  left: 17.5%;
+  width: 16%;
+}
+/* top player */
+.tricks div div.card1 img,
+.tricks div div.card1 .score,
+.vorbehalt1 {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 0%;
+  left: 47%;
+  right: 47%;
+  height: 40%;
+  text-align: center;
+  z-index: 30;
+}
+.vorbehalt1 {
+  left: 45%;
+  right: 45%;
+  width: 10%;
+  z-index: 30;
+}
+.tricks div div.card1 span.comment {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 5%;
+  left: 66.5%;
+  right: 17.5%;
+  width: 16%;
+  text-align: center;
+}
+/* right player */
+.tricks div div.card2 img,
+.tricks div div.card2 .score,
+.vorbehalt2 {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 30%;
+  right: 37.5%;
+  left: 56.5%;
+  height: 40%;
+  z-index: 30;
+}
+.vorbehalt2 {
+  left: 56%;
+  right: 34%;
+  width: 10%;
+  text-align: right;
+}
+.tricks div div.card2 span.comment {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 85%;
+  left: 66.5%;
+  right: 17.5%;
+  width: 16%;
+  text-align: center;
+}
+/* bottom player */
+.tricks div div.card3 img,
+.tricks div div.card3 .score,
+.vorbehalt3 {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  bottom: 0%;
+  left: 47%;
+  right: 47%;
+  height: 40%;
+  z-index: 30;
+}
+.tricks div div.card3 .score,
+.vorbehalt3 {
+  left: 45%;
+  right: 45%;
+  width: 10%;
+  height: 3em;
+  text-align: center;
+}
+.tricks div div.card3 span.comment {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  /*border: 1px solid red;*/
+
+  top: 85%;
+  right: 66.5%;
+  left: 17.5%;
+  width: 16%;
+}
+span.comment {
+  border: 3px solid green;
+  max-height: 6em;
+  overflow: auto;
+  word-wrap: break-word;
+}
+.tricks div div span.comment span {
+  display: block;
+  text-align: left;
+  border-top: 1px solid green;
+}
+.mycards {
+  margin: 0;
+  padding: 0;
+  border-top: 2px solid gray;
+  /* border-bottom:    2px solid green;*/
+
+  background-color: #faffc7;
+  text-align: center;
+}
+.mycards img {
+  height: 6em;
+}
+.exchange {
+  clear: both;
+  margin: 0;
+  padding: 0;
+  border: 1px solid red;
+  background-color: yellow;
+}
+.exchange img {
+  height: 6em;
+}
+.line {
+  clear: both;
+  border-top: 2px solid gray;
+  margin: 0;
+  padding: 0;
+}
+.gameinfo {
+  position: relative;
+  top: 0em;
+  margin: 0em;
+  padding: 0em;
+  width: 100%;
+  border-top: 2px solid gray;
+  background-color: #efaaaa;
+  text-align: center;
+}
+.usermenu {
+  text-align: center;
+  padding: 0.7em;
+  border-bottom: 1px solid black;
+}
+.notes {
+  position: absolute;
+  top: 3em;
+  left: 0;
+  margin: 1em;
+  margin-top: 0em;
+  margin-left: 2em;
+  width: 12em;
+  border: 2px solid gray;
+  padding: 0.3em;
+  background-color: #efefef;
+  height: 10em;
+  overflow: auto;
+  z-index: 50;
+}
+.user {
+  margin-left: 25%;
+  margin-right: 5%;
+}
+div.user ul {
+  list-style: none;
+  padding: 0px;
+}
+div.user ul li {
+  position: relative;
+  padding: 3px;
+  margin: 0px;
+  width: 80%;
+  min-height: 1.2em;
+  border-left: 2px solid #babdb6 ;
+  border-right: 2px solid #babdb6 ;
+  border-bottom: 2px solid #babdb6 ;
+}
+div.user ul li:first-child {
+  border-top: 2px solid #babdb6 ;
+}
+.gamessession {
+  display: none;
+}
+.user .gameid {
+  float: left;
+  width: 5em;
+}
+.user .turn {
+  padding-left: 1em;
+  width: 20em;
+}
+.user .gameshidesession {
+  display: none;
+}
+.user .gameshidesession,
+.user .gamesshowsession {
+  float: right;
+  width: 10em;
+}
+.wide {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.over {
+  text-align: center;
+  margin-bottom: 0.1em;
+}
+.cardinput {
+  display: inline;
+  position: relative;
+  border: 1px solid #000;
+}
+.cardinput img {
+  width: 4em;
+}
+.cardinput:hover {
+  background-color: red;
+}
+.gamestatuspre {
+  padding: 0 0.3em;
+  background-color: #f57900;
+}
+.gamestatusover {
+  padding: 0 0.3em;
+  background-color: #e9b96e ;
+  color: #fff;
+}
+.gamestatusplay {
+  padding: 0 0.3em;
+  background-color: #8ae234;
+}
+/* statistics using jquery*/
+caption {
+  text-align: center;
+  margin: 0.5em;
+  padding: 0.5em;
+  padding-bottom: 0em;
+  margin-bottom: 0;
+}
+table.stats {
+  margin: 0.5em 1em;
+  border: solid 0.2em #aeaeae;
+  -moz-border-radius: 0.5em ;
+  float: left;
+}
+table.stats tbody tr.odd td {
+  background-color: #aeaeae;
+}
+table.stats tbody tr.even td {
+  background-color: #eaeaea;
+}
+table.stats td,
+table.stats th {
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  border-right: solid 0.1em #000;
+}
+table.stats tr td:last-child,
+table.stats tr th:last-child {
+  border-right: solid 0 #000;
+}
+table.stats th {
+  border-bottom: solid 0.2em #000000;
+}
+table.stats thead tr .header {
+  background-image: url(bg.png);
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+  cursor: pointer;
+}
+table.stats tbody td {
+  padding: 4px;
+  background-color: #eaeaea;
+  vertical-align: top;
+}
+table.stats thead tr .headerSortUp {
+  background-image: url(asc.png);
+}
+table.stats thead tr .headerSortDown {
+  background-image: url(desc.png);
+}
+table.stats thead tr .headerSortDown,
+table.tablesorter thead tr .headerSortUp {
+  background-color: #8dbdd8;
+}
+/* the login window */
+/* the login/register form */
+#openid_url {
+  background: #ffffff url('openid-icon-small.gif') no-repeat scroll 0pt 50%;
+  padding-left: 18px;
+}
+table.openid td,
+table.openid th {
+  padding: 0.0em 0.3em;
+}
+.newbiehint {
+  background-color: #fee;
+}
+.vacation {
+  color: #666;
+  background-color: #fc3;
+}
+.highcall {
+  background-color: #fc3;
+}
+.about {
+  margin-left: 20%;
+  margin-right: 20%;
+  padding-top: 10%;
+}
+.about ul {
+  margin-left: 2em;
+}
+.about div {
+  width: 12em;
+  height: 6em;
+  margin: 2em;
+  padding: 1em;
+  float: left;
+  border: 1px solid black;
+}
+.about .code {
+  background-color: #729fcf;
+}
+.about .database {
+  background-color: #8ae234;
+}
+.about .graphics {
+  background-color: #e9b96e;
+}
+.about .translation {
+  background-color: #fce94f;
+}
+/* special layout for mobile devices */
+@media only screen and (max-width: 600px) {
+  .nav > li > a .navhide {
+    display: none;
+  }
+  .lastlogin {
+    position: relative;
+    left: 0em;
+    top: 0em;
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid gray;
+  }
+  .session div.sessionscore div {
+    right: 0em;
+  }
+  .notes {
+    position: relative;
+    top: 0em;
+    left: 0;
+    margin: 0.1em;
+    margin-top: 0em;
+    margin-left: 0em;
+    width: 100%;
+    border: 2px solid gray;
+    padding: 0.3em;
+    background-color: #efefef;
+    height: 100%;
+    overflow: auto;
+    z-index: 0;
+  }
+  .user {
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+  .message {
+    position: relative;
+    background-color: #fff;
+    width: 100%;
+    top: 0em;
+    left: 0%;
+    right: 0%;
+    text-align: center;
+    z-index: 1;
+  }
+  .message > div {
+    border: 2px solid black;
+  }
+  .message div div {
+    width: 100%;
+    text-align: right;
+    font-size: smaller;
+  }
+}
+.pagination {
+  text-align: center;
+}
+.nav > li > img {
+  height: 16.666666666666668px;
+}
