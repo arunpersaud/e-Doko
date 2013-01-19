@@ -555,15 +555,15 @@ switch($mystatus)
 
 	if($Nsickness>1)
 	  {
-	    $messages[] = 'You selected more than one sickness, please go back '.
-	      "and answer the <a href=\"$INDEX?action=game&amp;me=$me&amp;in=yes\">question</a> again.";
-
+	    $messages[] = sprintf(_('You selected more than one sickness, please go back '.
+				    'and answer the <a href="%s">question</a> again.'),
+				  $INDEX.'?action=game&amp;me=$me&amp;in=yes');
 	    break;
 	  }
 	else
 	  {
 	    /* everything is ok, save what user said and proceed */
-	    $messages[] = 'Processing what you selected in the last step...';
+	    $messages[] = _('Processing what you selected in the last step...');
 
 	    /* check if this sickness needs to be handled first */
 	    $gametype    = DB_get_gametype_by_gameid($gameid);
@@ -577,7 +577,9 @@ switch($mystatus)
 		DB_set_solo_by_hash($me,$_REQUEST['solo']);
 		DB_set_sickness_by_hash($me,'solo');
 
-		$messages[] = "<br />Seems like you want to play a {$_REQUEST['solo']} solo. Got it.<br />\n";
+		$messages[] = '<br />'.
+		  sprintf(_('Seems like you want to play a %s solo. Got it.'),$_REQUEST['solo']).
+		  "<br />\n";
 
 		if($gametype == 'solo' && $startplayer<$mypos)
 		  {}/* do nothing, since someone else already is playing solo */
@@ -878,7 +880,8 @@ switch($mystatus)
 		  }
 	      }
 	    else
-	      $messages[] = "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br />\n";
+	      $messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
+		"<br />\n";
 	  }
 	else
 	  {
@@ -888,7 +891,8 @@ switch($mystatus)
 
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
-	      $messages[] =  "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.<br /\n";
+	      $messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
+		"<br /\n";
 	    else
 	      {
 		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
@@ -978,7 +982,7 @@ switch($mystatus)
 	      }
 	  }
 	else
-	  $messages[]= "Please, <a href=\"$INDEX?action=game&amp;me=$me\">start</a> the game.";
+	  $messages[]= sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me");
       }
 
     /* the following is part A) of what needs to be done */
@@ -1059,7 +1063,7 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('trump',$gameid);
 
-		$messages[] = 'Game '.DB_format_gameid($gameid).' has been canceled.';
+		$messages[] = sprintf(_('Game %s has been canceled.'),DB_format_gameid($gameid));
 		break;
 	      }
 	    else
@@ -1173,7 +1177,7 @@ switch($mystatus)
 		    set_language($myid,'uid');
 		  }
 	      }
-	    $messages[] = "Please, <a href=\"$INDEX?action=game&amp;me=$me\">continue</a> here";
+	    $messages[] = sprintf(_('Please, <a href="%s">continue</a> here'),$INDEX."?action=game&amp;me=$me");
 	  }
       }
     break;
@@ -1188,19 +1192,19 @@ switch($mystatus)
     switch($gamestatus)
       {
       case 'cancel-noplay':
-	$messages[] = "The game has been canceled due to the request of one player.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.";
+	$messages[] = _("The game has been canceled due to the request of one player.</p><p>If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.");
 	break;
       case 'cancel-timedout':
-	$messages[] = "The game has been canceled because one player wasn't responding.<br />If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.";
+	$messages[] = _("The game has been canceled because one player wasn't responding.<br />If this was a mistake all 4 players need to send an Email to $ADMIN_NAME at $ADMIN_EMAIL requesting that the game should be restarted.");
 	break;
       case 'cancel-nines':
-	$messages[] = 'The game has been canceled because one player had too many nines.';
+	$messages[] = _('The game has been canceled because one player had too many nines.');
 	break;
       case 'cancel-lowtrump':
-	$messages[] = 'The game has been canceled because one player had low trump.';
+	$messages[] = _('The game has been canceled because one player had low trump.');
 	break;
       case 'cancel-trump':
-	$messages[] = 'The game has been canceled because nobody wanted to take the trump.';
+	$messages[] = _('The game has been canceled because nobody wanted to take the trump.');
 	break;
       }
     /* for these two types, we shouldn't show the cards, since we might want to restart the game */
@@ -1715,8 +1719,8 @@ switch($mystatus)
 				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 				   " WHERE Hand.game_id='$gameid'".
 				   ' GROUP BY User.fullname' );
-		$email_message  = "The game is over. Thanks for playing :)\n";
-		$email_message .= "Final score:\n";
+		$email_message  = _("The game is over. Thanks for playing :)")."\n";
+		$email_message .= _("Final score:")."\n";
 		while( $r = DB_fetch_array($result) )
 		  $email_message .= '   '.$r[0].'('.$r[2].') '.$r[1]."\n";
 
@@ -1728,7 +1732,7 @@ switch($mystatus)
 				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 				   " WHERE Hand.game_id='$gameid'".
 				   ' GROUP BY Hand.party' );
-		$email_message .= "\nTotals:\n";
+		$email_message .= "\n"._("Totals:")."\n";
 		$re     = 0;
 		$contra = 0;
 		while( $r = DB_fetch_array($result) )
@@ -1904,7 +1908,7 @@ switch($mystatus)
 		  /* add score points to email */
 		  $email_message .= "\n";
 		  $Tpoint = 0;
-		  $email_message .= " Points Re: \n";
+		  $email_message .= " "._("Points Re:")." \n";
 		  $queryresult = DB_query('SELECT score FROM Score '.
 					  "  WHERE game_id=$gameid AND party='re'");
 		  while($r = DB_fetch_array($queryresult) )
@@ -1912,7 +1916,7 @@ switch($mystatus)
 		      $email_message .= '   '.$r[0]."\n";
 		      $Tpoint ++;
 		    }
-		  $email_message .= " Points Contra: \n";
+		  $email_message .= " "._("Points Contra:")." \n";
 		  $queryresult = DB_query('SELECT score FROM Score '.
 					  "  WHERE game_id=$gameid AND party='contra'");
 		  while($r = DB_fetch_array($queryresult) )
@@ -1920,15 +1924,15 @@ switch($mystatus)
 		      $email_message .= '   '.$r[0]."\n";
 		      $Tpoint --;
 		    }
-		  $email_message .= " Total Points (from the Re point of view): $Tpoint\n";
+		  $email_message .= " "._("Total Points (from the Re point of view):")." $Tpoint\n";
 		  $email_message .= "\n";
 
 		  $session = DB_get_session_by_gameid($gameid);
 		  $score = generate_score_table($session);
 
-		  $email_message .= "Score Table:\n";
+		  $email_message .= _("Score Table:")."\n";
 		  $email_message .= format_score_table_ascii($score);
-		  $email_message .= "\nUse these links to have a look at game ".DB_format_gameid($gameid).": \n";
+		  $email_message .= "\n"._("Use these links to have a look at game")." ".DB_format_gameid($gameid).": \n";
 
 		  /* send out final email */
 		  foreach($userids as $user)
@@ -1940,14 +1944,14 @@ switch($mystatus)
 		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
 		      $email_message .= $link;
 		    }
-		  $email_message .= "\n\n (use in-game comments to reach all players)\n\n";
+		  $email_message .= "\n\n "._("(use in-game comments to reach all players)")."\n\n";
 		  mymail($userids,$gameid, GAME_OVER, $email_message);
 		  set_language($myid,'uid');
 	      }
 	  }
 	else
 	  {
-	    $messages[] = "can't find that card?!";
+	    $messages[] = _("can't find that card?!");
 	  }
       }
     else if(myisset('card') && !$myturn )
@@ -2261,7 +2265,7 @@ if( sizeof($messages) )
     echo "\n<div class=\"message\">\n";
     foreach($messages as $message)
       {
-	echo "  <div>$message <div>close</div> </div>\n";
+	echo "  <div>$message <div>"._("close")."</div> </div>\n";
       }
     echo "</div>\n\n";
   }

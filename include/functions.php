@@ -1087,8 +1087,8 @@ function display_single_user($r,$start=0)
 	  $stop    = substr($vacation[1],0,10);
 	  $comment = $vacation[2];
 
-	      $title = "begin: $start  end: $stop $comment";
-	      echo "   <span class=\"vacation\" title=\"$title\">$gravatar (on vacation until $stop)</span> \n";
+	  $title = _("begin:")." $start  "._("end:")." $stop $comment";
+	      echo "   <span class=\"vacation\" title=\"$title\">$gravatar "._("(on vacation until $stop)")."</span> \n";
 	}
       else
 	echo "   $gravatar \n";
@@ -1450,7 +1450,7 @@ function format_score_table_ascii($score)
 
   /* truncate table if we have too many games */
   $max = sizeof($score);
-  if($max>6) $output.=" (table truncated to last 6 games)\n";
+  if($max>6) $output.=" "._("(table truncated to last 6 games)")."\n";
 
   /* output header */
   foreach($score[0]['players'] as $id=>$points)
