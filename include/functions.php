@@ -218,6 +218,10 @@ function sendmail($To,$Subject,$message)
   if(isset($EMAIL_REPLY))
     $header .= "From: e-DoKo daemon <$EMAIL_REPLY>\r\n";
 
+  $headers .= "Content-Type: text/plain; charset = \"UTF-8\";\r\n";
+  $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+  $headers .= "\r\n";
+
   if($debug)
     {
       /* display email on screen,
@@ -228,15 +232,12 @@ function sendmail($To,$Subject,$message)
 			      "<a href=\"$1\">$1</a>", $message);
 
       echo "<br />To: $To<br />";
-      if($header != "")
-	echo $header."<br />";
+      echo $header."<br />";
       echo "Subject: $Subject <br />$message<br />\n";
     }
   else
-    if($header != "")
-      mail($To,$Subject,$message,$header);
-    else
-      mail($To,$Subject,$message);
+    mail($To,$Subject,$message,$header);
+
   return;
 }
 
