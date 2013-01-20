@@ -218,9 +218,9 @@ function sendmail($To,$Subject,$message)
   if(isset($EMAIL_REPLY))
     $header .= "From: e-DoKo daemon <$EMAIL_REPLY>\r\n";
 
-  $headers .= "Content-Type: text/plain; charset = \"UTF-8\";\r\n";
-  $headers .= "Content-Transfer-Encoding: 8bit\r\n";
-  $headers .= "\r\n";
+  $header .= "Content-Type: text/plain; charset = \"UTF-8\";\r\n";
+  $header .= "Content-Transfer-Encoding: 8bit\r\n";
+  $header .= "\r\n";
 
   if($debug)
     {
