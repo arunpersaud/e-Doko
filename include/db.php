@@ -33,14 +33,10 @@ function DB_open()
   $version_needed = 5;
 
   global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
-  $DB = @mysql_connect($DB_host,$DB_user, $DB_password);
-  if ( $DB )
+  $DB = new mysqli($DB_host,$DB_user, $DB_password, $DB_database);
+  if ( $DB->connect_errno )
     {
-      mysql_select_db($DB_database) or die('Error: Could not select database');
-    }
-  else
-    {
-      echo mysql_errno() . ": " . mysql_error(). "\n";
+      echo "Failed to connect to Mysql ".$DB->connect_error." (".$DB->connect_errno.")\n";
       return -1;
     };
 
@@ -54,19 +50,21 @@ function DB_open()
 function DB_close()
 {
   global $DB;
-  mysql_close($DB);
+  $DB->close();
   return;
 }
 
 function DB_quote_smart($value)
 {
+    global $DB;
     /* Stripslashes */
     if (get_magic_quotes_gpc()) {
         $value = stripslashes($value);
     }
     /* Quote if not a number or a numeric string */
     if (!is_numeric($value)) {
-        $value = "'" . mysql_real_escape_string($value) . "'";
+        $value = "'" . $DB->real_escape_string($value) . "'";
+	$value = addcslashes($value, '%_');
     }
     return $value;
 }
@@ -86,9 +84,10 @@ function DB_test()
 /* use Mysql in the background */
 function DB_query($query)
 {
+  global $DB;
   /* debug/optimize the database
   $time = microtime();
-  $return = mysql_query($query);
+  $return = $DB->query($query);
   $time = $time - microtime();
 
   if($time > 0.05) // this way we can find only the long ones
@@ -102,22 +101,18 @@ function DB_query($query)
   return $return;
   */
 
-  return mysql_query($query);
+  return $DB->query($query);
 }
 
 function DB_fetch_array($result)
 {
-  return mysql_fetch_array($result,MYSQL_NUM);
+  return $result->fetch_array(MYSQLI_NUM);
 }
 
 function DB_insert_id()
 {
-  return mysql_insert_id();
-}
-
-function DB_num_rows($result)
-{
-  return mysql_num_rows($result);
+  global $DB;
+  return $DB->insert_id;
 }
 /* end Mysql functions */
 

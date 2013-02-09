@@ -199,13 +199,14 @@ if( !$content = getCache("cache/stats.html",60*60*24) )
   /*
  does the party win more often if they start
 
+ global $DB;
  echo "<p>The party playing first wins in";
- $result = mysql_query("SELECT COUNT(*) from Score".
+ $result = $DB->query("SELECT COUNT(*) from Score".
  " LEFT JOIN Game ON Game.id=game_id".
  " WHERE score='againstqueens'".
  " AND Game.status='gameover'".
  " AND Game.type<>'solo'");
- while( $r = mysql_fetch_array($result,MYSQL_NUM))
+ while( $r = $result->fetch_array(MYSQLI_NUM))
  echo $r[1]." (".$r[0].") <br />\n";
  echo " games</p>\n";
   */
