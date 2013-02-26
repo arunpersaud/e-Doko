@@ -114,7 +114,10 @@ function DB_query($query)
 
 function DB_fetch_array($result)
 {
-  return $result->fetch_array(MYSQLI_NUM);
+  if($result)
+    return $result->fetch_array(MYSQLI_NUM);
+  else
+    return NULL;
 }
 
 function DB_insert_id()
