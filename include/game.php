@@ -1719,10 +1719,9 @@ switch($mystatus)
 				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 				   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 				   ' GROUP BY User.fullname' );
-		$email_message  = _("The game is over. Thanks for playing :)")."\n";
-		$email_message .= _("Final score:")."\n";
+		$email_final_score="";
 		while( $r = DB_fetch_array($result) )
-		  $email_message .= '   '.$r[0].'('.$r[2].') '.$r[1]."\n";
+		  $email_final_score .= '   '.$r[0].'('.$r[2].') '.$r[1]."\n";
 
 		$result = DB_query('SELECT  Hand.party, IFNULL(SUM(Card.points),0) FROM Hand'.
 				   ' LEFT JOIN Trick ON Trick.winner=Hand.position AND Trick.game_id=Hand.game_id'.
@@ -1732,12 +1731,12 @@ switch($mystatus)
 				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 				   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 				   ' GROUP BY Hand.party' );
-		$email_message .= "\n"._("Totals:")."\n";
+		$email_totals="";
 		$re     = 0;
 		$contra = 0;
 		while( $r = DB_fetch_array($result) )
 		  {
-		    $email_message .= '    '.$r[0].' '.$r[1]."\n";
+		    $email_totals .= '    '.$r[0].' '.$r[1]."\n";
 		    if($r[0] == 're')
 		      $re = $r[1];
 		    else if($r[0] == 'contra')
@@ -1902,39 +1901,36 @@ switch($mystatus)
 			    DB_query('INSERT INTO Score'.
 				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
 			}
-		    }
-
+		    };
 
 		  /* add score points to email */
-		  $email_message .= "\n";
 		  $Tpoint = 0;
-		  $email_message .= " "._("Points Re:")." \n";
+
+		  $email_points_re="";
 		  $queryresult = DB_query('SELECT score FROM Score '.
 					  "  WHERE game_id=".DB_quote_smart($gameid)." AND party='re'");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
-		      $email_message .= '   '.$r[0]."\n";
+		      $email_points_re .= '   '.$r[0]."\n";
 		      $Tpoint ++;
 		    }
-		  $email_message .= " "._("Points Contra:")." \n";
+
+		  $email_points_contra="";
 		  $queryresult = DB_query('SELECT score FROM Score '.
 					  "  WHERE game_id=".DB_quote_smart($gameid)." AND party='contra'");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
-		      $email_message .= '   '.$r[0]."\n";
+		      $email_points_contra .= '   '.$r[0]."\n";
 		      $Tpoint --;
 		    }
-		  $email_message .= " "._("Total Points (from the Re point of view):")." $Tpoint\n";
-		  $email_message .= "\n";
 
 		  $session = DB_get_session_by_gameid($gameid);
 		  $score = generate_score_table($session);
 
-		  $email_message .= _("Score Table:")."\n";
-		  $email_message .= format_score_table_ascii($score);
-		  $email_message .= "\n"._("Use these links to have a look at game")." ".DB_format_gameid($gameid).": \n";
+		  $email_score_table = format_score_table_ascii($score);
 
-		  /* send out final email */
+		  /* add user links */
+		  $email_user_links="";
 		  foreach($userids as $user)
 		    {
 		      /* add links for all players */
@@ -1942,10 +1938,35 @@ switch($mystatus)
 		      $name = DB_get_name('userid',$user);
 
 		      $link = "$name: ".$HOST.$INDEX."?action=game&me=".$hash."\n" ;
-		      $email_message .= $link;
+		      $email_user_links .= $link;
 		    }
-		  $email_message .= "\n\n "._("(use in-game comments to reach all players)")."\n\n";
-		  mymail($userids,$gameid, GAME_OVER, $email_message);
+
+		  foreach($userids as $user)
+		    {
+		      /* set correct language for this user */
+		      set_language($user,'uid');
+
+		      /* generate message */
+		      $email_message  = _("The game is over. Thanks for playing :)")."\n";
+		      $email_message .= _("Final score:")."\n";
+		      $email_message .= $email_final_score;
+		      $email_message .= "\n"._("Totals:")."\n";
+		      $email_message .= $email_totals;
+		      $email_message .= "\n "._("Points Re:")." \n";
+		      $email_message .= $email_points_re;
+		      $email_message .= " "._("Points Contra:")." \n";
+		      $email_message .= $email_points_contra;
+		      $email_message .= " "._("Total Points (from the Re point of view):")." $Tpoint\n\n";
+		      $email_message .= _("Score Table:")."\n";
+		      $email_message .= $email_score_table;
+		      $email_message .= "\n"._("Use these links to have a look at game")." ".DB_format_gameid($gameid).": \n";
+		      $email_message .= $email_user_links;
+		      $email_message .= "\n\n "._("(use in-game comments to reach all players)")."\n\n";
+
+		      /* send email */
+		      mymail($user,$gameid, GAME_OVER, $email_message);
+		    }
+		  /* reset language */
 		  set_language($myid,'uid');
 	      }
 	  }
