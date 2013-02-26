@@ -88,13 +88,21 @@ function DB_query($query)
   /* debug/optimize the database
   $time = microtime();
   $return = $DB->query($query);
-  $time = $time - microtime();
+  $time = microtime() - $time;
 
-  if($time > 0.05) // this way we can find only the long ones
+  if($time > 0.15) // this way we can find only the long ones
   {
-    $logfile=fopen('/tmp/DBlog.log','a+');
-    fwrite($logfile,"EXPLAIN $query ;\n");
-    fwrite($logfile,"time of above query: $time\n");
+    $logfile=fopen('DBlog.log','a+');
+    fwrite($logfile,"time of query: $time\n");
+    fwrite($logfile,wordwrap("  EXPLAIN $query ;\n", 60, "\n         "));
+
+    $result = "";
+    $queryresult  = mysql_query("EXPLAIN $query ;");
+    if( $queryresult )
+      while($row = DB_fetch_array($queryresult))
+        $result  .= "   |".implode("|",$row)."|\n";
+
+    fwrite($logfile,"$result \n\n");
     fclose($logfile);
   };
 
