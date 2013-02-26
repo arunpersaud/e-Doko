@@ -25,11 +25,15 @@ if(!isset($HOST))
   exit;
 
 /* test id and password, should really be done in one step */
-if(isset($_SESSION['name']))
+if(isset($_SESSION['id']))
   {
-    $name = $_SESSION['name'];
-    $email     = DB_get_email('name',$name);
-    $password  = DB_get_passwd_by_name($name);
+    $myid = $_SESSION['id'];
+    $r = DB_query_array("SELECT email,password FROM User WHERE id=".DB_quote_smart($myid)."");
+    if($r)
+      {
+	$email     = $r[0];
+	$password  = $r[1];
+      };
   };
 
 global  $ADMIN_NAME;

@@ -141,16 +141,6 @@ function DB_get_version()
   return $version[0];
 }
 
-function DB_get_passwd_by_name($name)
-{
-  $r = DB_query_array("SELECT password FROM User WHERE fullname=".DB_quote_smart($name)."");
-
-  if($r)
-    return $r[0];
-  else
-    return "";
-}
-
 function DB_get_passwd_by_userid($id)
 {
   $r = DB_query_array("SELECT password FROM User WHERE id=".DB_quote_smart($id)."");
