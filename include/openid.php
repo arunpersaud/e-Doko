@@ -142,22 +142,23 @@ function DB_GetUserId($openid_url)
 
 function DB_GetOpenIDsByUser($user_id)
 {
-  return DB_query_array_all("SELECT openid_url FROM user_openids WHERE user_id = '$user_id'");
+  return DB_query_array_all("SELECT openid_url FROM user_openids WHERE user_id =".DB_quote_smart($user_id));
 }
 
 function DB_AttachOpenID($openid_url, $user_id)
 {
-  DB_query("INSERT INTO user_openids VALUES (".DB_quote_smart(OpenIDUrlEncode($openid_url)).", '$user_id')");
+  DB_query("INSERT INTO user_openids VALUES (".DB_quote_smart(OpenIDUrlEncode($openid_url)).", ".DB_quote_smart($user_id).")");
 }
 
 function DB_DetachOpenID($openid_url, $user_id)
 {
-  DB_query("DELETE FROM user_openids WHERE openid_url = ".DB_quote_smart(OpenIDUrlEncode($openid_url))." AND user_id = '$user_id'");
+  DB_query("DELETE FROM user_openids WHERE openid_url = ".DB_quote_smart(OpenIDUrlEncode($openid_url)).
+	   " AND user_id = ".DB_quote_smart($user_id));
 }
 
 function DB_DetachOpenIDsByUser($user_id)
 {
-  DB_query("DELETE FROM user_openids WHERE user_id = '$user_id'");
+  DB_query("DELETE FROM user_openids WHERE user_id = ".DB_quote_smart($user_id));
 }
 
 ?>

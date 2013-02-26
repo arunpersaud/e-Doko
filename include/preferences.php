@@ -92,11 +92,11 @@ if(myisset('vacation_start','vacation_stop','vacation_comment') &&
     if($_REQUEST['vacation_start'] == $_REQUEST['vacation_stop'])
       {
 	$result = DB_query("DELETE FROM User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='vacation start'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation start'" );
 	$result = DB_query("DELETE FROM User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation stop'" );
 	$result = DB_query("DELETE FROM User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation comment'" );
 	$changed_vacation = 1;
       }
     /* change in database if format is ok */
@@ -106,12 +106,12 @@ if(myisset('vacation_start','vacation_stop','vacation_comment') &&
 	if($vacation_start!=$PREF['vacation_start'])
 	  {
 	    $result = DB_query("SELECT * from User_Prefs".
-			       " WHERE user_id='$myid' AND pref_key='vacation start'" );
+			       " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation start'" );
 	    if( DB_fetch_array($result))
 	      $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($vacation_start).
-				 " WHERE user_id='$myid' AND pref_key='vacation start'" );
+				 " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation start'" );
 	    else
-	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','vacation start',".
+	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'vacation start',".
 				 DB_quote_smart($vacation_start).")");
 
 	    $changed_vacation = 1;
@@ -121,12 +121,12 @@ if(myisset('vacation_start','vacation_stop','vacation_comment') &&
 	if($vacation_stop!=$PREF['vacation_stop'])
 	  {
 	    $result = DB_query("SELECT * from User_Prefs".
-			       " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+			       " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation stop'" );
 	    if( DB_fetch_array($result))
 	      $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($vacation_stop).
-				 " WHERE user_id='$myid' AND pref_key='vacation stop'" );
+				 " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation stop'" );
 	    else
-	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','vacation stop',".
+	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'vacation stop',".
 				 DB_quote_smart($vacation_stop).")");
 
 	    $changed_vacation = 1;
@@ -136,12 +136,12 @@ if(myisset('vacation_start','vacation_stop','vacation_comment') &&
 	if($vacation_comment!=$PREF['vacation_comment'])
 	  {
 	    $result = DB_query("SELECT * from User_Prefs".
-			       " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+			       " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation comment'" );
 	    if( DB_fetch_array($result))
 	      $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($vacation_comment).
-				 " WHERE user_id='$myid' AND pref_key='vacation comment'" );
+				 " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='vacation comment'" );
 	    else
-	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','vacation comment',".
+	      $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'vacation comment',".
 				 DB_quote_smart($vacation_comment).")");
 
 	    $changed_vacation = 1;
@@ -167,12 +167,12 @@ if(myisset("cards"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='cardset'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='cardset'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($cards).
-			     " WHERE user_id='$myid' AND pref_key='cardset'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='cardset'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','cardset',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'cardset',".
 			     DB_quote_smart($cards).")");
 	$changed_cards = 1;
       }
@@ -185,12 +185,12 @@ if(myisset("notify"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='email'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='email'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($notify).
-			     " WHERE user_id='$myid' AND pref_key='email'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='email'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','email',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'email',".
 			     DB_quote_smart($notify).")");
 	$changed_notify=1;
       }
@@ -203,12 +203,12 @@ if(myisset("digest"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='digest'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='digest'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($digest).
-			     " WHERE user_id='$myid' AND pref_key='digest'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='digest'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','digest',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'digest',".
 			     DB_quote_smart($digest).")");
 	$changed_digest=1;
       }
@@ -221,12 +221,12 @@ if(myisset("autosetup"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='autosetup'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='autosetup'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($autosetup).
-			     " WHERE user_id='$myid' AND pref_key='autosetup'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='autosetup'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','autosetup',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'autosetup',".
 			     DB_quote_smart($autosetup).")");
 	$changed_autosetup=1;
       }
@@ -239,12 +239,12 @@ if(myisset("sorting"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='sorting'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='sorting'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($sorting).
-			     " WHERE user_id='$myid' AND pref_key='sorting'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='sorting'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','sorting',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'sorting',".
 			     DB_quote_smart($sorting).")");
 	$changed_sorting=1;
       }
@@ -257,12 +257,12 @@ if(myisset("open_for_games"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='open for games'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='open for games'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($openforgames).
-			     " WHERE user_id='$myid' AND pref_key='open for games'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='open for games'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','open for games',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'open for games',".
 			     DB_quote_smart($openforgames).")");
 	$changed_openforgames=1;
       }
@@ -319,12 +319,12 @@ if(myisset("language"))
       {
 	/* check if we already have an entry for the user, if so change it, if not create new one */
 	$result = DB_query("SELECT * from User_Prefs".
-			   " WHERE user_id='$myid' AND pref_key='language'" );
+			   " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='language'" );
 	if( DB_fetch_array($result))
 	  $result = DB_query("UPDATE User_Prefs SET value=".DB_quote_smart($language).
-			     " WHERE user_id='$myid' AND pref_key='language'" );
+			     " WHERE user_id=".DB_quote_smart($myid)." AND pref_key='language'" );
 	else
-	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,'$myid','language',".
+	  $result = DB_query("INSERT INTO User_Prefs VALUES(NULL,".DB_quote_smart($myid).",'language',".
 			     DB_quote_smart($language).")");
 	$changed_language = 1;
       }

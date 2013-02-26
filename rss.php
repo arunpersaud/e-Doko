@@ -100,8 +100,8 @@ echo "</author>\n\n";
 
   $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		     " LEFT JOIN Game On Hand.game_id=Game.id".
-		     " WHERE Hand.user_id='$id'".
-		     " AND ( Game.player='$id' OR ISNULL(Game.player) )".
+		     " WHERE Hand.user_id=".DB_quote_smart($id).
+		     " AND ( Game.player=".DB_quote_smart($id)." OR ISNULL(Game.player) )".
 		     " AND ( Game.status='pre' OR Game.status='play' )".
 		     " ORDER BY Game.session" );
 

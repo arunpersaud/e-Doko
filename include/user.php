@@ -160,7 +160,7 @@ else
 			   " G.session".
 			   " FROM Hand".
 			   " LEFT JOIN Game G ON G.id=Hand.game_id".
-			   " WHERE user_id='$myid'".
+			   " WHERE user_id=".DB_quote_smart($myid).
 			   " ORDER BY G.session,G.create_date" );
 
 	/* sort into active and passive sessions */

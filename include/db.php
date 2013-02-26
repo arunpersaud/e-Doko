@@ -802,7 +802,7 @@ function DB_get_PREF($myid)
 
   /* get all preferences */
   $r = DB_query('SELECT pref_key, value FROM User_Prefs'.
-		      " WHERE user_id='$myid' " );
+		" WHERE user_id=".DB_quote_smart($myid) );
   while($pref = DB_fetch_array($r) )
     {
       switch($pref[0])
@@ -864,7 +864,7 @@ function DB_get_RULES($gameid)
 {
   $r = DB_query_array("SELECT * FROM Rulesets".
 		      " LEFT JOIN Game ON Game.ruleset=Rulesets.id ".
-		      " WHERE Game.id='$gameid'" );
+		      " WHERE Game.id=".DB_quote_smart($gameid) );
 
   $RULES['dullen']      = $r[2];
   $RULES['schweinchen'] = $r[3];
@@ -878,7 +878,7 @@ function DB_get_email_pref_by_hash($hash)
 {
   $r = DB_query_array("SELECT value FROM Hand".
 		      " LEFT JOIN User_Prefs ON Hand.user_id=User_Prefs.user_id".
-		      " WHERE hash='$hash' AND pref_key='email'" );
+		      " WHERE hash=".DB_quote_smart($hash)." AND pref_key='email'" );
   if($r)
     {
       if($r[0]=="emailaddict")
@@ -893,7 +893,7 @@ function DB_get_email_pref_by_hash($hash)
 function DB_get_email_pref_by_uid($uid)
 {
   $r = DB_query_array("SELECT value FROM User_Prefs ".
-		      " WHERE user_id='$uid' AND pref_key='email'" );
+		      " WHERE user_id=".DB_quote_smart($uid)." AND pref_key='email'" );
   if($r)
     {
       if($r[0]=="emailaddict")
@@ -928,7 +928,7 @@ function DB_get_unused_randomnumbers($userstr)
 function DB_get_number_of_passwords_recovery($user)
 {
   $r = DB_query_array("SELECT COUNT(*) FROM Recovery ".
-		      "  WHERE user_id=$user ".
+		      "  WHERE user_id=".DB_quote_smart($user).
 		      "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
 		      "  GROUP BY user_id " );
   if($r)
@@ -955,7 +955,7 @@ function DB_get_card_name($card)
   if($card==0)
     return 'backside';
 
-  $r = DB_query_array("SELECT strength,suite FROM Card WHERE id='$card'");
+  $r = DB_query_array("SELECT strength,suite FROM Card WHERE id=".DB_quote_smart($card));
 
   if($r)
     return $r[0]." of ".$r[1];
@@ -970,7 +970,7 @@ function DB_get_current_playid($gameid)
 
   if(!$trick) return -1;
 
-  $r = DB_query_array("SELECT id FROM Play WHERE trick_id='$trick' ORDER BY create_date DESC LIMIT 1");
+  $r = DB_query_array("SELECT id FROM Play WHERE trick_id=".DB_quote_smart($trick)." ORDER BY create_date DESC LIMIT 1");
 
   if($r)
     return $r[0];
@@ -980,7 +980,7 @@ function DB_get_current_playid($gameid)
 
 function DB_get_call_by_hash($hash)
 {
-  $r = DB_query_array("SELECT point_call FROM Hand WHERE hash='$hash'");
+  $r = DB_query_array("SELECT point_call FROM Hand WHERE hash=".DB_quote_smart($hash));
 
   if($r)
     return $r[0];
@@ -994,7 +994,7 @@ function DB_get_partner_call_by_hash($hash)
 
   if($partner)
     {
-      $r = DB_query_array("SELECT point_call FROM Hand WHERE hash='$partner'");
+      $r = DB_query_array("SELECT point_call FROM Hand WHERE hash=".DB_quote_smart($partner));
 
       if($r)
 	return $r[0];
@@ -1008,7 +1008,8 @@ function DB_get_partner_hash_by_hash($hash)
   $gameid = DB_get_gameid_by_hash($hash);
   $party  = DB_get_party_by_hash($hash);
 
-  $r = DB_query_array("SELECT hash FROM Hand WHERE game_id='$gameid' AND party='$party' AND hash<>'$hash'");
+  $r = DB_query_array("SELECT hash FROM Hand WHERE game_id=".DB_quote_smart($gameid).
+		      " AND party=".DB_quote_smart($party)." AND hash<>".DB_quote_smart($hash));
 
   if($r)
     return $r[0];
@@ -1019,22 +1020,22 @@ function DB_get_partner_hash_by_hash($hash)
 function DB_format_gameid($gameid)
 {
   /* get session and create date */
-  $r = DB_query_array("SELECT session, create_date FROM Game WHERE id='$gameid' ");
+  $r = DB_query_array("SELECT session, create_date FROM Game WHERE id=".DB_quote_smart($gameid));
   $session = $r[0];
   $date    = $r[1];
 
   /* get number of game */
   $r = DB_query_array("SELECT SUM(TIME_TO_SEC(TIMEDIFF(create_date, '$date'))<=0) ".
 		      " FROM Game".
-		      " WHERE session='$session' ");
+		      " WHERE session=".DB_quote_smart($session));
   return $session.'.'.$r[0];
 }
 
 function DB_get_reminder($user,$gameid)
 {
   $r = DB_query_array("SELECT COUNT(*) FROM Reminder ".
-		      "  WHERE user_id=$user ".
-		      "  AND game_id=$gameid ".
+		      "  WHERE user_id=".DB_quote_smart($user).
+		      "  AND game_id=".DB_quote_smart($gameid).
 		      "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
 		      "  GROUP BY user_id " );
   if($r)
@@ -1073,11 +1074,11 @@ function DB_get_gameids_of_finished_games_by_session($session)
 				  " GROUP BY Game.id");
   else   /* return games in a session */
     $queryresult = DB_query_array_all("SELECT Game.id,SUM(IF(STRCMP(Score.party,'re'),-1,1)),Game.type FROM Game ".
-				  " LEFT JOIN Score on game_id=Game.id".
-				  "  WHERE session=$session ".
-				  "   AND status='gameover' ".
-				  " GROUP BY Game.id".
-				  " ORDER BY Game.create_date ASC");
+				      " LEFT JOIN Score on game_id=Game.id".
+				      " WHERE session=".DB_quote_smart($session).
+				      " AND status='gameover' ".
+				      " GROUP BY Game.id".
+				      " ORDER BY Game.create_date ASC");
 
   return $queryresult;
 }
@@ -1085,7 +1086,7 @@ function DB_get_gameids_of_finished_games_by_session($session)
 function DB_get_card_value_by_cardid($id)
 {
   $r = DB_query_array("SELECT points FROM Card ".
-		      "  WHERE id=$id ");
+		      "  WHERE id=".DB_quote_smart($id));
 
   if($r)
     return $r[0];

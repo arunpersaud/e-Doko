@@ -998,10 +998,10 @@ function display_table_begin ()
 		     "        Hand.hash,       ".
 		     "        User.timezone,    ".
 		     "        User.email       ".
-		     "FROM Hand ".
-		     "LEFT JOIN User ON User.id=Hand.user_id ".
-		     "WHERE Hand.game_id='".$gameid."' ".
-		     "ORDER BY position ASC");
+		     " FROM Hand".
+		     " LEFT JOIN User ON User.id=Hand.user_id".
+		     " WHERE Hand.game_id=".DB_quote_smart($gameid).
+		     " ORDER BY position ASC");
 
   $row0 = DB_fetch_array($result);
   $row1 = DB_fetch_array($result);
@@ -1032,10 +1032,10 @@ function display_table_end ()
 		     "        Hand.hash,       ".
 		     "        User.timezone,    ".
 		     "        User.email       ".
-		     "FROM Hand ".
-		     "LEFT JOIN User ON User.id=Hand.user_id ".
-		     "WHERE Hand.game_id='".$gameid."' ".
-		     "ORDER BY position ASC");
+		     " FROM Hand".
+		     " LEFT JOIN User ON User.id=Hand.user_id".
+		     " WHERE Hand.game_id=".DB_quote_smart($gameid).
+		     " ORDER BY position ASC");
 
   $row0 = DB_fetch_array($result);
   $row1 = DB_fetch_array($result);
@@ -1231,16 +1231,16 @@ function display_user_menu($id, $skiphash=NULL)
   if($skiphash)
     $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		       " LEFT JOIN Game On Hand.game_id=Game.id".
-		       " WHERE Hand.user_id='$id'".
-		       " AND Hand.hash!='$skiphash'".
+		       " WHERE Hand.user_id=".DB_quote_smart($id).
+		       " AND Hand.hash!=".DB_quote_smart($skiphash).
 		       " AND ( Game.player='$id' OR ISNULL(Game.player) )".
 		       " AND ( Game.status='pre' OR Game.status='play' )".
 		       " ORDER BY Game.session" );
   else
     $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
 		       " LEFT JOIN Game On Hand.game_id=Game.id".
-		       " WHERE Hand.user_id='$id'".
-		       " AND ( Game.player='$id' OR ISNULL(Game.player) )".
+		       " WHERE Hand.user_id=".DB_quote_smart($id).
+		       " AND ( Game.player=".DB_quote_smart($id)." OR ISNULL(Game.player) )".
 		       " AND ( Game.status='pre' OR Game.status='play' )".
 		       " ORDER BY Game.session" );
 
@@ -1294,7 +1294,7 @@ function generate_score_table($session)
 
   /* get player id from the first game */
   $result = DB_query("SELECT user_id from Hand".
-		     " WHERE Hand.game_id=".$gameids[0][0]);
+		     " WHERE Hand.game_id=".DB_quote_smart($gameids[0][0]));
   while( $r = DB_fetch_array($result))
     $player[$r[0]] = 0;
 
@@ -1578,7 +1578,7 @@ function check_vacation($userid)
 {
   /* get start date */
   $result = DB_query_array("SELECT value FROM User_Prefs".
-		     " WHERE user_id='$userid' AND pref_key='vacation start'" );
+			   " WHERE user_id=".DB_quote_smart($userid)." AND pref_key='vacation start'" );
   if($result)
     $start = $result[0];
   else
@@ -1586,7 +1586,7 @@ function check_vacation($userid)
 
   /* get end date */
   $result = DB_query_array("SELECT value FROM User_Prefs".
-		     " WHERE user_id='$userid' AND pref_key='vacation stop'" );
+			   " WHERE user_id=".DB_quote_smart($userid)." AND pref_key='vacation stop'" );
   if($result)
     $stop = $result[0];
   else
@@ -1594,7 +1594,7 @@ function check_vacation($userid)
 
   /* get comment */
   $result = DB_query_array("SELECT value FROM User_Prefs".
-		     " WHERE user_id='$userid' AND pref_key='vacation comment'" );
+			   " WHERE user_id=".DB_quote_smart($userid)." AND pref_key='vacation comment'" );
   if($result)
     $comment = $result[0];
   else

@@ -184,7 +184,7 @@ if( myisset('call') )
 
 
 /* get time from the last action of the game */
-$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
+$r = DB_query_array("SELECT mod_date from Game WHERE id=".DB_quote_smart($gameid));
 $gameend = time() - strtotime($r[0]);
 
 /* handle comments in case player didn't play a card, allow comments a week after the end of the game */
@@ -398,11 +398,11 @@ switch($mystatus)
       if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
 	echo "  <li onclick=\"hl(0);\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
 
-    $result = DB_query('SELECT Trick.id '.
-		       'FROM Trick '.
-		       "WHERE Trick.game_id='".$gameid."' ".
-		       'GROUP BY Trick.id '.
-		       'ORDER BY Trick.id ASC');
+    $result = DB_query('SELECT Trick.id'.
+		       ' FROM Trick'.
+		       " WHERE Trick.game_id=".DB_quote_smart($gameid).
+		       ' GROUP BY Trick.id'.
+		       ' ORDER BY Trick.id ASC');
     $trickNR   = 1;
     $lasttrick = DB_get_max_trickid($gameid);
 
@@ -945,7 +945,7 @@ switch($mystatus)
 	if($exchange >0)
 	  {
 	    $result = DB_query("UPDATE Hand_Card SET hand_id='$partnerhand'".
-			       " WHERE hand_id='$myhand' AND card_id=".DB_quote_smart($exchange));
+			       " WHERE hand_id=".DB_quote_smart($myhand)." AND card_id=".DB_quote_smart($exchange));
 	    DB_add_exchanged_card(DB_quote_smart($exchange),$myhand,$partnerhand);
 	  };
       }
@@ -1100,7 +1100,7 @@ switch($mystatus)
 		DB_add_exchanged_card($card,$userhand,$myhand);
 
 	    /* copy trump from player A to B */
-	    $result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id='$userhand' AND card_id<'27'" );
+	    $result = DB_query("UPDATE Hand_Card SET hand_id='$myhand' WHERE hand_id=".DB_quote_smart($userhand)." AND card_id<'27'" );
 
 	    /* reload cards */
 	    $mycards = DB_get_hand($me);
@@ -1290,20 +1290,20 @@ switch($mystatus)
     $result = DB_query('SELECT Hand_Card.card_id as card,'.
 		       '       Hand.position as position,'.
 		       '       Play.sequence as sequence, '.
-		       '       Trick.id, '.
+		       '       Trick.id,'.
 		       "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>')".
 		       "                    SEPARATOR '\n' ), ".
-		       '       Play.create_date, '.
-		       '       Hand.user_id '.
-		       'FROM Trick '.
-		       'LEFT JOIN Play ON Trick.id=Play.trick_id '.
-		       'LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id '.
-		       'LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id '.
-		       'LEFT JOIN Comment ON Play.id=Comment.play_id '.
-		       'LEFT JOIN User On User.id=Comment.user_id '.
-		       "WHERE Trick.game_id='".$gameid."' ".
-		       'GROUP BY Trick.id, sequence '.
-		       'ORDER BY Trick.id, sequence ASC');
+		       '       Play.create_date,'.
+		       '       Hand.user_id'.
+		       ' FROM Trick'.
+		       ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
+		       ' LEFT JOIN Hand_Card ON Play.hand_card_id=Hand_Card.id'.
+		       ' LEFT JOIN Hand ON Hand_Card.hand_id=Hand.id'.
+		       ' LEFT JOIN Comment ON Play.id=Comment.play_id'.
+		       ' LEFT JOIN User On User.id=Comment.user_id'.
+		       " WHERE Trick.game_id=".DB_quote_smart($gameid).
+		       ' GROUP BY Trick.id, sequence'.
+		       ' ORDER BY Trick.id, sequence ASC');
     $trickNR   = 0;
     $lasttrick = DB_get_max_trickid($gameid);
 
@@ -1457,7 +1457,7 @@ switch($mystatus)
 	    DB_update_game_timestamp($gameid);
 
 	    /* mark card as played */
-	    DB_query("UPDATE Hand_Card SET played='true' WHERE hand_id='$handid' AND card_id=".
+	    DB_query("UPDATE Hand_Card SET played='true' WHERE hand_id=".DB_quote_smart($handid)." AND card_id=".
 		     DB_quote_smart($card));
 
 	    /* get trick id or start new trick */
@@ -1623,7 +1623,7 @@ switch($mystatus)
 		 */
 
 		if($winner>0)
-		  DB_query("UPDATE Trick SET winner='$winner' WHERE id='$trickid'");
+		  DB_query("UPDATE Trick SET winner='$winner' WHERE id=".DB_quote_smart($trickid));
 		else
 		  $messages[] = "ERROR during scoring";
 
@@ -1717,7 +1717,7 @@ switch($mystatus)
 				   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
 				   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
 				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
-				   " WHERE Hand.game_id='$gameid'".
+				   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 				   ' GROUP BY User.fullname' );
 		$email_message  = _("The game is over. Thanks for playing :)")."\n";
 		$email_message .= _("Final score:")."\n";
@@ -1730,7 +1730,7 @@ switch($mystatus)
 				   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
 				   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
 				   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
-				   " WHERE Hand.game_id='$gameid'".
+				   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 				   ' GROUP BY Hand.party' );
 		$email_message .= "\n"._("Totals:")."\n";
 		$re     = 0;
@@ -1910,7 +1910,7 @@ switch($mystatus)
 		  $Tpoint = 0;
 		  $email_message .= " "._("Points Re:")." \n";
 		  $queryresult = DB_query('SELECT score FROM Score '.
-					  "  WHERE game_id=$gameid AND party='re'");
+					  "  WHERE game_id=".DB_quote_smart($gameid)." AND party='re'");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
 		      $email_message .= '   '.$r[0]."\n";
@@ -1918,7 +1918,7 @@ switch($mystatus)
 		    }
 		  $email_message .= " "._("Points Contra:")." \n";
 		  $queryresult = DB_query('SELECT score FROM Score '.
-					  "  WHERE game_id=$gameid AND party='contra'");
+					  "  WHERE game_id=".DB_quote_smart($gameid)." AND party='contra'");
 		  while($r = DB_fetch_array($queryresult) )
 		    {
 		      $email_message .= '   '.$r[0]."\n";
@@ -1975,7 +1975,7 @@ switch($mystatus)
 			   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
 			   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
 			   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
-			   " WHERE Hand.game_id='$gameid'".
+			   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 			   ' GROUP BY User.fullname' );
 	while( $r = DB_fetch_array($result))
 	  echo '      <div class="card'.($r[3]-1)."\">\n".
@@ -1989,27 +1989,27 @@ switch($mystatus)
 			   ' LEFT JOIN Play ON Trick.id=Play.trick_id'.
 			   ' LEFT JOIN Hand_Card ON Hand_Card.id=Play.hand_card_id'.
 			   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
-			   " WHERE Hand.game_id='$gameid'".
+			   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 			   ' GROUP BY Hand.party' );
 	echo "    <div class=\"total\">\n  Totals:<br />\n";
 	while( $r = DB_fetch_array($result))
 	  echo '      '.$r[0].' '.$r[1]."<br />\n";
 
 	$queryresult = DB_query('SELECT timediff(mod_date,create_date) '.
-				" FROM Game WHERE id='$gameid'");
+				" FROM Game WHERE id=".DB_quote_smart($gameid));
 	$r = DB_fetch_array($queryresult);
 	echo '      <p>This game took '.$r[0]." hours.</p>\n";
 
 	echo "      <div class=\"re\">\n   Points Re: <br />\n";
 	$queryresult = DB_query('SELECT score FROM Score '.
-				"  WHERE game_id=$gameid AND party='re'");
+				"  WHERE game_id=".DB_quote_smart($gameid)." AND party='re'");
 	while($r = DB_fetch_array($queryresult) )
 	  echo '       '.$r[0]."<br />\n";
 	echo "      </div>\n";
 
 	echo "      <div class=\"contra\">\n   Points Contra: <br />\n";
 	$queryresult = DB_query('SELECT score FROM Score '.
-				"  WHERE game_id=$gameid AND party='contra'");
+				"  WHERE game_id=".DB_quote_smart($gameid)." AND party='contra'");
 	while($r = DB_fetch_array($queryresult) )
 	  echo '       '.$r[0]."<br />\n";
 	echo "      </div>\n";
@@ -2293,7 +2293,7 @@ if($commentCall != '')
 echo "<div class=\"gameinfo\">\n";
 
 /* get time from the last action of the game */
-$r = DB_query_array("SELECT mod_date from Game WHERE id='$gameid' " );
+$r = DB_query_array("SELECT mod_date from Game WHERE id=".DB_quote_smart($gameid));
 $gameend = time() - strtotime($r[0]);
 
 /* comment box */
