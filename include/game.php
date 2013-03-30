@@ -27,7 +27,7 @@ if(!isset($HOST))
 /* calling game.php only makes sense when we give it a hash for a game */
 if(!myisset('me'))
   {
-    echo "Hmm, you really shouldn't mess with the urls.<br />\n";
+    echo _("Hmm, you really shouldn't mess with the urls.")."<br />\n";
     return;
   }
 $me = $_REQUEST['me'];
@@ -36,8 +36,8 @@ $me = $_REQUEST['me'];
 $myid = DB_get_userid('hash',$me);
 if(!$myid)
   {
-    echo "Can't find you in the database, please check the url.<br />\n";
-    echo "perhaps the game has been canceled, check by login in <a href=\"$INDEX\">here</a>.";
+    echo _('Cannot find you in the database, please check the url.')."<br />\n";
+    printf(_('Perhaps the game has been canceled, check by login in <a href="%s">here</a>.'),$INDEX);
     return;
   }
 
@@ -215,9 +215,8 @@ else if( $mystatus == 'gameover' && isset($_SESSION['id']) )
   }
 else
   {
-    echo "<div class=\"usermenu\">\n";
-    echo "It's your turn in these games: \n";
-    echo "Please log in to see this information.\n";
+    echo '<div class="usermenu">'."\n";
+    printf( _("It's your turn in these games:\nPlease log in to see this information.\n") );
     echo "</div>\n\n";
   }
 
@@ -226,7 +225,7 @@ else
  *****************************************************************/
 if($session)
   {
-    echo "<div class=\"session\">\n";
+    echo '<div class="session">'."\n";
 
     /* output rule set */
     echo "  <div class=\"sessionrules\">\n    "._('Rules').":\n";
@@ -710,7 +709,7 @@ switch($mystatus)
 		/* update game status */
 		cancel_game('lowtrump',$gameid);
 
-		$messages[] = sprintf(('The game has been canceled because %s'.
+		$messages[] = sprintf(_('The game has been canceled because %s'.
 		  ' has low trump and nobody is playing solo.'),DB_get_name('userid',$cancel));
 	      };
 
@@ -1009,12 +1008,15 @@ switch($mystatus)
 		      if($card<27) $nrtrump++;
 		    $low='';
 		    if($usersick=='lowtrump')
-		      $low='low';
-		    echo "Player $name has $nrtrump $low trump. Do you want to take them?".
-		      "<a href=\"index.php?action=game&amp;me=$me&amp;trump=$user\">Yes</a> <br />\n";
+		      $low=_('low');
+		    /// TRANSLATORS: first %s=name, %d=number of trump, second %s= '' or 'low' for trumpfarmut
+		    printf(_('Player %s has %d %s trump. Do you want to take them?'.
+			     '<a href="%s">Yes</a>')."<br />\n",
+			   $name,$nrtrump,$low,"index.php?action=game&amp;me=$me&amp;trump=$user");
 		  }
 	      }
-	    echo "<a href=\"index.php?action=game&amp;me=$me&amp;trump=no\">No way</a> <br />\n";
+	    /// TRANSLATORS: answer to question about taking trump in poverty game
+	    echo "<a href=\"index.php?action=game&amp;me=$me&amp;trump=no\">"._("No way")."</a> <br />\n";
 	    echo "</div>\n";
 	  }
 	break;
@@ -2012,23 +2014,25 @@ switch($mystatus)
 			   ' LEFT JOIN Card ON Card.id=Hand_Card.card_id'.
 			   " WHERE Hand.game_id=".DB_quote_smart($gameid).
 			   ' GROUP BY Hand.party' );
-	echo "    <div class=\"total\">\n  Totals:<br />\n";
+	echo "    <div class=\"total\">\n  "._("Totals:")."<br />\n";
 	while( $r = DB_fetch_array($result))
 	  echo '      '.$r[0].' '.$r[1]."<br />\n";
 
 	$queryresult = DB_query('SELECT timediff(mod_date,create_date) '.
 				" FROM Game WHERE id=".DB_quote_smart($gameid));
 	$r = DB_fetch_array($queryresult);
-	echo '      <p>This game took '.$r[0]." hours.</p>\n";
+	echo '      <p>';
+	printf(_('This game took %d hours.'), $r[0]);
+	echo "</p>\n";
 
-	echo "      <div class=\"re\">\n   Points Re: <br />\n";
+	echo "      <div class=\"re\">\n   "._("Points Re:")." <br />\n";
 	$queryresult = DB_query('SELECT score FROM Score '.
 				"  WHERE game_id=".DB_quote_smart($gameid)." AND party='re'");
 	while($r = DB_fetch_array($queryresult) )
 	  echo '       '.$r[0]."<br />\n";
 	echo "      </div>\n";
 
-	echo "      <div class=\"contra\">\n   Points Contra: <br />\n";
+	echo "      <div class=\"contra\">\n   "._("Points Contra:")." <br />\n";
 	$queryresult = DB_query('SELECT score FROM Score '.
 				"  WHERE game_id=".DB_quote_smart($gameid)." AND party='contra'");
 	while($r = DB_fetch_array($queryresult) )
@@ -2170,10 +2174,11 @@ switch ($card_status) {
    $type='exchange';
    foreach($mycards as $card)
      display_link_card($card,$PREF['cardset'],$type);
-   echo '  <input type="submit" class="submitbutton" value="select card to give back" />'."\n";
+   echo '  <input type="submit" class="submitbutton" value="'._('select card to give back').'" />'."\n";
    break;
  case CARDS_MYTURN:
-   echo 'Hello '.$myname.", it's your turn!  <br />\n";
+   printf (_("Hello %s, it's your turn!"),$myname);
+   echo "  <br />\n";
    echo _('Your cards are').": <br />\n";
 
    /* do we have to follow suite? */
@@ -2243,7 +2248,8 @@ switch ($card_status) {
    else
      {
        $name = DB_get_name('userid',$myid);
-       echo "$name's were: <br />\n";
+       printf (_("%s's were:"),$name);
+       echo " <br />\n";
      }
    $oldcards = DB_get_all_hand($me);
    $oldcards = mysort($oldcards,$gametype);
@@ -2264,7 +2270,7 @@ switch ($card_status) {
 	   $name = DB_get_name('userid',$user);
 	   $oldcards = DB_get_all_hand($userhash);
 	   $oldcards = mysort($oldcards,$gametype);
-	   echo sprintf(_("%s's cards were:"),$name);
+	   printf(_("%s's cards were:"),$name);
 	   echo " <br />\n";
 	   foreach($oldcards as $card)
 	     display_card($card,$PREF['cardset']);
@@ -2341,7 +2347,7 @@ $other_game_ids = DB_played_by_others($gameid);
 if(sizeof($other_game_ids)>0 && $mystatus=='gameover')
   {
     $mypos = DB_get_pos_by_hash($me);
-    echo "  <p>See how other played the same hand: \n";
+    echo '  <p>'._('See how other played the same hand:')." \n";
     foreach($other_game_ids as $id)
       {
 	$otherhash = DB_get_hash_from_game_and_pos($id,$mypos);

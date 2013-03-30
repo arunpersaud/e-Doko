@@ -2,7 +2,7 @@ Translation:
 
 to update the pot file run:
 
-xgettext -L PHP -n --package-name=edoko --msgid-bugs-address=arun@nubati.net *php */*php
+xgettext --add-comment=/ -L PHP -n --package-name=edoko --msgid-bugs-address=arun@nubati.net *php */*php
 mv messages.po po/messages.pot
 
 To start a new translation use something like (here shown to create de.po):
