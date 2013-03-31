@@ -50,6 +50,11 @@ echo '
     <li> Frances Allen </li>
     <li> Arun Persaud  </li>
  </ul>
+<h4>external:</h4>
+ <ul>
+    <li> Cards design for english by David Bellot. <a href="http://svg-cards.sourceforge.net/">project page</a></li>
+    <li> Cards design for english2 by Chris Aguilar. <a href="http://code.google.com/p/vectorized-playing-cards/">project page</a></li>
+ </ul>
 </div>
 
 <div class="translation">
