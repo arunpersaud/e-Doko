@@ -808,6 +808,8 @@ function DB_get_PREF($myid)
       switch($pref[0])
 	{
 	case 'cardset':
+	  if($pref[1])
+	    $PREF['cardset'] = $pref[1];
 	  break;
 
 	case 'email':
