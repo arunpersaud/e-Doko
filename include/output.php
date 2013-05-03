@@ -640,7 +640,7 @@ function output_robotproof($i)
     }
 }
 
-function output_exchanged_cards()
+function output_exchanged_cards($gametype)
 {
   /* in a poverty game this function will output the exchanged cards
    * players in the team will see the cards, the other team will see
@@ -648,7 +648,7 @@ function output_exchanged_cards()
    */
 
   /* need some information about the game */
-  global $gameid,$mygametype, $PREF,$me,$mystatus, $RULES;
+  global $gameid,$PREF,$me,$mystatus, $RULES;
 
   /* some variables to track where the people with poverty are sitting */
   $partnerpos1 = 0;
@@ -659,7 +659,7 @@ function output_exchanged_cards()
   /* only need to do it in a poverty game, this might not be needed, but
    * just to make sure everything is ok
    */
-  if($mygametype == 'poverty' || $mygametype=='dpoverty')
+  if($gametype == 'poverty' || $gametype=='dpoverty')
     {
       /* find out who has poverty */
       for($mypos=1;$mypos<5;$mypos++)
@@ -795,7 +795,7 @@ function output_exchanged_cards()
 	    }
 	  echo  "      </div>\n";
 	}
-      if($mygametype == $usersick)
+      if($gametype == $usersick)
 	$show = 0;
     }
 }

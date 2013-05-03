@@ -65,17 +65,20 @@ set_language($PREF['language']);
 $RULES = DB_get_RULES($gameid);
 
 /* get some infos about the game */
-$gametype   = DB_get_gametype_by_gameid($gameid);
-$gamestatus = DB_get_game_status_by_gameid($gameid);
-$GT         = $gametype;
-if($gametype=='solo')
-  {
-    $gametype = DB_get_solo_by_gameid($gameid);
-    if($gametype=='silent')
-      $GT = 'normal';
-    else
-      $GT = $gametype.' '.$GT;
-  }
+$gametype_raw  = DB_get_gametype_by_gameid($gameid);
+$gametype_solo = DB_get_solo_by_gameid($gameid);
+
+/* replace solo with the type of solo */
+$gametype     = $gametype_raw;
+if($gametype_raw=='solo')
+  $gametype = $gametype_solo;
+
+/* gametype for displaying it (hides hidden solo)*/
+$GT           = get_display_gametype($gameid);
+
+$gamestatus   = DB_get_game_status_by_gameid($gameid);
+
+
 
 /* do we need to worry about Schweinchen?
  * check gametype and rules
@@ -279,7 +282,7 @@ if($session)
     $score   = generate_score_table($session);
 
     /* get the last entry to show on the main page */
-    $tmpscore= $score;
+    $tmpscore   = $score;
     $finalscore = array_pop($tmpscore);
     $finalscore = $finalscore['players'];
 
@@ -306,7 +309,7 @@ if($session)
      * previous and next game if possible
      */
     $hashes = DB_get_hashes_by_session($session,$myid);
-    $next     = NULL;
+    $next   = NULL;
     $i = 1;
     foreach($hashes as $hash)
       {
@@ -328,8 +331,11 @@ if($session)
 
     /* check for solo, add game type to session number */
     echo '    '._('Game')." $session.$j";
-    if($gamestatus != 'pre' && $GT !='normal' )
-      echo " ($GT)";
+    if($gamestatus != 'pre')
+      if($gametype_raw != 'normal') /* only show when needed */
+	if(!($gametype_raw == 'solo' && $gametyep_solo == 'silent') )
+	  echo " ($GT)";
+
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
       {
 	if($previous)
@@ -377,9 +383,6 @@ switch($mystatus)
     if($myparty=='re' || $myparty=='contra')
       {
 	echo "\n<ul class=\"tricks\">\n";
-
-	$mygametype =  DB_get_gametype_by_gameid($gameid);
-
 	echo "  <li onclick=\"hl(0);\" class=\"active\"><a href=\"#\">Pre</a>\n";
 	echo "  </li>\n</ul>\n\n";  /* end div trick, end li trick , end ul tricks */
       }
@@ -391,15 +394,13 @@ switch($mystatus)
     echo "\n<ul class=\"tricks\">\n";
 
     /* output vorbehalte */
-    $mygametype = DB_get_gametype_by_gameid($gameid);
-    $mygamesolo = DB_get_solo_by_gameid($gameid);
-    if($mygametype != 'normal') /* only show when needed */
-      if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
+    if($gametype_raw != 'normal') /* only show when needed */
+      if(!($gametype_raw == 'solo' && $gametyep_solo == 'silent') )
 	echo "  <li onclick=\"hl(0);\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
 
     $result = DB_query('SELECT Trick.id'.
 		       ' FROM Trick'.
-		       " WHERE Trick.game_id=".DB_quote_smart($gameid).
+		       ' WHERE Trick.game_id='.DB_quote_smart($gameid).
 		       ' GROUP BY Trick.id'.
 		       ' ORDER BY Trick.id ASC');
     $trickNR   = 1;
@@ -565,7 +566,6 @@ switch($mystatus)
 	    $messages[] = _('Processing what you selected in the last step...');
 
 	    /* check if this sickness needs to be handled first */
-	    $gametype    = DB_get_gametype_by_gameid($gameid);
 	    $startplayer = DB_get_startplayer_by_gameid($gameid); /* need this to check which solo goes first */
 
 	    if( $_REQUEST['solo']!='No' )
@@ -580,7 +580,7 @@ switch($mystatus)
 		  sprintf(_('Seems like you want to play a %s solo. Got it.'),$_REQUEST['solo']).
 		  "<br />\n";
 
-		if($gametype == 'solo' && $startplayer<$mypos)
+		if($gametype_raw == 'solo' && $startplayer<$mypos)
 		  {}/* do nothing, since someone else already is playing solo */
 		else
 		  {
@@ -588,8 +588,11 @@ switch($mystatus)
 		     * store info in game table
 		     */
 		    DB_set_gametype_by_gameid($gameid,'solo');
+		    $gametype_raw = 'solo';
 		    DB_set_startplayer_by_gameid($gameid,$mypos);
 		    DB_set_solo_by_gameid($gameid,$_REQUEST['solo']);
+		    $gametype_solo = $_REQUEST['solo'];
+		    $gametype      = $gametype_solo;
 		  };
 	      }
 	    else if($_REQUEST['wedding'] == 'yes')
@@ -662,7 +665,9 @@ switch($mystatus)
 
 	$messages[] = _('Ok, everyone is done... figuring out what kind of game we are playing.');
 
-	$gametype    = DB_get_gametype_by_gameid($gameid);
+	/* gametype for displaying it (hides hidden solo)*/
+	$GT           = get_display_gametype($gameid);
+
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
 
 	/* check for sickness */
@@ -689,7 +694,7 @@ switch($mystatus)
 	  }
 
 	/* now check which sickness comes first and set the gametype to it */
-	if($gametype == 'solo')
+	if($gametype_raw == 'solo')
 	  {
 	    /* do nothing */
 	  }
@@ -745,7 +750,8 @@ switch($mystatus)
 	else if($poverty==1) /* one person has poverty */
 	  {
 	    DB_set_gametype_by_gameid($gameid,'poverty');
-	    $gametype = 'poverty';
+	    $gametype_raw = 'poverty';
+	    $gametype     = 'poverty';
 	    $who      = DB_get_sickness_by_gameid($gameid);
 	    if(!$who)
 	      {
@@ -759,7 +765,8 @@ switch($mystatus)
 	else if($poverty==2) /* two people have poverty */
 	  {
 	    DB_set_gametype_by_gameid($gameid,'dpoverty');
-	    $gametype = 'dpoverty';
+	    $gametype_raw = 'dpoverty';
+	    $gametype     = 'dpoverty';
 	    $who      = DB_get_sickness_by_gameid($gameid);
 	    if(!$who)
 	      {
@@ -780,7 +787,8 @@ switch($mystatus)
 	  {
 	    DB_set_gametype_by_gameid($gameid,'wedding');
 	    DB_set_sickness_by_gameid($gameid,'-1'); /* wedding not resolved yet */
-	    $gametype = 'wedding';
+	    $gametype_raw = 'wedding';
+	    $gametype     = 'wedding';
 	  };
 	/* now the gametype is set correctly in the database */
 	$messages[] = _('Got it').' :)';
@@ -791,7 +799,7 @@ switch($mystatus)
 	  {
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$userid);
 
-	    switch($gametype)
+	    switch($gametype_raw)
 	      {
 	      case 'solo':
 		/* are we the solo player? set us to re, else set us to contra */
@@ -839,13 +847,12 @@ switch($mystatus)
 	      }
 	  }
 	/* check for silent solo, set game type to solo in this case */
-	$gametype = DB_get_gametype_by_gameid($gameid);
 	$userids  = DB_get_all_userid_by_gameid($gameid);
 	foreach($userids as $userid)
 	  {
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$userid);
 
-	    if($gametype=='normal')
+	    if($gametype_raw=='normal')
 	      {
 		$userhand = DB_get_all_hand($userhash);
 		if(check_wedding($userhand))
@@ -854,6 +861,9 @@ switch($mystatus)
 		    /* keep startplayer, just set gametype to silent solo */
 		    DB_set_gametype_by_gameid($gameid,'solo');
 		    DB_set_solo_by_gameid($gameid,'silent');
+		    $gametype_raw  = 'solo';
+		    $gametype_solo = 'silent';
+		    $gametype      = 'normal';
 		  }
 	      }
 	  }
@@ -1260,19 +1270,6 @@ switch($mystatus)
      * accordingly
      */
 
-    $gametype = DB_get_gametype_by_gameid($gameid);
-    $GT       = $gametype;
-    if($gametype=='solo')
-      {
-	$gametype = DB_get_solo_by_gameid($gameid);
-	if($gametype=='silent')
-	  $GT = 'normal';
-	else
-	  $GT = $gametype.' '.$GT;
-      }
-    else
-      $gametype = 'normal';
-
     set_gametype($gametype); /* this sets the $CARDS variable */
 
     /* get some infos about the game, need to reset this, since it might have changed */
@@ -1317,16 +1314,14 @@ switch($mystatus)
     echo "\n<div class=\"tricks\">\n";
 
     /* output vorbehalte */
-    $mygametype = DB_get_gametype_by_gameid($gameid);
-    $mygamesolo = DB_get_solo_by_gameid($gameid);
     $show_pre_game_comments=1;
-    if($mygametype != 'normal') /* only show when needed */
-      if(!( $mygametype == 'solo' && $mygamesolo == 'silent') )
+    if($gametype_raw != 'normal') /* only show when needed */
+      if(!($gametype_raw == 'solo' && $gametype_solo == 'silent') )
 	{
 	  echo "    <div class=\"trick\" id=\"trick0\">\n";
 
 	  /* get information so show the cards that have been handed over in a poverty game */
-	  output_exchanged_cards();
+	  output_exchanged_cards($gametype);
 	  $show_pre_game_comments=0;
 
 	  echo "    </div>\n";  /* end div trick, end li trick */
@@ -1543,7 +1538,7 @@ switch($mystatus)
 		 * since it doesn't make sense in some games
 		 */
 		$ok = 0; /* fox shouldn't be counted */
-		if(DB_get_gametype_by_gameid($gameid)=='solo')
+		if($gametype_raw=='solo')
 		  {
 		    $solo = DB_get_solo_by_gameid($gameid);
 		    if($solo == 'trump' || $solo == 'silent')
@@ -1580,13 +1575,8 @@ switch($mystatus)
 
 		if($tricknr == 12 ) /* Karlchen works only in the last trick */
 		  {
-		    /* check for solo */
-		    $solo = 'none';
-		    if(DB_get_gametype_by_gameid($gameid)=='solo' )
-		      $solo = DB_get_solo_by_gameid($gameid);
-
 		    /* no Karlchen in these solos */
-		    if($solo != 'trumpless' && $solo != 'jack' && $solo != 'queen' )
+		    if($gametype_solo != 'trumpless' && $gametype_solo != 'jack' && $gametype_solo != 'queen' )
 		      {
 			foreach($play as $played)
 			  if ( $played['card']==11 || $played['card']==12 )
@@ -2131,12 +2121,10 @@ switch($mystatus)
       {
 	echo "\n<div class=\"tricks\">\n";
 
-	$mygametype =  DB_get_gametype_by_gameid($gameid);
-
 	echo "    <div class=\"trick\" id=\"trick0\">\n";
 
 	/* get information so show the cards that have been handed over in a poverty game */
-	output_exchanged_cards();
+	output_exchanged_cards($gametype);
 
 	echo "    </div>\n </div>\n\n";  /* end div trick, end li trick , end ul tricks */
       }
@@ -2392,13 +2380,10 @@ if($mystatus=='gameover' &&
       {
 	/* suggest a new game with the same people in it, just rotated once (unless last game was solo) */
 	$names = DB_get_all_names_by_gameid($gameid);
-	$type  = DB_get_gametype_by_gameid($gameid);
 
-	if($type=='solo')
+	if($gametype_raw=='solo')
 	  {
-	    $solo = DB_get_solo_by_gameid($gameid);
-
-	    if($solo!='silent') /* repeat game with same first player */
+	    if($gametype_solo!='silent') /* repeat game with same first player */
 	      output_ask_for_new_game($names[0],$names[1],$names[2],$names[3],$gameid);
 	    else /* rotate normally */
 	      output_ask_for_new_game($names[1],$names[2],$names[3],$names[0],$gameid);

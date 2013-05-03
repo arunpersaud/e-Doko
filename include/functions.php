@@ -985,23 +985,22 @@ function can_call($what,$hash)
 
 function display_table_begin ()
 {
-  global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
-  global $RULES,$GAME,$gametype;
+  global $gameid;
 
-  $result = DB_query("SELECT  User.fullname as name,".
-		     "        Hand.position as position, ".
-		     "        User.id, ".
-		     "        Hand.party as party, ".
-		     "        Hand.sickness as sickness, ".
-		     "        Hand.point_call, ".
-		     "        User.last_login, ".
-		     "        Hand.hash,       ".
-		     "        User.timezone,    ".
-		     "        User.email       ".
-		     " FROM Hand".
-		     " LEFT JOIN User ON User.id=Hand.user_id".
-		     " WHERE Hand.game_id=".DB_quote_smart($gameid).
-		     " ORDER BY position ASC");
+  $result = DB_query('SELECT  User.fullname as name,'.
+		     '        Hand.position as position,'.
+		     '        User.id,'.
+		     '        Hand.party as party,'.
+		     '        Hand.sickness as sickness,'.
+		     '        Hand.point_call,'.
+		     '        User.last_login,'.
+		     '        Hand.hash,'.
+		     '        User.timezone,'.
+		     '        User.email'.
+		     ' FROM Hand'.
+		     ' LEFT JOIN User ON User.id=Hand.user_id'.
+		     ' WHERE Hand.game_id='.DB_quote_smart($gameid).
+		     ' ORDER BY position ASC');
 
   $row0 = DB_fetch_array($result);
   $row1 = DB_fetch_array($result);
@@ -1017,25 +1016,26 @@ function display_table_begin ()
 
   return;
 }
+
+
 function display_table_end ()
 {
-  global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
-  global $RULES,$GAME,$gametype;
+  global $gameid;
 
-  $result = DB_query("SELECT  User.fullname as name,".
-		     "        Hand.position as position, ".
-		     "        User.id, ".
-		     "        Hand.party as party, ".
-		     "        Hand.sickness as sickness, ".
-		     "        Hand.point_call, ".
-		     "        User.last_login, ".
-		     "        Hand.hash,       ".
-		     "        User.timezone,    ".
-		     "        User.email       ".
-		     " FROM Hand".
-		     " LEFT JOIN User ON User.id=Hand.user_id".
-		     " WHERE Hand.game_id=".DB_quote_smart($gameid).
-		     " ORDER BY position ASC");
+  $result = DB_query('SELECT  User.fullname as name,'.
+		     '        Hand.position as position,'.
+		     '        User.id,'.
+		     '        Hand.party as party,'.
+		     '        Hand.sickness as sickness,'.
+		     '        Hand.point_call,'.
+		     '        User.last_login,'.
+		     '        Hand.hash,'.
+		     '        User.timezone,'.
+		     '        User.email'.
+		     ' FROM Hand'.
+		     ' LEFT JOIN User ON User.id=Hand.user_id'.
+		     ' WHERE Hand.game_id='.DB_quote_smart($gameid).
+		     ' ORDER BY position ASC');
 
   $row0 = DB_fetch_array($result);
   $row1 = DB_fetch_array($result);
@@ -1053,8 +1053,8 @@ function display_single_user($r,$start=0)
 {
   /* start=1, mark starting player, default=0, so the player on the left is not marked */
 
-  global $gameid, $GT, $debug,$INDEX,$defaulttimezone,$session;
-  global $RULES,$GAME,$gametype;
+  global $gameid, $debug,$INDEX,$defaulttimezone;
+  global $RULES,$GAME, $gametype_raw;
 
       $name  = $r[0];
       $pos   = $r[1];
@@ -1096,11 +1096,11 @@ function display_single_user($r,$start=0)
 	echo"   </a>\n";
 
       /* add hints for poverty, wedding, solo, etc */
-      if( $gametype != "solo")
+      if( $gametype_raw != "solo")
 	if( $RULES["schweinchen"]=="both" && $GAME["schweinchen-who"]==$hash )
 	  echo " Schweinchen. <br />";
 
-      if($GT=="poverty" && $party=="re")
+      if($gametype_raw=="poverty" && $party=="re")
 	if($sickness=="poverty" || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	  {
 	    $userhash = DB_get_hash_from_gameid_and_userid($gameid,$user);
@@ -1117,7 +1117,7 @@ function display_single_user($r,$start=0)
 	  echo "   <img src=\"pics/button/poverty_partner_button.png\" class=\"button\" ".
 	    "alt=\"poverty partner\" title=\"poverty partner\" />\n";
 
-      if($GT=="dpoverty")
+      if($gametype_raw=="dpoverty")
 	if($party=="re")
 	  if($sickness=="poverty" || ($RULES['lowtrump']=='poverty' && $sickness=='lowtrump'))
 	    {
@@ -1151,28 +1151,31 @@ function display_single_user($r,$start=0)
 	    echo "   <img src=\"pics/button/poverty2_partner_button.png\" class=\"button\" ".
 	      "alt=\"poverty2 >\" title=\"poverty2 partner\" />\n";
 
-      if($GT=="wedding" && $party=="re")
+      if($gametype_raw=="wedding" && $party=="re")
 	if($sickness=="wedding")
 	  echo "   <img src=\"pics/button/wedding_button.png\" class=\"button\" alt=\"wedding\" title=\"wedding\" />\n";
 	else
 	  echo "   <img src=\"pics/button/wedding_partner_button.png\" class=\"button\" ".
 	    "alt=\"wedding partner\" title=\"wedding partner\" />\n";
 
-      if( (strpos($GT,"solo")!==false) && $party=="re")
+      if( $gametype_raw=='solo' && $party=="re")
 	{
-	  if(strpos($GT,"queen")!==false)
+	  $solotype = DB_get_solo_by_gameid($gameid);
+	  $GT = get_display_gametype($gameid);
+
+	  if($solotype=='queen')
 	    echo "   <img src=\"pics/button/queensolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Queen solo\" />\n";
-	  else if(strpos($GT,"jack")!==false)
+	  else if($solotype=='jack')
 	    echo "   <img src=\"pics/button/jacksolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Jack solo\" />\n";
-	  else if(strpos($GT,"club")!==false)
+	  else if($solotype=='club')
 	    echo "   <img src=\"pics/button/clubsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Club solo\" />\n";
-	  else if(strpos($GT,"spade")!==false)
+	  else if($solotype=='spade')
 	    echo "   <img src=\"pics/button/spadesolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Spade solo\" />\n";
-	  else if(strpos($GT,"heart")!==false)
+	  else if($solotype=='heart')
 	    echo "   <img src=\"pics/button/heartsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Heart solo\" />\n";
-	  else if(strpos($GT,"trumpless")!==false)
+	  else if($solotype=='trumpless')
 	    echo "   <img src=\"pics/button/notrumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trumpless solo\" />\n";
-	  else if(strpos($GT,"trump")!==false)
+	  else if($solotype=='trump')
 	    echo "   <img src=\"pics/button/trumpsolo_button.png\" class=\"button\" alt=\"$GT\" title=\"Trump solo\" />\n";
 	}
 
@@ -1237,12 +1240,12 @@ function display_user_menu($id, $skiphash=NULL)
 		       " AND ( Game.status='pre' OR Game.status='play' )".
 		       " ORDER BY Game.session" );
   else
-    $result = DB_query("SELECT Hand.hash,Hand.game_id,Game.player from Hand".
-		       " LEFT JOIN Game On Hand.game_id=Game.id".
-		       " WHERE Hand.user_id=".DB_quote_smart($id).
-		       " AND ( Game.player=".DB_quote_smart($id)." OR ISNULL(Game.player) )".
+    $result = DB_query('SELECT Hand.hash,Hand.game_id,Game.player from Hand'.
+		       ' LEFT JOIN Game On Hand.game_id=Game.id'.
+		       ' WHERE Hand.user_id='.DB_quote_smart($id).
+		       ' AND ( Game.player='.DB_quote_smart($id).' OR ISNULL(Game.player) )'.
 		       " AND ( Game.status='pre' OR Game.status='play' )".
-		       " ORDER BY Game.session" );
+		       ' ORDER BY Game.session' );
 
   $i=0;
   while( $r = DB_fetch_array($result))
@@ -1293,8 +1296,8 @@ function generate_score_table($session)
   $player_party = array();
 
   /* get player id from the first game */
-  $result = DB_query("SELECT user_id from Hand".
-		     " WHERE Hand.game_id=".DB_quote_smart($gameids[0][0]));
+  $result = DB_query('SELECT user_id from Hand'.
+		     ' WHERE Hand.game_id='.DB_quote_smart($gameids[0][0]));
   while( $r = DB_fetch_array($result))
     $player[$r[0]] = 0;
 
@@ -1310,18 +1313,18 @@ function generate_score_table($session)
       foreach($player as $id=>$points)
 	{
 	  $party = $player_party[$id][$i][0];
-	  if($party == "re")
-	    if($gametype=="solo")
+	  if($party == 're')
+	    if($gametype=='solo')
 	      $player[$id] += 3*$re_score;
 	    else
 	      $player[$id] += $re_score;
-	  else if ($party == "contra")
+	  else if ($party == 'contra')
 	    $player[$id] -= $re_score;
 	}
       $score[$i]['gameid']  = $gameid[0] ;
       $score[$i]['players'] = $player;
       $score[$i]['points']  = abs($re_score);
-      $score[$i]['solo']    = ($gametype=="solo");
+      $score[$i]['solo']    = ($gametype=='solo');
 
       $i++;
     }
@@ -1741,6 +1744,58 @@ function set_language($l,$type='lang')
     textdomain("edoko");
 
     return;
+}
+
+function get_display_gametype($gameid)
+{
+  /* return a readable string that can be displayed to show the game type
+   * this means hiding silent solo from the user
+   */
+
+  $gametype = DB_get_gametype_by_gameid($gameid);
+
+  if ($gametype == 'normal')
+    $GT = _('normal');
+  else if($gametype=='solo')
+    {
+      $solotype = DB_get_solo_by_gameid($gameid);
+
+      switch($solotype)
+	{
+	case 'trumpless':
+	  $GT = _('trumpless solo');
+	  break;
+        case 'jack':
+	  $GT = _('jack solo');
+	  break;
+        case 'queen':
+	  $GT = _('queen solo');
+	  break;
+        case 'trump':
+	  $GT = _('trump solo');
+	  break;
+        case 'club':
+	  $GT = _('club solo');
+	  break;
+        case 'spade':
+	  $GT = _('spade solo');
+	  break;
+        case 'heart':
+	  $GT = _('heart solo');
+	  break;
+        case 'silent':
+	  $GT = _('normal');   /* this is change compared to $gametype */
+	  break;
+        }
+    }
+  else if ($gametype == 'wedding')
+    $GT = _('wedding');
+  else if ($gametype == 'poverty')
+    $GT = _('poverty');
+  else if ($gametype == 'dpoverty')
+    $GT = _('double poverty');
+
+  return $GT;
 }
 
 ?>
