@@ -636,6 +636,11 @@ switch($mystatus)
 
     $messages[] = _('Checking if someone else selected solo, nines, wedding or poverty.');
 
+    /* in case the user can go do the next stage, we want to skip the break statement at the
+     * end. We keep track of these cases using this variable
+     */
+    $nobreak=0;
+
     /* check if everyone has reached this stage */
     $userids = DB_get_all_userid_by_gameid($gameid);
     $ok = 1;
@@ -666,7 +671,7 @@ switch($mystatus)
 	$messages[] = _('Ok, everyone is done... figuring out what kind of game we are playing.');
 
 	/* gametype for displaying it (hides hidden solo)*/
-	$GT           = get_display_gametype($gameid);
+	$GT          = get_display_gametype($gameid);
 
 	$startplayer = DB_get_startplayer_by_gameid($gameid);
 
@@ -889,8 +894,11 @@ switch($mystatus)
 		  }
 	      }
 	    else
-	      $messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
-		"<br />\n";
+	      {
+		$messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
+		  "<br />\n";
+		$nobreak=1;
+	      }
 	  }
 	else
 	  {
@@ -900,8 +908,11 @@ switch($mystatus)
 
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
-	      $messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
-		"<br /\n";
+	      {
+		$messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
+		  "<br /\n";
+		$nobreak=1;
+	      }
 	    else
 	      {
 		$whohash = DB_get_hash_from_game_and_pos($gameid,$who);
@@ -919,7 +930,8 @@ switch($mystatus)
 	      }
 	  }
       }
-    break;
+    if(!$nobreak)
+      break;
 
   case 'poverty':
     /* user only gets here in a poverty game, several things have to be handled here:
@@ -937,6 +949,11 @@ switch($mystatus)
      *
      * it is easier to check B) first
      */
+
+    /* in case the user can go do the next stage, we want to skip the break statement at the
+     * end. We keep track of these cases using this variable
+     */
+    $nobreak=0;
 
     set_gametype($gametype); /* this sets the $CARDS variable */
     $myparty = DB_get_party_by_hash($me);
@@ -1190,9 +1207,11 @@ switch($mystatus)
 		  }
 	      }
 	    $messages[] = sprintf(_('Please, <a href="%s">continue</a> here'),$INDEX."?action=game&amp;me=$me");
+	    $nobreak = 1;
 	  }
       }
-    break;
+    if(!$nobreak)
+      break;
 
   case 'play':
   case 'gameover':
