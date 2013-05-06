@@ -46,6 +46,7 @@ global $GAME,$RULES,$CARDS;
 /**************************************
  * get some information from the DB
  **************************************/
+start:
 $gameid   = DB_get_gameid_by_hash($me);
 $myname   = DB_get_name('hash',$me);
 $mystatus = DB_get_status_by_hash($me);
@@ -561,9 +562,7 @@ switch($mystatus)
 	    break;
 	  }
 	else
-	  {
-	    /* everything is ok, save what user said and proceed */
-	    $messages[] = _('Processing what you selected in the last step...');
+	  { /* everything is ok, save what user said and proceed */
 
 	    /* check if this sickness needs to be handled first */
 	    $startplayer = DB_get_startplayer_by_gameid($gameid); /* need this to check which solo goes first */
@@ -634,13 +633,6 @@ switch($mystatus)
      * this can therefore only be handled once all players finished the last stage
      */
 
-    $messages[] = _('Checking if someone else selected solo, nines, wedding or poverty.');
-
-    /* in case the user can go do the next stage, we want to skip the break statement at the
-     * end. We keep track of these cases using this variable
-     */
-    $nobreak=0;
-
     /* check if everyone has reached this stage */
     $userids = DB_get_all_userid_by_gameid($gameid);
     $ok = 1;
@@ -667,8 +659,6 @@ switch($mystatus)
 	/* Ok, everyone finished the init-phase, time to figure out what game we
 	 * are playing, in case there are any solos this already
 	 * will have the correct information in it */
-
-	$messages[] = _('Ok, everyone is done... figuring out what kind of game we are playing.');
 
 	/* gametype for displaying it (hides hidden solo)*/
 	$GT          = get_display_gametype($gameid);
@@ -796,7 +786,6 @@ switch($mystatus)
 	    $gametype     = 'wedding';
 	  };
 	/* now the gametype is set correctly in the database */
-	$messages[] = _('Got it').' :)';
 
 	/* loop over all players, set re/contra if possible and start the game if possible */
 	$userids = DB_get_all_userid_by_gameid($gameid);
@@ -895,9 +884,8 @@ switch($mystatus)
 	      }
 	    else
 	      {
-		$messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
-		  "<br />\n";
-		$nobreak=1;
+		$mystatus = 'play';
+		goto play;
 	      }
 	  }
 	else
@@ -909,9 +897,8 @@ switch($mystatus)
 	    $whoid = DB_get_userid('gameid-position',$gameid,$who);
 	    if($whoid==$myid)
 	      {
-		$messages[] = sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me").
-		  "<br /\n";
-		$nobreak=1;
+		$mystatus = 'poverty';
+		goto poverty;
 	      }
 	    else
 	      {
@@ -930,10 +917,10 @@ switch($mystatus)
 	      }
 	  }
       }
-    if(!$nobreak)
-      break;
+    break;
 
   case 'poverty':
+  poverty:
     /* user only gets here in a poverty game, several things have to be handled here:
      * A) ask, if user wants to take trump
      *      yes-> take trump,
@@ -949,11 +936,6 @@ switch($mystatus)
      *
      * it is easier to check B) first
      */
-
-    /* in case the user can go do the next stage, we want to skip the break statement at the
-     * end. We keep track of these cases using this variable
-     */
-    $nobreak=0;
 
     set_gametype($gametype); /* this sets the $CARDS variable */
     $myparty = DB_get_party_by_hash($me);
@@ -1008,7 +990,10 @@ switch($mystatus)
 	      }
 	  }
 	else
-	  $messages[]= sprintf(_('Please, <a href="%s">start</a> the game.'),$INDEX."?action=game&amp;me=$me");
+	  {
+	    $mystatus = 'play';
+	    goto play;
+	  }
       }
 
     /* the following is part A) of what needs to be done */
@@ -1207,14 +1192,13 @@ switch($mystatus)
 		  }
 	      }
 	    $messages[] = sprintf(_('Please, <a href="%s">continue</a> here'),$INDEX."?action=game&amp;me=$me");
-	    $nobreak = 1;
 	  }
       }
-    if(!$nobreak)
-      break;
+    break;
 
   case 'play':
   case 'gameover':
+  play:
     /* both entries here,  so that the tricks are visible for both.
      * in case of 'play' there is a break later that skips the last part
      */
