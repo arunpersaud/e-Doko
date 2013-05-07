@@ -334,7 +334,7 @@ if($session)
     echo '    '._('Game')." $session.$j";
     if($gamestatus != 'pre')
       if($gametype_raw != 'normal') /* only show when needed */
-	if(!($gametype_raw == 'solo' && $gametyep_solo == 'silent') )
+	if(!($gametype_raw == 'solo' && $gametype_solo == 'silent') )
 	  echo " ($GT)";
 
     if(isset($_SESSION['id']) && $_SESSION['id']==$myid)
@@ -396,7 +396,7 @@ switch($mystatus)
 
     /* output vorbehalte */
     if($gametype_raw != 'normal') /* only show when needed */
-      if(!($gametype_raw == 'solo' && $gametyep_solo == 'silent') )
+      if(!($gametype_raw == 'solo' && $gametype_solo == 'silent') )
 	echo "  <li onclick=\"hl(0);\" class=\"old\"><a href=\"#\">Pre</a></li>\n";
 
     $result = DB_query('SELECT Trick.id'.
