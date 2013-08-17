@@ -35,3 +35,33 @@ $('div.code').addClass('offset2 span2');
 $('div.database').addClass('span2');
 $('div.graphics').addClass('span2');
 $('div.translation').addClass('span2');
+
+// favicon as indicator if it's your turn
+document.head || (document.head = document.getElementsByTagName('head')[0]);
+
+function checkFavicon() {
+    /* check if it's your turn */
+    url=window.location.href;
+    url=url.substring(0, url.lastIndexOf('index.php'))+"testfav.php";
+
+    $.getJSON(url)
+	.done(function( json ) {
+
+	    var link = document.createElement('link'),
+	    oldLink = document.getElementById('favicon');
+	    link.id = 'favicon';
+	    link.rel = 'shortcut icon';
+
+	    if(json.turn=="yes")
+		link.href = "pics/edoko-favicon-your-turn.png";
+	    else
+		link.href = "pics/edoko-favicon.png";
+
+	    if (oldLink)
+		document.head.removeChild(oldLink);
+
+	    document.head.appendChild(link);
+	});
+}
+checkFavicon();
+setInterval(checkFavicon,10000);

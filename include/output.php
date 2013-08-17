@@ -423,7 +423,7 @@ function output_header()
      <title>e-Doko</title>
      <meta charset="utf-8" />
      <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
-     <link rel="shortcut icon" href="pics/edoko-favicon.png" />
+     <link id="favicon" rel="shortcut icon" href="pics/edoko-favicon.png" />
      <link rel="stylesheet" media="all" href="<?php echo autoversion("css/bootstrap.css"); ?>" />
      <link rel="stylesheet" href="<?php echo autoversion("css/standard.css"); ?>" />
      <link rel="stylesheet" href="<?php echo autoversion("css/dateinput.css"); ?>"/>
