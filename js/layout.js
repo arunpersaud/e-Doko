@@ -64,4 +64,4 @@ function checkFavicon() {
 	});
 }
 checkFavicon();
-setInterval(checkFavicon,10000);
+setInterval(checkFavicon,30000);
