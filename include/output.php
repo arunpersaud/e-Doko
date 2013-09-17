@@ -274,8 +274,8 @@ function output_check_for_sickness($me,$mycards)
   echo '      <option value="queen">'._('queen').'</option>';
   echo '      <option value="jack">'._('jack').'</option>';
   echo '      <option value="club">'._('club').'</option>';
-  echo '      <option valvue="spade">'._('spade').'</option>';
-  echo '      <option value="hear">'._('heart').'</option>';
+  echo '      <option value="spade">'._('spade').'</option>';
+  echo '      <option value="heart">'._('heart').'</option>';
   echo '    </select>';
   echo '    <br />';
 

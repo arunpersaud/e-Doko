@@ -571,6 +571,17 @@ switch($mystatus)
 	      {
 		/* user wants to play a solo */
 
+		/* double check input value */
+		$s = $_REQUEST['solo'];
+		$solos = array('trumpless','jack','queen','trump','club','spade','heart');
+		if (!in_array($s, $solos))
+		  {
+		    $messages[] = sprintf(_('There is a problem with the type of solo you selected (%s does not exist), please go back '.
+					    'and answer the <a href="%s">question</a> again.'),
+					  $s,$INDEX.'?action=game&amp;me=$me&amp;in=yes');
+		    break;
+		  }
+
 		/* store the info in the user's hand info */
 		DB_set_solo_by_hash($me,$_REQUEST['solo']);
 		DB_set_sickness_by_hash($me,'solo');
