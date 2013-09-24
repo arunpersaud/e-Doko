@@ -518,6 +518,7 @@ switch($mystatus)
 	     */
 
 	    DB_set_hand_status_by_hash($me,'init');
+	    $mystatus='init';
 
 	    /* check if everyone has reached this stage, set player in game-table to the next player */
 	    $userids = DB_get_all_userid_by_gameid($gameid);
@@ -2089,17 +2090,21 @@ switch($mystatus)
  * this outputs status of healthy, *
  * sick, etc during pre-game phase *
  **********************************/
+
+$posmax=5; // if user is still in init, we only show vorbehalte from players before him, otherwise all of them
+
 switch($mystatus)
   {
   case 'start':
     break;
   case 'init':
+    $posmax=$mypos;
   case 'check':
     /* output sickness of other playes, in case they already selected and are sitting in front of the current player */
     echo "\n".'<div class="tricks">'."\n";
     echo '    <div class="trick" id="trick0">'."\n";
 
-    for($pos=1;$pos<5;$pos++)
+    for($pos=1;$pos<$posmax;$pos++)
       {
 	$usersick   = DB_get_sickness_by_pos_and_gameid($pos,$gameid);
 	$userid     = DB_get_userid('gameid-position',$gameid,$pos);
