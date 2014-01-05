@@ -1,5 +1,5 @@
 <?php
-/* Copyright 2013 Arun Persaud <arun@nubati.net>
+/* Copyright 2013, 2014 Arun Persaud <arun@nubati.net>
  *
  *   This file is part of e-DoKo.
  *
