@@ -52,7 +52,7 @@ $avgage	= $avgage[0];
 echo "\n\n<div class=\"login\">\n";
 
 ?>
-  <div class="hero-unit">
+  <div class="jumbotron">
   <h1>E-DoKo</h1>
   <p>Play Doppelkopf online</p>
   <p> For more information please visit our <a href="<?php echo "$WIKI"; ?>">wiki</a> or just log in. </p>
@@ -100,10 +100,15 @@ echo "\n\n<div class=\"login\">\n";
 
      echo '  <form class="loginregister form-horizontal doregister" action="index.php?action=register" method="post">'; echo "\n";
      echo '  <fieldset>'; echo "\n";
+     echo '     <div class="form-group">'; echo "\n";
      echo '     <label for="Rfullname">Full name:</label>'; echo "\n";
      echo "     <input type=\"text\" id=\"Rfullname\" name=\"Rfullname\" size=\"20\" maxlength=\"30\" value=\"$name\" /> <br />\n";
+     echo "     </div>\n";
+     echo '     <div class="form-group">'; echo "\n";
      echo '     <label for="Remail">Email:</label>'; echo "\n";
-     echo "     <input type=\"text\" id=\"Remail\" name=\"Remail\" size=\"20\" maxlength=\"30\" value=\"$email\" />  <br />\n";
+     echo "     <input type=\"email\" id=\"Remail\" name=\"Remail\" size=\"20\" maxlength=\"30\" value=\"$email\" />  <br />\n";
+     echo "     </div>\n";
+     echo '     <div class="form-group">'; echo "\n";
      if($openid_url=='')
        {
 	 echo '     <label for="Rpassword">Password:</label>'; echo "\n";
@@ -114,18 +119,23 @@ echo "\n\n<div class=\"login\">\n";
 	 echo '    <label for="Ropenid">OpenId:</label>'; echo "\n";
 	 echo '    <input type="text" id="Ropenid" name="Ropenid" size="20" maxlength="50" value="'.htmlentities($openid_url).'" /> <br />'; echo "\n";
        }
+     echo "     </div>\n";
+     echo '     <div class="form-group">'; echo "\n";
      echo '     <label for="Rtimezone">Timezone:</label>'; echo "\n";
      output_select_timezone("Rtimezone");
+     echo "     </div>\n";
 
      /* random number to select robotproof question */
      $rand_number = mt_rand(0,3); /* to get numbers between 0 and 4  */
      $Robotproof = "Robotproof".$rand_number;
 ?>
-    Please answer this anti-spam question:<br />
+    <p>Please answer this anti-spam question:</p>
+    <div class="form-group">
     <label for="Robotproof">  <?php echo output_robotproof($rand_number); ?></label>
 <?php
 	 echo "    <input type=\"text\" id=\"Robotproof\" name=\"$Robotproof\" size=\"20\" maxlength=\"30\" /> <br />\n";
 ?>
+    </div>
     <input type="submit" class="submitbutton" value="register" />
 
 <?php

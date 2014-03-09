@@ -204,8 +204,8 @@ else
 
 		/* create output */
 		$sessionoutput .= $gameoutput;
-		$gameoutput     = "   <span class=\"gamestatusover \"><a href=\"".$INDEX."?action=game&amp;me=".$myhash."\">"
-		  .$gamefrequence."</a></span>\n";
+		$gameoutput     = "  <a class=\"gamestatusover\" href=\"".$INDEX."?action=game&amp;me=".$myhash."\">"
+		  .$gamefrequence."</a>\n";
 	      }
 	    else
 	      {	/* new session */
@@ -218,13 +218,13 @@ else
 		      {
 			$output_active .= "<li> ";
 			if($gamestatus == 'pre')
-			  $output_active .= '<span class="gamestatuspre gameid">';
+			  $class= 'class="gamestatuspre gameid"';
 			else if($gamestatus == 'play')
-			  $output_active .= '<span class="gamestatusplay gameid">';
+			  $class= 'class="gamestatusplay gameid"';
 			else
-			  $output_active .= '<span class="gamestatusover gameid">';
-			$output_active .= "<a href=\"$INDEX?action=game&amp;me=$myhash\">".
-			  DB_format_gameid($gameid).'</a></span>&nbsp;&nbsp;&nbsp;';
+			  $class= 'class="gamestatusover gameid"';
+			$output_active .= "<a $class href=\"$INDEX?action=game&amp;me=$myhash\">".
+			  DB_format_gameid($gameid).'</a>&nbsp;&nbsp;&nbsp;';
 
 
 

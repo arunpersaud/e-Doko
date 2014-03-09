@@ -17,8 +17,8 @@
  *
  */
 body {
-  background-color: #ddd;
-  padding-top: 25px;
+  background-color: #fff;
+  padding-top: 70px;
 }
 /* the header, footer, etc */
 header {
@@ -26,14 +26,6 @@ header {
   text-align: center;
   padding-top: 1.5em;
   border-bottom: 3px solid gray;
-}
-.lastlogin {
-  position: absolute;
-  top: 0;
-  left: 3em;
-}
-.lastlogin span {
-  font-size: smaller;
 }
 .main {
   background-color: #fff;
@@ -478,6 +470,10 @@ span.comment {
   background-color: #efaaaa;
   text-align: center;
 }
+.user {
+    margin-left: 5%;
+    margin-right: 5%;
+}
 .usermenu {
   text-align: center;
   padding: 0.7em;
@@ -498,27 +494,6 @@ span.comment {
   overflow: auto;
   z-index: 50;
 }
-.user {
-  margin-left: 25%;
-  margin-right: 5%;
-}
-div.user ul {
-  list-style: none;
-  padding: 0px;
-}
-div.user ul li {
-  position: relative;
-  padding: 3px;
-  margin: 0px;
-  width: 80%;
-  min-height: 1.2em;
-  border-left: 2px solid #babdb6 ;
-  border-right: 2px solid #babdb6 ;
-  border-bottom: 2px solid #babdb6 ;
-}
-div.user ul li:first-child {
-  border-top: 2px solid #babdb6 ;
-}
 .gamessession {
   display: none;
 }
@@ -535,7 +510,6 @@ div.user ul li:first-child {
 }
 .user .gameshidesession,
 .user .gamesshowsession {
-  float: right;
   width: 10em;
 }
 .wide {
@@ -556,19 +530,6 @@ div.user ul li:first-child {
 }
 .cardinput:hover {
   background-color: red;
-}
-.gamestatuspre {
-  padding: 0 0.3em;
-  background-color: #f57900;
-}
-.gamestatusover {
-  padding: 0 0.3em;
-  background-color: #e9b96e ;
-  color: #fff;
-}
-.gamestatusplay {
-  padding: 0 0.3em;
-  background-color: #8ae234;
 }
 /* statistics using jquery*/
 caption {
@@ -668,17 +629,6 @@ table.openid th {
 }
 /* special layout for mobile devices */
 @media only screen and (max-width: 600px) {
-  .nav > li > a .navhide {
-    display: none;
-  }
-  .lastlogin {
-    position: relative;
-    left: 0em;
-    top: 0em;
-    width: 100%;
-    text-align: center;
-    border-top: 1px solid gray;
-  }
   .session div.sessionscore div {
     right: 0em;
   }
@@ -696,10 +646,6 @@ table.openid th {
     height: 100%;
     overflow: auto;
     z-index: 0;
-  }
-  .user {
-    margin-left: 5%;
-    margin-right: 5%;
   }
   .message {
     position: relative;
@@ -720,9 +666,7 @@ table.openid th {
     font-size: smaller;
   }
 }
-.pagination {
-  text-align: center;
-}
-.nav > li > img {
-  height: 16.666666666666668px;
+
+img.grav {
+  height: 50px;
 }

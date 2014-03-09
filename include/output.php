@@ -489,25 +489,33 @@ function output_navbar()
       $token = get_user_token($myid);
 
       /* logout info */
-      echo "\n<div class=\"navigation\">\n";
-      echo "  <span class=\"brand\" href=\"#\">E-DoKo</span>\n";
-      echo "  <ul class=\"nav\">";
-      echo "     <li>\n";
-      echo "         <img title=\"$name\" ";
+      echo "\n<nav class=\"navbar navbar-default navbar-fixed-top\" role=\"navigation\">\n";
+      echo "  <div class=\"container-fluid\">\n";
+      echo "    <div class=\"navbar-header\">";
+      echo "         <img class=\"grav navbar-right\" title=\""._('last login').": ".date("r",$unixtime)."\" ";
       echo             "src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" />\n";
-      echo "     </li>\n";
-      echo "     <li> <a href=\"".$INDEX."\"><i class=\"icon-home\"></i><span class=\"navhide\">"._('Home')."</span></a></li>\n";
-      echo "     <li> <a href=\"".$INDEX."?action=prefs\"><i class=\"icon-cog\"></i><span class=\"navhide\">".
-	_('settings')."</span></a></li>\n";
-      echo "     <li> <a href=\"".$INDEX."?action=new\">"._('new game')."</a></li>\n";
-      echo "     <li> <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a></li>\n";
-      echo "     <li> <a href=\"".$WIKI."\">"._('wiki/bugs')."</a></li>\n";
-      echo "     <li> <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a></li>\n";
-      echo "     <li> <a href=\"".$INDEX."?action=logout\"><i class=\"icon-off\"></i><span class=\"navhide\">"._('logout')."</span></a></li>\n";
-      echo "  </ul>\n";
-      echo "</div>\n";
-
-      echo "<div class=\"lastlogin\"><span>"._('last login').": ".date("r",$unixtime)."</span></div>\n\n";
+      echo '         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-elements">
+                         <span class="sr-only">Toggle navigation</span>
+                         <span class="icon-bar"></span>
+                         <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                     </button>';
+      echo "      <a class=\"navbar-brand\" href=\"#\">E-DoKo</a>\n";
+      echo "    </div>";
+      echo '    <div class="collapse navbar-collapse" id="navbar-collapse-elements">';
+      echo "      <ul class=\"nav navbar-nav\">";
+      echo "         <li> <a href=\"".$INDEX."\"><span class=\"glyphicon glyphicon-home\"></span>"._('Home')."</a></li>\n";
+      echo "         <li> <a href=\"".$INDEX."?action=prefs\"><span class=\"glyphicon glyphicon-cog\"></span>".
+	_('settings')."</a></li>\n";
+      echo "         <li> <a href=\"".$INDEX."?action=new\">"._('new game')."</a></li>\n";
+      echo "         <li> <a href=\"".$INDEX."?action=stats\">"._('statistics')."</a></li>\n";
+      echo "         <li> <a href=\"".$WIKI."\">"._('wiki/bugs')."</a></li>\n";
+      echo "         <li> <a href=\"".$RSS."?uid=".$myid."&amp;token=".$token."\">"._('atom')."</a></li>\n";
+      echo "         <li> <a href=\"".$INDEX."?action=logout\"><span class=\"glyphicon glyphicon-off\"></span>"._('logout')."</a></li>\n";
+      echo "      </ul>\n";
+      echo "    </div>\n";
+      echo "  </div>\n";
+      echo "</nav>\n";
     }
   return;
 }

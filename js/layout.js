@@ -1,11 +1,16 @@
 $("table").addClass("table table-striped");
-$("ul.tricks").wrap('<div class="pagination">');
+$("ul.tricks").wrap('<div class="container text-center">');
+$("ul.tricks").addClass('pagination');
 
-$(".navigation").addClass("navbar-inner");
-$(".navbar-inner").wrap('<div class="navbar navbar-fixed-top">');
 $(".navbar .nav").addClass("pull-right");
-$(".navbar p").addClass("navbar-text");
 
+// user page
+$(".user ul").addClass("list-group");
+$(".user ul li").addClass("list-group-item");
+
+$(".user .gamestatuspre").addClass("btn btn-warning");
+$(".user .gamestatusplay").addClass("btn btn-success");
+$(".user .gamestatusover").addClass("btn btn-info");
 
 // enable tabs on login page
 $('a[data-toggle="tab"]').on('shown', function (e) {
@@ -13,28 +18,17 @@ $('a[data-toggle="tab"]').on('shown', function (e) {
   e.relatedTarget // previous tab
 })
 
-$('div.login').addClass("row-fluid");
-$('div.login ul').addClass("offset3 span6");
-$('div.login .tab-content').addClass("offset3 span6");
+$('ul.loginregister').wrap('<div class="container text-center">');
+$('.tab-content').addClass('container');
 
 $('.login input.submitbutton').addClass('btn btn-primary');
 $('.login input[type="submit"]').addClass('btn');
 
-$(".doregister div").addClass('control-group');
-$(".doregister label").wrap('<div class="control-label">');
-$(".doregister input").wrap('<div class="controls">');
-$(".doregister select").wrap('<div class="controls">');
+$('.login form label').addClass("form-label col-xs-4");
+
+$(".welcomestats").addClass("container");
 
 $(".gravatar").addClass('img-polaroid');
-
-$(".welcomestats").addClass('offset1');
-
-// about
-$('div.about').addClass('row-fluid');
-$('div.code').addClass('offset2 span2');
-$('div.database').addClass('span2');
-$('div.graphics').addClass('span2');
-$('div.translation').addClass('span2');
 
 // favicon as indicator if it's your turn
 document.head || (document.head = document.getElementsByTagName('head')[0]);
