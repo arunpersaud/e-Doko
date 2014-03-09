@@ -507,7 +507,9 @@ function DB_get_names_of_new_logins($N)
 {
   $names  = array();
 
-  $result = DB_query("SELECT fullname FROM User ORDER BY create_date DESC, id DESC LIMIT $N");
+  $result = DB_query("SELECT fullname FROM User".
+		     " WHERE create_date >=(NOW() - interval 45 day)".
+		     " ORDER BY create_date DESC, id DESC LIMIT $N");
   while($r = DB_fetch_array($result))
     $names[] = $r[0];
 

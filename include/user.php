@@ -314,11 +314,14 @@ else
 	if($count<10)
 	  echo '<p class="newbiehint">'._('You can start new games using the link in the top right corner!')."</p>\n";
 
-	/* display last 5 users that have signed up to e-DoKo */
+	/* display last 5 users that have signed up to e-DoKo within the 45 days */
 	$names = DB_get_names_of_new_logins(5);
-	echo '<h4>'._('New Players').":</h4>\n<p>\n";
-	echo implode(", ",$names).",...\n";
-	echo "</p>\n";
+        if ($names)
+	  {
+	    echo '<h4>'._('New Player(s)').":</h4>\n<p>\n";
+	    echo implode(", ",$names).",...\n";
+	    echo "</p>\n";
+	  };
 
 	/* display last 5 users that logged on */
 	echo '<h4>'._('Players last logged in').":</h4>\n<p>\n";
