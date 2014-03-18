@@ -60,6 +60,18 @@ function hl_prev()
 	hl(current-1);
 }
 
+/* check for swipes */
+var down_x = null;
+var up_x = null;
+
+/* advance trick according to swipe direction */
+function do_swipe()
+{
+    if ((down_x - up_x) > 50)  { hl_prev(); }
+    if ((up_x - down_x) > 50)  { hl_next(); }
+}
+
+
 $(document).ready(
     function()
     {
@@ -89,5 +101,24 @@ $(document).ready(
 	});
 
 	$(".message div div").parent().click ( function() { $(this).hide(); });
-
     });
+
+/* look for swipes left/right */
+$().ready(function(){
+	$("div.table").mousedown(function(e){
+	    down_x = e.pageX;
+	});
+	$("div.table").mouseup(function(e){
+	    up_x = e.pageX;
+	    do_swipe();
+	});
+	$("div.table").bind('touchstart', function(e){
+	    down_x = e.originalEvent.touches[0].pageX;
+	});
+	$("div.table").bind('touchmove', function(e){
+	    up_x = e.originalEvent.touches[0].pageX;
+	});
+	$("div.table").bind('touchend', function(e){
+	    do_swipe();
+	});
+});
