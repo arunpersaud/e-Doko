@@ -299,8 +299,7 @@ hr {
 
   top: 30%;
   left: 37.5%;
-  right: 56.5%;
-  height: 40%;
+  width: 8%;
   z-index: 30;
 }
 .vorbehalt0 {
@@ -330,9 +329,8 @@ hr {
   /*border: 1px solid red;*/
 
   top: 0%;
-  left: 47%;
-  right: 47%;
-  height: 40%;
+  left: 46%;
+  width: 8%;
   text-align: center;
   z-index: 30;
 }
@@ -365,8 +363,7 @@ hr {
 
   top: 30%;
   right: 37.5%;
-  left: 56.5%;
-  height: 40%;
+  width: 8%;
   z-index: 30;
 }
 .vorbehalt2 {
@@ -397,9 +394,8 @@ hr {
   /*border: 1px solid red;*/
 
   bottom: 0%;
-  left: 47%;
-  right: 47%;
-  height: 40%;
+  left: 46%;
+  width: 8%;
   z-index: 30;
 }
 .tricks div div.card3 .score,
@@ -665,6 +661,19 @@ table.openid th {
     text-align: right;
     font-size: smaller;
   }
+  img.gravatar {
+    width: 3em;
+    height: 3em;
+  }
+  div.table img.table { width: 45%; }
+
+  .tricks div div.card0 img { width: 14%; }
+  .tricks div div.card1 img { width: 14%; left: 43%;}
+  .tricks div div.card2 img { width: 14%; }
+  .tricks div div.card3 img { width: 14%; left: 43%;}
+  .tricks div div.card0 img { left:  28%;}
+  .tricks div div.card2 img { right: 28%;}
+
 }
 
 img.grav {
