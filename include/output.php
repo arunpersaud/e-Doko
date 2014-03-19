@@ -492,15 +492,16 @@ function output_navbar()
       echo "\n<nav class=\"navbar navbar-default navbar-fixed-top\" role=\"navigation\">\n";
       echo "  <div class=\"container-fluid\">\n";
       echo "    <div class=\"navbar-header\">";
-      echo "         <img class=\"grav navbar-right\" title=\""._('last login').": ".date("r",$unixtime)."\" ";
-      echo             "src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" />\n";
+      echo "         <a href=\"".$INDEX."\">\n";
+      echo "           <img class=\"grav navbar-right\" title=\""._('last login').": ".date("r",$unixtime)."\" ";
+      echo             "src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" /></a>\n";
       echo '         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-elements">
                          <span class="sr-only">Toggle navigation</span>
                          <span class="icon-bar"></span>
                          <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                      </button>';
-      echo "      <a class=\"navbar-brand\" href=\"#\">E-DoKo</a>\n";
+      echo "      <a class=\"navbar-brand\" href=\"".$INDEX."\">E-DoKo</a>\n";
       echo "    </div>";
       echo '    <div class="collapse navbar-collapse" id="navbar-collapse-elements">';
       echo "      <ul class=\"nav navbar-nav\">";
