@@ -128,7 +128,7 @@ else
 	      }
 
 	    if($session)
-	      DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
+	      DB_query("INSERT INTO Game VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 		       "'$ruleset','$session' ,NULL)");
 	    else
 	      {
@@ -136,7 +136,7 @@ else
 		$max = DB_get_max_session();
 		$max++;
 		DB_query("UPDATE Game SET session='".$max."' WHERE id=".DB_quote_smart($followup));
-		DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
+		DB_query("INSERT INTO Game VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre',".
 			    "'$ruleset','$max' ,NULL)");
 	      }
 	  }
@@ -153,7 +153,7 @@ else
 	    $max = DB_get_max_session();
 	    $max++;
 
-	    DB_query("INSERT INTO Game VALUES (NULL, NULL, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
+	    DB_query("INSERT INTO Game VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '$randomNRstring', 'normal', NULL,NULL,'1',NULL,'pre', ".
 		     "'$ruleset','$max' ,NULL)");
 	  }
 	$gameid = DB_insert_id();

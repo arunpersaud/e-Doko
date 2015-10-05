@@ -379,7 +379,7 @@ function DB_get_current_trickid($gameid)
 
   if(!$sequence || $sequence==4)
     {
-      DB_query("INSERT INTO Trick VALUES (NULL,NULL,NULL, ".DB_quote_smart($gameid).",NULL)");
+      DB_query("INSERT INTO Trick VALUES (CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,NULL,".DB_quote_smart($gameid).",NULL)");
       $trickid  = DB_insert_id();
       $sequence = 1;
       $number++;
@@ -401,7 +401,7 @@ function DB_get_max_trickid($gameid)
 
 function DB_play_card($trickid,$handcardid,$sequence)
 {
-  DB_query("INSERT INTO Play VALUES(NULL,NULL,NULL,".DB_quote_smart($trickid).
+  DB_query("INSERT INTO Play VALUES(CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,NULL,".DB_quote_smart($trickid).
 	   ",".DB_quote_smart($handcardid).",".DB_quote_smart($sequence).")");
 
   $playid = DB_insert_id();
@@ -570,7 +570,7 @@ function DB_get_user_timezone($userid)
 
 function DB_insert_comment($comment,$playid,$gameid,$userid)
 {
-  DB_query("INSERT INTO Comment VALUES (NULL,NULL,NULL,$userid,$playid,$gameid, ".DB_quote_smart($comment).")");
+  DB_query("INSERT INTO Comment VALUES (CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,NULL,$userid,$playid,$gameid, ".DB_quote_smart($comment).")");
 
   return;
 }
@@ -595,7 +595,7 @@ function DB_get_pre_comment_call($gameid)
 
 function DB_insert_note($comment,$gameid,$userid)
 {
-  DB_query("INSERT INTO Notes VALUES (NULL,NULL,NULL,$userid,$gameid, ".DB_quote_smart($comment).")");
+  DB_query("INSERT INTO Notes VALUES (CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,NULL,$userid,$gameid, ".DB_quote_smart($comment).")");
 
   return;
 }
@@ -736,7 +736,7 @@ function DB_get_ruleset($dullen,$schweinchen,$call,$lowtrump)
   else
     {
       /* create new one */
-      $result = DB_query("INSERT INTO Rulesets VALUES (NULL, NULL, ".
+      $result = DB_query("INSERT INTO Rulesets VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ".
 			 DB_quote_smart($dullen).",".
 			 DB_quote_smart($schweinchen).",".
 			 DB_quote_smart($lowtrump).",".
@@ -944,7 +944,7 @@ function DB_get_number_of_passwords_recovery($user)
 function DB_set_recovery_password($user,$newpw)
 {
   DB_query("INSERT INTO Recovery VALUES(NULL,".DB_quote_smart($user).
-	   ",".DB_quote_smart($newpw).",NULL)");
+	   ",".DB_quote_smart($newpw).",CURRENT_TIMESTAMP)");
   return;
 }
 
@@ -1052,7 +1052,7 @@ function DB_set_reminder($user,$gameid)
 {
   DB_query("INSERT INTO Reminder ".
 	   "  VALUES(NULL, ".DB_quote_smart($user).", ".DB_quote_smart($gameid).
-	   ", NULL) ");
+	   ", CURRENT_TIMESTAMP) ");
   return 0;
 }
 
@@ -1249,9 +1249,9 @@ function DB_get_number_of_tricks($gameid,$position)
 function DB_digest_insert_email($To,$message,$type,$gameid)
 {
   if($type == GAME_YOUR_TURN)
-    DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",NULL,'your_turn',$gameid,".DB_quote_smart($message).")");
+    DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",CURRENT_TIMESTAMP,'your_turn',$gameid,".DB_quote_smart($message).")");
   else
-    DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",NULL,'misc',NULL,".DB_quote_smart($message).")");
+    DB_query("INSERT INTO digest_email VALUES (NULL,".DB_quote_smart($To).",CURRENT_TIMESTAMP,'misc',NULL,".DB_quote_smart($message).")");
   return;
 }
 

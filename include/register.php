@@ -113,7 +113,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
 		$r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
 			    ','.DB_quote_smart($_REQUEST['Remail']).
 			    ','.DB_quote_smart($hash).
-			    ','.DB_quote_smart($_REQUEST['Rtimezone']).',NULL,NULL)');
+			    ','.DB_quote_smart($_REQUEST['Rtimezone']).',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)');
 	      }
 	    else /* hash function didn't work */
 	      $r=0;
@@ -124,7 +124,7 @@ if(myisset('Rfullname','Remail','Rtimezone') )
 	    $r=DB_query('INSERT INTO User VALUES(NULL,'.DB_quote_smart($_REQUEST['Rfullname']).
 			','.DB_quote_smart($_REQUEST['Remail']).
 			','.DB_quote_smart(md5($password)).
-			','.DB_quote_smart($_REQUEST['Rtimezone']).',NULL,NULL)');
+			','.DB_quote_smart($_REQUEST['Rtimezone']).',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)');
 	    if($r)
 	      {
 		include_once('openid.php');

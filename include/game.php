@@ -1577,7 +1577,7 @@ switch($mystatus)
 
 			    if($party1 != $party2)
 			      DB_query("INSERT INTO Score".
-				       " VALUES( NULL,NULL,$gameid,'$party1',$uid1,$uid2,'fox')");
+				       " VALUES(NULL,CURRENT_TIMESTAMP,$gameid,'$party1',$uid1,$uid2,'fox')");
 			  }
 		    }
 
@@ -1602,7 +1602,7 @@ switch($mystatus)
 				$party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
 				DB_query("INSERT INTO Score".
-					 " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'karlchen')");
+					 " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'$party1',$uid1,NULL,'karlchen')");
 			      };
 		      };
 		  }; /* end scoring Karlchen */
@@ -1622,7 +1622,7 @@ switch($mystatus)
 		    $party1 = DB_get_party_by_gameid_and_userid($gameid,$uid1);
 
 		    DB_query("INSERT INTO Score".
-			     " VALUES( NULL,NULL,$gameid,'$party1',$uid1,NULL,'doko')");
+			     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'$party1',$uid1,NULL,'doko')");
 		  }
 
 		/*
@@ -1835,14 +1835,14 @@ switch($mystatus)
 		    for( $p=$call_contra;$p<=120; $p+=30 )
 		      {
 			  DB_query('INSERT INTO Score'.
-				   " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'against$p')");
+				   " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'re',NULL,NULL,'against$p')");
 			}
 
 		      for( $p=$call_contra; $p<120; $p+=30)
 			{
 			  if( $re >= $p )
 			    DB_query('INSERT INTO Score'.
-				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'made$p')");
+				     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'re',NULL,NULL,'made$p')");
 			}
 		    }
 		  if($winning_party!='re' and $call_re!= -1)
@@ -1850,14 +1850,14 @@ switch($mystatus)
 		      for( $p=$call_re;$p<=120; $p+=30 )
 			{
 			  DB_query('INSERT INTO Score'.
-				   " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'against$p')");
+				   " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'contra',NULL,NULL,'against$p')");
 			}
 
 		      for( $p=$call_re; $p<120; $p+=30)
 			{
 			  if( $contra>=$p )
 			    DB_query('INSERT INTO Score'.
-				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'made$p')");
+				     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'contra',NULL,NULL,'made$p')");
 			}
 		    }
 
@@ -1865,7 +1865,7 @@ switch($mystatus)
 		  if($winning_party=='contra')
 		    {
 		      DB_query('INSERT INTO Score'.
-			       " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'againstqueens')");
+			       " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'contra',NULL,NULL,'againstqueens')");
 		    }
 
 		  /* one point each for winning and each 30 points + calls */
@@ -1879,14 +1879,14 @@ switch($mystatus)
 
 			  if($re>$p-$offset)
 			    DB_query('INSERT INTO Score'.
-				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'".(240-$p)."')");
+				     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'re',NULL,NULL,'".(240-$p)."')");
 			}
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
 			  if($call_re!= -1 && $call_re<$p+1)
 			    DB_query('INSERT INTO Score'.
-				     " VALUES( NULL,NULL,$gameid,'re',NULL,NULL,'call$p')");
+				     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'re',NULL,NULL,'call$p')");
 			}
 		    }
 		  else if( $winning_party=='contra')
@@ -1899,14 +1899,14 @@ switch($mystatus)
 
 			  if($contra>$p-$offset)
 			    DB_query('INSERT INTO Score'.
-				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
+				     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'contra',NULL,NULL,'".(240-$p)."')");
 			}
 		      /* re called something and won */
 		      foreach(array(0,30,60,90,120) as $p)
 			{
 			  if($call_contra != -1 && $call_contra<$p+1)
 			    DB_query('INSERT INTO Score'.
-				     " VALUES( NULL,NULL,$gameid,'contra',NULL,NULL,'call$p')");
+				     " VALUES( NULL,CURRENT_TIMESTAMP,$gameid,'contra',NULL,NULL,'call$p')");
 			}
 		    };
 
