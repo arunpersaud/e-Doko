@@ -329,6 +329,7 @@ function compare_cards($a,$b,$game)
     case "normal":
     case "silent":
     case "trump":
+    case "wedding":
       if($RULES['schweinchen']=='both' && $GAME['schweinchen-who'])
 	{
 	  if($a == 19 || $a == 20 )
@@ -356,6 +357,8 @@ function compare_cards($a,$b,$game)
 	  /* if not, do nothing and the foxes are just handeled as normal trump */
 	}
 	;
+    case "poverty":
+    case "dpoverty":
     case "heart":
     case "spade":
     case "club":
