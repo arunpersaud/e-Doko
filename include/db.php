@@ -912,13 +912,13 @@ function DB_get_email_pref_by_uid($uid)
 function DB_get_unused_randomnumbers($userstr)
 {
   /* optimized version of this query using temporary tables (perhaps we should use a procedure here?).
-     First we create a copy of the Game table using just the gameid and the cards.
-     Then in a second round we delete all the gameids of games where our players are in.
+     First we create a copy of the Game table using just the cards.
+     Then in a second round we delete all the randomnumbers of games where our players are in.
      At the end we return only the first entry in the temporary table.
   */
   DB_query("DROP   TEMPORARY TABLE IF EXISTS gametmp;");
-  DB_query("CREATE TEMPORARY TABLE gametmp SELECT id,randomnumbers FROM Game;");
-  DB_query("DELETE FROM gametmp WHERE id IN (SELECT distinct game_id FROM Hand LEFT JOIN Game ON Game.id=game_id WHERE user_id IN (".$userstr."));");
+  DB_query("CREATE TEMPORARY TABLE gametmp SELECT DISTINCT randomnumbers FROM Game;");
+  DB_query("DELETE FROM gametmp WHERE randomnumbers IN (SELECT DISTINCT randomnumbers FROM Game WHERE id IN (SELECT DISTINCT game_id FROM Hand WHERE user_id IN (".$userstr.")));");
 
   $r = DB_query_array("SELECT randomnumbers FROM gametmp LIMIT 1;");
   DB_query("DROP   TEMPORARY TABLE IF EXISTS gametmp;");
