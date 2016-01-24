@@ -101,10 +101,8 @@ $(document).ready(
 	});
 
 	$(".message div div").parent().click ( function() { $(this).hide(); });
-    });
 
-/* look for swipes left/right */
-$().ready(function(){
+	/* look for swipes left/right */
 	$("div.table").mousedown(function(e){
 	    down_x = e.pageX;
 	});
@@ -121,4 +119,5 @@ $().ready(function(){
 	$("div.table").bind('touchend', function(e){
 	    do_swipe();
 	});
-});
+
+    });
