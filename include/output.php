@@ -494,7 +494,7 @@ function output_navbar()
       echo "    <div class=\"navbar-header\">";
       echo "         <a href=\"".$INDEX."\">\n";
       echo "           <img class=\"grav navbar-right\" title=\""._('last login').": ".date("r",$unixtime)."\" ";
-      echo             "src=\"http://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" /></a>\n";
+      echo             "src=\"https://www.gravatar.com/avatar/".md5(strtolower(trim($email)))."?d=identicon\" /></a>\n";
       echo '         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-elements">
                          <span class="sr-only">Toggle navigation</span>
                          <span class="icon-bar"></span>

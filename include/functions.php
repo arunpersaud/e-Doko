@@ -1073,7 +1073,7 @@ function display_single_user($r,$start=0)
       $lastlogin = strtotime($r[6]);
       date_default_timezone_set($timezone);
       $timenow   = strtotime(date("Y-m-d H:i:s"));
-      $gravatar = "$name<br />\n       <img class=\"gravatar\" title=\"$name\" src=\"http://www.gravatar.com/avatar/".
+      $gravatar = "$name<br />\n       <img class=\"gravatar\" title=\"$name\" src=\"https://www.gravatar.com/avatar/".
 	md5(strtolower(trim($email)))."?d=identicon\" alt=\"$name's gravatar\" />";
 
       echo "  <div class=\"table".($pos-1)."\">\n";

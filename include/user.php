@@ -331,7 +331,7 @@ else
 	for($i=0;$i<7;$i++)
 	  {
 	    echo '<img class="gravatar" title="'.$names[$i].
-	      '" src="http://www.gravatar.com/avatar/'.
+	      '" src="https://www.gravatar.com/avatar/'.
 	      md5(strtolower(trim($emails[$i])))."?d=identicon\" />\n";
 	  }
 	echo "</p>\n";
