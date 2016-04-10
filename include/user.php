@@ -67,7 +67,8 @@ if(myisset('forgot'))
 
 	    /* create temporary password, use the fist 8 letters of a md5 hash */
 	    $TIME  = (string) time(); /* to avoid collisions */
-	    $hash  = md5('Anewpassword'.$email.$TIME);
+	    $rndstring = sha1(rand()); /* add some randomness */
+	    $hash  = md5('Anewpassword'.$email.$TIME.$rndstring);
 	    $newpw = substr($hash,1,8);
 
 	    $message = sprintf( _("Someone (hopefully you) requested a new password.\n".
