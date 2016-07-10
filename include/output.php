@@ -1,5 +1,5 @@
 <?php
-/* Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Arun Persaud <arun@nubati.net>
+/* Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2016 Arun Persaud <arun@nubati.net>
  *
  *   This file is part of e-DoKo.
  *
@@ -446,7 +446,7 @@ function output_footer()
 
   echo "</div>\n\n";
   echo "<footer>\n";
-  echo "  <p class=\"left\"> copyright 2006-2014 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n";
+  echo "  <p class=\"left\"> copyright 2006-2016 <a href=\"$INDEX?action=about\">Arun Persaud, et al.</a> <br />\n";
   echo "  <p class=\"right\"> See the latest changes <a href=\"http://nubati.net/cgi-bin/gitweb.cgi?p=e-DoKo.git;a=summary\">\n".
     "  via git </a> <br />or download the source via <br />\n'git clone http://nubati.net/git/e-DoKo.git' <br />\n".
     "  <a href=\"http://www.dreamhost.com/green.cgi\">\n".
