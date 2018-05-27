@@ -1715,9 +1715,14 @@ function verify_password($email, $password)
 function detectlanguage()
 {
 	/* read out browser's prefered language, taken from php-manual*/
-	$langcode = explode(";", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-	$langcode = explode(",", $langcode['0']);
-	return $langcode['0'];
+  if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
+    {
+      $langcode = explode(";", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+      $langcode = explode(",", $langcode['0']);
+      return $langcode['0'];
+    }
+  else
+    return 'en';
 }
 
 function set_language($l,$type='lang')
