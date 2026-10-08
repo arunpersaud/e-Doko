@@ -1656,6 +1656,13 @@ function get_user_token($userid)
   $date = DB_get_user_creation_date($userid);
   $name = DB_get_name('userid',$userid);
 
+  /* the token was computed from the date as MySQL on DreamHost returned it
+   * (Pacific time); the database is UTC now, so convert back to keep old
+   * feed URLs working */
+  if($date)
+    $date = (new DateTime($date, new DateTimeZone('UTC')))
+      ->setTimezone(new DateTimeZone('America/Los_Angeles'))->format('Y-m-d H:i:s');
+
   if($date && $name)
     $token = md5("token".$name.$date);
 
