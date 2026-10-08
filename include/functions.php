@@ -104,7 +104,7 @@ define("CARDS_GAMEOVER",    5); /* show all cards from everyone (looking at some
  *                 GAMEOVER  show all cards from everyone
  */
 
-function mymail($uid,$gameid=0,$type,$message)
+function mymail($uid,$gameid,$type,$message)
 {
   global $EmailName,$WIKI,$PREF;
 
@@ -203,7 +203,7 @@ function mymail($uid,$gameid=0,$type,$message)
     }
 
   /* reset language to original user*/
-  set_language($PREF['language']);
+  set_language($PREF['language'] ?? 'en');
 
   return;
 }
@@ -1239,14 +1239,14 @@ function display_user_menu($id, $skiphash=NULL)
 		       " LEFT JOIN Game On Hand.game_id=Game.id".
 		       " WHERE Hand.user_id=".DB_quote_smart($id).
 		       " AND Hand.hash!=".DB_quote_smart($skiphash).
-		       " AND ( Game.player='$id' OR ISNULL(Game.player) )".
+		       " AND ( Game.player='$id' OR Game.player IS NULL )".
 		       " AND ( Game.status='pre' OR Game.status='play' )".
 		       " ORDER BY Game.session" );
   else
     $result = DB_query('SELECT Hand.hash,Hand.game_id,Game.player from Hand'.
 		       ' LEFT JOIN Game On Hand.game_id=Game.id'.
 		       ' WHERE Hand.user_id='.DB_quote_smart($id).
-		       ' AND ( Game.player='.DB_quote_smart($id).' OR ISNULL(Game.player) )'.
+		       ' AND ( Game.player='.DB_quote_smart($id).' OR Game.player IS NULL )'.
 		       " AND ( Game.status='pre' OR Game.status='play' )".
 		       ' ORDER BY Game.session' );
 
@@ -1392,8 +1392,8 @@ function generate_global_score_table()
 
   /* response time of users*/
   $result = DB_query_array_all("SELECT user_id,".
-                              "IFNULL(AVG(if(P1.sequence in (2,3,4),".
-                              "-timestampdiff(MINUTE,mod_date,(select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1)),NULL )),1e9) as a ".
+                              "IFNULL(ROUND(AVG(if(P1.sequence in (2,3,4),".
+                              "-((unixepoch((select mod_date from Play P2 where P1.trick_id=P2.trick_id  and P2.sequence=P1.sequence-1))-unixepoch(mod_date))/60),NULL )),4),1e9) as a ".
                               "FROM Play P1 ".
                               "LEFT JOIN Hand_Card ON P1.hand_card_id=Hand_Card.id ".
                               "LEFT JOIN Hand ON Hand.id=Hand_Card.hand_id ".
@@ -1407,7 +1407,7 @@ function generate_global_score_table()
   /* most solos */
   $result = DB_query_array_all("SELECT user_id as uid,".
 			       "       COUNT(*), ".
-			       "       COUNT(*)/(SELECT COUNT(*) FROM Hand LEFT JOIN User ON User.id=Hand.user_id WHERE User.id=uid) as c ".
+			       "       ROUND(COUNT(*)*1.0/(SELECT COUNT(*) FROM Hand H2 WHERE H2.user_id=Hand.user_id),4) as c ".
 			       " FROM Game ".
 			       " LEFT JOIN Hand ON Hand.position=startplayer AND Game.id=Hand.game_id ".
 			       " WHERE type='solo' AND Game.status='gameover' ".

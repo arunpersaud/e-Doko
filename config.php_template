@@ -18,11 +18,11 @@
  *
  */
 
-    /* the program needs this to access the mysql database */
-    $DB_host	 = "";
-    $DB_user	 = "";
-    $DB_password = "";
-    $DB_database = "";
+    /* the SQLite database file (create it from schema-sqlite.sql, or from
+     * a MySQL dump with tools/mysql2sqlite.py); the web server needs write
+     * access to the file and its directory
+     */
+    $DB_FILE = "/path/to/edoko.sqlite";
 
     /* set this to 1 to debug the server
      * emails won't be send out, but  be shown on the page;
@@ -57,8 +57,10 @@
     /* point this to a Wiki that explains the rules, etc (or use this one)*/
     $WIKI  = "http://wiki.nubati.net/index.php?title=EmailDoko";
 
-    /* the default timezone for you domain */
-    $defaulttimezone = date_default_timezone_get();
+    /* the timezone of the timestamps in the database; SQLite's
+     * CURRENT_TIMESTAMP is UTC, so keep this at UTC
+     */
+    $defaulttimezone = "UTC";
 
     /* OpenId
      *

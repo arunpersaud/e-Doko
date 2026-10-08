@@ -285,7 +285,7 @@ if($session)
     /* get the last entry to show on the main page */
     $tmpscore   = $score;
     $finalscore = array_pop($tmpscore);
-    $finalscore = $finalscore['players'];
+    $finalscore = $finalscore['players'] ?? null;
 
     if($finalscore)
       {
@@ -1305,8 +1305,7 @@ switch($mystatus)
 		       '       Hand.position as position,'.
 		       '       Play.sequence as sequence, '.
 		       '       Trick.id,'.
-		       "       GROUP_CONCAT(CONCAT('<span>',User.fullname,': ',Comment.comment,'</span>')".
-		       "                    SEPARATOR '\n' ), ".
+		       "       GROUP_CONCAT('<span>'||User.fullname||': '||Comment.comment||'</span>', '\n'), ".
 		       '       Play.create_date,'.
 		       '       Hand.user_id'.
 		       ' FROM Trick'.
@@ -1671,7 +1670,7 @@ switch($mystatus)
 
 	    /* display comments */
 	    display_card($card,$PREF['cardset']);
-	    if($comment!='')
+	    if(!empty($comment))
 	      echo "\n        <span class=\"comment\"> ".$comment."</span>\n";
 	    echo "      </div>\n";
 

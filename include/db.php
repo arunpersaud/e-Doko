@@ -32,13 +32,48 @@ function DB_open()
 {
   $version_needed = 5;
 
-  global $DB,$DB_user,$DB_host,$DB_database,$DB_password;
-  $DB = new mysqli($DB_host,$DB_user, $DB_password, $DB_database);
-  if ( $DB->connect_errno )
+  global $DB,$DB_FILE;
+  try
     {
-      echo "Failed to connect to Mysql ".$DB->connect_error." (".$DB->connect_errno.")\n";
+      $DB = new Pdo\Sqlite('sqlite:'.$DB_FILE, null, null, array(
+        /* the code expects false from failed queries (mysqli behaviour) */
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
+        /* mysqli returned all values as strings */
+        PDO::ATTR_STRINGIFY_FETCHES => true));
+    }
+  catch (PDOException $e)
+    {
+      error_log('DB error: cannot open '.$DB_FILE.': '.$e->getMessage());
+      echo "Failed to open the database\n";
       return -1;
-    };
+    }
+  $DB->exec('PRAGMA busy_timeout = 5000');
+
+  /* MySQL functions used in the queries */
+  $DB->createFunction('IF', fn($cond, $a, $b) => $cond ? $a : $b, 3, Pdo\Sqlite::DETERMINISTIC);
+  $DB->createFunction('STRCMP', fn($a, $b) => $a === null || $b === null ? null : ($a <=> $b),
+		      2, Pdo\Sqlite::DETERMINISTIC);
+  /* DATEDIFF(a,b): days between the date parts of a and b */
+  $DB->createFunction('DATEDIFF', function ($a, $b) {
+      if ($a === null || $b === null)
+	return null;
+      return intdiv(strtotime(substr($a, 0, 10).' UTC') - strtotime(substr($b, 0, 10).' UTC'), 86400);
+    }, 2, Pdo\Sqlite::DETERMINISTIC);
+  /* TIMEDIFF(a,b) -> '[-]H:MM:SS', TIME_TO_SEC('[-]H:MM:SS') -> seconds */
+  $DB->createFunction('TIMEDIFF', function ($a, $b) {
+      if ($a === null || $b === null)
+	return null;
+      $d = strtotime($a.' UTC') - strtotime($b.' UTC');
+      $abs = abs($d);
+      return ($d < 0 ? '-' : '').sprintf('%d:%02d:%02d', intdiv($abs, 3600), intdiv($abs, 60) % 60, $abs % 60);
+    }, 2, Pdo\Sqlite::DETERMINISTIC);
+  $DB->createFunction('TIME_TO_SEC', function ($t) {
+      if ($t === null)
+	return null;
+      $sign = $t[0] === '-' ? -1 : 1;
+      $p = array_map('intval', explode(':', ltrim($t, '-')));
+      return $sign * ($p[0] * 3600 + ($p[1] ?? 0) * 60 + ($p[2] ?? 0));
+    }, 1, Pdo\Sqlite::DETERMINISTIC);
 
   $version = DB_get_version();
   if ($version != $version_needed)
@@ -50,23 +85,17 @@ function DB_open()
 function DB_close()
 {
   global $DB;
-  $DB->close();
+  $DB = null;
   return;
 }
 
 function DB_quote_smart($value)
 {
-    global $DB;
-    /* Stripslashes */
-    if (get_magic_quotes_gpc()) {
-        $value = stripslashes($value);
-    }
-    /* Quote if not a number or a numeric string */
-    if (!is_numeric($value)) {
-        $value = "'" . $DB->real_escape_string($value) . "'";
-	$value = addcslashes($value, '%_');
-    }
-    return $value;
+  global $DB;
+  /* Quote if not a number or a numeric string */
+  if (!is_numeric($value))
+    $value = $DB->quote((string) $value);
+  return $value;
 }
 
 function DB_test()
@@ -81,41 +110,22 @@ function DB_test()
   return;
 }
 
-/* use Mysql in the background */
 function DB_query($query)
 {
   global $DB;
-  /* debug/optimize the database
-  $time = microtime();
-  $return = $DB->query($query);
-  $time = microtime() - $time;
-
-  if($time > 0.15) // this way we can find only the long ones
-  {
-    $logfile=fopen('DBlog.log','a+');
-    fwrite($logfile,"time of query: $time\n");
-    fwrite($logfile,wordwrap("  EXPLAIN $query ;\n", 60, "\n         "));
-
-    $result = "";
-    $queryresult  = mysql_query("EXPLAIN $query ;");
-    if( $queryresult )
-      while($row = DB_fetch_array($queryresult))
-        $result  .= "   |".implode("|",$row)."|\n";
-
-    fwrite($logfile,"$result \n\n");
-    fclose($logfile);
-  };
-
-  return $return;
-  */
-
-  return $DB->query($query);
+  $result = $DB->query($query);
+  if ($result === false)
+    error_log('DB error: '.$DB->errorInfo()[2].' in query: '.$query);
+  return $result;
 }
 
 function DB_fetch_array($result)
 {
   if($result)
-    return $result->fetch_array(MYSQLI_NUM);
+    {
+      $row = $result->fetch(PDO::FETCH_NUM);
+      return $row === false ? NULL : $row;
+    }
   else
     return NULL;
 }
@@ -123,9 +133,9 @@ function DB_fetch_array($result)
 function DB_insert_id()
 {
   global $DB;
-  return $DB->insert_id;
+  return $DB->lastInsertId();
 }
-/* end Mysql functions */
+/* end DB functions */
 
 function DB_query_array($query)
 {
@@ -168,7 +178,7 @@ function DB_check_recovery_passwords($password,$email)
 		      " LEFT JOIN Recovery ON User.id=Recovery.user_id".
 		      " WHERE email=".DB_quote_smart($email).
 		      " AND Recovery.password=".DB_quote_smart($password).
-		      " AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
+		      " AND date('now','-1 day') <= Recovery.create_date");
   if($r)
     return 1;
   else
@@ -468,12 +478,9 @@ function DB_get_all_user_names_open_for_games()
 {
   $names  = array();
 
-  DB_query("DROP   TEMPORARY TABLE IF EXISTS Usertmp;");
-  DB_query("CREATE TEMPORARY TABLE Usertmp SELECT id,fullname FROM User;");
-  DB_query("DELETE FROM Usertmp WHERE id IN (SELECT user_id FROM User_Prefs WHERE pref_key='open for games' and value='no')");
-
-  $result = DB_query("SELECT fullname FROM Usertmp");
-  DB_query("DROP   TEMPORARY TABLE IF EXISTS Usertmp;");
+  $result = DB_query("SELECT fullname FROM User".
+		     " WHERE id NOT IN (SELECT user_id FROM User_Prefs WHERE pref_key='open for games' and value='no')".
+		     " ORDER BY id");
 
   while($r = DB_fetch_array($result))
     $names[] = $r[0];
@@ -508,7 +515,7 @@ function DB_get_names_of_new_logins($N)
   $names  = array();
 
   $result = DB_query("SELECT fullname FROM User".
-		     " WHERE create_date >=(NOW() - interval 45 day)".
+		     " WHERE create_date >= datetime('now','-45 days')".
 		     " ORDER BY create_date DESC, id DESC LIMIT $N");
   while($r = DB_fetch_array($result))
     $names[] = $r[0];
@@ -911,17 +918,13 @@ function DB_get_email_pref_by_uid($uid)
 
 function DB_get_unused_randomnumbers($userstr)
 {
-  /* optimized version of this query using temporary tables (perhaps we should use a procedure here?).
-     First we create a copy of the Game table using just the cards.
-     Then in a second round we delete all the randomnumbers of games where our players are in.
-     At the end we return only the first entry in the temporary table.
-  */
-  DB_query("DROP   TEMPORARY TABLE IF EXISTS gametmp;");
-  DB_query("CREATE TEMPORARY TABLE gametmp SELECT DISTINCT randomnumbers FROM Game;");
-  DB_query("DELETE FROM gametmp WHERE randomnumbers IN (SELECT DISTINCT randomnumbers FROM Game WHERE id IN (SELECT DISTINCT game_id FROM Hand WHERE user_id IN (".$userstr.")));");
-
-  $r = DB_query_array("SELECT randomnumbers FROM gametmp LIMIT 1;");
-  DB_query("DROP   TEMPORARY TABLE IF EXISTS gametmp;");
+  /* the cards of the oldest game that none of our players has seen */
+  $r = DB_query_array("SELECT randomnumbers FROM Game".
+		      " WHERE randomnumbers IS NOT NULL".
+		      " AND randomnumbers NOT IN (SELECT randomnumbers FROM Game".
+		      "   WHERE randomnumbers IS NOT NULL".
+		      "   AND id IN (SELECT game_id FROM Hand WHERE user_id IN (".$userstr.")))".
+		      " GROUP BY randomnumbers ORDER BY MIN(id) LIMIT 1");
 
   if($r)
     return $r[0];
@@ -933,7 +936,7 @@ function DB_get_number_of_passwords_recovery($user)
 {
   $r = DB_query_array("SELECT COUNT(*) FROM Recovery ".
 		      "  WHERE user_id=".DB_quote_smart($user).
-		      "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
+		      "  AND date('now','-1 day') <= create_date".
 		      "  GROUP BY user_id " );
   if($r)
     return $r[0];
@@ -1040,7 +1043,7 @@ function DB_get_reminder($user,$gameid)
   $r = DB_query_array("SELECT COUNT(*) FROM Reminder ".
 		      "  WHERE user_id=".DB_quote_smart($user).
 		      "  AND game_id=".DB_quote_smart($gameid).
-		      "  AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= create_date".
+		      "  AND date('now','-1 day') <= create_date".
 		      "  GROUP BY user_id " );
   if($r)
     return $r[0];
@@ -1133,7 +1136,7 @@ function DB_get_userid($type,$var1="",$var2="")
 			     " LEFT JOIN Recovery ON User.id=Recovery.user_id".
 			     " WHERE email=".DB_quote_smart($var1).
 			     " AND Recovery.password=".DB_quote_smart($var2).
-			     " AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) <= Recovery.create_date");
+			     " AND date('now','-1 day') <= Recovery.create_date");
 	}
       break;
     case 'gameid-position':
