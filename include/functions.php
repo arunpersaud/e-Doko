@@ -213,14 +213,15 @@ function sendmail($To,$Subject,$message)
   /* this function sends the mail or outputs to the screen in case of debugging */
   global $debug,$EMAIL_REPLY;
 
-  $header = "";
-
+  /* without MIME-Version, strict clients ignore the charset (broken umlauts) */
+  $header = array('MIME-Version' => '1.0',
+		  'Content-Type' => 'text/plain; charset=UTF-8',
+		  'Content-Transfer-Encoding' => '8bit');
   if(isset($EMAIL_REPLY))
-    $header .= "From: e-DoKo daemon <$EMAIL_REPLY>\r\n";
-
-  $header .= "Content-Type: text/plain; charset = \"UTF-8\";\r\n";
-  $header .= "Content-Transfer-Encoding: 8bit\r\n";
-  $header .= "\r\n";
+    $header['From'] = "e-DoKo daemon <$EMAIL_REPLY>";
+  /* German subjects can contain umlauts: encode as RFC 2047 if needed */
+  if(preg_match('/[^\x20-\x7e]/', $Subject))
+    $Subject = '=?UTF-8?B?'.base64_encode($Subject).'?=';
 
   if($debug)
     {
@@ -232,7 +233,8 @@ function sendmail($To,$Subject,$message)
 			      "<a href=\"$1\">$1</a>", $message);
 
       echo "<br />To: $To<br />";
-      echo $header."<br />";
+      foreach($header as $key => $value)
+	echo htmlspecialchars("$key: $value")."<br />";
       echo "Subject: $Subject <br />$message<br />\n";
     }
   else
