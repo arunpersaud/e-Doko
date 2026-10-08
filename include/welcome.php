@@ -77,9 +77,9 @@ echo "\n\n<div class=\"login\">\n";
     <input type="text" id="openid_url" name="openid_url" size="20" maxlength="50" placeholder="http://username.openid.net"/>
          <span class="help-bloc">See <a href="http://openid.net">openid.net</a> for more information</span>.
     <hr />
+<?php }?>
     <input type="submit" class="submitbutton" name="login"  value="login" />
     <input type="submit" class="button"       name="forgot" value="Forgot your password?" />
-<?php }?>
   </fieldset>
   </form>
    </div>
