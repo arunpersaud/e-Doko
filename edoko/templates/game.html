@@ -42,7 +42,7 @@
 
   {% for corner, remarks in bubbles %}
   <div class="bubbles corner-{{ corner }}">
-    {% for c in remarks %}<p class="bubble{% if c.icon %} announcement{% endif %}" data-seq="{{ c.sequence }}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}<img class="card tiny" src="{{ url_for('static', filename='cards/english/%d.png' % image_number(c.card_id)) }}" alt="{{ card_name(c) }}" title="{{ card_name(c) }}" width="169" height="245"> {{ c.body }}{% endif %}</p>{% endfor %}
+    {% for c in remarks %}<p class="bubble{% if c.icon %} announcement{% endif %}" data-seq="{{ c.sequence }}" title="{{ _('about %(card)s', card=card_name(c)) }}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}{{ c.body }}{% endif %}</p>{% endfor %}
   </div>
   {% endfor %}
 

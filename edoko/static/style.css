@@ -201,9 +201,7 @@ p.bubble .who {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap; font-weight: 700;
 }
-/* the card the remark is about */
-img.card.tiny { float: left; height: 1.9rem; width: auto; margin: 0.1rem 0.45rem 0 0; border-radius: 2px; }
-/* hovering a bubble marks that card on the table (browsers that know :has) */
+/* hovering a bubble marks the card it is about on the table (browsers that know :has) */
 .table-view:has(p.bubble[data-seq="1"]:hover) figure.play[data-seq="1"] img,
 .table-view:has(p.bubble[data-seq="2"]:hover) figure.play[data-seq="2"] img,
 .table-view:has(p.bubble[data-seq="3"]:hover) figure.play[data-seq="3"] img,

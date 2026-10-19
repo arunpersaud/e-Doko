@@ -1835,3 +1835,7 @@ msgstr "Ansage von %(party)s geschlagen: %(call)s"
 #, python-format
 msgid "Beat the announcement of %(party)s"
 msgstr "Ansage von %(party)s geschlagen"
+
+#, python-format
+msgid "about %(card)s"
+msgstr "zu %(card)s"

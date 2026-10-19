@@ -770,16 +770,15 @@ def test_several_remarks_of_a_player_stack_in_one_corner(world):
     )
 
 
-def test_a_bubble_shows_the_card_it_is_about_and_not_a_number(world):
+def test_a_bubble_has_no_card_picture_but_says_which_card_in_its_tooltip(world):
     remark(world, 10013, 1, "about the third card")  # play 10013: seat 3, card 25
     page = client_for(world, 1).get("/game/10/").text
     bubble = page.split('<p class="bubble"')[1].split("</p>")[0]
-    assert 'data-seq="3"' in bubble
-    assert 'class="card tiny"' in bubble and "cards/english/25.png" in bubble
-    assert 'alt="nine diamonds"' in bubble and 'title="nine diamonds"' in bubble
+    assert "cards/english" not in bubble and "tiny" not in bubble
+    assert 'title="about nine diamonds"' in bubble
     assert "#3" not in page  # the old number that nobody understood
-    # the card on the table has the same number, so hovering can mark it
-    assert 'data-seq="3"' in on_table(page)
+    # the card on the table has the same number, so hovering a bubble can mark it
+    assert 'data-seq="3"' in bubble and 'data-seq="3"' in on_table(page)
 
 
 def test_the_name_is_in_the_bubble_for_screen_readers_and_phones(world):
@@ -864,7 +863,7 @@ def test_an_announcement_shows_its_icon_and_not_the_card(world):
         bubble = bubble_of(client_for(world, 1).get("/game/10/").text)
         assert f"icons/{icon}_button.png" in bubble
         assert f'alt="{words}"' in bubble
-        assert 'class="card tiny"' not in bubble  # not a card that looks like a catch
+        assert "cards/english" not in bubble  # not a card that looks like a catch
         assert "announcement" in bubble.split(">")[0]
 
 
@@ -874,15 +873,13 @@ def test_the_icon_of_an_announcement_still_belongs_to_a_card_for_the_hover(world
 
 
 def test_only_the_words_of_the_site_are_announcements(world):
-    # players' own remarks, even "re" or "RE", keep their card and their words
+    # players' own remarks, even "re" or "RE", keep their words and are no icon
     for body in ("re", "RE", "No 91", "Zero!", "Schweinchen! ", "hello"):
         with closing(db.connect(world.config["DATABASE"])) as conn:
             conn.execute("DELETE FROM comment")
         remark(world, 10013, 1, body)
         bubble = bubble_of(client_for(world, 1).get("/game/10/").text)
-        assert (
-            'class="card tiny"' in bubble and "announcement" not in bubble.split(">")[0]
-        )
+        assert "icons/" not in bubble and "announcement" not in bubble.split(">")[0]
         assert body.strip() in bubble
 
 
