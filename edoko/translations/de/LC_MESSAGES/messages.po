@@ -1765,3 +1765,12 @@ msgstr "Die Kopie des Bildes wurde gelöscht."
 
 msgid "Winner"
 msgstr "Gewinner"
+
+#, python-format
+msgid "%(num)d game point for %(party)s"
+msgid_plural "%(num)d game points for %(party)s"
+msgstr[0] "%(num)d Spielpunkt für %(party)s"
+msgstr[1] "%(num)d Spielpunkte für %(party)s"
+
+msgid "the soloist counts triple"
+msgstr "der Solospieler zählt dreifach"

@@ -563,3 +563,37 @@ def test_the_trophy_follows_the_items_not_the_card_points(world):
     score_items(world, ("re", "120"), ("re", "call120"), ("re", "90"))
     page = client_for(world, 1).get("/game/10/").text
     assert info(page).index("🏆") < info(page).index("Re ")
+
+
+def test_the_game_points_are_shown_for_the_winning_party(world):
+    score_items(
+        world,
+        ("contra", "againstqueens"),
+        ("contra", "120"),
+        ("contra", "doko"),
+        ("contra", "fox"),
+        ("re", "fox"),
+    )
+    line = info(client_for(world, 1).get("/game/10/").text)
+    assert "3 game points for Contra" in line
+    assert "triple" not in line
+    score_items(world, ("re", "120"), ("re", "90"), ("re", "call90"), ("re", "doko"))
+    assert "1 game point for Re" in info(client_for(world, 1).get("/game/10/").text)
+
+
+def test_the_game_points_in_german_and_for_solos(world):
+    score_items(world, ("re", "120"), ("re", "90"))
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE game SET type = 'solo', solo = 'jack' WHERE id = 10")
+    page = client_for(world, 1).get("/game/10/").text
+    assert "2 game points for Re" in info(page) and "the soloist counts triple" in info(
+        page
+    )
+    german = client_for(world, 1).get("/game/10/", headers={"Accept-Language": "de"})
+    assert "2 Spielpunkte für Re" in info(german.text)
+
+
+def test_no_game_points_without_a_winner(world):
+    assert "game point" not in info(client_for(world, 1).get("/game/10/").text)
+    score_items(world, ("re", "fox"), ("contra", "fox"))
+    assert "game point" not in info(client_for(world, 1).get("/game/10/").text)

@@ -298,6 +298,7 @@ def result(game_id: int, hands, tricks) -> dict:
         "scores": scores,
         "card_points": {"re": points["re"], "contra": points["contra"]},
         "winner": winner,
+        "game_points": abs(items["re"] - items["contra"]),
     }
 
 
