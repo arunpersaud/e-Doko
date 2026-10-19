@@ -214,3 +214,8 @@ p.bubble::after {
   }
   p.bubble::after { display: none; }
 }
+
+table.users th a.sort { text-decoration: none; color: inherit; white-space: nowrap; }
+table.users th a.sort:hover { text-decoration: underline; }
+table.users th[aria-sort] a.sort { color: var(--pico-primary); }
+table.users th a.sort .idle { opacity: 0.35; }

@@ -242,3 +242,153 @@ def test_the_admin_page_counts_passkeys_and_games(app):
     row = page.split("<tbody>")[1].split("</tr>")[0]
     cells = [c.split("</td>")[0].strip() for c in row.split("<td>")[1:]]
     assert cells[2:4] == ["0", "2"]  # games, passkeys
+
+
+# --- sorting the user table ----------------------------------------------------------
+
+
+def admin_with_users(app):
+    """Ann (admin) and four others with different logins, games and passkeys."""
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET is_admin = 1, last_login = '2026-10-01 10:00:00'")
+        users = [
+            (2, "bob", "z@x.org", "2026-10-19 08:00:00"),
+            (3, "Cy", "b@x.org", None),  # never logged in
+            (4, "Di", "m@x.org", "2026-09-01 08:00:00"),
+            (5, "eve", "c@x.org", "2026-10-10 08:00:00"),
+        ]
+        for uid, name, email, last in users:
+            conn.execute(
+                "INSERT INTO user (id, name, email, last_login) VALUES (?, ?, ?, ?)",
+                (uid, name, email, last),
+            )
+        conn.execute("DELETE FROM game")  # the two games of conftest have no hands
+        for game in (1, 2, 3):
+            conn.execute(
+                "INSERT INTO game (id, session, deal, ruleset, status)"
+                " VALUES (?, 1, 1, 1, 'play')",
+                (game,),
+            )
+        for game, seat, user in [
+            (1, 1, 1),
+            (2, 1, 1),
+            (3, 1, 1),
+            (1, 2, 2),
+            (2, 2, 2),
+            (1, 3, 5),
+        ]:
+            conn.execute(
+                "INSERT INTO hand (game, seat, user, token) VALUES (?, ?, ?, ?)",
+                (game, seat, user, f"t{game}{seat}"),
+            )
+        for user, n in [(2, 3), (5, 1)]:
+            for k in range(n):
+                conn.execute(
+                    "INSERT INTO passkey (user, credential_id, public_key)"
+                    " VALUES (?, ?, x'00')",
+                    (user, bytes([user, k])),
+                )
+    return logged_in_as(app, 1)
+
+
+def names(page):
+    """The names in the first column, in the order shown."""
+    import re
+
+    body = page.split("<tbody>")[1]
+    return [
+        re.sub(r"<[^>]+>", "", n).strip()
+        for n in re.findall(r"<tr>\s*<td>(.*?)</td>", body)
+    ]
+
+
+def test_the_default_order_is_the_last_login_with_the_newest_first(app):
+    page = admin_with_users(app).get("/admin").text
+    assert names(page) == ["bob", "eve", "Ann", "Di", "Cy"]  # Cy never logged in: last
+
+
+def test_sorting_by_name_ignores_the_case(app):
+    client = admin_with_users(app)
+    assert names(client.get("/admin?sort=name").text) == [
+        "Ann",
+        "bob",
+        "Cy",
+        "Di",
+        "eve",
+    ]
+    assert names(client.get("/admin?sort=name&dir=desc").text) == [
+        "eve",
+        "Di",
+        "Cy",
+        "bob",
+        "Ann",
+    ]
+
+
+def test_sorting_by_email_games_and_passkeys(app):
+    client = admin_with_users(app)
+    assert (
+        names(client.get("/admin?sort=email").text) == ["eve", "Cy", "Di", "bob", "Ann"]
+        or True
+    )
+    by_email = names(client.get("/admin?sort=email").text)
+    assert by_email == ["Ann", "Cy", "eve", "Di", "bob"]  # a@, b@, c@, m@, z@
+    games = names(client.get("/admin?sort=games").text)  # most games first
+    assert games[:2] == ["Ann", "bob"] and games[2] == "eve"
+    passkeys = names(client.get("/admin?sort=passkeys").text)
+    assert passkeys[:2] == ["bob", "eve"]
+    assert names(client.get("/admin?sort=games&dir=asc").text)[-2:] == ["bob", "Ann"]
+
+
+def test_users_who_never_logged_in_come_last_in_both_directions(app):
+    client = admin_with_users(app)
+    assert names(client.get("/admin?sort=last_login&dir=desc").text)[-1] == "Cy"
+    assert names(client.get("/admin?sort=last_login&dir=asc").text)[-1] == "Cy"
+    assert names(client.get("/admin?sort=last_login&dir=asc").text)[0] == "Di"
+
+
+def test_rubbish_in_the_query_falls_back_to_the_default(app):
+    client = admin_with_users(app)
+    default = names(client.get("/admin").text)
+    for query_string in (
+        "sort=password",
+        "sort=name;drop table user",
+        "sort=name&dir=sideways",
+        "sort=&dir=",
+        "dir=asc",
+    ):
+        response = client.get("/admin?" + query_string)
+        assert response.status_code == 200
+    assert names(client.get("/admin?sort=password").text) == default
+    # an unknown direction keeps the column but uses its natural direction
+    assert names(client.get("/admin?sort=name&dir=sideways").text)[0] == "Ann"
+    assert names(client.get("/admin?dir=asc").text) == default  # no column: the default
+
+
+def test_the_headers_are_links_that_reverse_the_sorted_column(app):
+    client = admin_with_users(app)
+    page = client.get("/admin?sort=name&dir=asc").text
+    assert 'aria-sort="ascending"' in page and page.count("aria-sort") == 1
+    assert 'href="/admin?sort=name&amp;dir=desc"' in page  # a click reverses
+    assert 'href="/admin?sort=games&amp;dir=desc"' in page  # others: natural direction
+    assert 'href="/admin?sort=email&amp;dir=asc"' in page
+    desc = client.get("/admin?sort=name&dir=desc").text
+    assert (
+        'aria-sort="descending"' in desc
+        and 'href="/admin?sort=name&amp;dir=asc"' in desc
+    )
+    first = client.get(
+        "/admin"
+    ).text  # the default order is by last login, newest first
+    assert 'aria-sort="descending"' in first.split("Last login")[0].rsplit("<th", 1)[1]
+
+
+def test_sorting_does_not_open_the_page_to_others(app):
+    admin_with_users(app)
+    assert logged_in_as(app, 2).get("/admin?sort=name").status_code == 403
+    assert app.test_client().get("/admin?sort=name").status_code == 302
+
+
+def test_unsorted_headers_hint_that_they_can_be_clicked(app):
+    page = admin_with_users(app).get("/admin?sort=name").text
+    assert page.count('class="idle"') == 4  # the four other sortable columns

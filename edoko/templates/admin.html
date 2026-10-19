@@ -6,7 +6,10 @@
 <div class="overflow-auto">
 <table class="users">
   <thead>
-    <tr><th>{{ _("Name") }}</th><th>{{ _("Email") }}</th><th>{{ _("Games") }}</th><th>{{ _("Passkeys") }}</th><th>{{ _("Last login") }}</th><th></th></tr>
+    <tr>
+      {% macro header(column, label) %}<th scope="col"{% if sort == column %} aria-sort="{{ 'ascending' if direction == 'asc' else 'descending' }}"{% endif %}><a href="{{ url_for('admin.index', **links[column]) }}" class="sort">{{ label }} <span aria-hidden="true"{% if sort != column %} class="idle"{% endif %}>{% if sort == column %}{{ "▲" if direction == "asc" else "▼" }}{% else %}↕{% endif %}</span></a></th>{% endmacro %}
+      {{ header("name", _("Name")) }}{{ header("email", _("Email")) }}{{ header("games", _("Games")) }}{{ header("passkeys", _("Passkeys")) }}{{ header("last_login", _("Last login")) }}<th></th>
+    </tr>
   </thead>
   <tbody>
   {% for u in users %}
