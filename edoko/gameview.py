@@ -79,10 +79,6 @@ def badges(game, hand, trump_back: bool, over: bool) -> list[tuple[str, str]]:
 
 
 # where the ring starts: degrees clockwise from the right, as the spots lie
-# the corner of the table where the remarks of the player at a spot appear
-CORNER = {"top": "nw", "left": "sw", "bottom": "se", "right": "ne"}
-CORNERS = ("nw", "ne", "se", "sw")
-
 START_ANGLE = {"right": 0, "bottom": 90, "left": 180, "top": 270}
 
 
@@ -183,6 +179,14 @@ def build(
         )
         cards[h["seat"]] = [rows[card_id] for card_id in order]
 
+    if tricks:
+        if trick is None or not 1 <= trick <= len(tricks):
+            trick = len(tricks) if not over else 1
+        selected = tricks[trick - 1]
+        lead = spot[selected["plays"][0]["seat"]] if selected["plays"] else "bottom"
+    else:
+        selected, lead = None, "bottom"
+    bubbles, strangers = speech_bubbles(selected, hands)
     seats = []
     for h in hands:
         party_known = over or h["point_call"] is not None or h["seat"] in queen_played
@@ -200,6 +204,7 @@ def build(
                 "label": label,
                 "badges": badges(game, h, trump_back.get(h["seat"], False), over),
                 "tricks": won[h["seat"]],
+                "bubbles": bubbles.get(h["seat"], []),
                 "cards": cards[h["seat"]],
                 "on_turn": game["status"] in ("pre", "play")
                 and h["seat"] == game["turn_seat"],
@@ -207,17 +212,8 @@ def build(
         )
     seats.sort(key=lambda s: SPOTS.index(s["spot"]))
 
-    if tricks:
-        if trick is None or not 1 <= trick <= len(tricks):
-            trick = len(tricks) if not over else 1
-        selected = tricks[trick - 1]
-        lead = spot[selected["plays"][0]["seat"]] if selected["plays"] else "bottom"
-    else:
-        selected, lead = None, "bottom"
-    bubbles, strangers = speech_bubbles(selected, hands, spot)
     context = {
         "game": game,
-        "bubbles": bubbles,
         "strangers": strangers,
         "selected": selected,
         "ring": ring(lead),
@@ -259,25 +255,25 @@ def announcement(body: str):
     return icon, _("Announced %(call)s", call=name)
 
 
-def speech_bubbles(selected, hands, spot) -> tuple[list, list]:
-    """The remarks on a trick as speech bubbles: (corner, remarks) for each corner
-    that has some, in the corner next to the player who made them.
+def speech_bubbles(selected, hands) -> tuple[dict[int, list], list]:
+    """The remarks on a trick, by the seat of the player who made them.
 
-    Remarks of somebody who is not at the table are returned apart.
+    They are shown as speech bubbles that hang off that player's box. Remarks
+    of somebody who is not at the table are returned apart.
     """
     seat_of = {h["user_id"]: h["seat"] for h in hands}
-    corners: dict[str, list] = {corner: [] for corner in CORNERS}
+    by_seat: dict[int, list] = {}
     strangers = []
     for remark in selected["comments"] if selected else []:
-        seat = seat_of.get(remark["user_id"])
         said = announcement(remark["body"])
         if said:
             remark = {**remark, "icon": said[0], "words": said[1]}
+        seat = seat_of.get(remark["user_id"])
         if seat is None:
             strangers.append(remark)
         else:
-            corners[CORNER[spot[seat]]].append(remark)
-    return [(c, corners[c]) for c in CORNERS if corners[c]], strangers
+            by_seat.setdefault(seat, []).append(remark)
+    return by_seat, strangers
 
 
 def tricks_so_far(game_id: int) -> list[dict]:
@@ -311,18 +307,7 @@ def tricks_so_far(game_id: int) -> list[dict]:
                 "number": trick["number"],
                 "winner_seat": trick["winner_seat"],
                 "plays": [dict(p) for p in plays],
-                # each remark knows the card it is about (to show it in the bubble)
-                "comments": [
-                    {
-                        **dict(c),
-                        "sequence": p["sequence"],
-                        "card_id": p["card_id"],
-                        "suit": p["suit"],
-                        "rank": p["rank"],
-                    }
-                    for p in plays
-                    for c in comments.get(p["id"], [])
-                ],
+                "comments": [dict(c) for p in plays for c in comments.get(p["id"], [])],
             }
         )
     return tricks

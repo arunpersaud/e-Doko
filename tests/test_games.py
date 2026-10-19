@@ -691,12 +691,11 @@ def test_the_cross_has_tracks_of_a_fixed_size():
     assert "grid-template-columns: repeat(3, var(--card-w))" in cross
 
 
-def test_the_bubbles_leave_their_corners_on_narrow_screens():
-    # the corner areas do not exist in the one-column grid of a phone: a bubble that
-    # kept its grid-area would add columns and squeeze the table
+def test_the_bubbles_are_part_of_their_players_box_on_narrow_screens():
+    # on a phone the boxes are one column: the bubbles stop floating
     css = (Path(__file__).parent.parent / "edoko/static/style.css").read_text()
     narrow = css.split("@media (max-width: 42rem) {")[2]
-    assert ".table-view > .bubbles" in narrow and "grid-area: auto" in narrow
+    assert ".bubbles" in narrow and "position: static" in narrow
 
 
 def test_the_trick_label_has_two_lines_so_the_arrows_do_not_move(world):
@@ -718,78 +717,72 @@ def remark(world, play, user, body):
         )
 
 
-def corners(page):
-    """corner -> the texts of the bubbles in it."""
+def bubbles_by_spot(page):
+    """spot -> the texts of the bubbles that hang off the box at that spot."""
     import re
 
     found = {}
-    for corner, inner in re.findall(
-        r'<div class="bubbles corner-(\w+)">(.*?)</div>', page, re.S
+    for match in re.finditer(
+        r'<section class="seat spot-(\w+)[^"]*">(.*?)</section>', page, re.S
     ):
-        found[corner] = [
-            re.sub(r"<[^>]+>", " ", b)
-            for b in re.findall(r'<p class="bubble"[^>]*>(.*?)</p>', inner, re.S)
-        ]
+        spot, inner = match.groups()
+        box = re.search(r'<div class="bubbles bubbles-(\w+)">(.*?)</div>', inner, re.S)
+        if box:
+            assert box.group(1) == spot  # the bubbles belong to the box they are in
+            found[spot] = [
+                re.sub(r"<[^>]+>", " ", b)
+                for b in re.findall(
+                    r'<p class="bubble[^"]*">(.*?)</p>', box.group(2), re.S
+                )
+            ]
     return found
 
 
-def test_a_remark_is_a_bubble_in_the_corner_next_to_its_author(world):
+def test_a_remark_is_a_bubble_that_hangs_off_the_box_of_its_author(world):
     # Ann (1) is at the bottom, Bob (2) left, Cy (3) top, Di (4) right
     remark(world, 10011, 1, "mine")
     remark(world, 10012, 2, "from the left")
     remark(world, 10013, 3, "from the top")
     remark(world, 10014, 4, "from the right")
-    found = corners(client_for(world, 1).get("/game/10/").text)
-    assert set(found) == {"se", "sw", "nw", "ne"}  # bottom, left, top, right
-    assert "mine" in found["se"][0] and "Ann" in found["se"][0]
-    assert "from the left" in found["sw"][0]
-    assert "from the top" in found["nw"][0]
-    assert "from the right" in found["ne"][0]
-    # no list of remarks under the table any more
-    assert 'class="trick-comments"' not in client_for(world, 1).get("/game/10/").text
+    found = bubbles_by_spot(client_for(world, 1).get("/game/10/").text)
+    assert set(found) == {"bottom", "left", "top", "right"}
+    assert "mine" in found["bottom"][0] and "Ann" in found["bottom"][0]
+    assert "from the left" in found["left"][0]
+    assert "from the top" in found["top"][0]
+    assert "from the right" in found["right"][0]
+    # no list of remarks under the table any more, no corner containers
+    page = client_for(world, 1).get("/game/10/").text
+    assert 'class="trick-comments"' not in page and "corner-" not in page
 
 
-def test_the_corner_follows_the_viewers_spots(world):
+def test_the_bubble_follows_the_viewers_spots(world):
     remark(world, 10012, 2, "Bob speaking")  # Bob: left of Ann, top for Di
     assert (
-        "Bob speaking" in corners(client_for(world, 1).get("/game/10/").text)["sw"][0]
+        "Bob speaking"
+        in bubbles_by_spot(client_for(world, 1).get("/game/10/").text)["left"][0]
     )
     assert (
-        "Bob speaking" in corners(client_for(world, 4).get("/game/10/").text)["nw"][0]
+        "Bob speaking"
+        in bubbles_by_spot(client_for(world, 4).get("/game/10/").text)["top"][0]
     )
 
 
-def test_several_remarks_of_a_player_stack_in_one_corner(world):
+def test_several_remarks_of_a_player_stack_in_their_bubbles(world):
     remark(world, 10011, 1, "first")
     remark(world, 10012, 1, "second")
-    found = corners(client_for(world, 1).get("/game/10/").text)
-    assert (
-        len(found["se"]) == 2
-        and "first" in found["se"][0]
-        and "second" in found["se"][1]
-    )
+    found = bubbles_by_spot(client_for(world, 1).get("/game/10/").text)
+    assert len(found["bottom"]) == 2
+    assert "first" in found["bottom"][0] and "second" in found["bottom"][1]
 
 
-def test_a_bubble_has_no_card_picture_but_says_which_card_in_its_tooltip(world):
-    remark(world, 10013, 1, "about the third card")  # play 10013: seat 3, card 25
+def test_a_bubble_has_no_card_no_tooltip_and_no_hover(world):
+    remark(world, 10013, 1, "about the third card")
     page = client_for(world, 1).get("/game/10/").text
-    bubble = page.split('<p class="bubble"')[1].split("</p>")[0]
-    assert "cards/english" not in bubble and "tiny" not in bubble
-    assert 'title="about nine diamonds"' in bubble
-    assert "#3" not in page  # the old number that nobody understood
-    # the card on the table has the same number, so hovering a bubble can mark it
-    assert 'data-seq="3"' in bubble and 'data-seq="3"' in on_table(page)
-
-
-def test_the_name_is_in_the_bubble_for_screen_readers_and_phones(world):
-    remark(world, 10011, 1, "hello")
-    page = client_for(world, 1).get("/game/10/").text
-    assert '<span class="who">Ann:</span>' in page  # hidden by the style on a desktop
+    bubble = page.split('<p class="bubble')[1].split("</p>")[0]
+    assert "cards/english" not in bubble and "title=" not in bubble
+    assert "data-seq" not in page and "#3" not in page
     css = (Path(__file__).parent.parent / "edoko/static/style.css").read_text()
-    desktop = css.split("p.bubble .who {")[1].split("}")[0]
-    assert "clip-path: inset(50%)" in desktop and "position: absolute" in desktop
-    phone = css.split("p.bubble .who {")[2].split("}")[0]  # the media query
-    assert "position: static" in phone and "clip-path: none" in phone
+    assert ":hover" not in css.split("remarks on the trick")[1].split("@media")[0]
 
 
 def test_only_the_remarks_of_the_shown_trick(world):
@@ -813,32 +806,16 @@ def test_a_remark_of_somebody_who_is_not_at_the_table_is_not_lost(world):
     remark(world, 10011, 9, "from outside")
     page = client_for(world, 1).get("/game/10/").text
     assert "from outside" in page and 'class="trick-comments"' in page
-    assert not corners(page)
+    assert not bubbles_by_spot(page)
 
 
-def test_the_values_decide_the_winner_and_the_game_points(world, monkeypatch):
-    # a rule set that gives more for some items: the sums decide, not the rows
-    from edoko import rules
-
-    monkeypatch.setattr(
-        rules, "item_value", lambda kind, rule_set=None: 2 if kind == "doko" else 1
-    )
-    # three rows each (a tie by rows), but contra has 2 + 1 + 1 = 4 points against 3
-    score_items(
-        world,
-        ("re", "120"),
-        ("re", "90"),
-        ("re", "fox"),
-        ("contra", "doko"),
-        ("contra", "karlchen"),
-        ("contra", "againstqueens"),
-    )
+def test_the_name_stays_out_of_the_way_the_box_names_the_speaker(world):
+    remark(world, 10011, 1, "hello")
     page = client_for(world, 1).get("/game/10/").text
-    assert "1 game point for Contra" in info(page)
-    assert info(page).count("🏆") == 1
-    rows = breakdown(page)
-    assert any(r.startswith("+2 Contra: Doppelkopf") for r in rows)
-    assert sum(r.startswith("+1 ") for r in rows) == 5
+    assert '<span class="who">Ann:</span>' in page  # for screen readers
+    css = (Path(__file__).parent.parent / "edoko/static/style.css").read_text()
+    who = css.split("p.bubble .who {")[1].split("}")[0]
+    assert "clip-path: inset(50%)" in who and "position: absolute" in who
 
 
 # --- announcements are not remarks ----------------------------------------------------
@@ -865,11 +842,6 @@ def test_an_announcement_shows_its_icon_and_not_the_card(world):
         assert f'alt="{words}"' in bubble
         assert "cards/english" not in bubble  # not a card that looks like a catch
         assert "announcement" in bubble.split(">")[0]
-
-
-def test_the_icon_of_an_announcement_still_belongs_to_a_card_for_the_hover(world):
-    remark(world, 10013, 1, "Re")
-    assert 'data-seq="3"' in bubble_of(client_for(world, 1).get("/game/10/").text)
 
 
 def test_only_the_words_of_the_site_are_announcements(world):

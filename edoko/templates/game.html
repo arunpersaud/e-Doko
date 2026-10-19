@@ -37,14 +37,14 @@
     {% if s.cards %}
     <div class="hand">{% for c in s.cards %}{{ card(c, "small") }}{% endfor %}</div>
     {% endif %}
+    {% if s.bubbles %}
+    <div class="bubbles bubbles-{{ s.spot }}">
+      {% for c in s.bubbles %}<p class="bubble{% if c.icon %} announcement{% endif %}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}{{ c.body }}{% endif %}</p>{% endfor %}
+    </div>
+    {% endif %}
   </section>
   {% endfor %}
 
-  {% for corner, remarks in bubbles %}
-  <div class="bubbles corner-{{ corner }}">
-    {% for c in remarks %}<p class="bubble{% if c.icon %} announcement{% endif %}" data-seq="{{ c.sequence }}" title="{{ _('about %(card)s', card=card_name(c)) }}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}{{ c.body }}{% endif %}</p>{% endfor %}
-  </div>
-  {% endfor %}
 
   <div class="felt">
     {% if selected %}
@@ -56,7 +56,7 @@
       </svg>
       <div class="cross large">
         {% for p in selected.plays %}
-        <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" data-seq="{{ p.sequence }}" title="{{ names[p.seat] }}">
+        <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" title="{{ names[p.seat] }}">
           {{ card(p) }}<span class="seq">{{ p.sequence }}</span>
         </figure>
         {% endfor %}

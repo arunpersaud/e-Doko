@@ -49,11 +49,9 @@ nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-
 .table-view {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
-  grid-template-areas: "nw top ne" "left felt right" "sw bottom se";
-  /* the corner rows are tall enough for the bubbles, which scroll instead of growing:
-     the table must not move when one clicks from trick to trick */
-  grid-template-rows: minmax(var(--corner), auto) auto minmax(var(--corner), auto);
-  --corner: 6.5rem;
+  grid-template-areas: ". top ." "left felt right" ". bottom .";
+  container-type: inline-size; /* the bubbles are sized by the width of the table */
+  --side: calc((100cqw - 1.5rem) / 3.2); /* the width of a side column */
   gap: 0.75rem;
   align-items: start;
   margin-bottom: 1.5rem;
@@ -181,16 +179,20 @@ details.points > ul {
 details.points li { margin: 0.2rem 0; font-size: 0.9rem; line-height: 1.35; list-style: none; }
 details.points em { font-weight: 600; }
 
-/* remarks on the trick: speech bubbles in the corners of the table, each next to the
-   player who made them, with a tail that points at that player */
+/* remarks on the trick: speech bubbles that hang off the box of the player who made
+   them, with a tail that points at that box. They float (position: absolute), so they
+   never move the table: below the left box, above the right box, to the left of the
+   top box, to the right of the bottom box */
+.seat { position: relative; }
 .bubbles {
-  display: flex; flex-direction: column; gap: 0.6rem;
-  max-height: var(--corner); overflow-y: auto; scrollbar-width: thin; padding: 0.5rem 0.65rem;
+  position: absolute; display: flex; flex-direction: column; gap: 0.6rem;
+  max-height: 9rem; overflow-y: auto; scrollbar-width: thin;
+  padding: 0.4rem 0.6rem; width: max-content; z-index: 5;
 }
-.corner-nw { grid-area: nw; align-self: center; justify-self: end; }
-.corner-ne { grid-area: ne; align-self: end; justify-self: center; }
-.corner-se { grid-area: se; align-self: center; justify-self: start; }
-.corner-sw { grid-area: sw; align-self: start; justify-self: center; }
+.bubbles-top { right: calc(100% + 0.5rem); top: 0; max-width: calc(var(--side) - 1rem); }
+.bubbles-bottom { left: calc(100% + 0.5rem); bottom: 0; max-width: calc(var(--side) - 1rem); }
+.bubbles-left { top: calc(100% + 0.5rem); left: 0; max-width: 100%; }
+.bubbles-right { bottom: calc(100% + 0.5rem); right: 0; max-width: 100%; }
 p.bubble {
   position: relative; margin: 0; padding: 0.35rem 0.65rem;
   background: #fff; color: #222; border: 2px solid #333; border-radius: 1rem;
@@ -201,32 +203,21 @@ p.bubble .who {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap; font-weight: 700;
 }
-/* hovering a bubble marks the card it is about on the table (browsers that know :has) */
-.table-view:has(p.bubble[data-seq="1"]:hover) figure.play[data-seq="1"] img,
-.table-view:has(p.bubble[data-seq="2"]:hover) figure.play[data-seq="2"] img,
-.table-view:has(p.bubble[data-seq="3"]:hover) figure.play[data-seq="3"] img,
-.table-view:has(p.bubble[data-seq="4"]:hover) figure.play[data-seq="4"] img {
-  outline: 3px solid #ffc107; outline-offset: 1px; border-radius: 4px;
-}
 p.bubble::after {
   content: ""; position: absolute; width: 11px; height: 11px;
   background: #fff; border: 0 solid #333; transform: rotate(45deg);
 }
-.corner-nw p.bubble::after { right: -7px; top: calc(50% - 6px); border-width: 2px 2px 0 0; }
-.corner-ne p.bubble::after { bottom: -7px; left: calc(50% - 6px); border-width: 0 2px 2px 0; }
-.corner-se p.bubble::after { left: -7px; top: calc(50% - 6px); border-width: 0 0 2px 2px; }
-.corner-sw p.bubble::after { top: -7px; left: calc(50% - 6px); border-width: 2px 0 0 2px; }
+.bubbles-top p.bubble::after { right: -7px; top: calc(50% - 6px); border-width: 2px 2px 0 0; }
+.bubbles-right p.bubble::after { bottom: -7px; left: calc(50% - 6px); border-width: 0 2px 2px 0; }
+.bubbles-bottom p.bubble::after { left: -7px; top: calc(50% - 6px); border-width: 0 0 2px 2px; }
+.bubbles-left p.bubble::after { top: -7px; left: calc(50% - 6px); border-width: 2px 0 0 2px; }
 @media (max-width: 42rem) {
-  /* one column: the bubbles follow the table, the name says who spoke */
-  .table-view > .bubbles {
-    grid-area: auto; /* the corner names of the desktop grid do not exist here */
-    order: 20; align-self: stretch; justify-self: stretch; max-height: none; padding: 0;
+  /* one column: the bubbles are part of the box of the player who spoke */
+  .bubbles {
+    position: static; width: auto; max-width: none; max-height: none;
+    padding: 0.5rem 0 0;
   }
   p.bubble::after { display: none; }
-  p.bubble .who {
-    position: static; width: auto; height: auto; margin: 0; overflow: visible;
-    clip-path: none; white-space: normal;
-  }
 }
 
 table.users th a.sort { text-decoration: none; color: inherit; white-space: nowrap; }
