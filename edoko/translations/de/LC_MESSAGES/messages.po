@@ -1442,3 +1442,9 @@ msgstr "Unbekannter Passkey."
 
 msgid "This passkey is not registered here."
 msgstr "Dieser Passkey ist hier nicht registriert."
+
+msgid "(no name)"
+msgstr "(ohne Namen)"
+
+msgid "Save"
+msgstr "Speichern"

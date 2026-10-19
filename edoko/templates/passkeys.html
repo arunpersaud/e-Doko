@@ -5,30 +5,34 @@
 <h1>{{ _("Your passkeys") }}</h1>
 <p>{{ _("A passkey lets you log in with your fingerprint, face or device PIN, without a password and without waiting for an email. Set one up on every device you use.") }}</p>
 {% if passkeys %}
+<div class="overflow-auto">
 <table>
-  <thead><tr><th>{{ _("Name") }}</th><th>{{ _("Added") }}</th><th>{{ _("Last used") }}</th><th></th></tr></thead>
-  <tbody>
+    <tbody>
   {% for p in passkeys %}
   <tr>
     <td>
-      <form method="post" action="{{ url_for('passkeys.rename', key=p.id) }}">
-        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-        <input type="text" name="name" value="{{ p.name }}" maxlength="60" aria-label="{{ _('Name') }}">
-        <button type="submit" class="secondary">{{ _("Rename") }}</button>
-      </form>
+      {{ p.name or _("(no name)") }}
+      <details class="rename">
+        <summary title="{{ _('Rename') }}" aria-label="{{ _('Rename') }}">✎</summary>
+        <form method="post" action="{{ url_for('passkeys.rename', key=p.id) }}" role="group">
+          <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+          <input type="text" name="name" value="{{ p.name }}" maxlength="60" aria-label="{{ _('Name') }}">
+          <button type="submit">{{ _("Save") }}</button>
+        </form>
+      </details>
+      <br><small>{{ _("Added") }} {{ p.created_at[:10] }} · {{ _("Last used") }} {{ p.last_used_at[:10] if p.last_used_at else "–" }}</small>
     </td>
-    <td>{{ p.created_at[:10] }}</td>
-    <td>{{ p.last_used_at[:10] if p.last_used_at else "–" }}</td>
-    <td>
+    <td class="end">
       <form method="post" action="{{ url_for('passkeys.delete', key=p.id) }}">
         <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-        <button type="submit" class="secondary outline">{{ _("Remove") }}</button>
+        <button type="submit" class="compact secondary outline">{{ _("Remove") }}</button>
       </form>
     </td>
   </tr>
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <p>{{ _("You have no passkey yet.") }}</p>
 {% endif %}

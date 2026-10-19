@@ -2,3 +2,22 @@
 .flash { padding: 0.5rem 1rem; border-left: 4px solid var(--pico-primary); }
 form.inline { margin: 0; }
 form.inline button { margin: 0; padding: 0.25rem 0.75rem; }
+
+/* small inline "rename" pen: a <details> without Pico's accordion look */
+details.rename { display: inline; border: 0; margin: 0; padding: 0; }
+details.rename > summary {
+  display: inline;
+  width: auto;
+  padding: 0 0.4em;
+  cursor: pointer;
+  list-style: none;
+  color: var(--pico-muted-color);
+}
+details.rename > summary::after { display: none; }
+details.rename > summary:hover { color: var(--pico-primary); }
+details.rename[open] > form { display: flex; margin: 0.5rem 0 0; }
+details.rename input, details.rename button { margin-bottom: 0; }
+details.rename input { flex: 1 1 8rem; min-width: 8rem; }
+details.rename form button { flex: 0 0 auto; width: auto; padding: 0.4rem 1rem; }
+button.compact { padding: 0.15rem 0.6rem; font-size: 0.85em; margin: 0; width: auto; }
+td.end { text-align: right; vertical-align: top; }
