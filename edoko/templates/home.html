@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ _("My games") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("My games") }}</h1>
+
+<h2>{{ _("Your turn") }}</h2>
+{% if your_turn %}
+<ul>{% for x in your_turn %}{% include "_game_row.html" %}{% endfor %}</ul>
+{% else %}
+<p>{{ _("Nothing waits for you.") }}</p>
+{% endif %}
+
+{% if waiting %}
+<h2>{{ _("Waiting for the others") }}</h2>
+<ul>{% for x in waiting %}{% include "_game_row.html" %}{% endfor %}</ul>
+{% endif %}
+
+<h2>{{ _("Your tables") }}</h2>
+{% if tables %}
+<ul>
+  {% for t in tables %}
+  <li>
+    <a href="{{ url_for('games.table', session_id=t.id) }}">{{ _("Table %(n)d", n=t.id) }}</a>
+    – {{ t.players | join(", ") }}
+    <small class="muted">· {{ ngettext("%(num)d game", "%(num)d games", t.games) }} · {{ t.last[:10] }}{% if t.active %} · {{ _("in play") }}{% endif %}</small>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>{{ _("You have not played yet.") }}</p>
+{% endif %}
+{% endblock %}

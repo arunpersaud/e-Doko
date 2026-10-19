@@ -1524,3 +1524,34 @@ msgstr "Andere Tische, die diese Karten gespielt haben"
 
 msgid "to see how the other tables played this deal."
 msgstr "um zu sehen, wie die anderen Tische diese Karten gespielt haben."
+
+msgid "My games"
+msgstr "Meine Spiele"
+
+msgid "Your turn"
+msgstr "Du bist dran"
+
+msgid "Nothing waits for you."
+msgstr "Nichts wartet auf dich."
+
+msgid "Waiting for the others"
+msgstr "Warten auf die anderen"
+
+msgid "Your tables"
+msgstr "Deine Tische"
+
+msgid "You have not played yet."
+msgstr "Du hast noch nicht gespielt."
+
+msgid "in play"
+msgstr "läuft"
+
+#, python-format
+msgid "%(name)s's turn"
+msgstr "%(name)s ist dran"
+
+#, python-format
+msgid "%(num)d game"
+msgid_plural "%(num)d games"
+msgstr[0] "%(num)d Spiel"
+msgstr[1] "%(num)d Spiele"

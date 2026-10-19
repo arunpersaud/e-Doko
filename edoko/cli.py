@@ -25,3 +25,36 @@ def migrate() -> None:
     """Apply missing schema migrations (also done at startup)."""
     applied = migrations.migrate(Path(current_app.config["DATABASE"]))
     click.echo(f"applied: {applied}" if applied else "up to date")
+
+
+@edoko.command("users")
+def users() -> None:
+    """List the users: id, admin, passkeys, last login, name, email."""
+    rows = db.connect(current_app.config["DATABASE"]).execute(
+        """SELECT user.id, user.name, user.email, user.is_admin, user.disabled_at,
+                  user.last_login,
+                  (SELECT count(*) FROM passkey WHERE passkey.user = user.id) AS keys
+           FROM user ORDER BY user.id"""
+    )
+    for u in rows:
+        flags = ("admin" if u["is_admin"] else "").ljust(5) + (
+            " disabled" if u["disabled_at"] else ""
+        )
+        click.echo(
+            f"{u['id']:4d}  {flags:14s} {u['keys']} passkeys  "
+            f"{(u['last_login'] or '-')[:10]:10s}  {u['name']} <{u['email']}>"
+        )
+
+
+@edoko.command("make-admin")
+@click.argument("email")
+@click.option("--remove", is_flag=True, help="take the admin rights away")
+def make_admin(email: str, remove: bool) -> None:
+    """Make the user with this email address an admin (several are fine)."""
+    conn = db.connect(current_app.config["DATABASE"])
+    changed = conn.execute(
+        "UPDATE user SET is_admin = ? WHERE email = ?", (0 if remove else 1, email)
+    ).rowcount
+    if not changed:
+        raise click.ClickException(f"no user with the address {email}")
+    click.echo(("removed admin rights of " if remove else "admin: ") + email)

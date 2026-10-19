@@ -187,6 +187,76 @@ def render_game(game_id: int, user_id: int, *, details: bool, logged_in: bool = 
     return response, 200, PRIVATE
 
 
+ACTIVE = ("pre", "play")
+
+
+def my_games(user_id: int):
+    """All games of the user, newest table and game first."""
+    return query(
+        """SELECT game.id, game.session, game.status, game.type, game.solo,
+                  game.created_at, game.updated_at, game.turn_seat,
+                  me.seat AS my_seat, me.party AS my_party,
+                  (SELECT user.name FROM hand t JOIN user ON user.id = t.user
+                    WHERE t.game = game.id AND t.seat = game.turn_seat) AS turn_name
+           FROM hand me JOIN game ON game.id = me.game
+           WHERE me.user = ?
+           ORDER BY game.session DESC, game.id DESC""",
+        (user_id,),
+    )
+
+
+def table_players(session_id: int):
+    return query(
+        """SELECT user.id, user.name FROM session_player
+           JOIN user ON user.id = session_player.user
+           WHERE session_player.session = ? ORDER BY user.name""",
+        (session_id,),
+    )
+
+
+def dashboard(user_id: int) -> dict:
+    """The home page of a logged in player: whose turn it is, and the tables."""
+    mine = my_games(user_id)
+    your_turn = [
+        x for x in mine if x["status"] in ACTIVE and x["turn_seat"] == x["my_seat"]
+    ]
+    waiting = [
+        x for x in mine if x["status"] in ACTIVE and x["turn_seat"] != x["my_seat"]
+    ]
+    tables: dict[int, dict] = {}
+    for x in mine:
+        t = tables.setdefault(
+            x["session"],
+            {"id": x["session"], "games": 0, "last": x["updated_at"], "active": False},
+        )
+        t["games"] += 1
+        t["last"] = max(t["last"], x["updated_at"])
+        t["active"] = t["active"] or x["status"] in ACTIVE
+    for t in tables.values():
+        t["players"] = [p["name"] for p in table_players(t["id"]) if p["id"] != user_id]
+    return {
+        "your_turn": your_turn,
+        "waiting": waiting,
+        "tables": sorted(tables.values(), key=lambda t: -t["id"]),
+    }
+
+
+@bp.route("/table/<int:session_id>/")
+@login_required
+def table(session_id):
+    players = table_players(session_id)
+    if g.user["id"] not in {p["id"] for p in players}:
+        abort(404)
+    rows = [x for x in my_games(g.user["id"]) if x["session"] == session_id]
+    return (
+        render_template(
+            "table.html", session_id=session_id, players=players, games=rows
+        ),
+        200,
+        PRIVATE,
+    )
+
+
 @bp.route("/game/<int:game_id>/")
 @login_required
 def game(game_id):

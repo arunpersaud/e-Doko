@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Table %(n)d", n=session_id) }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Table %(n)d", n=session_id) }}</h1>
+<p>{{ players | map(attribute="name") | join(", ") }}</p>
+<ul>
+  {% for x in games %}{% include "_game_row.html" %}{% endfor %}
+</ul>
+<p><a href="{{ url_for('site.index') }}">{{ _("My games") }}</a></p>
+{% endblock %}

@@ -1,0 +1,8 @@
+{# one game in a list; x is a row of games.my_games #}
+<li>
+  <a href="{{ url_for('games.game', game_id=x.id) }}">{{ _("Game %(id)d", id=x.id) }}</a>
+  {% if x.type and x.type != "normal" %}<small>({{ x.type }}{% if x.solo %}, {{ x.solo }}{% endif %})</small>{% endif %}
+  <small class="muted">· {{ x.updated_at[:10] }}
+  {% if x.status in ("pre", "play") and x.turn_name %}· {{ _("%(name)s's turn", name=x.turn_name) }}{% endif %}
+  {% if x.status not in ("pre", "play", "gameover") %}· {{ x.status }}{% endif %}</small>
+</li>

@@ -248,3 +248,52 @@ def test_tokens_are_masked_in_the_access_log():
     assert mask("/Abc_Def-0123456789xyzZ") == "/<token>"
     assert mask("GET /game/2471/ HTTP/1.1") == "GET /game/2471/ HTTP/1.1"
     assert mask("/static/cards/english/1.png") == "/static/cards/english/1.png"
+
+
+# --- home page and tables ---------------------------------------------------------
+
+
+def test_home_lists_turns_and_tables(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE game SET turn_seat = 1 WHERE id = 13")  # user 5
+    mine = client_for(world, 5).get("/").text
+    assert "My games" in mine
+    section = mine.split("Your turn")[1].split("Your tables")[0]
+    assert "Game 13" in section and "Waiting for the others" not in section
+    other = client_for(world, 6).get("/").text
+    waiting = other.split("Waiting for the others")[1].split("Your tables")[0]
+    assert "Game 13" in waiting and "Eve's turn" in waiting
+    assert "Table 2" in other
+
+
+def test_home_for_a_new_user_and_anonymous_visitor(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("INSERT INTO user (id, name, email) VALUES (9, 'Ida', 'i@x.org')")
+    assert "You have not played yet." in client_for(world, 9).get("/").text
+    assert "games so far" in world.test_client().get("/").text
+
+
+def test_table_page_only_for_its_players(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        for user in (1, 2, 3, 4):
+            conn.execute("INSERT INTO session_player VALUES (1, ?)", (user,))
+    page = client_for(world, 1).get("/table/1/")
+    assert page.status_code == 200
+    assert "Game 10" in page.text and "Game 11" not in page.text
+    assert client_for(world, 5).get("/table/1/").status_code == 404
+    assert world.test_client().get("/table/1/").status_code == 302
+
+
+# --- command line --------------------------------------------------------------------
+
+
+def run(app, *args):
+    return app.test_cli_runner().invoke(args=["edoko", *args])
+
+
+def test_make_admin_and_users(app):
+    result = run(app, "make-admin", "a@x.org")
+    assert result.exit_code == 0 and "admin: a@x.org" in result.output
+    assert "admin" in run(app, "users").output
+    assert run(app, "make-admin", "a@x.org", "--remove").exit_code == 0
+    assert run(app, "make-admin", "nobody@x.org").exit_code != 0

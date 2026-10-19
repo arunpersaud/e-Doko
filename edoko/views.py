@@ -1,16 +1,18 @@
 import re
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, g, redirect, render_template, request, url_for
 
-from . import db
+from . import db, games
 
 site = Blueprint("site", __name__)
 
 
 @site.route("/")
 def index():
-    games = db.query_one("SELECT count(*) AS n FROM game")["n"]
-    return render_template("index.html", games=games)
+    if g.user is not None:
+        return render_template("home.html", **games.dashboard(g.user["id"]))
+    count = db.query_one("SELECT count(*) AS n FROM game")["n"]
+    return render_template("index.html", games=count)
 
 
 @site.route("/index.php")
