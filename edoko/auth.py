@@ -106,10 +106,22 @@ def admin_required(view):
 
 
 def check_post() -> None:
+    """CSRF: the session's token, and the request must come from this site.
+
+    Browsers send Sec-Fetch-Site, and "Origin: null" when the referrer
+    policy is no-referrer (ours is), so null is fine for a same-origin
+    request, and only then.
+    """
     if request.method != "POST":
         return
+    site = request.headers.get("Sec-Fetch-Site")
+    if site is not None and site not in ("same-origin", "none"):
+        abort(403)
     sent_origin = request.headers.get("Origin")
-    if sent_origin is not None and sent_origin != current_app.config["ORIGIN"]:
+    if sent_origin == "null":
+        if site != "same-origin":
+            abort(403)
+    elif sent_origin is not None and sent_origin != current_app.config["ORIGIN"]:
         abort(403)
     sent = request.headers.get("X-CSRF-Token") or request.form.get("csrf")
     if not sent or not secrets.compare_digest(sent, session.get("csrf", "")):

@@ -161,3 +161,22 @@ def test_login_required_redirects(app):
     client = app.test_client()
     response = client.get("/private")
     assert response.headers["Location"] == "/login?next=/private"
+
+
+@pytest.mark.parametrize(
+    "headers, status",
+    [
+        # Firefox/Chrome with Referrer-Policy: no-referrer
+        ({"Origin": "null", "Sec-Fetch-Site": "same-origin"}, 302),
+        ({"Origin": "null"}, 403),
+        ({"Origin": "null", "Sec-Fetch-Site": "cross-site"}, 403),
+        ({"Sec-Fetch-Site": "cross-site"}, 403),
+        ({"Sec-Fetch-Site": "same-site"}, 403),
+        ({"Sec-Fetch-Site": "same-origin", "Origin": "http://localhost:5000"}, 302),
+        ({"Sec-Fetch-Site": "same-origin", "Origin": "https://evil.org"}, 403),
+    ],
+)
+def test_post_origin_variants(client, headers, status):
+    token = csrf(client)
+    response = client.post("/logout", data={"csrf": token}, headers=headers)
+    assert response.status_code == status
