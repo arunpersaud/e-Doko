@@ -13,6 +13,7 @@ from flask import Blueprint, abort, g, render_template
 from flask_babel import lazy_gettext as _l
 from werkzeug.routing import BaseConverter
 
+from . import gameview
 from .auth import login_required
 from .db import query, query_one
 
@@ -85,104 +86,26 @@ def image_number(card_id: int) -> int:
     return card_id if card_id % 2 else card_id - 1
 
 
-def load_game(game_id: int) -> dict:
-    game = query_one(
-        """SELECT game.*, ruleset.dullen, ruleset.schweinchen, ruleset.lowtrump,
-                  ruleset.call
-           FROM game JOIN ruleset ON ruleset.id = game.ruleset WHERE game.id = ?""",
-        (game_id,),
+def render_game(game_id: int, user_id: int, *, full: bool, logged_in: bool = True):
+    """The page of a game for one of its players or for a qualified viewer.
+
+    full: the viewer may see all hands (the game is over). Otherwise they see
+    the tricks so far and their own cards.
+    """
+    context = gameview.build(game_id, user_id, full=full)
+    context.update(
+        user_id=user_id, logged_in=logged_in, others=[], previous=None, next=None
     )
-    hands = query(
-        """SELECT hand.id, hand.seat, hand.party, hand.sickness, hand.solo,
-                  hand.point_call, hand.points, user.id AS user_id, user.name
-           FROM hand JOIN user ON user.id = hand.user
-           WHERE hand.game = ? ORDER BY hand.seat""",
-        (game_id,),
-    )
-    return {"game": game, "hands": hands}
+    if logged_in:
+        # only games this viewer may open: their own, and those of the same deals
+        def allowed(other_id: int) -> bool:
+            return is_player(user_id, other_id) or can_see_details(user_id, other_id)
 
-
-def load_details(game_id: int, hands) -> dict:
-    """Cards per hand (in the order they were played), tricks, comments, scores."""
-    seat_of = {h["id"]: h["seat"] for h in hands}
-    cards = {h["seat"]: [] for h in hands}
-    for row in query(
-        """SELECT hand_card.hand, card.id, card.suit, card.rank, card.points
-           FROM hand_card JOIN card ON card.id = hand_card.card
-           JOIN hand ON hand.id = hand_card.hand
-           LEFT JOIN play ON play.hand_card = hand_card.id
-           LEFT JOIN trick ON trick.id = play.trick
-           WHERE hand.game = ?
-           ORDER BY trick.number, play.sequence, card.id""",
-        (game_id,),
-    ):
-        cards[seat_of[row["hand"]]].append(row)
-
-    comments: dict[int, list] = {}
-    for row in query(
-        """SELECT comment.play, comment.body, comment.created_at, user.name
-           FROM comment JOIN user ON user.id = comment.user
-           WHERE comment.game = ? AND comment.kind = 'move'
-             AND comment.deleted_at IS NULL
-           ORDER BY comment.id""",
-        (game_id,),
-    ):
-        comments.setdefault(row["play"], []).append(row)
-
-    tricks = []
-    for trick in query(
-        "SELECT id, number, winner_seat FROM trick WHERE game = ? ORDER BY number",
-        (game_id,),
-    ):
-        plays = query(
-            """SELECT play.id, play.sequence, hand.seat, card.id AS card_id,
-                      card.suit, card.rank
-               FROM play JOIN hand_card ON hand_card.id = play.hand_card
-               JOIN hand ON hand.id = hand_card.hand
-               JOIN card ON card.id = hand_card.card
-               WHERE play.trick = ? ORDER BY play.sequence""",
-            (trick["id"],),
+        context["previous"], context["next"] = gameview.neighbours(
+            game_id, context["game"]["session"], allowed
         )
-        tricks.append(
-            {
-                "number": trick["number"],
-                "winner_seat": trick["winner_seat"],
-                "plays": [dict(p, comments=comments.get(p["id"], [])) for p in plays],
-            }
-        )
-
-    before = query(
-        """SELECT comment.kind, comment.body, user.name FROM comment
-           JOIN user ON user.id = comment.user
-           WHERE comment.game = ? AND comment.kind != 'move'
-             AND comment.deleted_at IS NULL ORDER BY comment.id""",
-        (game_id,),
-    )
-    scores = query(
-        """SELECT score_item.party, score_item.kind, w.name AS winner, l.name AS loser
-           FROM score_item LEFT JOIN user w ON w.id = score_item.winner
-           LEFT JOIN user l ON l.id = score_item.loser
-           WHERE score_item.game = ? ORDER BY score_item.id""",
-        (game_id,),
-    )
-    return {"cards": cards, "tricks": tricks, "before": before, "scores": scores}
-
-
-def render_game(game_id: int, user_id: int, *, details: bool, logged_in: bool = True):
-    """The page of a game for one of its players or for a qualified viewer."""
-    shown = load_game(game_id)
-    context = {
-        "user_id": user_id,
-        "details": details,
-        "logged_in": logged_in,
-        "names": {h["seat"]: h["name"] for h in shown["hands"]},
-        **shown,
-    }
-    if details:
-        context.update(load_details(game_id, shown["hands"]))
-        # the links to other tables need a login
-        context["others"] = other_tables(user_id, game_id) if logged_in else []
-        context["others_hidden"] = not logged_in
+        if full:
+            context["others"] = other_tables(user_id, game_id)
     response = render_template("game.html", **context)
     return response, 200, PRIVATE
 
@@ -266,7 +189,7 @@ def game(game_id):
     details = can_see_details(user_id, game_id)
     if not details and not is_player(user_id, game_id):
         abort(404)
-    return render_game(game_id, user_id, details=details)
+    return render_game(game_id, user_id, full=details)
 
 
 @bp.route("/<token:token>")
@@ -286,10 +209,7 @@ def seat(token):
         abort(404)
     logged_in = g.user is not None and g.user["id"] == hand["user"]
     return render_game(
-        hand["game"],
-        hand["user"],
-        details=hand["status"] == OVER,
-        logged_in=logged_in,
+        hand["game"], hand["user"], full=hand["status"] == OVER, logged_in=logged_in
     )
 
 

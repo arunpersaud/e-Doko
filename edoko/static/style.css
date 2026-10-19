@@ -39,16 +39,72 @@ td.end { text-align: right; vertical-align: top; }
   border-top: 1px solid var(--pico-muted-border-color);
 }
 
-/* game page */
-tr.me td { font-weight: bold; }
-.hand { display: flex; flex-wrap: wrap; gap: 0.15rem; margin-bottom: 1rem; }
+/* game page: the four players around the table, then the tricks */
+nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.spot-bottom { grid-area: bottom; }
+.spot-left { grid-area: left; }
+.spot-top { grid-area: top; }
+.spot-right { grid-area: right; }
+.table-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-areas: ". top ." "left felt right" ". bottom .";
+  gap: 0.75rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+.felt {
+  grid-area: felt;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  background: #2f6f4f;
+  border-radius: 1rem;
+  padding: 0.75rem;
+}
+.felt, .felt p, .felt strong { color: #fff; }
+.felt p { margin: 0.25rem 0; }
+.seat { padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--pico-muted-border-color); }
+.seat.me { border-color: var(--pico-primary); }
+.seat.on-turn { background: var(--pico-card-background-color); box-shadow: 0 0 0 2px var(--pico-primary); }
+.seat header { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem; }
+.seat .start, .seat .party {
+  font-size: 0.7em;
+  padding: 0 0.4em;
+  border-radius: 0.5em;
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+}
+.seat .party { background: var(--pico-secondary-background); color: var(--pico-secondary-inverse); }
+img.badge { width: 1.5rem; height: 1.5rem; }
+.hand { display: flex; flex-wrap: wrap; gap: 0.1rem; }
 img.card { height: 5rem; width: auto; }
-img.card.small { height: 4rem; }
-.trick header { padding: 0.5rem 1rem; }
-.plays { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-figure.play { margin: 0; text-align: center; max-width: 9rem; }
-figure.play figcaption { font-size: 0.8em; }
+img.card.small { height: 3.2rem; }
+.tricks { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 0.75rem; }
+.trick { margin: 0; padding: 0.5rem; }
+.trick header { font-size: 0.85em; margin-bottom: 0.25rem; }
+.cross {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-areas: ". top ." "left . right" ". bottom .";
+  justify-content: center;
+  gap: 0.15rem;
+}
+figure.play { margin: 0; position: relative; }
+figure.play .seq {
+  position: absolute; top: 0; left: 0;
+  font-size: 0.65em; line-height: 1;
+  padding: 0.15em 0.35em; border-radius: 0 0 0.4em 0;
+  background: rgba(0, 0, 0, 0.6); color: #fff;
+}
 figure.play.winner img { outline: 3px solid var(--pico-primary); border-radius: 4px; }
-p.comment { font-size: 0.8em; text-align: left; margin: 0.25rem 0 0; }
+p.comment { font-size: 0.8em; margin: 0.25rem 0 0; }
+@media (max-width: 42rem) {
+  .table-view { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+  .table-view > * { grid-area: auto; }
+  .felt { order: -1; }
+}
 
 small.muted { color: var(--pico-muted-color); }

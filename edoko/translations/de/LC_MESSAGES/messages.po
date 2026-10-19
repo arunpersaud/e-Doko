@@ -1555,3 +1555,79 @@ msgid "%(num)d game"
 msgid_plural "%(num)d games"
 msgstr[0] "%(num)d Spiel"
 msgstr[1] "%(num)d Spiele"
+
+msgid "Games of this table"
+msgstr "Spiele dieses Tisches"
+
+msgid "Starting player"
+msgstr "Startspieler"
+
+msgid "on turn"
+msgstr "am Zug"
+
+msgid "No card has been played yet."
+msgstr "Es wurde noch keine Karte gespielt."
+
+msgid "The hands of the others are shown when the game is over, and only to players who have finished this deal themselves."
+msgstr "Die Blätter der anderen werden gezeigt, wenn das Spiel zu Ende ist, und nur Spielern, die diese Karten selbst zu Ende gespielt haben."
+
+#, python-format
+msgid "%(num)d trick"
+msgid_plural "%(num)d tricks"
+msgstr[0] "%(num)d Stich"
+msgstr[1] "%(num)d Stiche"
+
+msgid "Re"
+msgstr "Re"
+
+msgid "Contra"
+msgstr "Kontra"
+
+msgid "Wedding"
+msgstr "Hochzeit"
+
+msgid "Wedding partner"
+msgstr "Hochzeitspartner"
+
+msgid "Queen solo"
+msgstr "Damensolo"
+
+msgid "Jack solo"
+msgstr "Bubensolo"
+
+msgid "Club solo"
+msgstr "Kreuzsolo"
+
+msgid "Spade solo"
+msgstr "Piksolo"
+
+msgid "Heart solo"
+msgstr "Herzsolo"
+
+msgid "Trumpless solo"
+msgstr "Fleischloses"
+
+msgid "Trump solo"
+msgstr "Trumpfsolo"
+
+msgid "Poverty: trump given back"
+msgstr "Armut: Trumpf zurückgegeben"
+
+msgid "Poverty: no trump given back"
+msgstr "Armut: kein Trumpf zurückgegeben"
+
+msgid "Poverty partner"
+msgstr "Armutspartner"
+
+msgid "Second poverty: trump given back"
+msgstr "Zweite Armut: Trumpf zurückgegeben"
+
+msgid "Second poverty: no trump given back"
+msgstr "Zweite Armut: kein Trumpf zurückgegeben"
+
+msgid "Second poverty partner"
+msgstr "Partner der zweiten Armut"
+
+#, python-format
+msgid "Call %(n)s"
+msgstr "Ansage %(n)s"

@@ -5,8 +5,11 @@ import pytest
 from edoko import db, games
 
 
-def add_game(conn, game_id, deal, status, users, session=1):
-    """A game with four hands; a finished one also has cards and 12 tricks."""
+def add_game(conn, game_id, deal, status, users, session=1, played=None):
+    """A game with four hands; a finished one also has cards and 12 tricks.
+
+    played: the number of tricks of a game in progress (None: no cards at all).
+    """
     conn.execute(
         "INSERT OR IGNORE INTO deal (id, cards) VALUES (?, ?)", (deal, str(deal))
     )
@@ -21,7 +24,8 @@ def add_game(conn, game_id, deal, status, users, session=1):
             " VALUES (?, ?, ?, ?, ?, 're')",
             (game_id * 10 + seat, game_id, seat, user, f"token{game_id}{seat}"),
         )
-    if status != "gameover":
+    tricks = 12 if status == "gameover" else played
+    if tricks is None:
         return
     for seat in range(1, 5):
         hand = game_id * 10 + seat
@@ -31,7 +35,7 @@ def add_game(conn, game_id, deal, status, users, session=1):
                 "INSERT INTO hand_card (id, hand, card) VALUES (?, ?, ?)",
                 (hand * 100 + n, hand, card),
             )
-    for number in range(1, 13):
+    for number in range(1, tricks + 1):
         trick = game_id * 100 + number
         conn.execute(
             "INSERT INTO trick (id, game, number, winner_seat) VALUES (?, ?, ?, 1)",
@@ -54,6 +58,7 @@ def world(app, database):
     game 14, deal 3: cancelled, users 1-4       game 15, deal 3: finished, 5-8
     """
     with closing(db.connect(database)) as conn:
+        conn.execute("DELETE FROM game")  # the two games of conftest have no hands
         for uid, name in enumerate(["Bob", "Cy", "Di", "Eve", "Fay", "Gus", "Hal"], 2):
             conn.execute(
                 "INSERT INTO user (id, name, email) VALUES (?, ?, ?)",
@@ -110,12 +115,32 @@ def test_unfinished_own_deal_does_not_unlock_others(world):
     assert page.status_code == 404
 
 
-def test_players_of_unfinished_game_get_a_status_page_only(world):
-    response = client_for(world, 5).get("/game/13/")
-    assert response.status_code == 200
-    assert "/static/cards/" not in response.text
-    assert "Tricks" not in response.text
-    assert "shown when it is over" in response.text
+def images(page):
+    return page.count("/static/cards/english/")
+
+
+def test_game_in_progress_shows_the_tricks_so_far_and_only_your_cards(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM game WHERE id = 13")  # replace by one with cards
+        add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=2)
+    page = client_for(world, 5).get("/game/13/")
+    assert page.status_code == 200
+    assert page.text.count('class="trick"') == 2
+    # 2 tricks of 4 cards, and the 10 cards user 5 still holds: no other hand
+    assert images(page.text) == 8 + 10
+    assert "shown when the game is over" in page.text
+    # the same for the others, each sees only their own hand
+    assert images(client_for(world, 8).get("/game/13/").text) == 8 + 10
+    # nobody else sees anything
+    assert status(world, 1, 13) == 404
+
+
+def test_a_game_without_a_move_shows_the_own_hand_only(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM game WHERE id = 13")
+        add_game(conn, 13, 2, "pre", [5, 6, 7, 8], session=2, played=0)
+    page = client_for(world, 6).get("/game/13/").text
+    assert images(page) == 12 and "No card has been played yet." in page
 
 
 def test_cancelled_game_does_not_count_as_finished(world):
@@ -150,7 +175,7 @@ def test_page_lists_tricks_and_hands(world):
     page = client_for(world, 1).get("/game/10/").text
     assert page.count('class="trick"') == 12
     assert "Trick 12" in page
-    assert page.count("<h3>") == 4
+    assert page.count('class="seat ') == 4
 
 
 def test_comments_are_shown_unless_deleted(world):
@@ -297,3 +322,88 @@ def test_make_admin_and_users(app):
     assert "admin" in run(app, "users").output
     assert run(app, "make-admin", "a@x.org", "--remove").exit_code == 0
     assert run(app, "make-admin", "nobody@x.org").exit_code != 0
+
+
+# --- the table: fixed spots, neighbours --------------------------------------------
+
+
+def spots(page):
+    """spot -> name of the player, from the seats of the page."""
+    import re
+
+    found = re.findall(
+        r'class="seat spot-(\w+)[^"]*">\s*<header>\s*<strong>(\w+)', page
+    )
+    return dict(found)
+
+
+def test_players_keep_their_spot_when_the_seats_rotate(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        add_game(conn, 16, 4, "gameover", [2, 3, 4, 1])  # same table, rotated
+    first = spots(client_for(world, 1).get("/game/10/").text)
+    rotated = spots(client_for(world, 1).get("/game/16/").text)
+    assert first == rotated
+    assert first["bottom"] == "Ann" and first["left"] == "Bob"
+    assert first["top"] == "Cy" and first["right"] == "Di"
+    # somebody else sees the same table from their own seat
+    seen = spots(client_for(world, 3).get("/game/10/").text)
+    assert seen == {"bottom": "Cy", "left": "Di", "top": "Ann", "right": "Bob"}
+
+
+def test_a_viewer_who_did_not_play_sees_the_lowest_player_at_the_bottom(world):
+    page = client_for(world, 1).get("/game/11/").text  # table of Eve, Fay, Gus, Hal
+    assert spots(page)["bottom"] == "Eve"
+
+
+def test_the_starting_player_is_marked(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE game SET start_seat = 3 WHERE id = 10")
+    page = client_for(world, 1).get("/game/10/").text
+    assert page.count('class="start"') == 1
+    assert "spot-top" in page.split('class="start"')[0].rsplit("<section", 1)[1]
+
+
+def test_previous_and_next_game_of_the_table(world):
+    page = client_for(world, 1).get("/game/12/").text
+    assert 'href="/game/10/" rel="prev"' in page
+    assert 'href="/game/14/" rel="next"' in page
+    first = client_for(world, 1).get("/game/10/").text
+    assert 'rel="prev"' not in first and 'href="/game/12/" rel="next"' in first
+
+
+def test_neighbours_are_only_games_the_viewer_may_open(world):
+    # user 1 looks at table 2's game 11 (same deal): no way on to games 13 or 15
+    page = client_for(world, 1).get("/game/11/").text
+    assert "/game/13/" not in page and "/game/15/" not in page
+    # but a player of that table has them as neighbours
+    own = client_for(world, 5).get("/game/11/").text
+    assert 'href="/game/13/" rel="next"' in own
+
+
+def test_seat_links_have_no_neighbour_links(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE hand SET token = ? WHERE id = 121", ("f" * 32,))
+    page = world.test_client().get("/" + "f" * 32).text
+    assert 'rel="next"' not in page and 'rel="prev"' not in page
+
+
+def test_icons_for_solo_wedding_and_calls(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE game SET type = 'solo', solo = 'queen' WHERE id = 10")
+        conn.execute("UPDATE hand SET party = 're' WHERE id = 102")
+        conn.execute("UPDATE hand SET party = 'contra' WHERE id IN (101, 103, 104)")
+        conn.execute(
+            "UPDATE hand SET point_call = '90', party = 'contra' WHERE id = 103"
+        )
+    page = client_for(world, 1).get("/game/10/").text
+    assert "icons/queensolo_button.png" in page
+    assert "icons/contra_button.png" in page and "icons/90_button.png" in page
+
+
+def test_a_silent_solo_is_not_announced_while_it_is_played(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM game WHERE id = 13")
+        add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=1)
+        conn.execute("UPDATE game SET type = 'solo', solo = 'silent' WHERE id = 13")
+        conn.execute("UPDATE hand SET party = 're' WHERE id = 131")
+    assert "solo_button" not in client_for(world, 5).get("/game/13/").text
