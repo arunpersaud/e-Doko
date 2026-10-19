@@ -105,6 +105,12 @@ def admin_required(view):
     return wrapped
 
 
+def avatars_upload_limit() -> int:
+    from .avatars import MAX_UPLOAD
+
+    return MAX_UPLOAD + 64 * 1024  # the picture and the rest of the form
+
+
 def check_post() -> None:
     """CSRF: the session's token, and the request must come from this site.
 
@@ -114,6 +120,9 @@ def check_post() -> None:
     """
     if request.method != "POST":
         return
+    if request.endpoint == "account.avatar_upload":
+        # pictures are bigger than the 64 KB the other forms are limited to
+        request.max_content_length = avatars_upload_limit()
     site = request.headers.get("Sec-Fetch-Site")
     if site is not None and site not in ("same-origin", "none"):
         abort(403)

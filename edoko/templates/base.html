@@ -19,7 +19,7 @@
       <ul><li><a href="{{ url_for('site.index') }}" class="brand"><strong>e-DoKo</strong></a></li></ul>
       <ul>
         {% if current_user %}
-        <li><a href="{{ url_for('passkeys.manage') }}">{{ current_user.name }}</a></li>
+        <li><a href="{{ url_for('account.index') }}">{{ current_user.name }}</a></li>
         <li>
           <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
             <input type="hidden" name="csrf" value="{{ csrf_token() }}">

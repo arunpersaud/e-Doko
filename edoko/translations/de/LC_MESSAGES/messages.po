@@ -1640,3 +1640,53 @@ msgstr "Voriger Stich"
 
 msgid "Next trick"
 msgstr "Nächster Stich"
+
+msgid "Your account"
+msgstr "Dein Konto"
+
+msgid "Your picture"
+msgstr "Dein Bild"
+
+msgid "A picture was generated for you."
+msgstr "Für dich wurde ein Bild erzeugt."
+
+#, python-format
+msgid "Your own picture, uploaded on %(date)s."
+msgstr "Dein eigenes Bild, hochgeladen am %(date)s."
+
+#, python-format
+msgid "Your Gravatar, fetched on %(date)s."
+msgstr "Dein Gravatar, geholt am %(date)s."
+
+msgid "Upload a picture"
+msgstr "Bild hochladen"
+
+msgid "PNG, JPEG, WebP or GIF, at most 2 MB. It is cut to a square and shrunk; only that copy is kept."
+msgstr "PNG, JPEG, WebP oder GIF, höchstens 2 MB. Es wird quadratisch zugeschnitten und verkleinert; nur diese Kopie wird behalten."
+
+msgid "Upload"
+msgstr "Hochladen"
+
+msgid "Use the generated picture"
+msgstr "Das erzeugte Bild verwenden"
+
+msgid "Passkeys"
+msgstr "Passkeys"
+
+msgid "Manage your passkeys"
+msgstr "Passkeys verwalten"
+
+msgid "Please choose a picture."
+msgstr "Bitte wähle ein Bild."
+
+msgid "The picture is too big (at most 2 MB)."
+msgstr "Das Bild ist zu groß (höchstens 2 MB)."
+
+msgid "Your picture was saved."
+msgstr "Dein Bild wurde gespeichert."
+
+msgid "This is not a picture we can use."
+msgstr "Dieses Bild können wir nicht verwenden."
+
+msgid "You have the generated picture again."
+msgstr "Du hast wieder das erzeugte Bild."

@@ -81,3 +81,150 @@ def test_the_game_page_shows_the_avatars(app):
         add_game(conn, 10, 1, "gameover", [1, 2, 3, 4])
     page = logged_in(app).get("/game/10/").text
     assert page.count('src="/avatar/') == 4
+
+
+# --- uploads ---------------------------------------------------------------------
+
+
+def picture(fmt="PNG", size=(300, 200), color="red", mode="RGB", **save):
+    from io import BytesIO
+
+    from PIL import Image
+
+    out = BytesIO()
+    Image.new(mode, size, color).save(out, format=fmt, **save)
+    return out.getvalue()
+
+
+def upload(client, data, name="me.png", token="t"):
+    from io import BytesIO
+
+    return client.post(
+        "/account/avatar/upload",
+        data={"csrf": token, "picture": (BytesIO(data), name)},
+        content_type="multipart/form-data",
+    )
+
+
+def stored(app):
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        return conn.execute("SELECT * FROM avatar").fetchall()
+
+
+def test_process_makes_a_small_square_webp():
+    from io import BytesIO
+
+    from PIL import Image
+
+    for fmt in ("PNG", "JPEG", "GIF", "WEBP"):
+        out = avatars.process(picture(fmt, (400, 150)))
+        image = Image.open(BytesIO(out))
+        assert image.format == "WEBP" and image.size == (avatars.SIZE, avatars.SIZE)
+        assert len(out) < 20_000
+
+
+def test_process_drops_the_metadata():
+    from io import BytesIO
+
+    from PIL import Image
+
+    exif = Image.Exif()
+    exif[0x010E] = "a secret description"  # ImageDescription
+    exif[0x0112] = 6  # orientation
+    original = picture("JPEG", (200, 100), exif=exif)
+    assert b"a secret description" in original
+    out = avatars.process(original)
+    assert b"a secret description" not in out
+    assert not Image.open(BytesIO(out)).getexif()
+
+
+def test_transparent_parts_become_white():
+    from io import BytesIO
+
+    from PIL import Image
+
+    out = avatars.process(picture("PNG", (50, 50), (0, 0, 0, 0), "RGBA"))
+    pixel = Image.open(BytesIO(out)).convert("RGB").getpixel((5, 5))
+    assert all(v > 250 for v in pixel)
+
+
+def test_process_refuses_what_is_not_a_usable_picture():
+    import pytest
+
+    for junk in (b"", b"hello", b"GIF89a" + b"\0" * 20, picture("PNG")[:40]):
+        with pytest.raises(avatars.BadPicture):
+            avatars.process(junk)
+    # a format we do not accept, even though Pillow could read it
+    with pytest.raises(avatars.BadPicture):
+        avatars.process(picture("BMP"))
+
+
+def test_process_refuses_huge_pictures(monkeypatch):
+    import pytest
+
+    monkeypatch.setattr(avatars, "MAX_PIXELS", 1000)
+    with pytest.raises(avatars.BadPicture):
+        avatars.process(picture("PNG", (100, 100)))
+
+
+def test_upload_stores_the_cleaned_copy_and_serves_it(app):
+    client = logged_in(app)
+    response = upload(client, picture("JPEG", (640, 480)))
+    assert response.status_code == 302
+    (row,) = stored(app)
+    assert row["source"] == "upload" and row["content_type"] == "image/webp"
+    assert row["image"][:4] == b"RIFF" and len(row["image"]) < 20_000
+    shown = client.get("/avatar/1")
+    assert shown.mimetype == "image/webp" and shown.data == row["image"]
+    assert "uploaded on" in client.get("/account").text
+    # a new upload replaces the old one
+    upload(client, picture("PNG", (100, 100), "blue"))
+    assert len(stored(app)) == 1
+
+
+def test_upload_of_junk_is_refused_with_a_message(app):
+    client = logged_in(app)
+    upload(client, b"<script>alert(1)</script>", "x.png")
+    assert not stored(app)
+    assert "This is not a picture we can use." in client.get("/account").text
+
+
+def test_upload_without_a_file_and_too_big(app):
+    client = logged_in(app)
+    response = client.post(
+        "/account/avatar/upload", data={"csrf": "t"}, content_type="multipart/form-data"
+    )
+    assert response.status_code == 302 and not stored(app)
+    assert "Please choose a picture." in client.get("/account").text
+    upload(client, b"x" * (avatars.MAX_UPLOAD + 1))
+    assert "too big" in client.get("/account").text and not stored(app)
+    # far too much is refused before it is read
+    assert upload(client, b"x" * (avatars.MAX_UPLOAD + 200_000)).status_code == 413
+
+
+def test_upload_needs_login_and_csrf(app):
+    assert upload(app.test_client(), picture()).status_code in (302, 403)
+    assert upload(logged_in(app), picture(), token="wrong").status_code == 403
+    assert not stored(app)
+
+
+def test_other_forms_are_still_limited_to_64_kb(app):
+    client = logged_in(app)
+    response = client.post(
+        "/account/avatar/reset", data={"csrf": "t", "junk": "x" * 100_000}
+    )
+    assert response.status_code == 413
+
+
+def test_reset_returns_to_the_generated_picture(app):
+    client = logged_in(app)
+    upload(client, picture())
+    assert stored(app)
+    client.post("/account/avatar/reset", data={"csrf": "t"})
+    assert not stored(app)
+    assert client.get("/avatar/1").mimetype == "image/svg+xml"
+    assert "generated" in client.get("/account").text
+
+
+def test_the_account_page_needs_a_login(app):
+    assert app.test_client().get("/account").status_code == 302

@@ -10,15 +10,26 @@ browser ever contacts a third party.
 
 import hashlib
 import hmac
+import io
 
 from flask import Blueprint, Response, abort, current_app, request
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from .auth import login_required
-from .db import query_one
+from .db import get_db, query_one
 
 bp = Blueprint("avatars", __name__)
 
 CELLS = 5
+SIZE = 192  # pixels, a square
+MAX_UPLOAD = 2 * 1024 * 1024  # bytes
+MAX_PIXELS = 24_000_000  # refuse bigger pictures: they could eat all memory
+FORMATS = ["PNG", "JPEG", "WEBP", "GIF"]
+Image.MAX_IMAGE_PIXELS = MAX_PIXELS
+
+
+class BadPicture(ValueError):
+    """The data is not a picture we are willing to use."""
 
 
 def identicon(user_id: int, secret: str) -> str:
@@ -40,6 +51,50 @@ def identicon(user_id: int, secret: str) -> str:
         f'height="160"><rect width="5" height="5" fill="{paper}"/>'
         f'<g fill="{ink}">{"".join(rects)}</g></svg>'
     )
+
+
+def process(data: bytes) -> bytes:
+    """Make a small, clean square WebP of an uploaded picture.
+
+    Only PNG, JPEG, WebP and (the first frame of) GIF are accepted, and the
+    picture is decoded and drawn again, so nothing of the original file
+    (metadata, extra data, a script in a polyglot) is kept.
+    """
+    try:
+        with Image.open(io.BytesIO(data), formats=FORMATS) as image:
+            if image.width * image.height > MAX_PIXELS:
+                raise BadPicture("This picture is too big (too many pixels).")
+            image.load()
+            image = ImageOps.exif_transpose(image)
+            rgba = image.convert("RGBA")
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as error:
+        raise BadPicture("This is not a picture we can use.") from error
+    flat = Image.new("RGB", rgba.size, "white")  # transparent parts become white
+    flat.paste(rgba, mask=rgba.getchannel("A"))
+    square = ImageOps.fit(flat, (SIZE, SIZE), Image.Resampling.LANCZOS)
+    out = io.BytesIO()
+    square.save(out, format="WEBP", quality=85, method=4)
+    return out.getvalue()
+
+
+def store(user_id: int, source: str, image: bytes) -> None:
+    get_db().execute(
+        """INSERT INTO avatar (user, source, image, content_type, updated_at)
+           VALUES (?, ?, ?, 'image/webp', datetime('now'))
+           ON CONFLICT (user) DO UPDATE SET source = excluded.source,
+             image = excluded.image, content_type = excluded.content_type,
+             updated_at = excluded.updated_at""",
+        (user_id, source, image),
+    )
+
+
+def remove(user_id: int) -> None:
+    get_db().execute("DELETE FROM avatar WHERE user = ?", (user_id,))
+
+
+def source_of(user_id: int):
+    """Where the picture of a user comes from: a row (source, updated_at) or None."""
+    return query_one("SELECT source, updated_at FROM avatar WHERE user = ?", (user_id,))
 
 
 def picture(user_id: int) -> tuple[bytes, str] | None:
