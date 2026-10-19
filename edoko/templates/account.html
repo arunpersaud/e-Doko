@@ -3,37 +3,81 @@
 {% block content %}
 <h1>{{ _("Settings") }}</h1>
 
+{% set chosen = kept.values() | selectattr('chosen') | map(attribute='source') | first %}
 <h2>{{ _("Your picture") }}</h2>
-<div class="picture-row">
-  <img class="avatar large" src="{{ url_for('avatars.avatar', user_id=current_user.id) }}" alt="" width="96" height="96">
-  <p>
-    {% if not picture %}{{ _("A picture was generated for you.") }}
-    {% elif picture.source == "upload" %}{{ _("Your own picture, uploaded on %(date)s.", date=picture.updated_at[:10]) }}
-    {% else %}{{ _("Your Gravatar, fetched on %(date)s.", date=picture.updated_at[:10]) }}{% endif %}
-  </p>
+<div class="pictures">
+  {# the generated picture #}
+  <article class="option{% if not chosen %} chosen{% endif %}">
+    <img class="avatar large" src="{{ url_for('avatars.preview', user_id=current_user.id, source='generated') }}" alt="" width="96" height="96">
+    <strong>{{ _("Generated") }}</strong>
+    {% if not chosen %}<small class="muted">{{ _("in use") }}</small>
+    {% else %}
+    <form method="post" action="{{ url_for('account.avatar_choose') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="source" value="generated">
+      <button type="submit" class="compact">{{ _("Use") }}</button>
+    </form>
+    {% endif %}
+  </article>
+
+  {# an upload #}
+  <article class="option{% if chosen == 'upload' %} chosen{% endif %}">
+    {% if 'upload' in kept %}
+    <img class="avatar large" src="{{ url_for('avatars.preview', user_id=current_user.id, source='upload') }}" alt="" width="96" height="96">
+    {% else %}<div class="avatar large empty" aria-hidden="true">?</div>{% endif %}
+    <strong>{{ _("Your upload") }}</strong>
+    {% if 'upload' in kept %}
+      <small class="muted">{{ kept['upload'].updated_at[:10] }}</small>
+      {% if chosen == 'upload' %}<small class="muted">{{ _("in use") }}</small>
+      {% else %}
+      <form method="post" action="{{ url_for('account.avatar_choose') }}">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="source" value="upload">
+        <button type="submit" class="compact">{{ _("Use") }}</button>
+      </form>
+      {% endif %}
+    {% endif %}
+    <form method="post" action="{{ url_for('account.avatar_upload') }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <input type="file" name="picture" accept="image/png,image/jpeg,image/webp,image/gif" required aria-label="{{ _('Upload a picture') }}">
+      <button type="submit" class="compact secondary">{{ _("Upload") }}</button>
+    </form>
+    {% if 'upload' in kept %}
+    <form method="post" action="{{ url_for('account.avatar_delete') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="source" value="upload">
+      <button type="submit" class="compact secondary outline">{{ _("Delete") }}</button>
+    </form>
+    {% endif %}
+  </article>
+
+  {# Gravatar #}
+  <article class="option{% if chosen == 'gravatar' %} chosen{% endif %}">
+    {% if 'gravatar' in kept %}
+    <img class="avatar large" src="{{ url_for('avatars.preview', user_id=current_user.id, source='gravatar') }}" alt="" width="96" height="96">
+    {% else %}<div class="avatar large empty" aria-hidden="true">?</div>{% endif %}
+    <strong>Gravatar</strong>
+    {% if 'gravatar' in kept %}
+      <small class="muted">{{ kept['gravatar'].updated_at[:10] }}</small>
+      {% if chosen == 'gravatar' %}<small class="muted">{{ _("in use") }}</small>
+      {% else %}
+      <form method="post" action="{{ url_for('account.avatar_choose') }}">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="source" value="gravatar">
+        <button type="submit" class="compact">{{ _("Use") }}</button>
+      </form>
+      {% endif %}
+    {% endif %}
+    <form method="post" action="{{ url_for('account.avatar_gravatar') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="compact secondary">{% if 'gravatar' in kept %}{{ _("Fetch again") }}{% else %}{{ _("Fetch my Gravatar") }}{% endif %}</button>
+    </form>
+    {% if 'gravatar' in kept %}
+    <form method="post" action="{{ url_for('account.avatar_delete') }}">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="source" value="gravatar">
+      <button type="submit" class="compact secondary outline">{{ _("Delete") }}</button>
+    </form>
+    {% endif %}
+  </article>
 </div>
-
-<form method="post" action="{{ url_for('account.avatar_upload') }}" enctype="multipart/form-data">
-  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-  <label>{{ _("Upload a picture") }}
-    <input type="file" name="picture" accept="image/png,image/jpeg,image/webp,image/gif" required>
-  </label>
-  <small>{{ _("PNG, JPEG, WebP or GIF, at most 2 MB. It is cut to a square and shrunk; only that copy is kept.") }}</small>
-  <button type="submit">{{ _("Upload") }}</button>
-</form>
-
-<form method="post" action="{{ url_for('account.avatar_gravatar') }}">
-  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-  <p><small>{{ _("Gravatar is a service of Automattic that stores a picture for an email address. Only if you press this button, our server asks gravatar.com for the picture of your account address (it sends a SHA-256 hash of the address, not the address itself) and keeps a copy here. Nobody else's browser contacts Gravatar because of you. Press it again to fetch a changed picture.") }}</small></p>
-  <button type="submit" class="secondary">{% if picture and picture.source == "gravatar" %}{{ _("Fetch my Gravatar again") }}{% else %}{{ _("Use my Gravatar") }}{% endif %}</button>
-</form>
-
-{% if picture %}
-<form method="post" action="{{ url_for('account.avatar_reset') }}">
-  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-  <button type="submit" class="secondary outline">{{ _("Use the generated picture") }}</button>
-</form>
-{% endif %}
+<p><small>{{ _("An upload is cut to a square and shrunk (PNG, JPEG, WebP or GIF, at most 2 MB); only that copy is kept.") }}</small></p>
+<p><small>{{ _("Gravatar is a service of Automattic that stores a picture for an email address. Only if you press its button, our server asks gravatar.com for the picture of your account address (it sends a SHA-256 hash of the address, not the address itself) and keeps a copy here. Nobody else's browser contacts Gravatar because of you. Press it again to fetch a changed picture.") }}</small></p>
 
 <h2>{{ _("Passkeys") }}</h2>
 <p><a href="{{ url_for('passkeys.manage') }}">{{ _("Manage your passkeys") }}</a></p>

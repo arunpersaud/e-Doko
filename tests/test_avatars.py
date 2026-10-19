@@ -59,8 +59,8 @@ def test_avatar_needs_a_login_and_a_user(app):
 def test_a_stored_picture_is_served_instead(app):
     with closing(db.connect(app.config["DATABASE"])) as conn:
         conn.execute(
-            "INSERT INTO avatar (user, source, image, content_type)"
-            " VALUES (1, 'upload', ?, 'image/webp')",
+            "INSERT INTO avatar (user, source, image, content_type, chosen)"
+            " VALUES (1, 'upload', ?, 'image/webp', 1)",
             (b"RIFFxxxxWEBP",),
         )
     response = logged_in(app).get("/avatar/1")
@@ -173,10 +173,11 @@ def test_upload_stores_the_cleaned_copy_and_serves_it(app):
     assert response.status_code == 302
     (row,) = stored(app)
     assert row["source"] == "upload" and row["content_type"] == "image/webp"
+    assert row["chosen"] == 1
     assert row["image"][:4] == b"RIFF" and len(row["image"]) < 20_000
     shown = client.get("/avatar/1")
     assert shown.mimetype == "image/webp" and shown.data == row["image"]
-    assert "uploaded on" in client.get("/account").text
+    assert "/avatar/1/upload" in client.get("/account").text
     # a new upload replaces the old one
     upload(client, picture("PNG", (100, 100), "blue"))
     assert len(stored(app)) == 1
@@ -216,14 +217,16 @@ def test_other_forms_are_still_limited_to_64_kb(app):
     assert response.status_code == 413
 
 
-def test_reset_returns_to_the_generated_picture(app):
+def test_choosing_the_generated_picture_keeps_the_copies(app):
     client = logged_in(app)
     upload(client, picture())
-    assert stored(app)
-    client.post("/account/avatar/reset", data={"csrf": "t"})
-    assert not stored(app)
+    client.post("/account/avatar/choose", data={"csrf": "t", "source": "generated"})
+    (row,) = stored(app)  # the upload is still there, but not shown
+    assert row["chosen"] == 0
     assert client.get("/avatar/1").mimetype == "image/svg+xml"
-    assert "generated" in client.get("/account").text
+    client.post("/account/avatar/choose", data={"csrf": "t", "source": "upload"})
+    assert stored(app)[0]["chosen"] == 1
+    assert client.get("/avatar/1").mimetype == "image/webp"
 
 
 def test_the_account_page_needs_a_login(app):
@@ -268,7 +271,7 @@ def test_the_user_fetches_their_gravatar(app, monkeypatch):
     (row,) = stored(app)
     assert row["source"] == "gravatar" and row["content_type"] == "image/webp"
     page = client.get("/account").text
-    assert "Your Gravatar, fetched on" in page and "Fetch my Gravatar again" in page
+    assert "/avatar/1/gravatar" in page and "Fetch again" in page
 
 
 def test_fetching_again_gets_a_changed_picture(app, monkeypatch):
@@ -348,3 +351,104 @@ def test_redirects_only_to_gravatar_over_https():
     ):
         with pytest.raises(urllib.error.URLError):
             follow(bad)
+
+
+# --- several kept pictures ---------------------------------------------------------
+
+
+def chosen_sources(app):
+    return {r["source"]: r["chosen"] for r in stored(app)}
+
+
+def test_an_upload_and_a_gravatar_are_both_kept_and_you_can_switch(app, monkeypatch):
+    monkeypatch.setattr(
+        avatars, "fetch_gravatar", lambda email: picture("PNG", color="blue")
+    )
+    client = logged_in(app)
+    upload(client, picture("PNG", color="red"))
+    assert chosen_sources(app) == {"upload": 1}
+    gravatar_request(client)  # the newest one is shown, the upload is kept
+    assert chosen_sources(app) == {"upload": 0, "gravatar": 1}
+    client.post("/account/avatar/choose", data={"csrf": "t", "source": "upload"})
+    assert chosen_sources(app) == {"upload": 1, "gravatar": 0}
+    page = client.get("/account").text
+    assert "/avatar/1/upload" in page and "/avatar/1/gravatar" in page
+    assert "/avatar/1/generated" in page
+
+
+def test_choosing_something_that_is_not_kept_changes_nothing(app):
+    client = logged_in(app)
+    upload(client, picture())
+    for source in ("gravatar", "nonsense", ""):
+        client.post("/account/avatar/choose", data={"csrf": "t", "source": source})
+    assert chosen_sources(app) == {"upload": 1}
+
+
+def test_deleting_a_copy(app, monkeypatch):
+    monkeypatch.setattr(avatars, "fetch_gravatar", lambda email: picture())
+    client = logged_in(app)
+    upload(client, picture())
+    gravatar_request(client)
+    client.post("/account/avatar/delete", data={"csrf": "t", "source": "gravatar"})
+    assert chosen_sources(app) == {"upload": 0}  # the shown one is gone
+    assert client.get("/avatar/1").mimetype == "image/svg+xml"
+    client.post("/account/avatar/delete", data={"csrf": "t", "source": "upload"})
+    assert not stored(app)
+
+
+def test_only_one_picture_can_be_shown(app):
+    import sqlite3
+
+    import pytest
+
+    client = logged_in(app)
+    upload(client, picture())
+    with (
+        closing(db.connect(app.config["DATABASE"])) as conn,
+        pytest.raises(sqlite3.IntegrityError),
+    ):
+        conn.execute(
+            "INSERT INTO avatar (user, source, image, content_type, chosen)"
+            " VALUES (1, 'gravatar', x'00', 'image/webp', 1)"
+        )
+
+
+def test_previews_are_only_for_your_own_pictures(app):
+    client = logged_in(app)
+    upload(client, picture())
+    assert client.get("/avatar/1/upload").mimetype == "image/webp"
+    assert client.get("/avatar/1/generated").mimetype == "image/svg+xml"
+    assert client.get("/avatar/1/gravatar").status_code == 404  # none kept
+    assert client.get("/avatar/1/nonsense").status_code == 404
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("INSERT INTO user (id, name, email) VALUES (2, 'Bob', 'b@x.org')")
+    assert client.get("/avatar/2/generated").status_code == 404  # somebody else's
+    assert app.test_client().get("/avatar/1/upload").status_code == 302
+
+
+def test_the_account_page_shows_the_three_choices(app):
+    page = logged_in(app).get("/account").text
+    assert page.count('class="option') == 3
+    assert "/avatar/1/generated" in page and "in use" in page
+    assert "Fetch my Gravatar" in page
+
+
+def test_migration_3_keeps_the_picture_that_was_shown(tmp_path):
+    import sqlite3
+
+    from edoko import migrations
+
+    path = tmp_path / "v2.sqlite"  # a database as it was at version 2
+    with closing(sqlite3.connect(path, autocommit=True)) as conn:
+        conn.executescript(db.SCHEMA.read_text())
+        conn.executescript(
+            migrations.MIGRATIONS[2] + "PRAGMA user_version = 2;"
+            "INSERT INTO user (id, name, email) VALUES (1, 'Ann', 'a@x.org');"
+            "INSERT INTO avatar (user, source, image, content_type)"
+            " VALUES (1, 'gravatar', x'0102', 'image/webp');"
+        )
+    assert migrations.migrate(path)[-1] == migrations.LATEST
+    with closing(sqlite3.connect(path)) as conn:
+        assert conn.execute("SELECT source, chosen, image FROM avatar").fetchall() == [
+            ("gravatar", 1, b"\x01\x02")
+        ]

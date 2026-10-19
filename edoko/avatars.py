@@ -15,7 +15,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from flask import Blueprint, Response, abort, current_app, request
+from flask import Blueprint, Response, abort, current_app, g, request
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from .auth import login_required
@@ -136,30 +136,77 @@ def process(data: bytes) -> bytes:
     return out.getvalue()
 
 
+SOURCES = ("generated", "upload", "gravatar")
+
+
 def store(user_id: int, source: str, image: bytes) -> None:
-    get_db().execute(
-        """INSERT INTO avatar (user, source, image, content_type, updated_at)
-           VALUES (?, ?, ?, 'image/webp', datetime('now'))
-           ON CONFLICT (user) DO UPDATE SET source = excluded.source,
-             image = excluded.image, content_type = excluded.content_type,
-             updated_at = excluded.updated_at""",
+    """Keep a picture and make it the one that is shown."""
+    db = get_db()
+    db.execute("UPDATE avatar SET chosen = 0 WHERE user = ?", (user_id,))
+    db.execute(
+        """INSERT INTO avatar (user, source, image, content_type, updated_at, chosen)
+           VALUES (?, ?, ?, 'image/webp', datetime('now'), 1)
+           ON CONFLICT (user, source) DO UPDATE SET image = excluded.image,
+             content_type = excluded.content_type, updated_at = excluded.updated_at,
+             chosen = 1""",
         (user_id, source, image),
     )
 
 
-def remove(user_id: int) -> None:
-    get_db().execute("DELETE FROM avatar WHERE user = ?", (user_id,))
+def choose(user_id: int, source: str) -> bool:
+    """Show another of the kept pictures, or the generated one (False: none kept)."""
+    db = get_db()
+    if source != "generated" and not query_one(
+        "SELECT 1 FROM avatar WHERE user = ? AND source = ?", (user_id, source)
+    ):
+        return False
+    db.execute("UPDATE avatar SET chosen = 0 WHERE user = ?", (user_id,))
+    if source != "generated":
+        db.execute(
+            "UPDATE avatar SET chosen = 1 WHERE user = ? AND source = ?",
+            (user_id, source),
+        )
+    return True
 
 
-def source_of(user_id: int):
-    """Where the picture of a user comes from: a row (source, updated_at) or None."""
-    return query_one("SELECT source, updated_at FROM avatar WHERE user = ?", (user_id,))
+def delete(user_id: int, source: str) -> None:
+    """Throw away a kept picture (if it was shown, the generated one is back)."""
+    get_db().execute(
+        "DELETE FROM avatar WHERE user = ? AND source = ?", (user_id, source)
+    )
 
 
-def picture(user_id: int) -> tuple[bytes, str] | None:
-    """The stored picture of a user: (image, content type), or None."""
-    row = query_one("SELECT image, content_type FROM avatar WHERE user = ?", (user_id,))
+def kept(user_id: int) -> dict:
+    """The kept pictures of a user: source -> row (updated_at, chosen)."""
+    rows = get_db().execute(
+        "SELECT source, updated_at, chosen FROM avatar WHERE user = ?", (user_id,)
+    )
+    return {row["source"]: row for row in rows}
+
+
+def picture(user_id: int, source: str | None = None) -> tuple[bytes, str] | None:
+    """A kept picture of a user: the shown one, or the one of a given source."""
+    if source is None:
+        where, params = "chosen = 1", (user_id,)
+    else:
+        where, params = "source = ?", (user_id, source)
+    row = query_one(
+        f"SELECT image, content_type FROM avatar WHERE user = ? AND {where}", params
+    )
     return (row["image"], row["content_type"]) if row else None
+
+
+def respond(body: bytes, content_type: str) -> Response:
+    response = Response(body, mimetype=content_type)
+    # for members only; they check with the ETag, so a new picture shows at once
+    response.headers["Cache-Control"] = "private, no-cache"
+    response.set_etag(hashlib.sha256(body).hexdigest()[:20])
+    return response.make_conditional(request)
+
+
+def generated(user_id: int) -> tuple[bytes, str]:
+    svg = identicon(user_id, current_app.config["SECRET_KEY"])
+    return svg.encode(), "image/svg+xml"
 
 
 @bp.route("/avatar/<int:user_id>")
@@ -167,17 +214,19 @@ def picture(user_id: int) -> tuple[bytes, str] | None:
 def avatar(user_id):
     if query_one("SELECT 1 FROM user WHERE id = ?", (user_id,)) is None:
         abort(404)
-    stored = picture(user_id)
-    if stored:
-        body, content_type = stored
-    else:
-        body = identicon(user_id, current_app.config["SECRET_KEY"]).encode()
-        content_type = "image/svg+xml"
-    response = Response(body, mimetype=content_type)
-    # for members only; they check with the ETag, so a new picture shows at once
-    response.headers["Cache-Control"] = "private, no-cache"
-    response.set_etag(hashlib.sha256(body).hexdigest()[:20])
-    return response.make_conditional(request)
+    return respond(*(picture(user_id) or generated(user_id)))
+
+
+@bp.route("/avatar/<int:user_id>/<source>")
+@login_required
+def preview(user_id, source):
+    """One of your own kept pictures (or the generated one), to choose between."""
+    if user_id != g.user["id"] or source not in SOURCES:
+        abort(404)
+    found = generated(user_id) if source == "generated" else picture(user_id, source)
+    if found is None:
+        abort(404)
+    return respond(*found)
 
 
 def init_app(app) -> None:

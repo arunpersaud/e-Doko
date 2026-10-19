@@ -20,7 +20,7 @@ bp = Blueprint("account", __name__)
 @bp.route("/account")
 @login_required
 def index():
-    return render_template("account.html", picture=avatars.source_of(g.user["id"]))
+    return render_template("account.html", kept=avatars.kept(g.user["id"]))
 
 
 @bp.post("/account/avatar/upload")
@@ -60,11 +60,21 @@ def avatar_gravatar():
     return redirect(url_for("account.index"))
 
 
-@bp.post("/account/avatar/reset")
+@bp.post("/account/avatar/choose")
 @login_required
-def avatar_reset():
-    avatars.remove(g.user["id"])
-    flash(_("You have the generated picture again."))
+def avatar_choose():
+    if avatars.choose(g.user["id"], request.form.get("source", "")):
+        flash(_("Your picture was changed."))
+    return redirect(url_for("account.index"))
+
+
+@bp.post("/account/avatar/delete")
+@login_required
+def avatar_delete():
+    source = request.form.get("source", "")
+    if source in ("upload", "gravatar"):
+        avatars.delete(g.user["id"], source)
+        flash(_("The copy of the picture was deleted."))
     return redirect(url_for("account.index"))
 
 

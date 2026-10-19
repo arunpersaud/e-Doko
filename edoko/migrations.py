@@ -24,6 +24,24 @@ CREATE TABLE avatar (
   updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
 """,
+    # an upload and a Gravatar are both kept; one of them (or none: the
+    # generated picture) is the one that is shown
+    3: """
+CREATE TABLE avatar_new (
+  user            INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+  source          TEXT NOT NULL CHECK (source IN ('upload', 'gravatar')),
+  image           BLOB NOT NULL,
+  content_type    TEXT NOT NULL,
+  updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  chosen          INTEGER NOT NULL DEFAULT 0 CHECK (chosen IN (0, 1)),
+  PRIMARY KEY (user, source)
+) STRICT;
+INSERT INTO avatar_new (user, source, image, content_type, updated_at, chosen)
+  SELECT user, source, image, content_type, updated_at, 1 FROM avatar;
+DROP TABLE avatar;
+ALTER TABLE avatar_new RENAME TO avatar;
+CREATE UNIQUE INDEX avatar_one_chosen ON avatar(user) WHERE chosen = 1;
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

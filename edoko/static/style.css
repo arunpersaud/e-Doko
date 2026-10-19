@@ -127,8 +127,21 @@ small.muted { color: var(--pico-muted-color); }
 
 img.avatar { width: 2rem; height: 2rem; border-radius: 50%; object-fit: cover; }
 img.avatar.large { width: 6rem; height: 6rem; }
-.picture-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.picture-row p { margin: 0; }
+.pictures { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+.pictures article.option {
+  margin: 0; padding: 0.75rem; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  border: 2px solid transparent;
+}
+.pictures article.option.chosen { border-color: var(--pico-primary); }
+.pictures form { margin: 0; width: 100%; }
+.pictures input[type="file"] { width: 100%; font-size: 0.75em; margin-bottom: 0.25rem; padding: 0.25rem; }
+.pictures input[type="file"]::file-selector-button { font-size: 0.9em; padding: 0.25rem 0.5rem; margin-right: 0.35rem; }
+.pictures button.compact { width: 100%; }
+div.avatar.large.empty {
+  display: grid; place-items: center; font-size: 2rem; color: var(--pico-muted-color);
+  background: var(--pico-muted-border-color); border-radius: 50%;
+}
 
 /* the menu: the text of "Settings" gives way to the icon on narrow screens */
 header nav a[aria-current] { font-weight: bold; }

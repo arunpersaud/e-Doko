@@ -1732,3 +1732,33 @@ msgstr "Admin"
 
 msgid "disabled"
 msgstr "gesperrt"
+
+msgid "Generated"
+msgstr "Erzeugt"
+
+msgid "Your upload"
+msgstr "Dein Upload"
+
+msgid "in use"
+msgstr "in Gebrauch"
+
+msgid "Use"
+msgstr "Verwenden"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Fetch again"
+msgstr "Noch einmal holen"
+
+msgid "Fetch my Gravatar"
+msgstr "Meinen Gravatar holen"
+
+msgid "An upload is cut to a square and shrunk (PNG, JPEG, WebP or GIF, at most 2 MB); only that copy is kept."
+msgstr "Ein Upload wird quadratisch zugeschnitten und verkleinert (PNG, JPEG, WebP oder GIF, höchstens 2 MB); nur diese Kopie wird behalten."
+
+msgid "Your picture was changed."
+msgstr "Dein Bild wurde geändert."
+
+msgid "The copy of the picture was deleted."
+msgstr "Die Kopie des Bildes wurde gelöscht."
