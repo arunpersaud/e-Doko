@@ -99,9 +99,6 @@ img.badge { width: 1.5rem; height: 1.5rem; }
 .hand { display: flex; flex-wrap: wrap; gap: 0.1rem; }
 img.card { height: 5rem; width: auto; }
 img.card.small { height: 3.2rem; }
-.tricks { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 0.75rem; }
-.trick { margin: 0; padding: 0.5rem; }
-.trick header { font-size: 0.85em; margin-bottom: 0.25rem; }
 .cross {
   display: grid;
   grid-template-columns: repeat(3, auto);
@@ -117,7 +114,8 @@ figure.play .seq {
   background: rgba(0, 0, 0, 0.6); color: #fff;
 }
 figure.play.winner img { outline: 3px solid var(--pico-primary); border-radius: 4px; }
-p.comment { font-size: 0.8em; margin: 0.25rem 0 0; }
+div.trick-comments { margin: -0.75rem 0 1.5rem; }
+p.comment { font-size: 0.9em; margin: 0.25rem 0 0; }
 @media (max-width: 42rem) {
   .table-view { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
   .table-view > * { grid-area: auto; }

@@ -125,13 +125,13 @@ def test_game_in_progress_shows_the_tricks_so_far_and_only_your_cards(world):
         add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=2)
     page = client_for(world, 5).get("/game/13/")
     assert page.status_code == 200
-    assert page.text.count('class="trick"') == 2
-    # 2 tricks of 4 cards, the trick on the table, and the 10 cards user 5 still
-    # holds: no other hand
-    assert images(page.text) == 8 + 4 + 10
+    assert numbers(page.text) == 2
+    # the trick on the table (4 cards) and the 10 cards user 5 still holds:
+    # no other hand
+    assert images(page.text) == 4 + 10
     assert "shown when the game is over" in page.text
     # the same for the others, each sees only their own hand
-    assert images(client_for(world, 8).get("/game/13/").text) == 8 + 4 + 10
+    assert images(client_for(world, 8).get("/game/13/").text) == 4 + 10
     # nobody else sees anything
     assert status(world, 1, 13) == 404
 
@@ -172,11 +172,16 @@ def test_unknown_game_and_login_required(world):
     assert response.status_code == 302 and "/login" in response.headers["Location"]
 
 
-def test_page_lists_tricks_and_hands(world):
+def numbers(page):
+    """The numbered links to the tricks."""
+    return page.split('class="trick-numbers"')[1].split("</p>")[0].count("<a ")
+
+
+def test_page_has_the_four_players_and_a_link_to_every_trick(world):
     page = client_for(world, 1).get("/game/10/").text
-    assert page.count('class="trick"') == 12
-    assert "Trick 12" in page
+    assert numbers(page) == 12
     assert page.count('class="seat ') == 4
+    assert 'class="trick"' not in page  # no list of all tricks below the table
 
 
 def test_comments_are_shown_unless_deleted(world):
@@ -220,7 +225,7 @@ def test_seat_link_works_without_login_and_shows_only_that_game(world):
         conn.execute("UPDATE hand SET token = ? WHERE id = 101", ("a" * 32,))
     response = client.get("/" + "a" * 32)
     assert response.status_code == 200
-    assert "Game 10" in response.text and "Trick 12" in response.text
+    assert "Game 10" in response.text and "Trick 1 / 12" in response.text
     assert response.headers["Cache-Control"] == "private, no-store"
     assert response.headers["X-Robots-Tag"] == "noindex"
     # the other tables of the deal need a login
