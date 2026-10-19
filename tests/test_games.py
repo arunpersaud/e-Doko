@@ -181,3 +181,70 @@ def test_markup_in_names_and_comments_is_escaped(world):
     page = client_for(world, 1).get("/game/10/").text
     assert "<script>alert" not in page and "<b>Bob" not in page
     assert "&lt;script&gt;" in page
+
+
+# --- seat links ---------------------------------------------------------------
+
+
+def test_seat_link_works_without_login_and_shows_only_that_game(world):
+    client = world.test_client()
+    response = client.get("/token101")  # not a token: too short
+    assert response.status_code == 404
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE hand SET token = ? WHERE id = 101", ("a" * 32,))
+    response = client.get("/" + "a" * 32)
+    assert response.status_code == 200
+    assert "Game 10" in response.text and "Trick 12" in response.text
+    assert response.headers["Cache-Control"] == "private, no-store"
+    assert response.headers["X-Robots-Tag"] == "noindex"
+    # the other tables of the deal need a login
+    assert "/game/11/" not in response.text
+    assert "to see how the other tables played this deal" in response.text
+    # and the seat link opens nothing else
+    assert client.get("/game/11/").status_code == 302
+
+
+def test_seat_link_of_a_game_in_progress_shows_no_cards(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE hand SET token = ? WHERE id = 131", ("b" * 22,))
+    response = world.test_client().get("/" + "b" * 22)
+    assert response.status_code == 200
+    assert "/static/cards/" not in response.text
+
+
+def test_seat_link_when_logged_in_as_that_player_lists_other_tables(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE hand SET token = ? WHERE id = 101", ("c" * 32,))
+    page = client_for(world, 1).get("/" + "c" * 32).text
+    assert "/game/11/" in page
+    # logged in as somebody else, the link still only gives the seat view
+    page = client_for(world, 5).get("/" + "c" * 32).text
+    assert "/game/11/" not in page
+
+
+def test_unknown_seat_link(world):
+    assert world.test_client().get("/" + "d" * 32).status_code == 404
+    assert world.test_client().get("/" + "d" * 22).status_code == 404
+
+
+def test_old_php_links_are_redirected(world):
+    client = world.test_client()
+    token = "e" * 32
+    response = client.get(f"/index.php?action=game&me={token}")
+    assert response.headers["Location"] == f"/{token}"
+    assert client.get("/index.php?action=game&me=short").headers["Location"] == "/"
+    assert client.get("/index.php?action=stats").headers["Location"] == "/"
+
+
+def test_tokens_are_masked_in_the_access_log():
+    from edoko.gunicorn_log import mask
+
+    token = "0123456789abcdef0123456789abcdef"
+    assert mask(f"GET /{token} HTTP/1.1") == "GET /<token> HTTP/1.1"
+    assert mask(f"/{token}/") == "/<token>/"
+    assert mask(f"GET /index.php?action=game&me={token} HTTP/1.1") == (
+        "GET /index.php?action=game&me=<token> HTTP/1.1"
+    )
+    assert mask("/Abc_Def-0123456789xyzZ") == "/<token>"
+    assert mask("GET /game/2471/ HTTP/1.1") == "GET /game/2471/ HTTP/1.1"
+    assert mask("/static/cards/english/1.png") == "/static/cards/english/1.png"

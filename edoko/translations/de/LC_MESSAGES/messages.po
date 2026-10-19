@@ -1521,3 +1521,6 @@ msgstr "geht an %(name)s"
 
 msgid "Other tables that played this deal"
 msgstr "Andere Tische, die diese Karten gespielt haben"
+
+msgid "to see how the other tables played this deal."
+msgstr "um zu sehen, wie die anderen Tische diese Karten gespielt haben."

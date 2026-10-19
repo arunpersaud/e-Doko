@@ -56,6 +56,9 @@
 </article>
 {% endfor %}
 
+{% if others_hidden %}
+<p><a href="{{ url_for('auth.login') }}">{{ _("Log in") }}</a> {{ _("to see how the other tables played this deal.") }}</p>
+{% endif %}
 {% if others %}
 <h2>{{ _("Other tables that played this deal") }}</h2>
 <ul>

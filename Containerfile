@@ -22,4 +22,5 @@ ENV PATH=/venv/bin:$PATH \
     FLASK_DATABASE=/data/edoko.sqlite
 EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", \
-     "--no-control-socket", "--access-logfile", "-", "edoko:create_app()"]
+     "--no-control-socket", "--access-logfile", "-", \
+     "--logger-class", "edoko.gunicorn_log.Logger", "edoko:create_app()"]

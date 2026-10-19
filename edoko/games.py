@@ -11,6 +11,7 @@ Everybody else gets a 404, as if the game didn't exist.
 
 from flask import Blueprint, abort, g, render_template
 from flask_babel import lazy_gettext as _l
+from werkzeug.routing import BaseConverter
 
 from .auth import login_required
 from .db import query, query_one
@@ -18,6 +19,9 @@ from .db import query, query_one
 bp = Blueprint("games", __name__)
 
 OVER = "gameover"
+
+# pages with hands and tokens: nothing may keep them
+PRIVATE = {"Cache-Control": "private, no-store", "X-Robots-Tag": "noindex"}
 
 SUITS = {
     "diamonds": _l("diamonds"),
@@ -164,29 +168,68 @@ def load_details(game_id: int, hands) -> dict:
     return {"cards": cards, "tricks": tricks, "before": before, "scores": scores}
 
 
-@bp.route("/game/<int:game_id>/")
-@login_required
-def game(game_id):
+def render_game(game_id: int, user_id: int, *, details: bool, logged_in: bool = True):
+    """The page of a game for one of its players or for a qualified viewer."""
     shown = load_game(game_id)
-    if shown["game"] is None:
-        abort(404)
-    user_id = g.user["id"]
-    details = can_see_details(user_id, game_id)
-    if not details and not is_player(user_id, game_id):
-        abort(404)
     context = {
         "user_id": user_id,
         "details": details,
+        "logged_in": logged_in,
         "names": {h["seat"]: h["name"] for h in shown["hands"]},
         **shown,
     }
     if details:
         context.update(load_details(game_id, shown["hands"]))
-        context["others"] = other_tables(user_id, game_id)
+        # the links to other tables need a login
+        context["others"] = other_tables(user_id, game_id) if logged_in else []
+        context["others_hidden"] = not logged_in
     response = render_template("game.html", **context)
-    return response, 200, {"Cache-Control": "private, no-store"}
+    return response, 200, PRIVATE
+
+
+@bp.route("/game/<int:game_id>/")
+@login_required
+def game(game_id):
+    if query_one("SELECT 1 FROM game WHERE id = ?", (game_id,)) is None:
+        abort(404)
+    user_id = g.user["id"]
+    details = can_see_details(user_id, game_id)
+    if not details and not is_player(user_id, game_id):
+        abort(404)
+    return render_game(game_id, user_id, details=details)
+
+
+@bp.route("/<token:token>")
+def seat(token):
+    """A player's own link (from the mails): no login, but only this seat.
+
+    The token is a secret that stands for one seat of one game, so it shows
+    that game and nothing else. Whoever has it can play that seat, as on
+    the PHP site.
+    """
+    hand = query_one(
+        """SELECT hand.game, hand.user, game.status FROM hand
+           JOIN game ON game.id = hand.game WHERE hand.token = ?""",
+        (token,),
+    )
+    if hand is None:
+        abort(404)
+    logged_in = g.user is not None and g.user["id"] == hand["user"]
+    return render_game(
+        hand["game"],
+        hand["user"],
+        details=hand["status"] == OVER,
+        logged_in=logged_in,
+    )
+
+
+class TokenConverter(BaseConverter):
+    """Seat tokens: 32 hex digits (the PHP site) or 22 url-safe characters."""
+
+    regex = r"[0-9a-f]{32}|[A-Za-z0-9_-]{22}"
 
 
 def init_app(app) -> None:
+    app.url_map.converters["token"] = TokenConverter
     app.register_blueprint(bp)
     app.jinja_env.globals.update(card_name=card_name, image_number=image_number)
