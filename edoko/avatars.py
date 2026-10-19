@@ -11,6 +11,9 @@ browser ever contacts a third party.
 import hashlib
 import hmac
 import io
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from flask import Blueprint, Response, abort, current_app, request
 from PIL import Image, ImageOps, UnidentifiedImageError
@@ -30,6 +33,62 @@ Image.MAX_IMAGE_PIXELS = MAX_PIXELS
 
 class BadPicture(ValueError):
     """The data is not a picture we are willing to use."""
+
+
+class NoGravatar(Exception):
+    """Gravatar has no picture for this address."""
+
+
+class GravatarUnavailable(Exception):
+    """Gravatar could not be reached or answered with something odd."""
+
+
+GRAVATAR = "https://gravatar.com/avatar/"
+GRAVATAR_HOSTS = ("gravatar.com", "secure.gravatar.com", "www.gravatar.com")
+GRAVATAR_TIMEOUT = 10  # seconds
+GRAVATAR_TRIES = 10  # per user and hour
+
+
+def gravatar_url(email: str) -> str:
+    """The address of the Gravatar for an email address (we send a SHA-256 hash).
+
+    d=404: an answer of 404 if there is none (not a picture of their own).
+    """
+    digest = hashlib.sha256(email.strip().lower().encode()).hexdigest()
+    return f"{GRAVATAR}{digest}?{urllib.parse.urlencode({'s': SIZE, 'd': '404'})}"
+
+
+class _OnlyGravatar(urllib.request.HTTPRedirectHandler):
+    """Follow redirects, but only to https pages of Gravatar itself."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target = urllib.parse.urlsplit(newurl)
+        if target.scheme != "https" or target.hostname not in GRAVATAR_HOSTS:
+            raise urllib.error.URLError(f"redirect to {newurl!r} refused")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def fetch_gravatar(email: str) -> bytes:
+    """Download the Gravatar of an address; only called when the user asks.
+
+    Raises NoGravatar or GravatarUnavailable.
+    """
+    request = urllib.request.Request(
+        gravatar_url(email), headers={"User-Agent": "e-DoKo (doko.nubati.net)"}
+    )
+    opener = urllib.request.build_opener(_OnlyGravatar)
+    try:
+        with opener.open(request, timeout=GRAVATAR_TIMEOUT) as response:
+            data = response.read(MAX_UPLOAD + 1)
+    except urllib.error.HTTPError as error:
+        if error.code == 404:
+            raise NoGravatar from error
+        raise GravatarUnavailable(f"Gravatar answered {error.code}") from error
+    except (urllib.error.URLError, OSError) as error:
+        raise GravatarUnavailable(str(error)) from error
+    if len(data) > MAX_UPLOAD:
+        raise GravatarUnavailable("the picture is too big")
+    return data
 
 
 def identicon(user_id: int, secret: str) -> str:

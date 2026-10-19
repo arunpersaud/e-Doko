@@ -22,6 +22,12 @@
   <button type="submit">{{ _("Upload") }}</button>
 </form>
 
+<form method="post" action="{{ url_for('account.avatar_gravatar') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <p><small>{{ _("Gravatar is a service of Automattic that stores a picture for an email address. Only if you press this button, our server asks gravatar.com for the picture of your account address (it sends a SHA-256 hash of the address, not the address itself) and keeps a copy here. Nobody else's browser contacts Gravatar because of you. Press it again to fetch a changed picture.") }}</small></p>
+  <button type="submit" class="secondary">{% if picture and picture.source == "gravatar" %}{{ _("Fetch my Gravatar again") }}{% else %}{{ _("Use my Gravatar") }}{% endif %}</button>
+</form>
+
 {% if picture %}
 <form method="post" action="{{ url_for('account.avatar_reset') }}">
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">

@@ -1690,3 +1690,24 @@ msgstr "Dieses Bild können wir nicht verwenden."
 
 msgid "You have the generated picture again."
 msgstr "Du hast wieder das erzeugte Bild."
+
+msgid "Gravatar is a service of Automattic that stores a picture for an email address. Only if you press this button, our server asks gravatar.com for the picture of your account address (it sends a SHA-256 hash of the address, not the address itself) and keeps a copy here. Nobody else's browser contacts Gravatar because of you. Press it again to fetch a changed picture."
+msgstr "Gravatar ist ein Dienst von Automattic, der ein Bild zu einer E-Mail-Adresse speichert. Nur wenn du diesen Knopf drückst, fragt unser Server bei gravatar.com nach dem Bild deiner Konto-Adresse (er schickt einen SHA-256-Hash der Adresse, nicht die Adresse selbst) und behält hier eine Kopie. Der Browser von niemand anderem nimmt deinetwegen Kontakt zu Gravatar auf. Drück ihn noch einmal, um ein geändertes Bild zu holen."
+
+msgid "Use my Gravatar"
+msgstr "Meinen Gravatar verwenden"
+
+msgid "Fetch my Gravatar again"
+msgstr "Meinen Gravatar noch einmal holen"
+
+msgid "Too many tries. Please wait a little."
+msgstr "Zu viele Versuche. Bitte warte ein wenig."
+
+msgid "Gravatar has no picture for your address."
+msgstr "Gravatar hat kein Bild für deine Adresse."
+
+msgid "Could not get your picture from Gravatar. Please try again later."
+msgstr "Dein Bild konnte nicht von Gravatar geholt werden. Bitte versuche es später noch einmal."
+
+msgid "Your Gravatar was saved."
+msgstr "Dein Gravatar wurde gespeichert."

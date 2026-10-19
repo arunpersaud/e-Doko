@@ -12,7 +12,7 @@ from flask import (
 from flask_babel import gettext as _
 
 from . import avatars
-from .auth import login_required
+from .auth import login_required, rate_limited
 
 bp = Blueprint("account", __name__)
 
@@ -38,6 +38,25 @@ def avatar_upload():
             flash(_("Your picture was saved."))
         except avatars.BadPicture as error:
             flash(str(error))
+    return redirect(url_for("account.index"))
+
+
+@bp.post("/account/avatar/gravatar")
+@login_required
+def avatar_gravatar():
+    """Fetch the Gravatar of the account's address: the user asked for it."""
+    if rate_limited(f"gravatar:{g.user['id']}", avatars.GRAVATAR_TRIES):
+        flash(_("Too many tries. Please wait a little."))
+        return redirect(url_for("account.index"))
+    try:
+        image = avatars.process(avatars.fetch_gravatar(g.user["email"]))
+    except avatars.NoGravatar:
+        flash(_("Gravatar has no picture for your address."))
+    except avatars.GravatarUnavailable, avatars.BadPicture:
+        flash(_("Could not get your picture from Gravatar. Please try again later."))
+    else:
+        avatars.store(g.user["id"], "gravatar", image)
+        flash(_("Your Gravatar was saved."))
     return redirect(url_for("account.index"))
 
 

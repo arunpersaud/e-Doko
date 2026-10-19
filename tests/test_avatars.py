@@ -228,3 +228,123 @@ def test_reset_returns_to_the_generated_picture(app):
 
 def test_the_account_page_needs_a_login(app):
     assert app.test_client().get("/account").status_code == 302
+
+
+# --- Gravatar ----------------------------------------------------------------------
+
+
+def gravatar_request(client, token="t"):
+    return client.post("/account/avatar/gravatar", data={"csrf": token})
+
+
+def test_gravatar_url_sends_a_hash_not_the_address():
+    import hashlib
+
+    url = avatars.gravatar_url("  Test@Example.org ")
+    digest = hashlib.sha256(b"test@example.org").hexdigest()
+    assert url == f"https://gravatar.com/avatar/{digest}?s=192&d=404"
+    assert "example" not in url and "@" not in url
+
+
+def test_nothing_is_fetched_unless_the_user_asks(app, monkeypatch):
+    def fail(email):
+        raise AssertionError("Gravatar was contacted")
+
+    monkeypatch.setattr(avatars, "fetch_gravatar", fail)
+    client = logged_in(app)
+    for url in ("/", "/account", "/avatar/1", "/game/1/", "/account/passkeys"):
+        client.get(url)
+    upload(client, picture())  # an upload does not contact it either
+
+
+def test_the_user_fetches_their_gravatar(app, monkeypatch):
+    asked = []
+    monkeypatch.setattr(
+        avatars, "fetch_gravatar", lambda email: asked.append(email) or picture("JPEG")
+    )
+    client = logged_in(app)
+    assert gravatar_request(client).status_code == 302
+    assert asked == ["a@x.org"]  # the account address
+    (row,) = stored(app)
+    assert row["source"] == "gravatar" and row["content_type"] == "image/webp"
+    page = client.get("/account").text
+    assert "Your Gravatar, fetched on" in page and "Fetch my Gravatar again" in page
+
+
+def test_fetching_again_gets_a_changed_picture(app, monkeypatch):
+    pictures = iter([picture("PNG", color="red"), picture("PNG", color="blue")])
+    monkeypatch.setattr(avatars, "fetch_gravatar", lambda email: next(pictures))
+    client = logged_in(app)
+    gravatar_request(client)
+    first = stored(app)[0]["image"]
+    gravatar_request(client)
+    assert len(stored(app)) == 1 and stored(app)[0]["image"] != first
+
+
+def test_gravatar_without_a_picture_or_unreachable_keeps_the_old_one(app, monkeypatch):
+    client = logged_in(app)
+    upload(client, picture())
+    kept = stored(app)[0]["image"]
+
+    def none(email):
+        raise avatars.NoGravatar
+
+    monkeypatch.setattr(avatars, "fetch_gravatar", none)
+    gravatar_request(client)
+    assert "Gravatar has no picture for your address." in client.get("/account").text
+
+    def down(email):
+        raise avatars.GravatarUnavailable("timeout")
+
+    monkeypatch.setattr(avatars, "fetch_gravatar", down)
+    gravatar_request(client)
+    assert "try again later" in client.get("/account").text
+
+    monkeypatch.setattr(avatars, "fetch_gravatar", lambda email: b"not a picture")
+    gravatar_request(client)
+    assert "try again later" in client.get("/account").text
+    assert stored(app)[0]["image"] == kept and stored(app)[0]["source"] == "upload"
+
+
+def test_gravatar_is_rate_limited(app, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        avatars, "fetch_gravatar", lambda email: calls.append(1) or picture()
+    )
+    client = logged_in(app)
+    for _ in range(avatars.GRAVATAR_TRIES + 3):
+        gravatar_request(client)
+    assert len(calls) == avatars.GRAVATAR_TRIES
+
+
+def test_gravatar_needs_login_and_csrf(app, monkeypatch):
+    monkeypatch.setattr(avatars, "fetch_gravatar", lambda email: picture())
+    assert gravatar_request(app.test_client()).status_code in (302, 403)
+    assert gravatar_request(logged_in(app), token="wrong").status_code == 403
+    assert not stored(app)
+
+
+def test_redirects_only_to_gravatar_over_https():
+    import urllib.error
+    import urllib.request
+
+    import pytest
+
+    handler = avatars._OnlyGravatar()
+    req = urllib.request.Request("https://gravatar.com/avatar/x")
+
+    def follow(url):
+        return handler.redirect_request(req, None, 302, "Found", {}, url)
+
+    assert follow("https://secure.gravatar.com/avatar/x").full_url.startswith(
+        "https://secure"
+    )
+    for bad in (
+        "https://evil.example/avatar/x",
+        "http://gravatar.com/avatar/x",
+        "https://gravatar.com.evil.example/x",
+        "https://127.0.0.1/x",
+        "file:///etc/passwd",
+    ):
+        with pytest.raises(urllib.error.URLError):
+            follow(bad)
