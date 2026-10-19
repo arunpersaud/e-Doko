@@ -19,7 +19,9 @@
       <ul><li><a href="{{ url_for('site.index') }}" class="brand"><strong>e-DoKo</strong></a></li></ul>
       <ul>
         {% if current_user %}
-        <li><a href="{{ url_for('account.index') }}">{{ current_user.name }}</a></li>
+        <li><a href="{{ url_for('site.index') }}"{% if request.endpoint in ('site.index', 'games.game', 'games.seat', 'games.table') %} aria-current="page"{% endif %}>{{ _("Games") }}</a></li>
+        <li><a href="{{ url_for('account.index') }}" title="{{ current_user.name }} – {{ _('Settings') }}"{% if request.endpoint in ('account.index', 'passkeys.manage') %} aria-current="page"{% endif %}><span aria-hidden="true">⚙</span><span class="nav-label"> {{ _("Settings") }}</span></a></li>
+        {% if current_user.is_admin %}<li><a href="{{ url_for('admin.index') }}"{% if request.endpoint == 'admin.index' %} aria-current="page"{% endif %}>{{ _("Admin") }}</a></li>{% endif %}
         <li>
           <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
             <input type="hidden" name="csrf" value="{{ csrf_token() }}">

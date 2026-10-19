@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Admin") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Admin") }}</h1>
+<h2>{{ _("Users") }} ({{ users | length }})</h2>
+<div class="overflow-auto">
+<table class="users">
+  <thead>
+    <tr><th>{{ _("Name") }}</th><th>{{ _("Email") }}</th><th>{{ _("Games") }}</th><th>{{ _("Passkeys") }}</th><th>{{ _("Last login") }}</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.name }}</td>
+    <td>{{ u.email }}{% if u.mail_status == "bounced" %} <small>({{ _("bounces") }})</small>{% endif %}</td>
+    <td>{{ u.games }}</td>
+    <td>{{ u.keys }}</td>
+    <td>{{ u.last_login[:10] if u.last_login else "–" }}</td>
+    <td>{% if u.is_admin %}<small>{{ _("admin") }}</small>{% endif %}{% if u.disabled_at %} <small>{{ _("disabled") }}</small>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

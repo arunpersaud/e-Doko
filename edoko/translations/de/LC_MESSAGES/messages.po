@@ -1641,8 +1641,8 @@ msgstr "Voriger Stich"
 msgid "Next trick"
 msgstr "Nächster Stich"
 
-msgid "Your account"
-msgstr "Dein Konto"
+msgid "Settings"
+msgstr "Einstellungen"
 
 msgid "Your picture"
 msgstr "Dein Bild"
@@ -1711,3 +1711,24 @@ msgstr "Dein Bild konnte nicht von Gravatar geholt werden. Bitte versuche es sp�
 
 msgid "Your Gravatar was saved."
 msgstr "Dein Gravatar wurde gespeichert."
+
+msgid "Games"
+msgstr "Spiele"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "bounces"
+msgstr "Mails kommen zurück"
+
+msgid "admin"
+msgstr "Admin"
+
+msgid "disabled"
+msgstr "gesperrt"

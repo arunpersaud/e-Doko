@@ -180,3 +180,49 @@ def test_post_origin_variants(client, headers, status):
     token = csrf(client)
     response = client.post("/logout", data={"csrf": token}, headers=headers)
     assert response.status_code == status
+
+
+# --- the menu and the admin page ---------------------------------------------------
+
+
+def logged_in_as(app, user_id):
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["user_id"] = user_id
+        session["csrf"] = "t"
+    return client
+
+
+def test_the_menu_of_a_player(app):
+    page = logged_in_as(app, 1).get("/").text
+    assert ">Games</a>" in page and 'title="Ann – Settings"' in page
+    assert 'href="/account"' in page and "Settings" in page
+    assert "Log out" in page
+    assert "/admin" not in page  # not an admin
+    assert 'href="/account/passkeys"' not in page  # the passkeys are under Settings
+
+
+def test_the_menu_of_an_admin_has_the_admin_page(app):
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET is_admin = 1 WHERE id = 1")
+    page = logged_in_as(app, 1).get("/").text
+    assert 'href="/admin"' in page
+
+
+def test_the_menu_of_a_visitor(app):
+    page = app.test_client().get("/").text
+    assert "Log in" in page and "Settings" not in page and "Games</a>" not in page
+
+
+def test_the_admin_page_is_for_admins_only(app):
+    assert app.test_client().get("/admin").status_code == 302
+    assert logged_in_as(app, 1).get("/admin").status_code == 403
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET is_admin = 1 WHERE id = 1")
+        conn.execute(
+            "INSERT INTO user (id, name, email) VALUES (2, '<i>Bob</i>', 'b@x.org')"
+        )
+        conn.execute("UPDATE user SET disabled_at = '2026-01-01 00:00:00' WHERE id = 2")
+    page = logged_in_as(app, 1).get("/admin").text
+    assert "Users (2)" in page and "a@x.org" in page and "b@x.org" in page
+    assert "disabled" in page and "<i>Bob</i>" not in page and "&lt;i&gt;Bob" in page
