@@ -434,6 +434,7 @@ def test_a_finished_game_starts_with_the_first_trick_and_can_step_through(world)
     assert "Trick 1 / 12" in page
     assert on_table(page).count("<figure") == 4
     assert 'rel="prev"' not in page.split("trick-nav")[1].split("</nav>")[0]
+    assert 'class="trick-label"' in page
     page = client.get("/game/10/trick/5").text
     assert "Trick 5 / 12" in page
     assert 'href="/game/10/trick/4#table" rel="prev"' in page
@@ -692,3 +693,112 @@ def test_the_cross_has_tracks_of_a_fixed_size():
     cross = css.split(".cross {")[1].split("}")[0]
     assert "grid-template-rows: repeat(3, var(--card-h))" in cross
     assert "grid-template-columns: repeat(3, var(--card-w))" in cross
+
+
+def test_the_bubbles_leave_their_corners_on_narrow_screens():
+    # the corner areas do not exist in the one-column grid of a phone: a bubble that
+    # kept its grid-area would add columns and squeeze the table
+    css = (Path(__file__).parent.parent / "edoko/static/style.css").read_text()
+    narrow = css.split("@media (max-width: 42rem) {")[2]
+    assert ".table-view > .bubbles" in narrow and "grid-area: auto" in narrow
+
+
+def test_the_trick_label_has_two_lines_so_the_arrows_do_not_move(world):
+    page = client_for(world, 1).get("/game/10/trick/3").text
+    label = page.split('class="trick-label"')[1].split("</nav>")[0]
+    assert label.count("<span") == 2  # its two lines (the label itself is cut off)
+    assert "Trick 3 / 12" in label and "won by" in label
+
+
+# --- remarks as speech bubbles ---------------------------------------------------
+
+
+def remark(world, play, user, body):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute(
+            "INSERT INTO comment (game, kind, play, user, body)"
+            " VALUES (10, 'move', ?, ?, ?)",
+            (play, user, body),
+        )
+
+
+def corners(page):
+    """corner -> the texts of the bubbles in it."""
+    import re
+
+    found = {}
+    for corner, inner in re.findall(
+        r'<div class="bubbles corner-(\w+)">(.*?)</div>', page, re.S
+    ):
+        found[corner] = [
+            re.sub(r"<[^>]+>", " ", b)
+            for b in re.findall(r'<p class="bubble">(.*?)</p>', inner, re.S)
+        ]
+    return found
+
+
+def test_a_remark_is_a_bubble_in_the_corner_next_to_its_author(world):
+    # Ann (1) is at the bottom, Bob (2) left, Cy (3) top, Di (4) right
+    remark(world, 10011, 1, "mine")
+    remark(world, 10012, 2, "from the left")
+    remark(world, 10013, 3, "from the top")
+    remark(world, 10014, 4, "from the right")
+    found = corners(client_for(world, 1).get("/game/10/").text)
+    assert set(found) == {"se", "sw", "nw", "ne"}  # bottom, left, top, right
+    assert "mine" in found["se"][0] and "Ann" in found["se"][0]
+    assert "from the left" in found["sw"][0]
+    assert "from the top" in found["nw"][0]
+    assert "from the right" in found["ne"][0]
+    # no list of remarks under the table any more
+    assert 'class="trick-comments"' not in client_for(world, 1).get("/game/10/").text
+
+
+def test_the_corner_follows_the_viewers_spots(world):
+    remark(world, 10012, 2, "Bob speaking")  # Bob: left of Ann, top for Di
+    assert (
+        "Bob speaking" in corners(client_for(world, 1).get("/game/10/").text)["sw"][0]
+    )
+    assert (
+        "Bob speaking" in corners(client_for(world, 4).get("/game/10/").text)["nw"][0]
+    )
+
+
+def test_several_remarks_of_a_player_stack_in_one_corner(world):
+    remark(world, 10011, 1, "first")
+    remark(world, 10012, 1, "second")
+    found = corners(client_for(world, 1).get("/game/10/").text)
+    assert (
+        len(found["se"]) == 2
+        and "first" in found["se"][0]
+        and "second" in found["se"][1]
+    )
+
+
+def test_a_bubble_says_which_card_it_is_about(world):
+    remark(world, 10013, 1, "about the third card")
+    page = client_for(world, 1).get("/game/10/").text
+    assert 'title="about card 3">#3</span>' in page
+
+
+def test_only_the_remarks_of_the_shown_trick(world):
+    remark(world, 10011, 1, "in trick one")
+    remark(world, 10021, 1, "in trick two")
+    one = client_for(world, 1).get("/game/10/trick/1").text
+    two = client_for(world, 1).get("/game/10/trick/2").text
+    assert "in trick one" in one and "in trick two" not in one
+    assert "in trick two" in two and "in trick one" not in two
+
+
+def test_the_text_of_a_bubble_is_escaped(world):
+    remark(world, 10011, 1, "<script>alert(1)</script>")
+    page = client_for(world, 1).get("/game/10/").text
+    assert "<script>alert" not in page and "&lt;script&gt;" in page
+
+
+def test_a_remark_of_somebody_who_is_not_at_the_table_is_not_lost(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("INSERT INTO user (id, name, email) VALUES (9, 'Ida', 'i@x.org')")
+    remark(world, 10011, 9, "from outside")
+    page = client_for(world, 1).get("/game/10/").text
+    assert "from outside" in page and 'class="trick-comments"' in page
+    assert not corners(page)

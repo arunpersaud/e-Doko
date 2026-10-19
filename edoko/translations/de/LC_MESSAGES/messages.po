@@ -1831,3 +1831,7 @@ msgstr "Karlchen: der letzte Stich mit dem Kreuzbuben (%(name)s)"
 #, python-format
 msgid "Doppelkopf: 40 points or more in a trick (%(name)s)"
 msgstr "Doppelkopf: 40 Punkte oder mehr in einem Stich (%(name)s)"
+
+#, python-format
+msgid "about card %(n)d"
+msgstr "zu Karte %(n)d"

@@ -79,6 +79,10 @@ def badges(game, hand, trump_back: bool, over: bool) -> list[tuple[str, str]]:
 
 
 # where the ring starts: degrees clockwise from the right, as the spots lie
+# the corner of the table where the remarks of the player at a spot appear
+CORNER = {"top": "nw", "left": "sw", "bottom": "se", "right": "ne"}
+CORNERS = ("nw", "ne", "se", "sw")
+
 START_ANGLE = {"right": 0, "bottom": 90, "left": 180, "top": 270}
 
 
@@ -210,8 +214,11 @@ def build(
         lead = spot[selected["plays"][0]["seat"]] if selected["plays"] else "bottom"
     else:
         selected, lead = None, "bottom"
+    bubbles, strangers = speech_bubbles(selected, hands, spot)
     context = {
         "game": game,
+        "bubbles": bubbles,
+        "strangers": strangers,
         "selected": selected,
         "ring": ring(lead),
         "seats": seats,
@@ -227,11 +234,29 @@ def build(
     return context
 
 
+def speech_bubbles(selected, hands, spot) -> tuple[list, list]:
+    """The remarks on a trick as speech bubbles: (corner, remarks) for each corner
+    that has some, in the corner next to the player who made them.
+
+    Remarks of somebody who is not at the table are returned apart.
+    """
+    seat_of = {h["user_id"]: h["seat"] for h in hands}
+    corners: dict[str, list] = {corner: [] for corner in CORNERS}
+    strangers = []
+    for remark in selected["comments"] if selected else []:
+        seat = seat_of.get(remark["user_id"])
+        if seat is None:
+            strangers.append(remark)
+        else:
+            corners[CORNER[spot[seat]]].append(remark)
+    return [(c, corners[c]) for c in CORNERS if corners[c]], strangers
+
+
 def tricks_so_far(game_id: int) -> list[dict]:
     """All tricks played so far, with the public comments on the moves."""
     comments: dict[int, list] = {}
     for row in query(
-        """SELECT comment.play, comment.body, user.name
+        """SELECT comment.play, comment.body, user.name, user.id AS user_id
            FROM comment JOIN user ON user.id = comment.user
            WHERE comment.game = ? AND comment.kind = 'move'
              AND comment.deleted_at IS NULL
@@ -258,7 +283,11 @@ def tricks_so_far(game_id: int) -> list[dict]:
                 "number": trick["number"],
                 "winner_seat": trick["winner_seat"],
                 "plays": [dict(p) for p in plays],
-                "comments": [c for p in plays for c in comments.get(p["id"], [])],
+                "comments": [
+                    {**dict(c), "sequence": p["sequence"]}
+                    for p in plays
+                    for c in comments.get(p["id"], [])
+                ],
             }
         )
     return tricks

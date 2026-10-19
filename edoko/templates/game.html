@@ -40,6 +40,12 @@
   </section>
   {% endfor %}
 
+  {% for corner, remarks in bubbles %}
+  <div class="bubbles corner-{{ corner }}">
+    {% for c in remarks %}<p class="bubble"><span class="who">{{ c.name }}</span> <span class="about" title="{{ _('about card %(n)d', n=c.sequence) }}">#{{ c.sequence }}</span> {{ c.body }}</p>{% endfor %}
+  </div>
+  {% endfor %}
+
   <div class="felt">
     {% if selected %}
     <div class="on-table">
@@ -59,7 +65,7 @@
     <nav class="trick-nav" aria-label="{{ _('Tricks') }}">
       {% set n = selected.number %}
       {% if n > 1 %}<a href="{{ trick_url(n - 1) }}#table" rel="prev" hx-get="{{ trick_url(n - 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Previous trick') }}">‹</a>{% else %}<span class="off">‹</span>{% endif %}
-      <span>{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}{% if selected.winner_seat %} · {{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% endif %}</span>
+      <span class="trick-label"><span>{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}</span><span class="trick-winner">{% if selected.winner_seat %}{{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% else %}&nbsp;{% endif %}</span></span>
       {% if n < tricks | length %}<a href="{{ trick_url(n + 1) }}#table" rel="next" hx-get="{{ trick_url(n + 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Next trick') }}">›</a>{% else %}<span class="off">›</span>{% endif %}
     </nav>
     <p class="trick-numbers">
@@ -71,9 +77,9 @@
   </div>
 </div>
 </div>
-{% if selected and selected.comments %}
+{% if strangers %}
 <div class="trick-comments">
-  {% for c in selected.comments %}<p class="comment"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
+  {% for c in strangers %}<p class="comment"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
 </div>
 {% endif %}
 </div>

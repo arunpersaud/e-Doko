@@ -49,7 +49,11 @@ nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-
 .table-view {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
-  grid-template-areas: ". top ." "left felt right" ". bottom .";
+  grid-template-areas: "nw top ne" "left felt right" "sw bottom se";
+  /* the corner rows are tall enough for the bubbles, which scroll instead of growing:
+     the table must not move when one clicks from trick to trick */
+  grid-template-rows: minmax(var(--corner), auto) auto minmax(var(--corner), auto);
+  --corner: 6.5rem;
   gap: 0.75rem;
   align-items: start;
   margin-bottom: 1.5rem;
@@ -72,9 +76,14 @@ nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-
 .ring-head { fill: rgba(255, 255, 255, 0.8); }
 .ring-dot { fill: #fff; }
 .cross.large { --card-h: 4.4rem; position: relative; gap: 0.25rem; }
-nav.trick-nav { display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-size: 0.85em; }
-nav.trick-nav a, nav.trick-nav .off { font-size: 1.6em; line-height: 1; text-decoration: none; padding: 0 0.4em; }
+/* the buttons stay where they are for every trick: fixed columns, and a label of
+   always two lines that never wraps */
+nav.trick-nav { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) 2.2rem; align-items: center; font-size: 0.85em; }
+nav.trick-nav a, nav.trick-nav .off { font-size: 1.6em; line-height: 1; text-decoration: none; text-align: center; padding: 0.15em 0; }
 nav.trick-nav .off { opacity: 0.3; }
+.trick-label { display: flex; flex-direction: column; text-align: center; min-width: 0; }
+.trick-label > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trick-winner { opacity: 0.85; font-size: 0.9em; }
 p.trick-numbers { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem; margin: 0.25rem 0; }
 p.trick-numbers a {
   min-width: 1.6rem; text-align: center; text-decoration: none; font-size: 0.8em;
@@ -122,7 +131,7 @@ figure.play.winner img { outline: 3px solid var(--pico-primary); border-radius: 
 div.trick-comments { margin: -0.75rem 0 1.5rem; }
 p.comment { font-size: 0.9em; margin: 0.25rem 0 0; }
 @media (max-width: 42rem) {
-  .table-view { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+  .table-view { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; grid-template-rows: none; }
   .table-view > * { grid-area: auto; }
   .felt { order: -1; }
 }
@@ -171,3 +180,37 @@ details.points > ul {
 }
 details.points li { margin: 0.2rem 0; font-size: 0.9rem; line-height: 1.35; list-style: none; }
 details.points em { font-weight: 600; }
+
+/* remarks on the trick: speech bubbles in the corners of the table, each next to the
+   player who made them, with a tail that points at that player */
+.bubbles {
+  display: flex; flex-direction: column; gap: 0.6rem;
+  max-height: var(--corner); overflow-y: auto; scrollbar-width: thin; padding: 0.5rem 0.65rem;
+}
+.corner-nw { grid-area: nw; align-self: center; justify-self: end; }
+.corner-ne { grid-area: ne; align-self: end; justify-self: center; }
+.corner-se { grid-area: se; align-self: center; justify-self: start; }
+.corner-sw { grid-area: sw; align-self: start; justify-self: center; }
+p.bubble {
+  position: relative; margin: 0; padding: 0.35rem 0.65rem;
+  background: #fff; color: #222; border: 2px solid #333; border-radius: 1rem;
+  font-size: 0.85rem; line-height: 1.3; overflow-wrap: anywhere;
+}
+p.bubble .who { font-weight: 700; }
+p.bubble .about { font-size: 0.75em; color: #666; }
+p.bubble::after {
+  content: ""; position: absolute; width: 11px; height: 11px;
+  background: #fff; border: 0 solid #333; transform: rotate(45deg);
+}
+.corner-nw p.bubble::after { right: -7px; top: calc(50% - 6px); border-width: 2px 2px 0 0; }
+.corner-ne p.bubble::after { bottom: -7px; left: calc(50% - 6px); border-width: 0 2px 2px 0; }
+.corner-se p.bubble::after { left: -7px; top: calc(50% - 6px); border-width: 0 0 2px 2px; }
+.corner-sw p.bubble::after { top: -7px; left: calc(50% - 6px); border-width: 2px 0 0 2px; }
+@media (max-width: 42rem) {
+  /* one column: the bubbles follow the table, the name says who spoke */
+  .table-view > .bubbles {
+    grid-area: auto; /* the corner names of the desktop grid do not exist here */
+    order: 20; align-self: stretch; justify-self: stretch; max-height: none; padding: 0;
+  }
+  p.bubble::after { display: none; }
+}
