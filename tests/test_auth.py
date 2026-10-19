@@ -226,3 +226,19 @@ def test_the_admin_page_is_for_admins_only(app):
     page = logged_in_as(app, 1).get("/admin").text
     assert "Users (2)" in page and "a@x.org" in page and "b@x.org" in page
     assert "disabled" in page and "<i>Bob</i>" not in page and "&lt;i&gt;Bob" in page
+
+
+def test_the_admin_page_counts_passkeys_and_games(app):
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET is_admin = 1 WHERE id = 1")
+        for n in (1, 2):
+            conn.execute(
+                "INSERT INTO passkey (user, credential_id, public_key)"
+                " VALUES (1, ?, x'00')",
+                (bytes([n]),),
+            )
+    page = logged_in_as(app, 1).get("/admin").text
+    assert "built-in method" not in page and "sqlite3" not in page
+    row = page.split("<tbody>")[1].split("</tr>")[0]
+    cells = [c.split("</td>")[0].strip() for c in row.split("<td>")[1:]]
+    assert cells[2:4] == ["0", "2"]  # games, passkeys

@@ -13,8 +13,8 @@
   <tr>
     <td>{{ u.name }}</td>
     <td>{{ u.email }}{% if u.mail_status == "bounced" %} <small>({{ _("bounces") }})</small>{% endif %}</td>
-    <td>{{ u.games }}</td>
-    <td>{{ u.keys }}</td>
+    <td>{{ u["games"] }}</td>
+    <td>{{ u["passkeys"] }}</td>
     <td>{{ u.last_login[:10] if u.last_login else "–" }}</td>
     <td>{% if u.is_admin %}<small>{{ _("admin") }}</small>{% endif %}{% if u.disabled_at %} <small>{{ _("disabled") }}</small>{% endif %}</td>
   </tr>
