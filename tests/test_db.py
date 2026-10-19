@@ -51,13 +51,13 @@ def test_migrate_applies_a_new_migration(tmp_path, monkeypatch):
     monkeypatch.setitem(
         migrations.MIGRATIONS,
         newer,
-        "CREATE TABLE mail_bounce (id INTEGER PRIMARY KEY);",
+        "CREATE TABLE later_table (id INTEGER PRIMARY KEY);",
     )
     monkeypatch.setattr(migrations, "LATEST", newer)
     assert migrations.migrate(path) == [newer]
     with closing(sqlite3.connect(path)) as conn:
         assert migrations.version(conn) == newer
-        conn.execute("SELECT * FROM mail_bounce")
+        conn.execute("SELECT * FROM later_table")
 
 
 def test_migrate_refuses_unversioned_database(tmp_path):

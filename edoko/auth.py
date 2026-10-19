@@ -118,8 +118,8 @@ def check_post() -> None:
     policy is no-referrer (ours is), so null is fine for a same-origin
     request, and only then.
     """
-    if request.method != "POST":
-        return
+    if request.method != "POST" or request.endpoint == "ses.notify":
+        return  # (SNS has no session; its messages are signed instead)
     if request.endpoint == "account.avatar_upload":
         # pictures are bigger than the 64 KB the other forms are limited to
         request.max_content_length = avatars_upload_limit()

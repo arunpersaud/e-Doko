@@ -1849,3 +1849,19 @@ msgstr "Dieselben Karten wie in Spiel %(id)d, die Hände sitzen an denselben Pl�
 #, python-format
 msgid "Back to game %(id)d"
 msgstr "Zurück zu Spiel %(id)d"
+
+#: edoko/templates/admin.html
+msgid "Recent bounces and complaints"
+msgstr "Letzte Bounces und Beschwerden"
+
+#: edoko/templates/admin.html
+msgid "When (UTC)"
+msgstr "Wann (UTC)"
+
+#: edoko/templates/admin.html
+msgid "Kind"
+msgstr "Art"
+
+#: edoko/templates/admin.html
+msgid "cleared"
+msgstr "erledigt"

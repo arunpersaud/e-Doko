@@ -205,6 +205,7 @@ name = "edoko"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cryptography" },
     { name = "flask" },
     { name = "flask-babel" },
     { name = "gunicorn" },
@@ -220,6 +221,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cryptography", specifier = ">=46" },
     { name = "flask", specifier = ">=3.1" },
     { name = "flask-babel", specifier = ">=4.0" },
     { name = "gunicorn", specifier = ">=23" },

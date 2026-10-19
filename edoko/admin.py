@@ -60,6 +60,10 @@ def index():
     return render_template(
         "admin.html",
         users=sorted_users(sort, direction),
+        bounces=query(
+            """SELECT occurred_at, address, kind, subtype, cleared_at FROM mail_bounce
+               ORDER BY occurred_at DESC, id DESC LIMIT 20"""
+        ),
         sort=sort,
         direction=direction,
         links=links,

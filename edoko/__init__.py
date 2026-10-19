@@ -6,6 +6,7 @@ Configuration comes from environment variables with a FLASK_ prefix:
     FLASK_SECRET_KEY   signs the session cookie
     FLASK_ORIGIN       the site's address, e.g. https://doko.nubati.net
     FLASK_SMTP_USER, FLASK_SMTP_PASSWORD, ...  mail, see mail.py
+    FLASK_SES_TOPIC_ARN  bounce notices from SES, see bounces.py
 
 FLASK_SECRET_KEY and FLASK_ORIGIN are required unless the app runs in
 debug or testing mode.
@@ -21,7 +22,18 @@ from urllib.parse import urlsplit
 from flask import Flask, request
 from flask_babel import Babel, get_locale
 
-from . import account, admin, auth, avatars, db, games, migrations, passkeys, views
+from . import (
+    account,
+    admin,
+    auth,
+    avatars,
+    bounces,
+    db,
+    games,
+    migrations,
+    passkeys,
+    views,
+)
 from .cli import edoko
 
 LANGUAGES = ["en", "de"]
@@ -131,6 +143,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     avatars.init_app(app)
     account.init_app(app)
     admin.init_app(app)
+    bounces.init_app(app)
     app.register_blueprint(views.site)
     app.cli.add_command(edoko)
 

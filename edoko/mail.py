@@ -47,6 +47,9 @@ def send_template(user, subject, template: str, **context) -> bool:
 
     subject is a lazy string, so it is translated here as well.
     """
+    if user["mail_status"] != "ok":
+        log.info("no mail to user %s: %s", user["id"], user["mail_status"])
+        return False
     with force_locale(user["language"] or "en"):
         body = render_template(f"mail/{template}.txt", user=user, **context)
         return send(user["email"], str(subject), body)

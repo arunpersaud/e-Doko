@@ -42,6 +42,26 @@ DROP TABLE avatar;
 ALTER TABLE avatar_new RENAME TO avatar;
 CREATE UNIQUE INDEX avatar_one_chosen ON avatar(user) WHERE chosen = 1;
 """,
+    # bounces and complaints reported by SES (see bounces.py); user.mail_status
+    # says whether mail still goes out
+    4: """
+CREATE TABLE mail_bounce (
+  id              INTEGER PRIMARY KEY,
+  notice          TEXT NOT NULL,        -- id of the SNS message (it may come twice)
+  address         TEXT NOT NULL COLLATE NOCASE,
+  user            INTEGER REFERENCES user(id) ON DELETE SET NULL,
+  kind            TEXT NOT NULL
+                  CHECK (kind IN
+                    ('permanent', 'transient', 'undetermined', 'complaint')),
+  subtype         TEXT,
+  diagnostic      TEXT,
+  occurred_at     TEXT NOT NULL,
+  created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  cleared_at      TEXT,                 -- the address was fixed: no longer counts
+  UNIQUE (notice, address)
+) STRICT;
+CREATE INDEX mail_bounce_address ON mail_bounce(address);
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

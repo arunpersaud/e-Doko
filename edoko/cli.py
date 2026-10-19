@@ -6,7 +6,7 @@ import click
 from flask import current_app
 from flask.cli import AppGroup
 
-from . import db, migrations
+from . import bounces, db, migrations
 
 edoko = AppGroup("edoko", help="e-DoKo database tools.")
 
@@ -44,6 +44,17 @@ def users() -> None:
             f"{u['id']:4d}  {flags:14s} {u['keys']} passkeys  "
             f"{(u['last_login'] or '-')[:10]:10s}  {u['name']} <{u['email']}>"
         )
+
+
+@edoko.command("mail-reset")
+@click.argument("email")
+def mail_reset(email: str) -> None:
+    """Send mail to this user again after bounces (the address works now)."""
+    user = db.query_one("SELECT id FROM user WHERE email = ?", (email,))
+    if user is None:
+        raise click.ClickException(f"no user with the address {email}")
+    bounces.reset(user["id"])
+    click.echo(f"mail to {email} is on again")
 
 
 @edoko.command("make-admin")

@@ -25,4 +25,17 @@
   </tbody>
 </table>
 </div>
+{% if bounces %}
+<h2>{{ _("Recent bounces and complaints") }}</h2>
+<div class="overflow-auto">
+<table class="bounces">
+  <thead><tr><th scope="col">{{ _("When (UTC)") }}</th><th scope="col">{{ _("Email") }}</th><th scope="col">{{ _("Kind") }}</th></tr></thead>
+  <tbody>
+  {% for b in bounces %}
+  <tr><td>{{ b.occurred_at[:16] }}</td><td>{{ b.address }}</td><td>{{ b.kind }}{% if b.subtype %} ({{ b.subtype }}){% endif %}{% if b.cleared_at %} <small>{{ _("cleared") }}</small>{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
 {% endblock %}

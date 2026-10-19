@@ -25,6 +25,13 @@ Translations (en msgids, de in `edoko/translations/de`):
 Configuration: `FLASK_DATABASE`, `FLASK_SECRET_KEY`, `FLASK_ORIGIN`
 (see `edoko/__init__.py`).
 
+Bounces and complaints: SES identity notifications -> an SNS topic -> HTTPS
+subscription to `<origin>/ses/notify`. Set `FLASK_SES_TOPIC_ARN` to that
+topic (the endpoint does not exist without it); the app checks the SNS
+signature, confirms the subscription itself, and stops mail to addresses
+that bounce for good (`bounces.py`). `flask --app edoko edoko mail-reset
+ADDRESS` turns the mail on again.
+
 ## This branch
 
 Branch `flask` is the rewrite; `main` is still the PHP site (running at
