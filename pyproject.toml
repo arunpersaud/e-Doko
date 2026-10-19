@@ -1,0 +1,36 @@
+[project]
+name = "edoko"
+version = "0.1.0"
+description = "e-DoKo: online Doppelkopf (Flask rewrite)"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.14"
+dependencies = [
+    "flask>=3.1",
+    "flask-babel>=4.0",
+    "gunicorn>=23",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.16",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 88
+# the PHP-era tools are kept as they are
+extend-exclude = ["tools/playtest.py", "tools/mysql2sqlite.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/conftest.py" = ["E501"]  # SQL test data

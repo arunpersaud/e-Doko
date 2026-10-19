@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}e-DoKo{% endblock %}</title>
+  <meta name="referrer" content="no-referrer">
+  <link rel="stylesheet" href="{{ url_for('static', filename='pico.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- htmx under a strict CSP: no eval, no inline styles, scripts loaded once -->
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false, "allowScriptTags": false, "historyCacheSize": 0, "attributesToSettle": ["class", "width", "height"]}'>
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <header class="container">
+    <nav>
+      <ul><li><a href="{{ url_for('site.index') }}" class="brand"><strong>e-DoKo</strong></a></li></ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% for message in get_flashed_messages() %}
+    <p class="flash" role="alert">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container">
+    <small>Copyright 2003-2026 Arun Persaud. Code available on
+      <a href="https://github.com/arunpersaud/e-Doko">github</a>.</small>
+  </footer>
+  <script src="{{ url_for('static', filename='htmx.min.js') }}"></script>
+</body>
+</html>

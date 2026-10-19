@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ _("Welcome to e-DoKo") }}</h1>
+<p>{{ ngettext("%(num)d game so far.", "%(num)d games so far.", games) }}</p>
+{% endblock %}

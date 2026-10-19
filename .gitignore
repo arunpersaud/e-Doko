@@ -9,3 +9,10 @@ pics/arrow3.svg
 scoretest.txt
 testscoring.php
 .htaccess
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+instance/
+*.mo
+messages.pot
