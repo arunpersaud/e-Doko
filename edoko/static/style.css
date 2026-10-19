@@ -71,8 +71,7 @@ nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-
 .ring-arc { fill: none; stroke: rgba(255, 255, 255, 0.55); stroke-width: 1.6; stroke-linecap: round; }
 .ring-head { fill: rgba(255, 255, 255, 0.8); }
 .ring-dot { fill: #fff; }
-.cross.large { position: relative; gap: 0.25rem; }
-.cross.large img.card { height: 4.4rem; }
+.cross.large { --card-h: 4.4rem; position: relative; gap: 0.25rem; }
 nav.trick-nav { display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-size: 0.85em; }
 nav.trick-nav a, nav.trick-nav .off { font-size: 1.6em; line-height: 1; text-decoration: none; padding: 0 0.4em; }
 nav.trick-nav .off { opacity: 0.3; }
@@ -99,13 +98,19 @@ img.badge { width: 1.5rem; height: 1.5rem; }
 .hand { display: flex; flex-wrap: wrap; gap: 0.1rem; }
 img.card { height: 5rem; width: auto; }
 img.card.small { height: 3.2rem; }
+/* a trick: the cards lie at the spots of their players. The tracks have the size
+   of a card whether or not it has been played, so a lone card stays at its spot */
 .cross {
+  --card-h: 3.2rem;
+  --card-w: calc(var(--card-h) * 169 / 245);
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(3, var(--card-w));
+  grid-template-rows: repeat(3, var(--card-h));
   grid-template-areas: ". top ." "left . right" ". bottom .";
   justify-content: center;
   gap: 0.15rem;
 }
+.cross img.card { height: var(--card-h); width: var(--card-w); }
 figure.play { margin: 0; position: relative; }
 figure.play .seq {
   position: absolute; top: 0; left: 0;

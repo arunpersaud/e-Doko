@@ -1,4 +1,5 @@
 from contextlib import closing
+from pathlib import Path
 
 import pytest
 
@@ -670,3 +671,24 @@ def test_the_words_are_german_too(world):
     items = breakdown(page)
     assert "Kontra Gegen die Alten gewonnen" in items
     assert "Re keine 90 angesagt" in items
+
+
+def test_a_trick_with_one_card_keeps_the_spot_of_its_player(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM game WHERE id = 13")
+        add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=1)
+        conn.execute("DELETE FROM play WHERE id != 13011")  # only seat 1 has played
+    page = client_for(world, 6).get("/game/13/").text  # Fay, seat 2, is at the bottom
+    figures = on_table(page).count("<figure")
+    assert figures == 1
+    # seat 1 (Eve) is the player to the right of the bottom player: not in the middle
+    assert 'class="play spot-right' in on_table(page)
+    assert 'data-lead="right"' in page
+
+
+def test_the_cross_has_tracks_of_a_fixed_size():
+    # a lone card must stay at its spot: the empty places of a trick keep their size
+    css = (Path(__file__).parent.parent / "edoko/static/style.css").read_text()
+    cross = css.split(".cross {")[1].split("}")[0]
+    assert "grid-template-rows: repeat(3, var(--card-h))" in cross
+    assert "grid-template-columns: repeat(3, var(--card-w))" in cross
