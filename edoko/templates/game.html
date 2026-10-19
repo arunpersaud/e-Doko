@@ -9,6 +9,7 @@
 </nav>
 
 <h1>{{ _("Game %(id)d", id=game.id) }}</h1>
+{% if origin %}<p class="compare-note"><small>{{ _("Same deal as game %(id)d, the hands are in the same places.", id=origin) }} <a href="{{ url_for('games.game', game_id=origin) }}">{{ _("Back to game %(id)d", id=origin) }}</a></small></p>{% endif %}
 <div class="game-info">
   <p>{{ game.created_at[:10] }} · {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}</p>
   {% if full and card_points %}
@@ -99,7 +100,7 @@
 <h2>{{ _("Other tables that played this deal") }}</h2>
 <ul>
   {% for o in others %}
-  <li><a href="{{ url_for('games.game', game_id=o.id) }}">{{ _("Game %(id)d", id=o.id) }}</a> – {{ o.players }}</li>
+  <li><a href="{% if o.id == origin %}{{ url_for('games.game', game_id=o.id) }}{% else %}{{ url_for('games.game', game_id=o.id, origin=origin or game.id) }}{% endif %}">{{ _("Game %(id)d", id=o.id) }}</a> – {{ o.players }}</li>
   {% endfor %}
 </ul>
 {% endif %}

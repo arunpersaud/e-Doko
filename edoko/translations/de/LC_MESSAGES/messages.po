@@ -1839,3 +1839,13 @@ msgstr "Ansage von %(party)s geschlagen"
 #, python-format
 msgid "about %(card)s"
 msgstr "zu %(card)s"
+
+#: edoko/templates/game.html
+#, python-format
+msgid "Same deal as game %(id)d, the hands are in the same places."
+msgstr "Dieselben Karten wie in Spiel %(id)d, die Hände sitzen an denselben Plätzen."
+
+#: edoko/templates/game.html
+#, python-format
+msgid "Back to game %(id)d"
+msgstr "Zurück zu Spiel %(id)d"

@@ -98,14 +98,21 @@ def render_game(
     full: bool,
     trick: int | None = None,
     logged_in: bool = True,
+    origin: int | None = None,
 ):
     """The page of a game for one of its players or for a qualified viewer.
 
     full: the viewer may see all hands (the game is over). Otherwise they see
     the tricks so far and their own cards.
+    origin: another game of the same deal; the table is turned so that its
+    seats are at the same places as in that game.
     """
-    context = gameview.build(game_id, user_id, full=full, trick=trick)
+    anchor = gameview.viewpoint_seat(origin, user_id) if origin else None
+    context = gameview.build(
+        game_id, user_id, full=full, trick=trick, anchor_seat=anchor
+    )
     context.update(
+        origin=origin,
         user_id=user_id,
         logged_in=logged_in,
         others=[],
@@ -197,10 +204,26 @@ def table(session_id):
     )
 
 
-@bp.route("/game/<int:game_id>/", defaults={"trick": None})
-@bp.route("/game/<int:game_id>/trick/<int:trick>")
+def comparable(user_id: int, game_id: int, origin: int) -> bool:
+    """Is origin another finished game of the deal of game_id that the user may open?"""
+    return (
+        origin != game_id
+        and query_one(
+            "SELECT 1 FROM game a JOIN game b ON b.deal = a.deal"
+            " WHERE a.id = ? AND b.id = ?",
+            (game_id, origin),
+        )
+        is not None
+        and can_see_details(user_id, origin)
+    )
+
+
+@bp.route("/game/<int:game_id>/", defaults={"trick": None, "origin": None})
+@bp.route("/game/<int:game_id>/trick/<int:trick>", defaults={"origin": None})
+@bp.route("/game/<int:game_id>/compare/<int:origin>/", defaults={"trick": None})
+@bp.route("/game/<int:game_id>/compare/<int:origin>/trick/<int:trick>")
 @login_required
-def game(game_id, trick):
+def game(game_id, trick, origin):
     if (old := request.args.get("trick", type=int)) is not None:  # an old link
         return redirect(url_for("games.game", game_id=game_id, trick=old))
     if query_one("SELECT 1 FROM game WHERE id = ?", (game_id,)) is None:
@@ -209,7 +232,10 @@ def game(game_id, trick):
     details = can_see_details(user_id, game_id)
     if not details and not is_player(user_id, game_id):
         abort(404)
-    return render_game(game_id, user_id, full=details, trick=trick)
+    if origin is not None and not (details and comparable(user_id, game_id, origin)):
+        # not the same deal, or not a game this viewer may see: the plain page
+        return redirect(url_for("games.game", game_id=game_id, trick=trick))
+    return render_game(game_id, user_id, full=details, trick=trick, origin=origin)
 
 
 @bp.route("/<token:token>", defaults={"trick": None})

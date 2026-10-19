@@ -248,7 +248,7 @@ def test_seat_link_when_logged_in_as_that_player_lists_other_tables(world):
     with closing(db.connect(world.config["DATABASE"])) as conn:
         conn.execute("UPDATE hand SET token = ? WHERE id = 101", ("c" * 32,))
     page = client_for(world, 1).get("/" + "c" * 32).text
-    assert "/game/11/" in page
+    assert "/game/11/compare/10/" in page
     # logged in as somebody else, the link still only gives the seat view
     page = client_for(world, 5).get("/" + "c" * 32).text
     assert "/game/11/" not in page
@@ -864,3 +864,55 @@ def test_announcements_in_german(world):
     remark(world, 10013, 1, "Contra")
     page = client_for(world, 1).get("/game/10/", headers={"Accept-Language": "de"}).text
     assert 'alt="Kontra angesagt"' in bubble_of(page)
+
+
+def test_compare_keeps_the_hands_in_the_same_places(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        add_game(conn, 16, 1, "gameover", [6, 7, 8, 5], session=2)  # rotated
+    ann = client_for(world, 1)
+    assert spots(ann.get("/game/10/").text)["bottom"] == "Ann"
+    # seat 1 is at the bottom in game 10, so it is in game 16 (Fay), and so on
+    page = ann.get("/game/16/compare/10/").text
+    assert spots(page) == {
+        "bottom": "Fay",
+        "left": "Gus",
+        "top": "Hal",
+        "right": "Eve",
+    }
+    assert "Same deal as game 10" in page and 'href="/game/10/"' in page
+    # without compare the table is turned to the lowest player, as before
+    assert spots(ann.get("/game/16/").text)["bottom"] == "Eve"
+    # the trick links keep it
+    assert "/game/16/compare/10/trick/2" in page
+
+
+def test_compare_needs_a_game_the_viewer_may_open(world):
+    # Eve did not play game 12 (deal 2), so she cannot compare with it
+    page = client_for(world, 5).get("/game/11/compare/12/", follow_redirects=False)
+    assert page.status_code == 302 and page.location == "/game/11/"
+
+
+def test_compare_is_ignored_for_other_deals_and_games_in_progress(world):
+    ann = client_for(world, 1)
+    for origin in (12, 14, 99, 10):  # other deal, cancelled, unknown, itself
+        response = ann.get(f"/game/10/compare/{origin}/trick/2")
+        assert response.status_code == 302
+        assert response.location == "/game/10/trick/2"
+    # Eve plays game 13 but has not finished deal 2: she may not compare with 12
+    response = client_for(world, 5).get("/game/13/compare/12/")
+    assert response.status_code == 302 and response.location == "/game/13/"
+    # and an outsider gets a 404, compare or not
+    assert client_for(world, 1).get("/game/13/compare/10/").status_code == 404
+
+
+def test_other_tables_link_with_the_origin(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("INSERT INTO session (id) VALUES (3)")
+        add_game(conn, 16, 1, "gameover", [6, 7, 8, 5], session=3)
+    ann = client_for(world, 1)
+    page = ann.get("/game/10/").text
+    assert "/game/11/compare/10/" in page and "/game/16/compare/10/" in page
+    # from a compared game: the others keep the origin, the origin itself is plain
+    page = ann.get("/game/11/compare/10/").text
+    assert "/game/16/compare/10/" in page
+    assert 'href="/game/10/"' in page and "/game/10/compare" not in page

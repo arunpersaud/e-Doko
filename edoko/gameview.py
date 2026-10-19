@@ -30,9 +30,17 @@ SOLO_ICONS = {
 }
 
 
-def spot_of_seat(hands, anchor_user: int) -> dict[int, str]:
-    anchor_seat = next(h["seat"] for h in hands if h["user_id"] == anchor_user)
-    return {h["seat"]: SPOTS[(h["seat"] - anchor_seat) % 4] for h in hands}
+def spot_of_seat(anchor_seat: int, seats) -> dict[int, str]:
+    return {seat: SPOTS[(seat - anchor_seat) % 4] for seat in seats}
+
+
+def viewpoint_seat(game_id: int, viewer_id: int) -> int:
+    """The seat at the bottom for this viewer: their own, or the lowest player's."""
+    rows = query("SELECT seat, user FROM hand WHERE game = ?", (game_id,))
+    if not rows:
+        abort(404)
+    mine = next((r for r in rows if r["user"] == viewer_id), None)
+    return (mine or min(rows, key=lambda r: r["user"]))["seat"]
 
 
 def badges(game, hand, trump_back: bool, over: bool) -> list[tuple[str, str]]:
@@ -119,7 +127,12 @@ def ring(lead: str) -> dict:
 
 
 def build(
-    game_id: int, viewer_id: int, *, full: bool, trick: int | None = None
+    game_id: int,
+    viewer_id: int,
+    *,
+    full: bool,
+    trick: int | None = None,
+    anchor_seat: int | None = None,
 ) -> dict:
     """The context of the game page.
 
@@ -127,6 +140,9 @@ def build(
     viewer plays in it and sees the tricks so far and only their own cards.
     trick: the number of the trick shown on the table; by default the latest
     one of a game in progress, the first one of a finished game.
+    anchor_seat: the seat at the bottom; by default the viewer's own. Seat k holds
+    the same cards in every game of a deal, so a seat number is a point of view
+    that can be kept from one game of the deal to another.
     """
     game = query_one(
         """SELECT game.*, ruleset.lowtrump, ruleset.dullen, ruleset.schweinchen
@@ -144,8 +160,9 @@ def build(
     if len(hands) != 4:
         abort(404)  # not a game
     mine = next((h for h in hands if h["user_id"] == viewer_id), None)
-    anchor = mine["user_id"] if mine else min(h["user_id"] for h in hands)
-    spot = spot_of_seat(hands, anchor)
+    if anchor_seat is None:
+        anchor_seat = viewpoint_seat(game_id, viewer_id)
+    spot = spot_of_seat(anchor_seat, [h["seat"] for h in hands])
 
     tricks = tricks_so_far(game_id)
     won = Counter(t["winner_seat"] for t in tricks if t["winner_seat"])
