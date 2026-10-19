@@ -42,7 +42,7 @@
 
   {% for corner, remarks in bubbles %}
   <div class="bubbles corner-{{ corner }}">
-    {% for c in remarks %}<p class="bubble"><span class="who">{{ c.name }}</span> <span class="about" title="{{ _('about card %(n)d', n=c.sequence) }}">#{{ c.sequence }}</span> {{ c.body }}</p>{% endfor %}
+    {% for c in remarks %}<p class="bubble" data-seq="{{ c.sequence }}"><span class="who">{{ c.name }}:</span> <img class="card tiny" src="{{ url_for('static', filename='cards/english/%d.png' % image_number(c.card_id)) }}" alt="{{ card_name(c) }}" title="{{ card_name(c) }}" width="169" height="245"> {{ c.body }}</p>{% endfor %}
   </div>
   {% endfor %}
 
@@ -56,7 +56,7 @@
       </svg>
       <div class="cross large">
         {% for p in selected.plays %}
-        <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" title="{{ names[p.seat] }}">
+        <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" data-seq="{{ p.sequence }}" title="{{ names[p.seat] }}">
           {{ card(p) }}<span class="seq">{{ p.sequence }}</span>
         </figure>
         {% endfor %}

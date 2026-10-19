@@ -732,7 +732,7 @@ def corners(page):
     ):
         found[corner] = [
             re.sub(r"<[^>]+>", " ", b)
-            for b in re.findall(r'<p class="bubble">(.*?)</p>', inner, re.S)
+            for b in re.findall(r'<p class="bubble"[^>]*>(.*?)</p>', inner, re.S)
         ]
     return found
 
@@ -774,10 +774,27 @@ def test_several_remarks_of_a_player_stack_in_one_corner(world):
     )
 
 
-def test_a_bubble_says_which_card_it_is_about(world):
-    remark(world, 10013, 1, "about the third card")
+def test_a_bubble_shows_the_card_it_is_about_and_not_a_number(world):
+    remark(world, 10013, 1, "about the third card")  # play 10013: seat 3, card 25
     page = client_for(world, 1).get("/game/10/").text
-    assert 'title="about card 3">#3</span>' in page
+    bubble = page.split('<p class="bubble"')[1].split("</p>")[0]
+    assert 'data-seq="3"' in bubble
+    assert 'class="card tiny"' in bubble and "cards/english/25.png" in bubble
+    assert 'alt="nine diamonds"' in bubble and 'title="nine diamonds"' in bubble
+    assert "#3" not in page  # the old number that nobody understood
+    # the card on the table has the same number, so hovering can mark it
+    assert 'data-seq="3"' in on_table(page)
+
+
+def test_the_name_is_in_the_bubble_for_screen_readers_and_phones(world):
+    remark(world, 10011, 1, "hello")
+    page = client_for(world, 1).get("/game/10/").text
+    assert '<span class="who">Ann:</span>' in page  # hidden by the style on a desktop
+    css = (Path(__file__).parent.parent / "edoko/static/style.css").read_text()
+    desktop = css.split("p.bubble .who {")[1].split("}")[0]
+    assert "clip-path: inset(50%)" in desktop and "position: absolute" in desktop
+    phone = css.split("p.bubble .who {")[2].split("}")[0]  # the media query
+    assert "position: static" in phone and "clip-path: none" in phone
 
 
 def test_only_the_remarks_of_the_shown_trick(world):

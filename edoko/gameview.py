@@ -283,8 +283,15 @@ def tricks_so_far(game_id: int) -> list[dict]:
                 "number": trick["number"],
                 "winner_seat": trick["winner_seat"],
                 "plays": [dict(p) for p in plays],
+                # each remark knows the card it is about (to show it in the bubble)
                 "comments": [
-                    {**dict(c), "sequence": p["sequence"]}
+                    {
+                        **dict(c),
+                        "sequence": p["sequence"],
+                        "card_id": p["card_id"],
+                        "suit": p["suit"],
+                        "rank": p["rank"],
+                    }
                     for p in plays
                     for c in comments.get(p["id"], [])
                 ],
