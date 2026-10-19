@@ -9,7 +9,7 @@
 </nav>
 
 <h1>{{ _("Game %(id)d", id=game.id) }}</h1>
-<p class="game-info">{{ game.created_at[:10] }} · {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}{% if full and card_points %}<br>{{ _("Re") }} {{ card_points.re }} – {{ _("Contra") }} {{ card_points.contra }}{% endif %}</p>
+<p class="game-info">{{ game.created_at[:10] }} · {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}{% if full and card_points %}<br>{% if winner == "re" %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ _("Re") }} {{ card_points.re }} – {% if winner == "contra" %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ _("Contra") }} {{ card_points.contra }}{% endif %}</p>
 
 <div id="table">
 <div class="table-view">

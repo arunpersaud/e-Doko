@@ -520,3 +520,46 @@ def test_hands_follow_the_game_type_and_the_own_hand_too(world):
         add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=0)
     mine = hand_images(client_for(world, 8).get("/game/13/").text, "Hal")
     assert mine == [43, 43, 45, 45, 47, 47, 37, 37, 39, 39, 41, 41]
+
+
+# --- the winner ---------------------------------------------------------------------
+
+
+def score_items(world, *items):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        for party, kind in items:
+            conn.execute(
+                "INSERT INTO score_item (game, party, kind) VALUES (10, ?, ?)",
+                (party, kind),
+            )
+
+
+def info(page):
+    return page.split('class="game-info"')[1].split("</p>")[0]
+
+
+def test_the_winner_gets_a_trophy(world):
+    score_items(world, ("re", "120"), ("re", "90"), ("contra", "fox"))
+    line = info(client_for(world, 1).get("/game/10/").text)
+    assert line.count("🏆") == 1
+    assert line.index("🏆") < line.index("Re ")  # in front of the winner, Re
+
+
+def test_the_trophy_goes_to_contra_when_it_won(world):
+    score_items(world, ("contra", "againstqueens"), ("contra", "120"), ("re", "fox"))
+    line = info(client_for(world, 1).get("/game/10/").text)
+    assert line.count("🏆") == 1
+    assert line.index("Re ") < line.index("🏆") < line.index("Contra")
+
+
+def test_no_trophy_without_items_or_with_a_tie(world):
+    assert "🏆" not in info(client_for(world, 1).get("/game/10/").text)
+    score_items(world, ("re", "fox"), ("contra", "fox"))
+    assert "🏆" not in info(client_for(world, 1).get("/game/10/").text)
+
+
+def test_the_trophy_follows_the_items_not_the_card_points(world):
+    # contra has more card points but re called and won: the items decide
+    score_items(world, ("re", "120"), ("re", "call120"), ("re", "90"))
+    page = client_for(world, 1).get("/game/10/").text
+    assert info(page).index("🏆") < info(page).index("Re ")

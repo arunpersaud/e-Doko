@@ -1762,3 +1762,6 @@ msgstr "Dein Bild wurde geändert."
 
 msgid "The copy of the picture was deleted."
 msgstr "Die Kopie des Bildes wurde gelöscht."
+
+msgid "Winner"
+msgstr "Gewinner"

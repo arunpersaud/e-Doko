@@ -287,10 +287,17 @@ def result(game_id: int, hands, tricks) -> dict:
            WHERE score_item.game = ? ORDER BY score_item.id""",
         (game_id,),
     )
+    # the party with more scoring items won (calls and "against" count, not only
+    # the card points); none if there are no items or a tie
+    items = Counter(row["party"] for row in scores)
+    winner = None
+    if items["re"] != items["contra"]:
+        winner = "re" if items["re"] > items["contra"] else "contra"
     return {
         "before": before,
         "scores": scores,
         "card_points": {"re": points["re"], "contra": points["contra"]},
+        "winner": winner,
     }
 
 
