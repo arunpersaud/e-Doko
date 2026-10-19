@@ -369,7 +369,15 @@ def _final_items(result: Result, parties: dict[int, str], calls: dict[int, int |
         for p in (0, 30, 60, 90, 120):
             if call[winning] != -1 and call[winning] < p + 1:
                 add(winning, f"call{p}")
-    result.game_points = sum(1 if item.party == "re" else -1 for item in result.items)
+    result.game_points = sum(
+        item_value(item.kind) * (1 if item.party == "re" else -1)
+        for item in result.items
+    )
+
+
+def item_value(kind: str, rules: Rules | None = None) -> int:
+    """What a scoring item is worth: one game point (some rule sets may give more)."""
+    return 1
 
 
 def player_points(

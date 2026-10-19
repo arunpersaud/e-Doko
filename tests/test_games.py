@@ -628,10 +628,11 @@ def test_the_result_list_is_gone_and_the_game_points_explain_themselves(world):
     assert re.search(r'<details class="points">\s*<summary>', page)
     assert "againstqueens" not in page and "call90" not in page  # words, not codes
     items = breakdown(page)
-    assert "Contra Won against the queens" in items
-    assert "Contra Won" in items
-    assert any(i.startswith("Contra Doppelkopf") for i in items)
-    assert "Re Announced no 90" in items
+    assert "+1 Contra: Won against the queens" in items
+    assert "+1 Contra: Won" in items
+    assert any(i.startswith("+1 Contra: Doppelkopf") for i in items)
+    assert "+1 Re: Announced no 90" in items
+    assert all(i.startswith("+1 ") for i in items)  # every row says what it is worth
 
 
 def test_the_wording_of_all_scoring_items(world):
@@ -644,21 +645,16 @@ def test_the_wording_of_all_scoring_items(world):
 
     with world.test_request_context("/"):
         assert text("120") == "Won"
-        assert text("90") == "The other side has fewer than 90 points"
-        assert text("0") == "The other side has no trick (schwarz)"
+        assert text("90") == "Contra has less than 90 points"
+        assert text("30", "contra") == "Re has less than 30 points"
+        assert text("0") == "Contra has no trick (schwarz)"
         assert text("call120") == "Announced Re"
         assert text("call120", "contra") == "Announced Contra"
         assert text("call30") == "Announced no 30"
         assert text("call0") == "Announced schwarz"
-        # the other side's call was beaten: it is named after the other side
-        assert (
-            text("against120", "re")
-            == "Beat the announcement of the other side: Contra"
-        )
-        assert (
-            text("against90", "contra")
-            == "Beat the announcement of the other side: no 90"
-        )
+        # the call of the other party was beaten: it is named after that party
+        assert text("against120", "re") == "Beat the announcement of Contra"
+        assert text("against90", "contra") == "Beat the announcement of Re: no 90"
         assert text("made60") == "Reached 60 points against the announcement"
         assert text("fox", loser="Bob") == "Caught a fox (Bob)"
         assert text("karlchen", winner="Ann").startswith("Karlchen")
@@ -670,8 +666,8 @@ def test_the_words_are_german_too(world):
     score_items(world, ("contra", "againstqueens"), ("contra", "120"), ("re", "call90"))
     page = client_for(world, 1).get("/game/10/", headers={"Accept-Language": "de"}).text
     items = breakdown(page)
-    assert "Kontra Gegen die Alten gewonnen" in items
-    assert "Re keine 90 angesagt" in items
+    assert "+1 Kontra: Gegen die Alten gewonnen" in items
+    assert "+1 Re: keine 90 angesagt" in items
 
 
 def test_a_trick_with_one_card_keeps_the_spot_of_its_player(world):
@@ -819,3 +815,83 @@ def test_a_remark_of_somebody_who_is_not_at_the_table_is_not_lost(world):
     page = client_for(world, 1).get("/game/10/").text
     assert "from outside" in page and 'class="trick-comments"' in page
     assert not corners(page)
+
+
+def test_the_values_decide_the_winner_and_the_game_points(world, monkeypatch):
+    # a rule set that gives more for some items: the sums decide, not the rows
+    from edoko import rules
+
+    monkeypatch.setattr(
+        rules, "item_value", lambda kind, rule_set=None: 2 if kind == "doko" else 1
+    )
+    # three rows each (a tie by rows), but contra has 2 + 1 + 1 = 4 points against 3
+    score_items(
+        world,
+        ("re", "120"),
+        ("re", "90"),
+        ("re", "fox"),
+        ("contra", "doko"),
+        ("contra", "karlchen"),
+        ("contra", "againstqueens"),
+    )
+    page = client_for(world, 1).get("/game/10/").text
+    assert "1 game point for Contra" in info(page)
+    assert info(page).count("🏆") == 1
+    rows = breakdown(page)
+    assert any(r.startswith("+2 Contra: Doppelkopf") for r in rows)
+    assert sum(r.startswith("+1 ") for r in rows) == 5
+
+
+# --- announcements are not remarks ----------------------------------------------------
+
+
+def bubble_of(page):
+    return page.split('<p class="bubble')[1].split("</p>")[0]
+
+
+def test_an_announcement_shows_its_icon_and_not_the_card(world):
+    for body, icon, words in [
+        ("Re", "re", "Announced Re"),
+        ("Contra", "contra", "Announced Contra"),
+        ("No 90", "90", "Announced no 90"),
+        ("No 60", "60", "Announced no 60"),
+        ("No 30", "30", "Announced no 30"),
+        ("Zero", "0", "Announced schwarz"),
+    ]:
+        with closing(db.connect(world.config["DATABASE"])) as conn:
+            conn.execute("DELETE FROM comment")
+        remark(world, 10013, 1, body)
+        bubble = bubble_of(client_for(world, 1).get("/game/10/").text)
+        assert f"icons/{icon}_button.png" in bubble
+        assert f'alt="{words}"' in bubble
+        assert 'class="card tiny"' not in bubble  # not a card that looks like a catch
+        assert "announcement" in bubble.split(">")[0]
+
+
+def test_the_icon_of_an_announcement_still_belongs_to_a_card_for_the_hover(world):
+    remark(world, 10013, 1, "Re")
+    assert 'data-seq="3"' in bubble_of(client_for(world, 1).get("/game/10/").text)
+
+
+def test_only_the_words_of_the_site_are_announcements(world):
+    # players' own remarks, even "re" or "RE", keep their card and their words
+    for body in ("re", "RE", "No 91", "Zero!", "Schweinchen! ", "hello"):
+        with closing(db.connect(world.config["DATABASE"])) as conn:
+            conn.execute("DELETE FROM comment")
+        remark(world, 10013, 1, body)
+        bubble = bubble_of(client_for(world, 1).get("/game/10/").text)
+        assert (
+            'class="card tiny"' in bubble and "announcement" not in bubble.split(">")[0]
+        )
+        assert body.strip() in bubble
+
+
+def test_announcements_in_german(world):
+    remark(world, 10013, 1, "No 90")
+    page = client_for(world, 1).get("/game/10/", headers={"Accept-Language": "de"}).text
+    assert 'alt="keine 90 angesagt"' in bubble_of(page)
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM comment")
+    remark(world, 10013, 1, "Contra")
+    page = client_for(world, 1).get("/game/10/", headers={"Accept-Language": "de"}).text
+    assert 'alt="Kontra angesagt"' in bubble_of(page)

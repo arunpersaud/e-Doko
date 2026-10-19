@@ -234,6 +234,31 @@ def build(
     return context
 
 
+# what the PHP site writes as a remark when a player announces something while playing
+# a card: the text -> the icon (the same as on the player boxes) and the kind of call
+ANNOUNCEMENTS = {
+    "Re": ("re", "120"),
+    "Contra": ("contra", "120"),
+    "No 90": ("90", "90"),
+    "No 60": ("60", "60"),
+    "No 30": ("30", "30"),
+    "Zero": ("0", "0"),
+}
+
+
+def announcement(body: str):
+    """(icon, words) if the remark is an announcement made by the site, else None.
+
+    Only these exact words count; a player's own "re" or "RE" is a remark like any.
+    """
+    found = ANNOUNCEMENTS.get(body)
+    if found is None:
+        return None
+    icon, call = found
+    name = party_name(icon) if call == "120" else call_name("re", call)
+    return icon, _("Announced %(call)s", call=name)
+
+
 def speech_bubbles(selected, hands, spot) -> tuple[list, list]:
     """The remarks on a trick as speech bubbles: (corner, remarks) for each corner
     that has some, in the corner next to the player who made them.
@@ -245,6 +270,9 @@ def speech_bubbles(selected, hands, spot) -> tuple[list, list]:
     strangers = []
     for remark in selected["comments"] if selected else []:
         seat = seat_of.get(remark["user_id"])
+        said = announcement(remark["body"])
+        if said:
+            remark = {**remark, "icon": said[0], "words": said[1]}
         if seat is None:
             strangers.append(remark)
         else:
@@ -319,21 +347,24 @@ def item_text(row) -> str:
     """The words for a scoring item (a row of score_item, with names)."""
     kind, party = row["kind"], row["party"]
     other = "contra" if party == "re" else "re"
-    if kind in ("120", "90", "60", "30", "0"):
-        return {
-            "120": _("Won"),
-            "90": _("The other side has fewer than 90 points"),
-            "60": _("The other side has fewer than 60 points"),
-            "30": _("The other side has fewer than 30 points"),
-            "0": _("The other side has no trick (schwarz)"),
-        }[kind]
+    if kind == "120":
+        return _("Won")
+    if kind in ("90", "60", "30"):
+        return _(
+            "%(party)s has less than %(n)s points", party=party_name(other), n=kind
+        )
+    if kind == "0":
+        return _("%(party)s has no trick (schwarz)", party=party_name(other))
     if kind == "againstqueens":
         return _("Won against the queens")
     if kind.startswith("call"):
         return _("Announced %(call)s", call=call_name(party, kind[4:]))
+    if kind == "against120":  # the call "Re" or "Contra" itself: the party says it all
+        return _("Beat the announcement of %(party)s", party=party_name(other))
     if kind.startswith("against"):
         return _(
-            "Beat the announcement of the other side: %(call)s",
+            "Beat the announcement of %(party)s: %(call)s",
+            party=party_name(other),
             call=call_name(other, kind[7:]),
         )
     if kind.startswith("made"):
@@ -376,20 +407,27 @@ def result(game_id: int, hands, tricks) -> dict:
            WHERE score_item.game = ? ORDER BY score_item.id""",
         (game_id,),
     )
-    # the party with more scoring items won (calls and "against" count, not only
-    # the card points); none if there are no items or a tie
-    items = Counter(row["party"] for row in scores)
+    # the party with more game points won (calls and "against" count, not only the
+    # card points); none if there are no items or a tie. Every item is worth
+    # item_value points (one, unless a rule set says otherwise)
+    totals = Counter()
+    for row in scores:
+        totals[row["party"]] += rules.item_value(row["kind"])
     winner = None
-    if items["re"] != items["contra"]:
-        winner = "re" if items["re"] > items["contra"] else "contra"
+    if totals["re"] != totals["contra"]:
+        winner = "re" if totals["re"] > totals["contra"] else "contra"
     return {
         "before": before,
         "scores": scores,
         "card_points": {"re": points["re"], "contra": points["contra"]},
         "winner": winner,
-        "game_points": abs(items["re"] - items["contra"]),
+        "game_points": abs(totals["re"] - totals["contra"]),
         "breakdown": [
-            {"party": party_name(row["party"]), "text": item_text(row)}
+            {
+                "value": rules.item_value(row["kind"]),
+                "party": party_name(row["party"]),
+                "text": item_text(row),
+            }
             for row in scores
         ],
     }

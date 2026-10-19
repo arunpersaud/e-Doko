@@ -323,3 +323,13 @@ def test_the_foxes_count_even_after_one_was_played():
     assert rules.sort_hand(
         [1, 20], "normal", Rules(schweinchen="both"), all_cards=[1, 19, 20]
     ) == [19 if False else 20, 1]
+
+
+def test_every_item_is_worth_one_game_point_unless_a_rule_set_says_otherwise():
+    for kind in ("120", "fox", "doko", "karlchen", "againstqueens", "call90", "made60"):
+        assert rules.item_value(kind) == 1
+    # the game points are the values, not the number of rows
+    result = rules.Result(card_points={"re": 150, "contra": 90})
+    assert result.game_points == 0
+    final_result, _ = final(155)
+    assert final_result and _.game_points == 2

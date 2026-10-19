@@ -1793,28 +1793,12 @@ msgstr "schwarz"
 msgid "Won"
 msgstr "Gewonnen"
 
-msgid "The other side has fewer than 90 points"
-msgstr "Die Gegenseite hat weniger als 90 Punkte"
-
-msgid "The other side has fewer than 60 points"
-msgstr "Die Gegenseite hat weniger als 60 Punkte"
-
-msgid "The other side has fewer than 30 points"
-msgstr "Die Gegenseite hat weniger als 30 Punkte"
-
-msgid "The other side has no trick (schwarz)"
-msgstr "Die Gegenseite hat keinen Stich (schwarz)"
-
 msgid "Won against the queens"
 msgstr "Gegen die Alten gewonnen"
 
 #, python-format
 msgid "Announced %(call)s"
 msgstr "%(call)s angesagt"
-
-#, python-format
-msgid "Beat the announcement of the other side: %(call)s"
-msgstr "Die Ansage der Gegenseite geschlagen: %(call)s"
 
 #, python-format
 msgid "Reached %(n)s points against the announcement"
@@ -1835,3 +1819,19 @@ msgstr "Doppelkopf: 40 Punkte oder mehr in einem Stich (%(name)s)"
 #, python-format
 msgid "about card %(n)d"
 msgstr "zu Karte %(n)d"
+
+#, python-format
+msgid "%(party)s has less than %(n)s points"
+msgstr "%(party)s hat weniger als %(n)s Punkte"
+
+#, python-format
+msgid "%(party)s has no trick (schwarz)"
+msgstr "%(party)s hat keinen Stich (schwarz)"
+
+#, python-format
+msgid "Beat the announcement of %(party)s: %(call)s"
+msgstr "Ansage von %(party)s geschlagen: %(call)s"
+
+#, python-format
+msgid "Beat the announcement of %(party)s"
+msgstr "Ansage von %(party)s geschlagen"

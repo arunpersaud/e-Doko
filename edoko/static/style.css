@@ -235,3 +235,6 @@ table.users th a.sort { text-decoration: none; color: inherit; white-space: nowr
 table.users th a.sort:hover { text-decoration: underline; }
 table.users th[aria-sort] a.sort { color: var(--pico-primary); }
 table.users th a.sort .idle { opacity: 0.35; }
+details.points .value { display: inline-block; min-width: 1.6em; color: var(--pico-primary); font-variant-numeric: tabular-nums; }
+p.bubble.announcement { padding: 0.25rem 0.5rem; }
+img.badge.announce { width: 1.9rem; height: 1.9rem; vertical-align: middle; border-radius: 4px; }

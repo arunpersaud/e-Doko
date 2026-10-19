@@ -16,7 +16,7 @@
   {% if winner %}
   <details class="points">
     <summary>{{ ngettext("%(num)d game point for %(party)s", "%(num)d game points for %(party)s", game_points, party=(_("Re") if winner == "re" else _("Contra"))) }}{% if game.type == "solo" %} · {{ _("the soloist counts triple") }}{% endif %}</summary>
-    <ul>{% for b in breakdown %}<li><em>{{ b.party }}</em> {{ b.text }}</li>{% endfor %}</ul>
+    <ul>{% for b in breakdown %}<li><b class="value">+{{ b.value }}</b> <em>{{ b.party }}:</em> {{ b.text }}</li>{% endfor %}</ul>
   </details>
   {% endif %}
   {% endif %}
@@ -42,7 +42,7 @@
 
   {% for corner, remarks in bubbles %}
   <div class="bubbles corner-{{ corner }}">
-    {% for c in remarks %}<p class="bubble" data-seq="{{ c.sequence }}"><span class="who">{{ c.name }}:</span> <img class="card tiny" src="{{ url_for('static', filename='cards/english/%d.png' % image_number(c.card_id)) }}" alt="{{ card_name(c) }}" title="{{ card_name(c) }}" width="169" height="245"> {{ c.body }}</p>{% endfor %}
+    {% for c in remarks %}<p class="bubble{% if c.icon %} announcement{% endif %}" data-seq="{{ c.sequence }}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}<img class="card tiny" src="{{ url_for('static', filename='cards/english/%d.png' % image_number(c.card_id)) }}" alt="{{ card_name(c) }}" title="{{ card_name(c) }}" width="169" height="245"> {{ c.body }}{% endif %}</p>{% endfor %}
   </div>
   {% endfor %}
 
