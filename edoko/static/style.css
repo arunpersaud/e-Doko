@@ -82,7 +82,6 @@ p.trick-numbers a {
   border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 0.3rem; padding: 0 0.3em;
 }
 p.trick-numbers a[aria-current] { background: #fff; color: #2f6f4f; }
-p.game-info { color: var(--pico-muted-color); margin-top: -0.5rem; }
 .felt p { margin: 0.25rem 0; }
 .seat { padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--pico-muted-border-color); }
 .seat.me { border-color: var(--pico-primary); }
@@ -148,16 +147,22 @@ header nav a[aria-current] { font-weight: bold; }
 @media (max-width: 36rem) { header nav .nav-label { display: none; } }
 table.users td, table.users th { font-size: 0.85em; }
 
-/* the game points: how they are counted shows on hover or focus */
-.points { position: relative; cursor: help; border-bottom: 1px dotted currentColor; }
-.points .breakdown {
-  display: none; position: absolute; left: 0; top: 100%; z-index: 10;
-  min-width: 18rem; max-width: 90vw; margin-top: 0.25rem; padding: 0.5rem 0.75rem;
-  background: var(--pico-card-background-color); color: var(--pico-color);
-  border-radius: var(--pico-border-radius); box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
-  text-align: left; font-size: 0.9rem; line-height: 1.35;
+/* the game points: click (or tap) to see how they are counted */
+.game-info { color: var(--pico-muted-color); margin-top: -0.5rem; margin-bottom: 1rem; }
+.game-info p { margin: 0 0 0.15rem; }
+details.points { position: relative; display: inline-block; margin: 0; border: 0; padding: 0; }
+details.points > summary {
+  display: inline-block; width: auto; margin: 0; padding: 0.15rem 0;
+  cursor: pointer; color: var(--pico-primary);
 }
-.points .breakdown .item { display: block; margin: 0.2rem 0; }
-.points .breakdown .item:first-child { margin-top: 0; }
-.points .breakdown em { font-weight: 600; }
-.points:hover .breakdown, .points:focus .breakdown, .points:focus-within .breakdown { display: block; }
+details.points > summary::after { display: inline-block; float: none; margin: 0 0 0 0.4rem; vertical-align: middle; }
+/* the explanation floats over the page, so nothing moves when it opens */
+details.points > ul {
+  position: absolute; left: 0; top: 100%; z-index: 10;
+  min-width: 18rem; max-width: 90vw; margin: 0.25rem 0 0; padding: 0.5rem 0.75rem;
+  list-style: none; text-align: left; color: var(--pico-color);
+  background: var(--pico-card-background-color); border-radius: var(--pico-border-radius);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
+}
+details.points li { margin: 0.2rem 0; font-size: 0.9rem; line-height: 1.35; list-style: none; }
+details.points em { font-weight: 600; }

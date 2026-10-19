@@ -535,7 +535,7 @@ def score_items(world, *items):
 
 
 def info(page):
-    return page.split('class="game-info"')[1].split("</p>")[0]
+    return page.split('class="game-info"')[1].split("</div>")[0]
 
 
 def test_the_winner_gets_a_trophy(world):
@@ -606,12 +606,13 @@ def breakdown(page):
     """The items of the popover on the game points, as text."""
     import re
 
-    box = page.split('class="breakdown"')[1].split("</span></span>")[0] + "</span>"
-    rows = re.findall(r'<span class="item">(.*?)</span>', box)
-    return [re.sub(r"<[^>]+>", "", row) for row in rows]
+    box = page.split('<details class="points">')[1].split("</details>")[0]
+    return [re.sub(r"<[^>]+>", "", row) for row in re.findall(r"<li>(.*?)</li>", box)]
 
 
 def test_the_result_list_is_gone_and_the_game_points_explain_themselves(world):
+    import re
+
     score_items(
         world,
         ("contra", "againstqueens"),
@@ -621,8 +622,8 @@ def test_the_result_list_is_gone_and_the_game_points_explain_themselves(world):
     )
     page = client_for(world, 1).get("/game/10/").text
     assert "<h2>Result</h2>" not in page and 'class="scores"' not in page
-    assert "<ul>" not in page.split('class="game-info"')[1].split("</p>")[0]
-    assert 'class="points" tabindex="0"' in page  # focusable: works without a mouse
+    # a click (or tap) opens it: a details element, no script and no hover needed
+    assert re.search(r'<details class="points">\s*<summary>', page)
     assert "againstqueens" not in page and "call90" not in page  # words, not codes
     items = breakdown(page)
     assert "Contra Won against the queens" in items
