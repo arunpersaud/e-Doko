@@ -32,7 +32,11 @@
   <div class="felt">
     {% if selected %}
     <div class="on-table">
-      <img class="ring" src="{{ url_for('static', filename='icons/ring%d.png' % ring) }}" alt="" width="500" height="500">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true" data-lead="{{ ring.lead }}">
+        <path class="ring-arc" d="{{ ring.arc }}"/>
+        <polygon class="ring-head" points="{{ ring.head }}"/>
+        <circle class="ring-dot" cx="{{ ring.dot[0] }}" cy="{{ ring.dot[1] }}" r="3.2"/>
+      </svg>
       <div class="cross large">
         {% for p in selected.plays %}
         <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" title="{{ names[p.seat] }}">

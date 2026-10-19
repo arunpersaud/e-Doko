@@ -7,6 +7,7 @@ others follow in seat order. The seat order of a table never changes, so
 everybody keeps the same spot from game to game.
 """
 
+import math
 from collections import Counter
 
 from flask import abort
@@ -77,8 +78,44 @@ def badges(game, hand, trump_back: bool, over: bool) -> list[tuple[str, str]]:
     return icons
 
 
-# the circle of arrows that opens at the spot of the player who leads
-RING = {"left": 0, "top": 1, "right": 2, "bottom": 3}
+# where the ring starts: degrees clockwise from the right, as the spots lie
+START_ANGLE = {"right": 0, "bottom": 90, "left": 180, "top": 270}
+
+
+def ring(lead: str) -> dict:
+    """The arrow around the table: a dot at the player who led, an arc clockwise
+    (the order of play) and an arrowhead; a gap before the start, so it reads
+    as a sequence. Numbers for an SVG with the viewBox 0 0 100 100.
+    """
+    centre, radius = 50, 40
+
+    def point(degrees: float, r: float = radius) -> tuple[float, float]:
+        angle = math.radians(degrees)
+        return centre + r * math.cos(angle), centre + r * math.sin(angle)
+
+    start = START_ANGLE[lead]
+    x0, y0 = point(start + 14)
+    end = start + 312
+    x1, y1 = point(end)
+    # the head: tip ahead of the end of the arc, the wings back and to the sides
+    angle = math.radians(end)
+    tangent = (-math.sin(angle), math.cos(angle))
+    normal = (math.cos(angle), math.sin(angle))
+    tip = (x1 + 7 * tangent[0], y1 + 7 * tangent[1])
+    wings = [
+        (
+            x1 - 2 * tangent[0] + side * 5 * normal[0],
+            y1 - 2 * tangent[1] + side * 5 * normal[1],
+        )
+        for side in (1, -1)
+    ]
+    dot = point(start)
+    return {
+        "lead": lead,
+        "arc": f"M {x0:.1f} {y0:.1f} A {radius} {radius} 0 1 1 {x1:.1f} {y1:.1f}",
+        "head": " ".join(f"{x:.1f},{y:.1f}" for x, y in [tip, *wings]),
+        "dot": (round(dot[0], 1), round(dot[1], 1)),
+    }
 
 
 def build(
@@ -176,7 +213,7 @@ def build(
     context = {
         "game": game,
         "selected": selected,
-        "ring": RING[lead],
+        "ring": ring(lead),
         "seats": seats,
         "spot_of": spot,
         "names": {h["seat"]: h["name"] for h in hands},

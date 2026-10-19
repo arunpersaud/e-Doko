@@ -455,14 +455,14 @@ def test_a_game_in_progress_starts_with_the_latest_trick(world):
     assert "Trick 2 / 3" in client_for(world, 5).get("/game/13/trick/2").text
 
 
-def test_the_arrow_ring_opens_at_the_player_who_leads(world):
+def test_the_arrow_ring_starts_at_the_player_who_leads(world):
     # trick 1 of game 10 is led by seat 1: Ann (user 1)
     page = client_for(world, 1).get("/game/10/").text
-    assert "icons/ring3.png" in page  # Ann is at the bottom
+    assert 'data-lead="bottom"' in page  # Ann is at the bottom
     page = client_for(world, 3).get("/game/10/").text
-    assert "icons/ring1.png" in page  # for Cy she is at the top
+    assert 'data-lead="top"' in page  # for Cy she is at the top
     page = client_for(world, 2).get("/game/10/").text
-    assert "icons/ring2.png" in page  # for Bob at the right
+    assert 'data-lead="right"' in page  # for Bob at the right
 
 
 def test_the_selected_trick_shows_in_play_order(world):
