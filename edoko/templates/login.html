@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block title %}{{ _("Log in") }} – e-DoKo{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
 {% block content %}
 <h1>{{ _("Log in") }}</h1>
+<button type="button" data-passkey="login" data-next="{{ next }}">{{ _("Log in with a passkey") }}</button>
+<p class="error" role="alert" data-passkey-error hidden></p>
+<hr>
 <form method="post" action="{{ url_for('auth.login_email') }}">
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">
   <input type="hidden" name="next" value="{{ next }}">

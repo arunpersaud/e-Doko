@@ -1373,3 +1373,72 @@ msgstr "mit diesem Link meldest du dich bei e-DoKo an. Er funktioniert einmal un
 
 msgid "If you did not ask for it, you can ignore this mail."
 msgstr "Wenn du ihn nicht angefordert hast, kannst du diese Mail ignorieren."
+
+msgid "Log in with a passkey"
+msgstr "Mit Passkey anmelden"
+
+msgid "Your passkeys"
+msgstr "Deine Passkeys"
+
+msgid "A passkey lets you log in with your fingerprint, face or device PIN, without a password and without waiting for an email. Set one up on every device you use."
+msgstr "Mit einem Passkey meldest du dich per Fingerabdruck, Gesicht oder Geräte-PIN an, ohne Passwort und ohne auf eine E-Mail zu warten. Richte auf jedem Gerät, das du benutzt, einen ein."
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Added"
+msgstr "Hinzugefügt"
+
+msgid "Last used"
+msgstr "Zuletzt benutzt"
+
+msgid "Rename"
+msgstr "Umbenennen"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "You have no passkey yet."
+msgstr "Du hast noch keinen Passkey."
+
+msgid "Name for the new passkey (optional)"
+msgstr "Name für den neuen Passkey (optional)"
+
+msgid "Name for this passkey (optional)"
+msgstr "Name für diesen Passkey (optional)"
+
+msgid "e.g. my phone"
+msgstr "z. B. mein Handy"
+
+msgid "Set up a passkey"
+msgstr "Passkey einrichten"
+
+msgid "If you remove all passkeys you can still log in with an emailed link."
+msgstr "Auch wenn du alle Passkeys entfernst, kannst du dich mit einem Link per E-Mail anmelden."
+
+msgid "Set up a passkey?"
+msgstr "Passkey einrichten?"
+
+msgid "With a passkey you log in with your fingerprint, face or device PIN: no email, no waiting. It takes a few seconds."
+msgstr "Mit einem Passkey meldest du dich per Fingerabdruck, Gesicht oder Geräte-PIN an: keine E-Mail, kein Warten. Es dauert ein paar Sekunden."
+
+msgid "Skip for now"
+msgstr "Jetzt überspringen"
+
+msgid "If you skip, we ask again in 30 days."
+msgstr "Wenn du überspringst, fragen wir in 30 Tagen wieder."
+
+msgid "Please log in first."
+msgstr "Bitte melde dich zuerst an."
+
+msgid "Please start again."
+msgstr "Bitte fang noch einmal von vorn an."
+
+msgid "The passkey could not be verified."
+msgstr "Der Passkey konnte nicht überprüft werden."
+
+msgid "Unknown passkey."
+msgstr "Unbekannter Passkey."
+
+msgid "This passkey is not registered here."
+msgstr "Dieser Passkey ist hier nicht registriert."

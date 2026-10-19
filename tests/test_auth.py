@@ -120,6 +120,7 @@ def test_link_in_german(app, client):
     ],
 )
 def test_next_is_only_a_path_on_this_site(app, client, target, expected):
+    client.set_cookie("passkey_skip", "1")  # no passkey offer in between
     request_link(client, app)
     path = link_from(app)
     token = csrf(client)

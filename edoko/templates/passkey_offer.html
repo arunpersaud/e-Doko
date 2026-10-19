@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Set up a passkey") }} – e-DoKo{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+{% block content %}
+<h1>{{ _("Set up a passkey?") }}</h1>
+<p>{{ _("With a passkey you log in with your fingerprint, face or device PIN: no email, no waiting. It takes a few seconds.") }}</p>
+<label>{{ _("Name for this passkey (optional)") }}
+  <input type="text" data-passkey-name placeholder="{{ _('e.g. my phone') }}" maxlength="60">
+</label>
+<button type="button" data-passkey="register">{{ _("Set up a passkey") }}</button>
+<p class="error" role="alert" data-passkey-error hidden></p>
+<form method="post" action="{{ url_for('passkeys.skip') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="next" value="{{ next }}">
+  <button type="submit" class="secondary outline">{{ _("Skip for now") }}</button>
+</form>
+<p><small>{{ _("If you skip, we ask again in 30 days.") }}</small></p>
+{% endblock %}

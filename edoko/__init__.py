@@ -16,11 +16,12 @@ import os
 from datetime import timedelta
 from functools import cache
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from flask import Flask, request
 from flask_babel import Babel, get_locale
 
-from . import auth, db, migrations, views
+from . import auth, db, migrations, passkeys, views
 from .cli import edoko
 
 LANGUAGES = ["en", "de"]
@@ -75,6 +76,8 @@ def create_app(test_config: dict | None = None) -> Flask:
     if app.testing:
         app.config["MAIL_BACKEND"] = "memory"
     app.outbox = []  # mail in the tests (MAIL_BACKEND=memory)
+    # passkeys are bound to this host name
+    app.config["RP_ID"] = urlsplit(app.config["ORIGIN"]).hostname
     https = app.config["ORIGIN"].startswith("https://")
     app.config.update(
         # forms are small; refuse anything bigger
@@ -123,6 +126,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         return response
 
     auth.init_app(app)
+    passkeys.init_app(app)
     app.register_blueprint(views.site)
     app.cli.add_command(edoko)
 

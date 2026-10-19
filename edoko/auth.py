@@ -40,6 +40,8 @@ LINK_HOURS = 1
 LIMIT_ADDRESS = 3
 LIMIT_CLIENT = 10
 
+SKIP_COOKIE = "passkey_skip"  # set when the user declines the passkey offer
+
 bp = Blueprint("auth", __name__)
 
 
@@ -112,6 +114,13 @@ def check_post() -> None:
     sent = request.headers.get("X-CSRF-Token") or request.form.get("csrf")
     if not sent or not secrets.compare_digest(sent, session.get("csrf", "")):
         abort(403)
+
+
+def wants_offer(user_id: int) -> bool:
+    """After a login by link: suggest a passkey, unless one exists or was skipped."""
+    if request.cookies.get(SKIP_COOKIE):
+        return False
+    return query_one("SELECT 1 FROM passkey WHERE user = ?", (user_id,)) is None
 
 
 def safe_next(target: str | None) -> str:
@@ -212,7 +221,10 @@ def link_use(token):
         "UPDATE login_token SET used_at = ? WHERE id = ?", (now(), user["token_id"])
     )
     log_in(user["id"])
-    return redirect(safe_next(request.form.get("next")))
+    target = safe_next(request.form.get("next"))
+    if wants_offer(user["id"]):
+        return redirect(url_for("passkeys.offer", next=target))
+    return redirect(target)
 
 
 @bp.post("/logout")
