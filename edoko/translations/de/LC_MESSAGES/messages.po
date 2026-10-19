@@ -1631,3 +1631,12 @@ msgstr "Partner der zweiten Armut"
 #, python-format
 msgid "Call %(n)s"
 msgstr "Ansage %(n)s"
+
+msgid "All tricks"
+msgstr "Alle Stiche"
+
+msgid "Previous trick"
+msgstr "Voriger Stich"
+
+msgid "Next trick"
+msgstr "Nächster Stich"

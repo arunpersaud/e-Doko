@@ -126,11 +126,12 @@ def test_game_in_progress_shows_the_tricks_so_far_and_only_your_cards(world):
     page = client_for(world, 5).get("/game/13/")
     assert page.status_code == 200
     assert page.text.count('class="trick"') == 2
-    # 2 tricks of 4 cards, and the 10 cards user 5 still holds: no other hand
-    assert images(page.text) == 8 + 10
+    # 2 tricks of 4 cards, the trick on the table, and the 10 cards user 5 still
+    # holds: no other hand
+    assert images(page.text) == 8 + 4 + 10
     assert "shown when the game is over" in page.text
     # the same for the others, each sees only their own hand
-    assert images(client_for(world, 8).get("/game/13/").text) == 8 + 10
+    assert images(client_for(world, 8).get("/game/13/").text) == 8 + 4 + 10
     # nobody else sees anything
     assert status(world, 1, 13) == 404
 
@@ -384,7 +385,7 @@ def test_seat_links_have_no_neighbour_links(world):
     with closing(db.connect(world.config["DATABASE"])) as conn:
         conn.execute("UPDATE hand SET token = ? WHERE id = 121", ("f" * 32,))
     page = world.test_client().get("/" + "f" * 32).text
-    assert 'rel="next"' not in page and 'rel="prev"' not in page
+    assert 'href="/game/' not in page  # no way on to other games
 
 
 def test_icons_for_solo_wedding_and_calls(world):
@@ -407,3 +408,55 @@ def test_a_silent_solo_is_not_announced_while_it_is_played(world):
         conn.execute("UPDATE game SET type = 'solo', solo = 'silent' WHERE id = 13")
         conn.execute("UPDATE hand SET party = 're' WHERE id = 131")
     assert "solo_button" not in client_for(world, 5).get("/game/13/").text
+
+
+# --- the trick on the table ---------------------------------------------------------
+
+
+def table(page):
+    """The part of the page that is swapped when clicking through the tricks."""
+    return page.split('<div class="felt">')[1].split("</nav>")[0]
+
+
+def on_table(page):
+    return table(page).split('class="trick-nav"')[0]
+
+
+def test_a_finished_game_starts_with_the_first_trick_and_can_step_through(world):
+    client = client_for(world, 1)
+    page = client.get("/game/10/").text
+    assert "Trick 1 / 12" in page
+    assert on_table(page).count("<figure") == 4
+    assert 'rel="prev"' not in page.split("trick-nav")[1].split("</nav>")[0]
+    page = client.get("/game/10/?trick=5").text
+    assert "Trick 5 / 12" in page
+    assert 'href="?trick=4#table" rel="prev"' in page
+    assert 'href="?trick=6#table" rel="next"' in page
+    assert "Trick 12 / 12" in client.get("/game/10/?trick=12").text
+    # numbers outside the game and rubbish fall back to the default
+    assert "Trick 1 / 12" in client.get("/game/10/?trick=13").text
+    assert "Trick 1 / 12" in client.get("/game/10/?trick=abc").text
+
+
+def test_a_game_in_progress_starts_with_the_latest_trick(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM game WHERE id = 13")
+        add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=3)
+    assert "Trick 3 / 3" in client_for(world, 5).get("/game/13/").text
+    assert "Trick 2 / 3" in client_for(world, 5).get("/game/13/?trick=2").text
+
+
+def test_the_arrow_ring_opens_at_the_player_who_leads(world):
+    # trick 1 of game 10 is led by seat 1: Ann (user 1)
+    page = client_for(world, 1).get("/game/10/").text
+    assert "icons/ring3.png" in page  # Ann is at the bottom
+    page = client_for(world, 3).get("/game/10/").text
+    assert "icons/ring1.png" in page  # for Cy she is at the top
+    page = client_for(world, 2).get("/game/10/").text
+    assert "icons/ring2.png" in page  # for Bob at the right
+
+
+def test_the_selected_trick_shows_in_play_order(world):
+    page = client_for(world, 1).get("/game/10/?trick=2").text
+    seq = on_table(page)
+    assert seq.index('<span class="seq">1') < seq.index('<span class="seq">4')

@@ -9,7 +9,7 @@ Games in progress are never shown to anybody else, not even their hands.
 Everybody else gets a 404, as if the game didn't exist.
 """
 
-from flask import Blueprint, abort, g, render_template
+from flask import Blueprint, abort, g, render_template, request
 from flask_babel import lazy_gettext as _l
 from werkzeug.routing import BaseConverter
 
@@ -92,7 +92,9 @@ def render_game(game_id: int, user_id: int, *, full: bool, logged_in: bool = Tru
     full: the viewer may see all hands (the game is over). Otherwise they see
     the tricks so far and their own cards.
     """
-    context = gameview.build(game_id, user_id, full=full)
+    context = gameview.build(
+        game_id, user_id, full=full, trick=request.args.get("trick", type=int)
+    )
     context.update(
         user_id=user_id, logged_in=logged_in, others=[], previous=None, next=None
     )

@@ -77,11 +77,19 @@ def badges(game, hand, trump_back: bool, over: bool) -> list[tuple[str, str]]:
     return icons
 
 
-def build(game_id: int, viewer_id: int, *, full: bool) -> dict:
+# the circle of arrows that opens at the spot of the player who leads
+RING = {"left": 0, "top": 1, "right": 2, "bottom": 3}
+
+
+def build(
+    game_id: int, viewer_id: int, *, full: bool, trick: int | None = None
+) -> dict:
     """The context of the game page.
 
     full: the game is over and the viewer may see everything; otherwise the
     viewer plays in it and sees the tricks so far and only their own cards.
+    trick: the number of the trick shown on the table; by default the latest
+    one of a game in progress, the first one of a finished game.
     """
     game = query_one(
         """SELECT game.*, ruleset.lowtrump FROM game
@@ -161,8 +169,17 @@ def build(game_id: int, viewer_id: int, *, full: bool) -> dict:
         )
     seats.sort(key=lambda s: SPOTS.index(s["spot"]))
 
+    if tricks:
+        if trick is None or not 1 <= trick <= len(tricks):
+            trick = len(tricks) if not over else 1
+        selected = tricks[trick - 1]
+        lead = spot[selected["plays"][0]["seat"]] if selected["plays"] else "bottom"
+    else:
+        selected, lead = None, "bottom"
     context = {
         "game": game,
+        "selected": selected,
+        "ring": RING[lead],
         "seats": seats,
         "spot_of": spot,
         "names": {h["seat"]: h["name"] for h in hands},

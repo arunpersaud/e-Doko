@@ -10,7 +10,7 @@
 
 <h1>{{ _("Game %(id)d", id=game.id) }}</h1>
 
-<div class="table-view">
+<div id="table" class="table-view">
   {% for s in seats %}
   <section class="seat spot-{{ s.spot }}{% if s.is_me %} me{% endif %}{% if s.on_turn %} on-turn{% endif %}">
     <header>
@@ -25,11 +25,32 @@
     {% endif %}
   </section>
   {% endfor %}
+
   <div class="felt">
-    <p><strong>{{ game.created_at[:10] }}</strong><br>
-      {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %}<br>{% endif %}
-      {{ game.status }}</p>
-    {% if full and card_points %}<p>{{ _("Re") }} {{ card_points.re }} – {{ _("Contra") }} {{ card_points.contra }}</p>{% endif %}
+    {% if selected %}
+    <div class="on-table">
+      <img class="ring" src="{{ url_for('static', filename='icons/ring%d.png' % ring) }}" alt="" width="500" height="500">
+      <div class="cross large">
+        {% for p in selected.plays %}
+        <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" title="{{ names[p.seat] }}">
+          {{ card(p) }}<span class="seq">{{ p.sequence }}</span>
+        </figure>
+        {% endfor %}
+      </div>
+    </div>
+    <nav class="trick-nav" aria-label="{{ _('Tricks') }}">
+      {% set n = selected.number %}
+      {% if n > 1 %}<a href="?trick={{ n - 1 }}#table" rel="prev" hx-get="?trick={{ n - 1 }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Previous trick') }}">‹</a>{% else %}<span class="off">‹</span>{% endif %}
+      <span>{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}{% if selected.winner_seat %} · {{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% endif %}</span>
+      {% if n < tricks | length %}<a href="?trick={{ n + 1 }}#table" rel="next" hx-get="?trick={{ n + 1 }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Next trick') }}">›</a>{% else %}<span class="off">›</span>{% endif %}
+    </nav>
+    <p class="trick-numbers">
+      {% for t in tricks %}<a href="?trick={{ t.number }}#table"{% if t.number == selected.number %} aria-current="true"{% endif %} hx-get="?trick={{ t.number }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true">{{ t.number }}</a>{% endfor %}
+    </p>
+    {% else %}
+    <p class="empty">{{ _("No card has been played yet.") }}</p>
+    {% endif %}
+    <p class="felt-info">{{ game.created_at[:10] }} · {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}{% if full and card_points %}<br>{{ _("Re") }} {{ card_points.re }} – {{ _("Contra") }} {{ card_points.contra }}{% endif %}</p>
   </div>
 </div>
 
@@ -48,12 +69,12 @@
 {% for c in before %}<p class="remark"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
 {% endif %}
 
-<h2>{{ _("Tricks") }}</h2>
+<h2>{{ _("All tricks") }}</h2>
 {% if tricks %}
 <div class="tricks">
   {% for t in tricks %}
   <article class="trick">
-    <header>{{ _("Trick %(n)d", n=t.number) }}{% if t.winner_seat %} – {{ _("won by %(name)s", name=names[t.winner_seat]) }}{% endif %}</header>
+    <header><a href="?trick={{ t.number }}#table">{{ _("Trick %(n)d", n=t.number) }}</a>{% if t.winner_seat %} – {{ _("won by %(name)s", name=names[t.winner_seat]) }}{% endif %}</header>
     <div class="cross">
       {% for p in t.plays %}
       <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == t.winner_seat %} winner{% endif %}" title="{{ names[p.seat] }}">
