@@ -157,6 +157,7 @@ def build(
                 "seat": h["seat"],
                 "spot": spot[h["seat"]],
                 "name": h["name"],
+                "user_id": h["user_id"],
                 "is_me": h is mine,
                 "starts": h["seat"] == game["start_seat"],
                 "label": label,

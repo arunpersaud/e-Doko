@@ -14,6 +14,7 @@
   {% for s in seats %}
   <section class="seat spot-{{ s.spot }}{% if s.is_me %} me{% endif %}{% if s.on_turn %} on-turn{% endif %}">
     <header>
+      <img class="avatar" src="{{ url_for('avatars.avatar', user_id=s.user_id) }}" alt="" width="32" height="32">
       <strong>{{ s.name }}</strong>
       {% if s.starts %}<span class="start">{{ _("Starting player") }}</span>{% endif %}
       {% if s.label %}<span class="party">{{ s.label }}</span>{% endif %}

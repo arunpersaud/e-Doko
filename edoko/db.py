@@ -1,7 +1,8 @@
 """Access to the SQLite database.
 
-schema.sql is version 1 (PRAGMA user_version); migrations.py brings an
-older database up to date when the app starts. A database from the PHP
+schema.sql is version 1 (PRAGMA user_version) and migrations.py has the
+changes since; a new database gets both and an older one is brought up to
+date when the app starts. A database from the PHP
 site is converted with importer.py.
 """
 
@@ -42,13 +43,16 @@ def query_one(sql: str, params: tuple | dict = ()) -> sqlite3.Row | None:
 
 
 def init_db(path: Path) -> None:
-    """Create an empty database (schema, cards)."""
+    """Create an empty database: the baseline schema and all migrations."""
+    from . import migrations
+
     if path.exists():
         raise FileExistsError(path)
     db = connect(path)
     try:
         db.execute("PRAGMA journal_mode = WAL")
         db.executescript(SCHEMA.read_text())
+        migrations.apply(db, 1)
     finally:
         db.close()
 

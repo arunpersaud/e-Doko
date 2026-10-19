@@ -333,7 +333,7 @@ def spots(page):
     import re
 
     found = re.findall(
-        r'class="seat spot-(\w+)[^"]*">\s*<header>\s*<strong>(\w+)', page
+        r'class="seat spot-(\w+)[^"]*">\s*<header>\s*<img[^>]*>\s*<strong>(\w+)', page
     )
     return dict(found)
 

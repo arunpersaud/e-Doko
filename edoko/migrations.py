@@ -1,9 +1,10 @@
 """Schema migrations.
 
-The baseline is version 1 (schema.sql). Each entry below brings the
-database from version N-1 to N (PRAGMA user_version). migrate() runs
-when the app starts, takes a backup first and holds a lock, so two
-gunicorn workers don't both migrate.
+The baseline is version 1 (schema.sql, frozen). Each entry below brings the
+database from version N-1 to N (PRAGMA user_version). A new database is
+the baseline plus all migrations (db.init_db); an existing one is brought
+up to date by migrate(), which runs when the app starts, takes a backup
+first and holds a lock, so two gunicorn workers don't both migrate.
 """
 
 import fcntl
@@ -12,7 +13,18 @@ from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 
-MIGRATIONS: dict[int, str] = {}
+MIGRATIONS: dict[int, str] = {
+    # profile pictures: uploaded or fetched from Gravatar (else generated)
+    2: """
+CREATE TABLE avatar (
+  user            INTEGER PRIMARY KEY REFERENCES user(id) ON DELETE CASCADE,
+  source          TEXT NOT NULL CHECK (source IN ('upload', 'gravatar')),
+  image           BLOB NOT NULL,
+  content_type    TEXT NOT NULL,
+  updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+) STRICT;
+""",
+}
 
 LATEST = max(MIGRATIONS, default=1)
 
@@ -32,6 +44,19 @@ def backup(db: sqlite3.Connection, path: Path, label: str) -> Path:
     return target
 
 
+def apply(db: sqlite3.Connection, current: int) -> list[int]:
+    """Run the migrations after version current on an open connection."""
+    applied = []
+    for target in range(current + 1, LATEST + 1):
+        db.executescript(
+            "BEGIN;\n"
+            + MIGRATIONS[target]
+            + f"\nPRAGMA user_version = {target};\nCOMMIT;"
+        )
+        applied.append(target)
+    return applied
+
+
 def migrate(path: Path) -> list[int]:
     """Apply missing migrations; returns the versions applied."""
     applied = []
@@ -44,11 +69,5 @@ def migrate(path: Path) -> list[int]:
             if current >= LATEST:
                 return applied
             backup(db, path, f"v{current}")
-            for target in range(current + 1, LATEST + 1):
-                db.executescript(
-                    "BEGIN;\n"
-                    + MIGRATIONS[target]
-                    + f"\nPRAGMA user_version = {target};\nCOMMIT;"
-                )
-                applied.append(target)
+            applied = apply(db, current)
     return applied
