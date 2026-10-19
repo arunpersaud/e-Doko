@@ -433,14 +433,18 @@ def test_a_finished_game_starts_with_the_first_trick_and_can_step_through(world)
     assert "Trick 1 / 12" in page
     assert on_table(page).count("<figure") == 4
     assert 'rel="prev"' not in page.split("trick-nav")[1].split("</nav>")[0]
-    page = client.get("/game/10/?trick=5").text
+    page = client.get("/game/10/trick/5").text
     assert "Trick 5 / 12" in page
-    assert 'href="?trick=4#table" rel="prev"' in page
-    assert 'href="?trick=6#table" rel="next"' in page
-    assert "Trick 12 / 12" in client.get("/game/10/?trick=12").text
-    # numbers outside the game and rubbish fall back to the default
-    assert "Trick 1 / 12" in client.get("/game/10/?trick=13").text
-    assert "Trick 1 / 12" in client.get("/game/10/?trick=abc").text
+    assert 'href="/game/10/trick/4#table" rel="prev"' in page
+    assert 'href="/game/10/trick/6#table" rel="next"' in page
+    assert 'hx-get="/game/10/trick/6"' in page
+    assert "Trick 12 / 12" in client.get("/game/10/trick/12").text
+    # numbers outside the game fall back to the default, rubbish is not a page
+    assert "Trick 1 / 12" in client.get("/game/10/trick/13").text
+    assert client.get("/game/10/trick/abc").status_code == 404
+    # links of the earlier version, with a query, go to the clean address
+    old = client.get("/game/10/?trick=5")
+    assert old.status_code == 302 and old.headers["Location"] == "/game/10/trick/5"
 
 
 def test_a_game_in_progress_starts_with_the_latest_trick(world):
@@ -448,7 +452,7 @@ def test_a_game_in_progress_starts_with_the_latest_trick(world):
         conn.execute("DELETE FROM game WHERE id = 13")
         add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=3)
     assert "Trick 3 / 3" in client_for(world, 5).get("/game/13/").text
-    assert "Trick 2 / 3" in client_for(world, 5).get("/game/13/?trick=2").text
+    assert "Trick 2 / 3" in client_for(world, 5).get("/game/13/trick/2").text
 
 
 def test_the_arrow_ring_opens_at_the_player_who_leads(world):
@@ -462,6 +466,57 @@ def test_the_arrow_ring_opens_at_the_player_who_leads(world):
 
 
 def test_the_selected_trick_shows_in_play_order(world):
-    page = client_for(world, 1).get("/game/10/?trick=2").text
+    page = client_for(world, 1).get("/game/10/trick/2").text
     seq = on_table(page)
     assert seq.index('<span class="seq">1') < seq.index('<span class="seq">4')
+
+
+def test_clean_urls_also_for_seat_links(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE hand SET token = ? WHERE id = 101", ("a" * 32,))
+    client = world.test_client()
+    page = client.get("/" + "a" * 32 + "/trick/3").text
+    assert "Trick 3 / 12" in page
+    assert f'href="/{"a" * 32}/trick/4#table" rel="next"' in page
+    old = client.get("/" + "a" * 32 + "?trick=3")
+    assert old.headers["Location"] == "/" + "a" * 32 + "/trick/3"
+
+
+def test_the_game_info_is_below_the_title(world):
+    page = client_for(world, 1).get("/game/10/").text
+    head, rest = page.split('<div id="table">')
+    assert 'class="game-info"' in head and "gameover" in head.split("game-info")[1]
+    assert "gameover" not in rest.split("</section>")[-1].split('class="felt"')[-1]
+
+
+def hand_images(page, name):
+    """The card image numbers of the hand of a player, in the order shown."""
+    import re
+
+    section = page.split(f"<strong>{name}</strong>")[1].split("</section>")[0]
+    return [int(n) for n in re.findall(r"cards/english/(\d+)\.png", section)]
+
+
+def test_the_hands_are_sorted_for_the_kind_of_game(world):
+    # seat 4 (Di) holds the cards 37 .. 48: spades and hearts. As in the PHP
+    # site: trump, then diamonds, clubs, hearts, spades; the best card first.
+    page = client_for(world, 1).get("/game/10/").text
+    assert hand_images(page, "Di") == [43, 43, 45, 45, 47, 47, 37, 37, 39, 39, 41, 41]
+    # seat 1 (Ann) holds 1 .. 12: the queens and the jacks of clubs are trump;
+    # with the ruleset of these tests (no dullen) the ten of hearts is a heart
+    assert hand_images(page, "Ann") == [3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 1, 1]
+
+
+def test_hands_follow_the_game_type_and_the_own_hand_too(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("UPDATE game SET type = 'solo', solo = 'queen' WHERE id = 10")
+    page = client_for(world, 1).get("/game/10/").text
+    # in a queen solo only the queens are trump; the jacks of clubs rank in the
+    # clubs (they come before the hearts), the ten of hearts in the hearts
+    assert hand_images(page, "Ann") == [3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 1, 1]
+    # a game in progress: the cards still held, sorted too
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("DELETE FROM game WHERE id = 13")
+        add_game(conn, 13, 2, "play", [5, 6, 7, 8], session=2, played=0)
+    mine = hand_images(client_for(world, 8).get("/game/13/").text, "Hal")
+    assert mine == [43, 43, 45, 45, 47, 47, 37, 37, 39, 39, 41, 41]

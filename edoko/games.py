@@ -9,7 +9,7 @@ Games in progress are never shown to anybody else, not even their hands.
 Everybody else gets a 404, as if the game didn't exist.
 """
 
-from flask import Blueprint, abort, g, render_template, request
+from flask import Blueprint, abort, g, redirect, render_template, request, url_for
 from flask_babel import lazy_gettext as _l
 from werkzeug.routing import BaseConverter
 
@@ -86,17 +86,32 @@ def image_number(card_id: int) -> int:
     return card_id if card_id % 2 else card_id - 1
 
 
-def render_game(game_id: int, user_id: int, *, full: bool, logged_in: bool = True):
+def trick_url(number: int) -> str:
+    """The address of the same page showing another trick: .../trick/N."""
+    return url_for(request.endpoint, **{**request.view_args, "trick": number})
+
+
+def render_game(
+    game_id: int,
+    user_id: int,
+    *,
+    full: bool,
+    trick: int | None = None,
+    logged_in: bool = True,
+):
     """The page of a game for one of its players or for a qualified viewer.
 
     full: the viewer may see all hands (the game is over). Otherwise they see
     the tricks so far and their own cards.
     """
-    context = gameview.build(
-        game_id, user_id, full=full, trick=request.args.get("trick", type=int)
-    )
+    context = gameview.build(game_id, user_id, full=full, trick=trick)
     context.update(
-        user_id=user_id, logged_in=logged_in, others=[], previous=None, next=None
+        user_id=user_id,
+        logged_in=logged_in,
+        others=[],
+        previous=None,
+        next=None,
+        trick_url=trick_url,
     )
     if logged_in:
         # only games this viewer may open: their own, and those of the same deals
@@ -182,26 +197,32 @@ def table(session_id):
     )
 
 
-@bp.route("/game/<int:game_id>/")
+@bp.route("/game/<int:game_id>/", defaults={"trick": None})
+@bp.route("/game/<int:game_id>/trick/<int:trick>")
 @login_required
-def game(game_id):
+def game(game_id, trick):
+    if (old := request.args.get("trick", type=int)) is not None:  # an old link
+        return redirect(url_for("games.game", game_id=game_id, trick=old))
     if query_one("SELECT 1 FROM game WHERE id = ?", (game_id,)) is None:
         abort(404)
     user_id = g.user["id"]
     details = can_see_details(user_id, game_id)
     if not details and not is_player(user_id, game_id):
         abort(404)
-    return render_game(game_id, user_id, full=details)
+    return render_game(game_id, user_id, full=details, trick=trick)
 
 
-@bp.route("/<token:token>")
-def seat(token):
+@bp.route("/<token:token>", defaults={"trick": None})
+@bp.route("/<token:token>/trick/<int:trick>")
+def seat(token, trick):
     """A player's own link (from the mails): no login, but only this seat.
 
     The token is a secret that stands for one seat of one game, so it shows
     that game and nothing else. Whoever has it can play that seat, as on
     the PHP site.
     """
+    if (old := request.args.get("trick", type=int)) is not None:  # an old link
+        return redirect(url_for("games.seat", token=token, trick=old))
     hand = query_one(
         """SELECT hand.game, hand.user, game.status FROM hand
            JOIN game ON game.id = hand.game WHERE hand.token = ?""",
@@ -211,7 +232,11 @@ def seat(token):
         abort(404)
     logged_in = g.user is not None and g.user["id"] == hand["user"]
     return render_game(
-        hand["game"], hand["user"], full=hand["status"] == OVER, logged_in=logged_in
+        hand["game"],
+        hand["user"],
+        full=hand["status"] == OVER,
+        trick=trick,
+        logged_in=logged_in,
     )
 
 

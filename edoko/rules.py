@@ -115,6 +115,37 @@ def layout(mode: str, dullen: str) -> dict[str, list[int]]:
     raise ValueError(f"unknown kind of game: {mode}")
 
 
+def hand_order(mode: str, rules: Rules, both_foxes: bool = False) -> list[int]:
+    """The order of all cards when sorting a hand: strongest trump first, then
+    the plain suits diamonds, clubs, hearts, spades, as on the PHP site.
+
+    both_foxes: the hand has both foxes and Schweinchen counts in this kind of
+    game; then they are shown first ("both") or the first of them is ("second").
+    """
+    cards = layout(mode, rules.dullen)
+    trump = list(cards["trump"])
+    if both_foxes and mode in ("normal", "wedding", "trump", "silent"):
+        if rules.schweinchen == "both":
+            trump = [19, 20] + [c for c in trump if c not in FOXES]
+        elif rules.schweinchen in ("second", "secondaftercall"):
+            trump = [19] + [c for c in trump if c != 19]
+    return (
+        trump + cards["diamonds"] + cards["clubs"] + cards["hearts"] + cards["spades"]
+    )
+
+
+def sort_hand(cards, mode: str, rules: Rules, *, all_cards=None) -> list[int]:
+    """Cards sorted for showing a hand, strongest first.
+
+    all_cards: the whole hand of the player including played cards, to know if
+    they had both foxes (default: cards).
+    """
+    held = set(all_cards if all_cards is not None else cards)
+    order = hand_order(mode, rules, both_foxes=19 in held and 20 in held)
+    position = {card: i for i, card in enumerate(order)}
+    return sorted(cards, key=position.__getitem__)
+
+
 def odd(card: int) -> int:
     return card if card % 2 else card - 1
 

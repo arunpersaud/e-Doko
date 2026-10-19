@@ -251,3 +251,75 @@ def test_doppelkopf_is_a_trick_with_40_points():
     assert not [
         i for i in replay([(1, 1), (2, 25), (3, 3), (4, 5)]).items if i.kind == "doko"
     ]
+
+
+# --- sorting a hand ------------------------------------------------------------------
+
+
+def test_sorting_a_hand_in_a_normal_game():
+    hand = [25, 1, 27, 3, 19, 35, 43, 9, 36]
+    # trump (10 of hearts, queens, the ace of diamonds, nine of diamonds), then
+    # clubs, hearts, spades
+    assert rules.sort_hand(hand, "normal", R) == [1, 3, 9, 19, 25, 27, 43, 35, 36]
+
+
+def test_sorting_without_dullen_puts_the_ten_of_hearts_among_the_hearts():
+    hand = [1, 3, 43, 45, 27]
+    assert rules.sort_hand(hand, "normal", Rules(dullen="none")) == [3, 27, 43, 1, 45]
+
+
+def test_sorting_in_solos():
+    hand = [3, 11, 27, 19, 43, 1]
+    # queen solo: the queens are trump, then diamonds (the ace of diamonds ...),
+    # clubs (with the jack of clubs between king and nine), hearts (10 first)
+    assert rules.sort_hand(hand, "queen", R) == [3, 19, 27, 11, 43, 1]
+    assert rules.sort_hand([3, 9, 17, 19], "queen", R) == [3, 9, 19, 17]
+    # trumpless: no trump, ace before ten
+    assert rules.sort_hand([29, 27, 3], "trumpless", R) == [27, 29, 3]
+    # a club solo: the clubs are trump, below the jacks
+    assert rules.sort_hand([27, 11, 35, 1], "club", R) == [1, 11, 27, 35]
+
+
+def test_foxes_come_first_for_a_hand_with_schweinchen():
+    hand = [1, 3, 19, 20, 25]
+    assert rules.sort_hand(hand, "normal", Rules(schweinchen="both")) == [
+        19,
+        20,
+        1,
+        3,
+        25,
+    ]
+    assert rules.sort_hand(hand, "normal", Rules(schweinchen="second")) == [
+        19,
+        1,
+        3,
+        20,
+        25,
+    ]
+    assert rules.sort_hand(hand, "normal", Rules(schweinchen="none")) == [
+        1,
+        3,
+        19,
+        20,
+        25,
+    ]
+    # one fox is nothing special, nor is it in a poverty
+    assert rules.sort_hand([1, 19, 25], "normal", Rules(schweinchen="both")) == [
+        1,
+        19,
+        25,
+    ]
+    assert rules.sort_hand(hand, "poverty", Rules(schweinchen="both")) == [
+        1,
+        3,
+        19,
+        20,
+        25,
+    ]
+
+
+def test_the_foxes_count_even_after_one_was_played():
+    # the hand had both foxes: the one still held is shown first
+    assert rules.sort_hand(
+        [1, 20], "normal", Rules(schweinchen="both"), all_cards=[1, 19, 20]
+    ) == [19 if False else 20, 1]

@@ -43,6 +43,7 @@ td.end { text-align: right; vertical-align: top; }
 nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .spot-bottom { grid-area: bottom; }
 .spot-left { grid-area: left; }
+.table-view > .spot-left, .table-view > .spot-right { align-self: center; }
 .spot-top { grid-area: top; }
 .spot-right { grid-area: right; }
 .table-view {
@@ -75,13 +76,13 @@ nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-
 nav.trick-nav { display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-size: 0.85em; }
 nav.trick-nav a, nav.trick-nav .off { font-size: 1.6em; line-height: 1; text-decoration: none; padding: 0 0.4em; }
 nav.trick-nav .off { opacity: 0.3; }
-p.trick-numbers { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem; margin: 0.25rem 0; }
+p.trick-numbers { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem; margin: 0.25rem 0; }
 p.trick-numbers a {
   min-width: 1.6rem; text-align: center; text-decoration: none; font-size: 0.8em;
   border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 0.3rem; padding: 0 0.3em;
 }
 p.trick-numbers a[aria-current] { background: #fff; color: #2f6f4f; }
-.felt-info { font-size: 0.8em; opacity: 0.9; }
+p.game-info { color: var(--pico-muted-color); margin-top: -0.5rem; }
 .felt p { margin: 0.25rem 0; }
 .seat { padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--pico-muted-border-color); }
 .seat.me { border-color: var(--pico-primary); }

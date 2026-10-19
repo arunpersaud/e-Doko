@@ -92,8 +92,8 @@ def build(
     one of a game in progress, the first one of a finished game.
     """
     game = query_one(
-        """SELECT game.*, ruleset.lowtrump FROM game
-           JOIN ruleset ON ruleset.id = game.ruleset WHERE game.id = ?""",
+        """SELECT game.*, ruleset.lowtrump, ruleset.dullen, ruleset.schweinchen
+           FROM game JOIN ruleset ON ruleset.id = game.ruleset WHERE game.id = ?""",
         (game_id,),
     )
     over = game["status"] == OVER
@@ -124,27 +124,23 @@ def build(
             (game_id,),
         )
     }
+    mode = (game["solo"] if game["type"] == "solo" else game["type"]) or "normal"
+    rule_set = rules.Rules(game["dullen"], game["schweinchen"], game["lowtrump"])
     cards = {h["seat"]: [] for h in hands}
-    if full:
-        for row in query(
-            """SELECT hand.seat, card.id, card.suit, card.rank
+    shown = hands if full else [mine] if mine else []
+    for h in shown:
+        held = query(
+            """SELECT card.id, card.suit, card.rank, play.id AS played
                FROM hand_card JOIN card ON card.id = hand_card.card
-               JOIN hand ON hand.id = hand_card.hand
                LEFT JOIN play ON play.hand_card = hand_card.id
-               LEFT JOIN trick ON trick.id = play.trick
-               WHERE hand.game = ?
-               ORDER BY trick.number, play.sequence, card.id""",
-            (game_id,),
-        ):
-            cards[row["seat"]].append(row)
-    elif mine:  # the cards they still hold
-        cards[mine["seat"]] = query(
-            """SELECT card.id, card.suit, card.rank FROM hand_card
-               JOIN card ON card.id = hand_card.card
-               LEFT JOIN play ON play.hand_card = hand_card.id
-               WHERE hand_card.hand = ? AND play.id IS NULL ORDER BY card.id""",
-            (mine["id"],),
+               WHERE hand_card.hand = ?""",
+            (h["id"],),
         )
+        rows = {r["id"]: r for r in held if full or r["played"] is None}
+        order = rules.sort_hand(
+            list(rows), mode, rule_set, all_cards=[r["id"] for r in held]
+        )
+        cards[h["seat"]] = [rows[card_id] for card_id in order]
 
     seats = []
     for h in hands:
