@@ -10,7 +10,7 @@
 
 <h1>{{ _("Game %(id)d", id=game.id) }}</h1>
 <p class="game-info">{{ game.created_at[:10] }} · {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}{% if full and card_points %}<br>{% if winner == "re" %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ _("Re") }} {{ card_points.re }} – {% if winner == "contra" %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ _("Contra") }} {{ card_points.contra }}
-  {% if winner %}<br>{{ ngettext("%(num)d game point for %(party)s", "%(num)d game points for %(party)s", game_points, party=(_("Re") if winner == "re" else _("Contra"))) }}{% if game.type == "solo" %} · {{ _("the soloist counts triple") }}{% endif %}{% endif %}{% endif %}</p>
+  {% if winner %}<br><span class="points" tabindex="0" aria-describedby="breakdown">{{ ngettext("%(num)d game point for %(party)s", "%(num)d game points for %(party)s", game_points, party=(_("Re") if winner == "re" else _("Contra"))) }}<span class="breakdown" id="breakdown" role="tooltip"><strong class="item">{{ _("How it is counted") }}</strong>{% for b in breakdown %}<span class="item"><em>{{ b.party }}</em> {{ b.text }}</span>{% endfor %}</span></span>{% if game.type == "solo" %} · {{ _("the soloist counts triple") }}{% endif %}{% endif %}{% endif %}</p>
 
 <div id="table">
 <div class="table-view">
@@ -73,12 +73,6 @@
 {% endif %}
 
 {% if full %}
-{% if scores %}
-<h2>{{ _("Result") }}</h2>
-<ul class="scores">
-  {% for s in scores %}<li>{{ s.party }}: {{ s.kind }}{% if s.winner %} ({{ s.winner }}{% if s.loser %} → {{ s.loser }}{% endif %}){% endif %}</li>{% endfor %}
-</ul>
-{% endif %}
 {% for c in before %}<p class="remark"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
 {% endif %}
 

@@ -1774,3 +1774,60 @@ msgstr[1] "%(num)d Spielpunkte für %(party)s"
 
 msgid "the soloist counts triple"
 msgstr "der Solospieler zählt dreifach"
+
+msgid "How it is counted"
+msgstr "So wird gezählt"
+
+msgid "no 90"
+msgstr "keine 90"
+
+msgid "no 60"
+msgstr "keine 60"
+
+msgid "no 30"
+msgstr "keine 30"
+
+msgid "schwarz"
+msgstr "schwarz"
+
+msgid "Won"
+msgstr "Gewonnen"
+
+msgid "The other side has fewer than 90 points"
+msgstr "Die Gegenseite hat weniger als 90 Punkte"
+
+msgid "The other side has fewer than 60 points"
+msgstr "Die Gegenseite hat weniger als 60 Punkte"
+
+msgid "The other side has fewer than 30 points"
+msgstr "Die Gegenseite hat weniger als 30 Punkte"
+
+msgid "The other side has no trick (schwarz)"
+msgstr "Die Gegenseite hat keinen Stich (schwarz)"
+
+msgid "Won against the queens"
+msgstr "Gegen die Alten gewonnen"
+
+#, python-format
+msgid "Announced %(call)s"
+msgstr "%(call)s angesagt"
+
+#, python-format
+msgid "Beat the announcement of the other side: %(call)s"
+msgstr "Die Ansage der Gegenseite geschlagen: %(call)s"
+
+#, python-format
+msgid "Reached %(n)s points against the announcement"
+msgstr "%(n)s Punkte gegen die Ansage erreicht"
+
+#, python-format
+msgid "Caught a fox (%(name)s)"
+msgstr "Fuchs gefangen (%(name)s)"
+
+#, python-format
+msgid "Karlchen: the last trick with the jack of clubs (%(name)s)"
+msgstr "Karlchen: der letzte Stich mit dem Kreuzbuben (%(name)s)"
+
+#, python-format
+msgid "Doppelkopf: 40 points or more in a trick (%(name)s)"
+msgstr "Doppelkopf: 40 Punkte oder mehr in einem Stich (%(name)s)"

@@ -147,3 +147,17 @@ div.avatar.large.empty {
 header nav a[aria-current] { font-weight: bold; }
 @media (max-width: 36rem) { header nav .nav-label { display: none; } }
 table.users td, table.users th { font-size: 0.85em; }
+
+/* the game points: how they are counted shows on hover or focus */
+.points { position: relative; cursor: help; border-bottom: 1px dotted currentColor; }
+.points .breakdown {
+  display: none; position: absolute; left: 0; top: 100%; z-index: 10;
+  min-width: 18rem; max-width: 90vw; margin-top: 0.25rem; padding: 0.5rem 0.75rem;
+  background: var(--pico-card-background-color); color: var(--pico-color);
+  border-radius: var(--pico-border-radius); box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
+  text-align: left; font-size: 0.9rem; line-height: 1.35;
+}
+.points .breakdown .item { display: block; margin: 0.2rem 0; }
+.points .breakdown .item:first-child { margin-top: 0; }
+.points .breakdown em { font-weight: 600; }
+.points:hover .breakdown, .points:focus .breakdown, .points:focus-within .breakdown { display: block; }

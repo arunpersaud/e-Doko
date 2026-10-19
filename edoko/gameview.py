@@ -264,6 +264,59 @@ def tricks_so_far(game_id: int) -> list[dict]:
     return tricks
 
 
+def party_name(party: str) -> str:
+    return _("Re") if party == "re" else _("Contra")
+
+
+def call_name(party: str, number: str) -> str:
+    """How an announcement is called: Re or Contra, no 90, no 60, no 30, schwarz."""
+    return {
+        "120": party_name(party),
+        "90": _("no 90"),
+        "60": _("no 60"),
+        "30": _("no 30"),
+        "0": _("schwarz"),
+    }[number]
+
+
+def item_text(row) -> str:
+    """The words for a scoring item (a row of score_item, with names)."""
+    kind, party = row["kind"], row["party"]
+    other = "contra" if party == "re" else "re"
+    if kind in ("120", "90", "60", "30", "0"):
+        return {
+            "120": _("Won"),
+            "90": _("The other side has fewer than 90 points"),
+            "60": _("The other side has fewer than 60 points"),
+            "30": _("The other side has fewer than 30 points"),
+            "0": _("The other side has no trick (schwarz)"),
+        }[kind]
+    if kind == "againstqueens":
+        return _("Won against the queens")
+    if kind.startswith("call"):
+        return _("Announced %(call)s", call=call_name(party, kind[4:]))
+    if kind.startswith("against"):
+        return _(
+            "Beat the announcement of the other side: %(call)s",
+            call=call_name(other, kind[7:]),
+        )
+    if kind.startswith("made"):
+        return _("Reached %(n)s points against the announcement", n=kind[4:])
+    if kind == "fox":
+        return _("Caught a fox (%(name)s)", name=row["loser"] or "?")
+    if kind == "karlchen":
+        return _(
+            "Karlchen: the last trick with the jack of clubs (%(name)s)",
+            name=row["winner"] or "?",
+        )
+    if kind == "doko":
+        return _(
+            "Doppelkopf: 40 points or more in a trick (%(name)s)",
+            name=row["winner"] or "?",
+        )
+    return kind
+
+
 def result(game_id: int, hands, tricks) -> dict:
     """Comments before the game, the scoring items and the card points."""
     parties = {h["seat"]: h["party"] for h in hands}
@@ -299,6 +352,10 @@ def result(game_id: int, hands, tricks) -> dict:
         "card_points": {"re": points["re"], "contra": points["contra"]},
         "winner": winner,
         "game_points": abs(items["re"] - items["contra"]),
+        "breakdown": [
+            {"party": party_name(row["party"]), "text": item_text(row)}
+            for row in scores
+        ],
     }
 
 

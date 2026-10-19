@@ -597,3 +597,75 @@ def test_no_game_points_without_a_winner(world):
     assert "game point" not in info(client_for(world, 1).get("/game/10/").text)
     score_items(world, ("re", "fox"), ("contra", "fox"))
     assert "game point" not in info(client_for(world, 1).get("/game/10/").text)
+
+
+# --- how the game points are counted -------------------------------------------------
+
+
+def breakdown(page):
+    """The items of the popover on the game points, as text."""
+    import re
+
+    box = page.split('class="breakdown"')[1].split("</span></span>")[0] + "</span>"
+    rows = re.findall(r'<span class="item">(.*?)</span>', box)
+    return [re.sub(r"<[^>]+>", "", row) for row in rows]
+
+
+def test_the_result_list_is_gone_and_the_game_points_explain_themselves(world):
+    score_items(
+        world,
+        ("contra", "againstqueens"),
+        ("contra", "120"),
+        ("contra", "doko"),
+        ("re", "call90"),
+    )
+    page = client_for(world, 1).get("/game/10/").text
+    assert "<h2>Result</h2>" not in page and 'class="scores"' not in page
+    assert "<ul>" not in page.split('class="game-info"')[1].split("</p>")[0]
+    assert 'class="points" tabindex="0"' in page  # focusable: works without a mouse
+    assert "againstqueens" not in page and "call90" not in page  # words, not codes
+    items = breakdown(page)
+    assert "Contra Won against the queens" in items
+    assert "Contra Won" in items
+    assert any(i.startswith("Contra Doppelkopf") for i in items)
+    assert "Re Announced no 90" in items
+
+
+def test_the_wording_of_all_scoring_items(world):
+    from edoko.gameview import item_text
+
+    def text(kind, party="re", winner=None, loser=None):
+        return item_text(
+            {"kind": kind, "party": party, "winner": winner, "loser": loser}
+        )
+
+    with world.test_request_context("/"):
+        assert text("120") == "Won"
+        assert text("90") == "The other side has fewer than 90 points"
+        assert text("0") == "The other side has no trick (schwarz)"
+        assert text("call120") == "Announced Re"
+        assert text("call120", "contra") == "Announced Contra"
+        assert text("call30") == "Announced no 30"
+        assert text("call0") == "Announced schwarz"
+        # the other side's call was beaten: it is named after the other side
+        assert (
+            text("against120", "re")
+            == "Beat the announcement of the other side: Contra"
+        )
+        assert (
+            text("against90", "contra")
+            == "Beat the announcement of the other side: no 90"
+        )
+        assert text("made60") == "Reached 60 points against the announcement"
+        assert text("fox", loser="Bob") == "Caught a fox (Bob)"
+        assert text("karlchen", winner="Ann").startswith("Karlchen")
+        assert "(Ann)" in text("doko", winner="Ann")
+        assert text("againstqueens", "contra") == "Won against the queens"
+
+
+def test_the_words_are_german_too(world):
+    score_items(world, ("contra", "againstqueens"), ("contra", "120"), ("re", "call90"))
+    page = client_for(world, 1).get("/game/10/", headers={"Accept-Language": "de"}).text
+    items = breakdown(page)
+    assert "Kontra Gegen die Alten gewonnen" in items
+    assert "Re keine 90 angesagt" in items
