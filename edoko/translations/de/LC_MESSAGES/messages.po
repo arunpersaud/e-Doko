@@ -1448,3 +1448,6 @@ msgstr "(ohne Namen)"
 
 msgid "Save"
 msgstr "Speichern"
+
+msgid "or"
+msgstr "oder"

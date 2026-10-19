@@ -21,3 +21,20 @@ details.rename input { flex: 1 1 8rem; min-width: 8rem; }
 details.rename form button { flex: 0 0 auto; width: auto; padding: 0.4rem 1rem; }
 button.compact { padding: 0.15rem 0.6rem; font-size: 0.85em; margin: 0; width: auto; }
 td.end { text-align: right; vertical-align: top; }
+
+/* login: one narrow column, both ways in the same size */
+.login-box { max-width: 22rem; }
+.login-box button { width: 100%; }
+.login-box form input[type="email"] { margin-bottom: 0.75rem; }
+.or {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: var(--pico-muted-color);
+}
+.or::before, .or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--pico-muted-border-color);
+}
