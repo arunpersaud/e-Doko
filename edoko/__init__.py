@@ -21,7 +21,7 @@ from urllib.parse import urlsplit
 from flask import Flask, request
 from flask_babel import Babel, get_locale
 
-from . import auth, db, migrations, passkeys, views
+from . import auth, db, games, migrations, passkeys, views
 from .cli import edoko
 
 LANGUAGES = ["en", "de"]
@@ -127,6 +127,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     auth.init_app(app)
     passkeys.init_app(app)
+    games.init_app(app)
     app.register_blueprint(views.site)
     app.cli.add_command(edoko)
 

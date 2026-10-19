@@ -1451,3 +1451,73 @@ msgstr "Speichern"
 
 msgid "or"
 msgstr "oder"
+
+msgid "diamonds"
+msgstr "Karo"
+
+msgid "hearts"
+msgstr "Herz"
+
+msgid "spades"
+msgstr "Pik"
+
+msgid "clubs"
+msgstr "Kreuz"
+
+msgid "nine"
+msgstr "Neun"
+
+msgid "ten"
+msgstr "Zehn"
+
+msgid "jack"
+msgstr "Bube"
+
+msgid "queen"
+msgstr "Dame"
+
+msgid "king"
+msgstr "König"
+
+msgid "ace"
+msgstr "Ass"
+
+#, python-format
+msgid "Game %(id)d"
+msgstr "Spiel %(id)d"
+
+#, python-format
+msgid "Table %(n)d"
+msgstr "Tisch %(n)d"
+
+msgid "Seat"
+msgstr "Platz"
+
+msgid "Player"
+msgstr "Spieler"
+
+msgid "Party"
+msgstr "Partei"
+
+msgid "The details of this game are shown when it is over, and only to players who have finished this deal themselves."
+msgstr "Die Einzelheiten dieses Spiels werden gezeigt, wenn es zu Ende ist, und nur Spielern, die diese Karten selbst zu Ende gespielt haben."
+
+msgid "Result"
+msgstr "Ergebnis"
+
+msgid "Hands"
+msgstr "Blätter"
+
+msgid "Tricks"
+msgstr "Stiche"
+
+#, python-format
+msgid "Trick %(n)d"
+msgstr "Stich %(n)d"
+
+#, python-format
+msgid "won by %(name)s"
+msgstr "geht an %(name)s"
+
+msgid "Other tables that played this deal"
+msgstr "Andere Tische, die diese Karten gespielt haben"
