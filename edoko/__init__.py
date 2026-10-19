@@ -5,6 +5,7 @@ Configuration comes from environment variables with a FLASK_ prefix:
     FLASK_DATABASE     SQLite file (default: instance/edoko.sqlite)
     FLASK_SECRET_KEY   signs the session cookie
     FLASK_ORIGIN       the site's address, e.g. https://doko.nubati.net
+    FLASK_SMTP_USER, FLASK_SMTP_PASSWORD, ...  mail, see mail.py
 
 FLASK_SECRET_KEY and FLASK_ORIGIN are required unless the app runs in
 debug or testing mode.
@@ -19,7 +20,7 @@ from pathlib import Path
 from flask import Flask, request
 from flask_babel import Babel, get_locale
 
-from . import db, migrations, views
+from . import auth, db, migrations, views
 from .cli import edoko
 
 LANGUAGES = ["en", "de"]
@@ -55,6 +56,12 @@ def select_locale() -> str | None:
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
     app.config["DATABASE"] = os.path.join(app.instance_path, "edoko.sqlite")
+    app.config.update(
+        MAIL_BACKEND="smtp",
+        MAIL_FROM="noreply@doko.nubati.net",
+        SMTP_HOST="email-smtp.us-east-2.amazonaws.com",
+        SMTP_PORT=587,
+    )
     app.config.from_prefixed_env()
     if test_config:
         app.config.update(test_config)
@@ -65,6 +72,9 @@ def create_app(test_config: dict | None = None) -> Flask:
             if not (app.debug or app.testing):
                 raise RuntimeError(f"FLASK_{key} is not set")
             app.config[key] = value
+    if app.testing:
+        app.config["MAIL_BACKEND"] = "memory"
+    app.outbox = []  # mail in the tests (MAIL_BACKEND=memory)
     https = app.config["ORIGIN"].startswith("https://")
     app.config.update(
         # forms are small; refuse anything bigger
@@ -112,6 +122,7 @@ def create_app(test_config: dict | None = None) -> Flask:
                 response.cache_control.no_cache = True
         return response
 
+    auth.init_app(app)
     app.register_blueprint(views.site)
     app.cli.add_command(edoko)
 

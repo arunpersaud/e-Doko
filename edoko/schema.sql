@@ -25,6 +25,9 @@ CREATE TABLE user (
   vacation_stop   TEXT,
   vacation_comment TEXT,
   is_admin        INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0, 1)),
+  disabled_at     TEXT,                                   -- NULL: may log in
+  -- the passkeys' user handle: random, not the id or the name
+  webauthn_id     BLOB NOT NULL DEFAULT (randomblob(32)),
   last_login      TEXT,
   created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
@@ -50,6 +53,14 @@ CREATE TABLE login_token (
   expires_at      TEXT NOT NULL,
   used_at         TEXT
 ) STRICT;
+
+-- recent attempts, to limit requests for login links; the key is a hash
+-- (of an address or an IP), rows older than a day are deleted
+CREATE TABLE rate_limit (
+  key             TEXT NOT NULL,
+  at              TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+) STRICT;
+CREATE INDEX rate_limit_key ON rate_limit(key, at);
 
 CREATE TABLE card (
   id              INTEGER PRIMARY KEY,

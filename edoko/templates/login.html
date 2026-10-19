@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Log in") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Log in") }}</h1>
+<form method="post" action="{{ url_for('auth.login_email') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="next" value="{{ next }}">
+  <label>{{ _("Your email address") }}
+    <input type="email" name="email" autocomplete="email" required autofocus>
+  </label>
+  <button type="submit">{{ _("Send me a login link") }}</button>
+</form>
+<p><small>{{ _("There are no passwords. We email you a link that logs you in once; there you can also set up a passkey for the next time.") }}</small></p>
+{% endblock %}

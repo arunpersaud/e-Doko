@@ -1322,3 +1322,54 @@ msgid "%(num)d game so far."
 msgid_plural "%(num)d games so far."
 msgstr[0] "Bisher %(num)d Spiel."
 msgstr[1] "Bisher %(num)d Spiele."
+
+msgid "Log in"
+msgstr "Anmelden"
+
+msgid "Log out"
+msgstr "Abmelden"
+
+msgid "Your email address"
+msgstr "Deine E-Mail-Adresse"
+
+msgid "Send me a login link"
+msgstr "Schick mir einen Anmelde-Link"
+
+msgid "There are no passwords. We email you a link that logs you in once; there you can also set up a passkey for the next time."
+msgstr "Es gibt keine Passwörter. Wir schicken dir einen Link, mit dem du dich einmal anmeldest; dort kannst du auch einen Passkey für das nächste Mal einrichten."
+
+msgid "Check your mail"
+msgstr "Schau in dein Postfach"
+
+msgid "If that address belongs to an account, we have sent a login link to it. The link works once and for one hour."
+msgstr "Wenn diese Adresse zu einem Konto gehört, haben wir ihr einen Anmelde-Link geschickt. Der Link funktioniert einmal und eine Stunde lang."
+
+#, python-format
+msgid "Hello %(name)s"
+msgstr "Hallo %(name)s"
+
+msgid "This link doesn't work"
+msgstr "Dieser Link funktioniert nicht"
+
+msgid "The login link was already used or has expired."
+msgstr "Der Anmelde-Link wurde schon benutzt oder ist abgelaufen."
+
+msgid "Get a new one"
+msgstr "Neuen Link anfordern"
+
+msgid "You are logged out."
+msgstr "Du bist abgemeldet."
+
+msgid "Your login link"
+msgstr "Dein Anmelde-Link"
+
+#, python-format
+msgid "Hello %(name)s,"
+msgstr "Hallo %(name)s,"
+
+#, python-format
+msgid "use this link to log in to e-DoKo. It works once and for %(hours)s hour(s):"
+msgstr "mit diesem Link meldest du dich bei e-DoKo an. Er funktioniert einmal und %(hours)s Stunde(n) lang:"
+
+msgid "If you did not ask for it, you can ignore this mail."
+msgstr "Wenn du ihn nicht angefordert hast, kannst du diese Mail ignorieren."

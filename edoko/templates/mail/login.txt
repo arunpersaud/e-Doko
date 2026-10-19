@@ -1,0 +1,7 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans hours=hours %}use this link to log in to e-DoKo. It works once and for {{ hours }} hour(s):{% endtrans %}
+
+{{ link }}
+
+{% trans %}If you did not ask for it, you can ignore this mail.{% endtrans %}

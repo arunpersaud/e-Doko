@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ _("This link doesn't work") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("This link doesn't work") }}</h1>
+<p>{{ _("The login link was already used or has expired.") }}
+  <a href="{{ url_for('auth.login') }}">{{ _("Get a new one") }}</a>.</p>
+{% endblock %}
