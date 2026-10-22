@@ -5,11 +5,12 @@ Configuration comes from environment variables with a FLASK_ prefix:
     FLASK_DATABASE     SQLite file (default: instance/edoko.sqlite)
     FLASK_SECRET_KEY   signs the session cookie
     FLASK_ORIGIN       the site's address, e.g. https://doko.nubati.net
-    FLASK_SMTP_USER, FLASK_SMTP_PASSWORD, ...  mail, see mail.py
+    FLASK_MAIL_FROM, FLASK_SMTP_HOST, FLASK_SMTP_USER, FLASK_SMTP_PASSWORD, ...
+                       mail, see mail.py
     FLASK_SES_TOPIC_ARN  bounce notices from SES, see bounces.py
 
-FLASK_SECRET_KEY and FLASK_ORIGIN are required unless the app runs in
-debug or testing mode.
+FLASK_SECRET_KEY, FLASK_ORIGIN, FLASK_MAIL_FROM and FLASK_SMTP_HOST are
+required unless the app runs in debug or testing mode.
 """
 
 import hashlib
@@ -71,15 +72,18 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config["DATABASE"] = os.path.join(app.instance_path, "edoko.sqlite")
     app.config.update(
         MAIL_BACKEND="smtp",
-        MAIL_FROM="noreply@doko.nubati.net",
-        SMTP_HOST="email-smtp.us-east-2.amazonaws.com",
         SMTP_PORT=587,
     )
     app.config.from_prefixed_env()
     if test_config:
         app.config.update(test_config)
 
-    defaults = {"SECRET_KEY": "insecure-dev-key", "ORIGIN": "http://localhost:5000"}
+    defaults = {
+        "SECRET_KEY": "insecure-dev-key",
+        "ORIGIN": "http://localhost:5000",
+        "MAIL_FROM": "noreply@localhost.invalid",
+        "SMTP_HOST": "localhost",
+    }
     for key, value in defaults.items():
         if not app.config.get(key):
             if not (app.debug or app.testing):

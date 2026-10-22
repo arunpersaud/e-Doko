@@ -1,8 +1,9 @@
 """Sending mail: SMTP (AWS SES) in production, a list in the tests.
 
 FLASK_MAIL_BACKEND  smtp (default) or memory (messages go to app.outbox)
-FLASK_SMTP_HOST, FLASK_SMTP_PORT, FLASK_SMTP_USER, FLASK_SMTP_PASSWORD
-FLASK_MAIL_FROM     the sender, e.g. noreply@doko.nubati.net
+FLASK_SMTP_HOST (required, the SES SMTP endpoint of your region),
+FLASK_SMTP_PORT (587), FLASK_SMTP_USER, FLASK_SMTP_PASSWORD
+FLASK_MAIL_FROM     the sender address (required), a verified SES identity
 """
 
 import logging
