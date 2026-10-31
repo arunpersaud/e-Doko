@@ -15,6 +15,11 @@ def index():
     return render_template("index.html", games=count)
 
 
+@site.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
 @site.route("/index.php")
 def legacy():
     """Links of the PHP site: index.php?action=game&me=<token> opens the seat."""

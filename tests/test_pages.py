@@ -21,3 +21,12 @@ def test_static_is_versioned(client):
     assert "pico.min.css?v=" in html
     response = client.get("/static/pico.min.css?v=x")
     assert "immutable" in response.headers["Cache-Control"]
+
+
+def test_the_privacy_page_is_public_and_linked_from_every_page(client):
+    page = client.get("/privacy")
+    assert page.status_code == 200
+    text = page.get_data(as_text=True)
+    for word in ("Cloudflare", "Amazon", "Gravatar", "passkey", "cookie"):
+        assert word in text
+    assert 'href="/privacy"' in client.get("/").get_data(as_text=True)

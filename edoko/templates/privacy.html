@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Privacy") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Privacy") }}</h1>
+<p><small>{{ _("Last changed: 2026-10-31") }}</small></p>
+
+<p>{% trans %}e-DoKo is a small site to play Doppelkopf with friends. It is run by Arun Persaud as a hobby. This page says what the site stores about you, who else gets to see it, and how to get rid of it.{% endtrans %}</p>
+
+<h2>{{ _("What is stored") }}</h2>
+<ul>
+  <li>{% trans %}Your account: the name you play under, your email address, your time zone and language, and your settings (how you want to get mail, your picture).{% endtrans %}</li>
+  <li>{% trans %}Your games: which tables and games you played in, the cards, the moves, the results, and the remarks you wrote in a game. Other players of a game see what you played and wrote there. Your cards in a game that is not over are never shown to anybody else.{% endtrans %}</li>
+  <li>{% trans %}Private notes you write on a game are only shown to you.{% endtrans %}</li>
+  <li>{% trans %}Passkeys: the public part of each passkey, its name, and when it was last used. The private part never leaves your device.{% endtrans %}</li>
+  <li>{% trans %}Login links by mail: only a scrambled form (a hash) of the link is kept, until it has been used or has expired.{% endtrans %}</li>
+  <li>{% trans %}Your picture: a generated one, or the one you uploaded, or a copy of your Gravatar if you asked for it. You can delete the copies in the settings.{% endtrans %}</li>
+  <li>{% trans %}Mails that could not be delivered: if a mail to your address bounces or is reported as unwanted, the address and the reason are noted, and no more mail is sent until it is fixed.{% endtrans %}</li>
+  <li>{% trans %}For a short time, a scrambled form of your address or your network address is kept to limit how often login links can be asked for.{% endtrans %}</li>
+</ul>
+
+<h2>{{ _("Logs") }}</h2>
+<p>{% trans %}The web server writes an access log: the network address of the visitor, the page asked for, the answer and the browser name. The secret links to a seat in a game (the links in the mails) are removed from this log. The log is used to find errors and abuse.{% endtrans %}</p>
+
+<h2>{{ _("Cookies") }}</h2>
+<ul>
+  <li>{% trans %}A session cookie that keeps you logged in and protects forms against forgery. It is only set when you log in or open a page with a form.{% endtrans %}</li>
+  <li>{% trans %}A cookie that remembers for 30 days that you did not want to create a passkey.{% endtrans %}</li>
+</ul>
+<p>{% trans %}There is no tracking, no advertising, no analytics, and the pages load nothing from other sites (no fonts, scripts or pictures).{% endtrans %}</p>
+
+<h2>{{ _("Who else is involved") }}</h2>
+<ul>
+  <li><strong>Cloudflare</strong>: {% trans %}the site is reached through Cloudflare (name service, protection against abuse, and the connection to the server). Cloudflare sees the traffic to the site.{% endtrans %}</li>
+  <li><strong>Amazon Web Services (SES)</strong>: {% trans %}the mails (invitations, login links, "it is your turn", the digest) are sent with Amazon SES. Amazon gets your address and the text of the mail.{% endtrans %}</li>
+  <li><strong>Gravatar</strong>: {% trans %}only if you press the button to fetch your Gravatar, the server asks gravatar.com for the picture of your address (a hash of the address is sent). Your browser never contacts Gravatar.{% endtrans %}</li>
+</ul>
+<p>{% trans %}Your data is not sold and not given to anybody else.{% endtrans %}</p>
+
+<h2>{{ _("Your rights") }}</h2>
+<p>{% trans %}You can ask for a copy of your data, for corrections, or to have your account deleted. Write to{% endtrans %} <!--email_off-->arun@nubati.net<!--/email_off-->.</p>
+{% endblock %}
