@@ -13,8 +13,8 @@ from collections import Counter
 from flask import abort
 from flask_babel import gettext as _
 
-from . import rules
-from .db import query, query_one
+from . import play, rules
+from .db import get_db, query, query_one
 
 OVER = "gameover"
 SPOTS = ("bottom", "left", "top", "right")
@@ -204,6 +204,9 @@ def build(
     else:
         selected, lead = None, "bottom"
     bubbles, strangers = speech_bubbles(selected, hands)
+    for remark in (r for rs in bubbles.values() for r in rs):
+        remark["own"] = remark["user_id"] == viewer_id and "icon" not in remark
+        remark["editable"] = remark["own"] and play.remark_editable(get_db(), remark["id"])
     seats = []
     for h in hands:
         party_known = over or h["point_call"] is not None or h["seat"] in queen_played
@@ -241,6 +244,7 @@ def build(
         "full": full,
         "over": over,
         "hands": hands,
+        "can_remark": mine is not None,
     }
     if full:
         context.update(result(game_id, hands, tricks))
@@ -297,7 +301,8 @@ def tricks_so_far(game_id: int) -> list[dict]:
     """All tricks played so far, with the public comments on the moves."""
     comments: dict[int, list] = {}
     for row in query(
-        """SELECT comment.play, comment.body, user.name, user.id AS user_id
+        """SELECT comment.id, comment.play, comment.body, comment.created_at,
+                  comment.edited_at, user.name, user.id AS user_id
            FROM comment JOIN user ON user.id = comment.user
            WHERE comment.game = ? AND comment.kind = 'move'
              AND comment.deleted_at IS NULL

@@ -122,6 +122,7 @@ def render_game(
         next=None,
         trick_url=trick_url,
         controls=None if full or base is None else play.controls(get_db(), game_id, user_id, base),
+        base=base,
     )
     if logged_in:
         # only games this viewer may open: their own, and those of the same deals

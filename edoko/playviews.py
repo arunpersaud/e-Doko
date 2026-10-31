@@ -15,7 +15,10 @@ from .db import get_db, query, query_one
 
 bp = Blueprint("playviews", __name__)
 
-ACTIONS = ("join", "decline", "declare", "play", "remind", "cancel", "take", "refuse", "giveback")
+ACTIONS = (
+    "join", "decline", "declare", "play", "remind", "cancel", "take", "refuse", "giveback",
+    "remark", "editremark", "deleteremark",
+)
 
 
 def act(hand, action: str):
@@ -33,7 +36,7 @@ def act(hand, action: str):
             call = form.get("call", type=int)
             if card is None:
                 raise play.PlayError("Please choose a card.")
-            play.play_card(db, hand["id"], card, call)
+            play.play_card(db, hand["id"], card, call, form.get("remark"))
         elif action == "take":
             play.take_trump(db, hand["id"], form.get("poor", type=int, default=0))
         elif action == "refuse":
@@ -43,6 +46,12 @@ def act(hand, action: str):
             if card is None:
                 raise play.PlayError("Please choose a card.")
             play.give_back(db, hand["id"], card)
+        elif action == "remark":
+            play.add_remark(db, hand["game"], hand["user"], form.get("play", type=int, default=0), form.get("body", ""))
+        elif action == "editremark":
+            play.edit_remark(db, form.get("remark", type=int, default=0), hand["user"], form.get("body", ""))
+        elif action == "deleteremark":
+            play.delete_remark(db, form.get("remark", type=int, default=0), hand["user"])
         elif action == "remind":
             play.remind(db, hand["game"], hand["user"])
             flash(_("An email has been sent out."))

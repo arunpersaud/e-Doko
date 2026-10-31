@@ -95,6 +95,7 @@
     <form method="post" action="{{ controls.base }}/play" class="play-form">
       <input type="hidden" name="csrf" value="{{ csrf_token() }}">
       <div class="hand">{% for c in s.cards %}{% if c.id in controls.legal %}<button type="submit" name="card" value="{{ c.id }}" class="card-button" title="{{ _('Play %(card)s', card=card_name(c)) }}">{{ card(c, "small") }}</button>{% else %}<span class="unplayable">{{ card(c, "small") }}</span>{% endif %}{% endfor %}</div>
+      <p><input type="text" name="remark" maxlength="500" placeholder="{{ _('Say something with your card (optional)') }}" aria-label="{{ _('Remark') }}"></p>
       <p><strong>{{ _("It is your turn: click a card.") }}</strong>
       {% if controls.calls %}<label class="announce">{{ _("Announce with it:") }}
         <select name="call"><option value="">–</option>{% for c in controls.calls %}<option value="{{ c.value }}">{{ c.words }}</option>{% endfor %}</select></label>{% endif %}</p>
@@ -109,7 +110,11 @@
     {% endif %}
     {% if s.bubbles %}
     <div class="bubbles bubbles-{{ s.spot }}">
-      {% for c in s.bubbles %}<p class="bubble{% if c.icon %} announcement{% endif %}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}{{ c.body }}{% endif %}</p>{% endfor %}
+      {% for c in s.bubbles %}<p class="bubble{% if c.icon %} announcement{% endif %}"><span class="who">{{ c.name }}:</span> {% if c.icon %}<img class="badge announce" src="{{ url_for('static', filename='icons/%s_button.png' % c.icon) }}" alt="{{ c.words }}" title="{{ c.words }}" width="28" height="28">{% else %}{{ c.body }}{% if c.edited_at %} <small class="muted">({{ _("edited") }})</small>{% endif %}{% endif %}</p>
+      {% if c.own and base %}<details class="bubble-edit"><summary>{{ _("change") }}</summary>
+        {% if c.editable %}<form method="post" action="{{ base }}/editremark"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="remark" value="{{ c.id }}"><input type="text" name="body" value="{{ c.body }}" maxlength="500" required aria-label="{{ _('Your remark') }}"><button type="submit" class="compact">{{ _("Save") }}</button></form>{% endif %}
+        <form method="post" action="{{ base }}/deleteremark"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="remark" value="{{ c.id }}"><button type="submit" class="compact secondary outline">{{ _("Delete") }}</button></form>
+      </details>{% endif %}{% endfor %}
     </div>
     {% endif %}
   </section>
@@ -138,6 +143,14 @@
       <span class="trick-label"><span>{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}</span><span class="trick-winner">{% if selected.winner_seat %}{{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% else %}&nbsp;{% endif %}</span></span>
       {% if n < tricks | length %}<a href="{{ trick_url(n + 1) }}#table" rel="next" hx-get="{{ trick_url(n + 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Next trick') }}">›</a>{% else %}<span class="off">›</span>{% endif %}
     </nav>
+    {% if can_remark and base and selected.plays %}
+    <form method="post" action="{{ base }}/remark" class="remark-form">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <select name="play" aria-label="{{ _('Remark on which card?') }}">{% for p in selected.plays %}<option value="{{ p.id }}">{{ names[p.seat] }}: {{ card_name(p) }}</option>{% endfor %}</select>
+      <input type="text" name="body" maxlength="500" required placeholder="{{ _('Your remark on this trick') }}" aria-label="{{ _('Your remark') }}">
+      <button type="submit" class="compact">{{ _("Say it") }}</button>
+    </form>
+    {% endif %}
     <p class="trick-numbers">
       {% for t in tricks %}<a href="{{ trick_url(t.number) }}#table"{% if t.number == selected.number %} aria-current="true"{% endif %} hx-get="{{ trick_url(t.number) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true">{{ t.number }}</a>{% endfor %}
     </p>

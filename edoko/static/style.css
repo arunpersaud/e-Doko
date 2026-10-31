@@ -236,3 +236,11 @@ button.card-button[type="submit"] { all: unset; cursor: pointer; display: inline
 button.card-button[type="submit"]:hover, button.card-button[type="submit"]:focus-visible { outline: 2px solid var(--pico-primary); }
 .unplayable img { opacity: 0.45; }
 .announce select { width: auto; display: inline-block; margin: 0 0 0 0.5rem; }
+
+/* remarks */
+.bubble-edit { font-size: 0.8rem; margin: 0 0 0.4rem; }
+.bubble-edit summary { cursor: pointer; color: var(--pico-muted-color); }
+.bubble-edit form { display: flex; gap: 0.3rem; margin: 0.2rem 0 0; }
+.bubble-edit input[type="text"], .bubble-edit button { margin: 0; }
+.remark-form { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.6rem 0; }
+.remark-form select, .remark-form input[type="text"], .remark-form button { margin: 0; width: auto; flex: 1 1 10rem; }

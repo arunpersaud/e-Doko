@@ -588,9 +588,14 @@ def start_play(db: sqlite3.Connection, game_id: int) -> list:
 
 
 def play_card(
-    db: sqlite3.Connection, hand_id: int, card: int, call: int | None = None
+    db: sqlite3.Connection,
+    hand_id: int,
+    card: int,
+    call: int | None = None,
+    remark: str | None = None,
 ) -> None:
-    """Play a card (with a call, if the player makes one with it)."""
+    """Play a card (with a call and/or a remark, if the player makes one with it)."""
+    remark = clean_remark(remark)
     notices: list = []
     with transaction(db):
         hand = _hand(db, hand_id)
@@ -641,6 +646,12 @@ def play_card(
                 "INSERT INTO comment (game, kind, play, user, body)"
                 " VALUES (?, 'move', ?, ?, ?)",
                 (game["id"], play_id, hand["user"], call_words(hand["party"], call)),
+            )
+        if remark:
+            db.execute(
+                "INSERT INTO comment (game, kind, play, user, body)"
+                " VALUES (?, 'move', ?, ?, ?)",
+                (game["id"], play_id, hand["user"], remark),
             )
 
         if len(state.tricks[-1]) < 4:
@@ -1231,3 +1242,71 @@ def give_back(db: sqlite3.Connection, hand_id: int, card: int) -> None:
             db.execute("UPDATE hand SET status = 'play' WHERE id = ?", (hand_id,))
             notices = maybe_start(db, hand["game"])
     notify(db, notices)
+
+
+# ---------------------------------------------------------------- remarks ---
+
+MAX_REMARK = 500
+EDIT_MINUTES = 15  # how long the author may still change a remark
+
+
+def clean_remark(text: str | None) -> str | None:
+    """The text of a remark without surrounding blanks and with single spaces
+    between lines; None if there is nothing."""
+    text = " ".join((text or "").split())
+    if len(text) > MAX_REMARK:
+        raise PlayError(_("A remark can have at most %(n)d characters.", n=MAX_REMARK))
+    return text or None
+
+
+def add_remark(db: sqlite3.Connection, game_id: int, user_id: int, play_id: int, text: str) -> None:
+    """A remark on a card played in this game (any player may write one)."""
+    body = clean_remark(text)
+    if body is None:
+        raise PlayError(_("Please write something."))
+    _player_hand(db, game_id, user_id)
+    found = db.execute(
+        "SELECT 1 FROM play JOIN trick ON trick.id = play.trick WHERE play.id = ? AND trick.game = ?",
+        (play_id, game_id),
+    ).fetchone()
+    if not found:
+        raise PlayError(_("There is no such card in this game."))
+    db.execute(
+        "INSERT INTO comment (game, kind, play, user, body) VALUES (?, 'move', ?, ?, ?)",
+        (game_id, play_id, user_id, body),
+    )
+
+
+def _own_remark(db: sqlite3.Connection, comment_id: int, user_id: int) -> sqlite3.Row:
+    row = db.execute("SELECT * FROM comment WHERE id = ?", (comment_id,)).fetchone()
+    if row is None or row["deleted_at"] is not None or row["user"] != user_id:
+        raise PlayError(_("You can only change your own remarks."))
+    return row
+
+
+def remark_editable(db: sqlite3.Connection, comment_id: int) -> bool:
+    row = db.execute(
+        "SELECT created_at > datetime('now', ?) FROM comment WHERE id = ?",
+        (f"-{EDIT_MINUTES} minutes", comment_id),
+    ).fetchone()
+    return bool(row and row[0])
+
+
+def edit_remark(db: sqlite3.Connection, comment_id: int, user_id: int, text: str) -> None:
+    """Change your own remark, within a few minutes of writing it."""
+    body = clean_remark(text)
+    if body is None:
+        raise PlayError(_("Please write something."))
+    _own_remark(db, comment_id, user_id)
+    if not remark_editable(db, comment_id):
+        raise PlayError(_("It is too late to change this remark, but you can delete it."))
+    db.execute(
+        "UPDATE comment SET body = ?, edited_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (body, comment_id),
+    )
+
+
+def delete_remark(db: sqlite3.Connection, comment_id: int, user_id: int) -> None:
+    """Delete your own remark (it stays in the database, marked as deleted)."""
+    _own_remark(db, comment_id, user_id)
+    db.execute("UPDATE comment SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?", (comment_id,))
