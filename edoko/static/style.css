@@ -231,7 +231,8 @@ img.badge.announce { width: 1.9rem; height: 1.9rem; vertical-align: middle; bord
 /* live play */
 .play-controls { margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--pico-muted-border-color); border-radius: var(--pico-border-radius); }
 .play-controls form.inline, .play-controls form.inline button { display: inline-block; width: auto; margin-right: 0.5rem; }
-.card-button { all: unset; cursor: pointer; display: inline-block; border-radius: 4px; }
-.card-button:hover, .card-button:focus-visible { outline: 2px solid var(--pico-primary); }
+/* (the selector must beat Pico's full-width submit buttons) */
+button.card-button[type="submit"] { all: unset; cursor: pointer; display: inline-block; border-radius: 4px; }
+button.card-button[type="submit"]:hover, button.card-button[type="submit"]:focus-visible { outline: 2px solid var(--pico-primary); }
 .unplayable img { opacity: 0.45; }
 .announce select { width: auto; display: inline-block; margin: 0 0 0 0.5rem; }

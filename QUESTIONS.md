@@ -13,3 +13,13 @@ Not committed; delete when answered.
 3. **Wedding and poverty are refused at the declaration** with a message ("can
    not be played on this site yet") until they are ported. Both club queens
    without declaring a wedding = silent solo (as in PHP).
+4. **Tables**: only *finished* games count towards `max_games` (a solo counts, a
+   canceled game does not and is dealt again). Tie at the end: all tied players are
+   shown as winners. Seats are drawn by lot at a new table. The new-table form
+   defaults to the PHP defaults (second ten wins, no Schweinchen, call on the first
+   own card) but low trump = "cancel" (poverty is not playable yet), and "number of
+   games" is empty = no end. What default do you want?
+5. "Keep playing" is offered after a finished game and after a game canceled for
+   nines/low trump (same dealer again, as PHP). Not after "a player does not want
+   to play" or a timeout (as in PHP). The same dealer repeats after a solo, but not
+   after a silent solo.

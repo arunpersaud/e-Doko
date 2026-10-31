@@ -11,7 +11,7 @@
 <h1>{{ _("Game %(id)d", id=game.id) }}</h1>
 {% if origin %}<p class="compare-note"><small>{{ _("Same deal as game %(id)d, the hands are in the same places.", id=origin) }} <a href="{{ url_for('games.game', game_id=origin) }}">{{ _("Back to game %(id)d", id=origin) }}</a></small></p>{% endif %}
 <div class="game-info">
-  <p>{{ game.created_at[:10] }} · {% if game.type %}{{ game.type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}</p>
+  <p>{{ game.created_at[:10] }} · {% set shown_type = "normal" if game.type == "solo" and game.solo == "silent" and not over else game.type %}{% if shown_type %}{{ shown_type }}{% if game.solo and over %} ({{ game.solo }}){% endif %} · {% endif %}{{ game.status }}</p>
   {% if full and card_points %}
   <p>{% if winner == "re" %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ _("Re") }} {{ card_points.re }} – {% if winner == "contra" %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ _("Contra") }} {{ card_points.contra }}</p>
   {% if winner %}

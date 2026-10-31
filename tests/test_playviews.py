@@ -114,3 +114,19 @@ def test_a_logged_in_player_can_play_on_the_game_page(app, conn):
     response = client.post(f"/game/{game_id}/join", data={"csrf": csrf(html)}, follow_redirects=True)
     assert response.status_code == 200
     assert conn.execute("SELECT status FROM hand WHERE game = ? AND seat = 1", (game_id,)).fetchone()[0] == "init"
+
+
+def test_a_silent_solo_is_not_announced_while_it_is_played(app, conn):
+    game_id = play.create_game(conn, [1, 2, 3, 4], RS)
+    conn.execute("DELETE FROM hand_card WHERE hand IN (SELECT id FROM hand WHERE game = ?)", (game_id,))
+    ids = {r["seat"]: r["id"] for r in conn.execute("SELECT id, seat FROM hand WHERE game = ?", (game_id,))}
+    cards = {1: [3, 4] + list(range(25, 35)), 2: list(range(5, 17)), 3: list(range(35, 47)), 4: [1, 2, 17, 18, 19, 20, 21, 22, 23, 24, 47, 48]}
+    for seat, mine in cards.items():
+        conn.executemany("INSERT INTO hand_card (hand, card) VALUES (?, ?)", [(ids[seat], c) for c in mine])
+    seats = {seat: Seat(app, token) for seat, token in tokens(conn, game_id).items()}
+    for seat in seats.values():
+        seat.post("join")
+        seat.post("declare", sickness="none")
+    assert conn.execute("SELECT solo FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "silent"
+    page = seats[2].page()
+    assert "normal · play" in page and "silent" not in page and "solo" not in page.split("<main")[1].split("</main>")[0]
