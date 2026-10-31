@@ -32,11 +32,17 @@ def hands(conn, game_id):
     }
 
 
-def start(conn, game_id, answers=None):
-    """Everybody joins and answers; answers: seat -> (sickness, solo)."""
+def start(conn, game_id, answers=None, wedding=False):
+    """Everybody joins and answers; answers: seat -> (sickness, solo).
+
+    wedding: whoever may declares a wedding (instead of a silent solo).
+    """
     for seat, h in hands(conn, game_id).items():
         play.join(conn, h["id"])
         sickness, solo = (answers or {}).get(seat, ("none", None))
+        state = play.load(conn, game_id)
+        if wedding and sickness == "none" and "wedding" in play.sickness_options(state.start[seat], state.rs):
+            sickness = "wedding"
         play.declare(conn, h["id"], sickness, solo)
 
 
@@ -167,14 +173,60 @@ def test_the_lowest_seat_wins_two_solos(app, conn):
     assert (game["solo"], game["start_seat"]) == ("heart", 2)
 
 
-def test_poverty_and_wedding_are_refused_for_now(app, conn):
+def test_poverty_is_refused_for_now(app, conn):
     with app.app_context():
         game_id = new_game(conn)
-        stack(conn, game_id, {1: [3, 4]})
+        stack(conn, game_id, {1: [1, 25, 33, 34, 27, 28, 29, 30, 31, 32, 35, 36]})
         h = hands(conn, game_id)[1]
         play.join(conn, h["id"])
-        with pytest.raises(play.PlayError):
-            play.declare(conn, h["id"], "wedding")
+        assert "poverty" in play.sickness_options(play.load(conn, game_id).start[1], RS)
+        with pytest.raises(play.PlayError, match="Poverty"):
+            play.declare(conn, h["id"], "poverty")
+
+
+def test_wedding_partner_is_the_first_to_win_a_trick_from_the_bride(app, conn):
+    with app.app_context():
+        game_id = new_game(conn)
+        stack(conn, game_id, {1: [3, 4, 25, 26], 2: [1, 2]})
+        start(conn, game_id, {1: ("wedding", None)})
+        game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+        assert (game["type"], game["sickness_state"], game["solo"]) == ("wedding", -1, None)
+        hs = hands(conn, game_id)
+        assert {s: h["party"] for s, h in hs.items()} == {1: "re", 2: "contra", 3: "contra", 4: "contra"}
+        assert play.possible_calls(play.load(conn, game_id), 1) == []  # not before the partner is known
+        play.play_card(conn, hs[1]["id"], 25)
+        play.play_card(conn, hs[2]["id"], 1)  # the ten of hearts wins
+        for seat in (3, 4):
+            state = play.load(conn, game_id)
+            play.play_card(conn, hs[seat]["id"], play.legal_cards(state, seat)[-1])
+        game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+        assert (game["sickness_state"], game["turn_seat"]) == (1, 2)
+        assert {s: h["party"] for s, h in hands(conn, game_id).items()} == {1: "re", 2: "re", 3: "contra", 4: "contra"}
+        # calls are possible now, as if the game had started one trick later
+        assert 120 in play.possible_calls(play.load(conn, game_id), 2)
+
+
+def test_a_bride_who_wins_three_tricks_plays_alone(app, conn):
+    rs = rules.Rules("none", "none", "none", "1st-own-card")  # the queens of clubs are the top cards
+    with app.app_context():
+        game_id = new_game(conn, rs)
+        stack(conn, game_id, {1: [3, 4, 5, 6]})
+        start(conn, game_id, {1: ("wedding", None)})
+        hs = hands(conn, game_id)
+        rng = random.Random(1)
+        for card in (3, 4, 5):
+            while conn.execute("SELECT turn_seat FROM game WHERE id = ?", (game_id,)).fetchone()[0] != 1:
+                seat = conn.execute("SELECT turn_seat FROM game WHERE id = ?", (game_id,)).fetchone()[0]
+                play.play_card(conn, hs[seat]["id"], rng.choice(play.legal_cards(play.load(conn, game_id), seat)))
+            play.play_card(conn, hs[1]["id"], card)
+            for _ in range(3):
+                seat = conn.execute("SELECT turn_seat FROM game WHERE id = ?", (game_id,)).fetchone()[0]
+                play.play_card(conn, hs[seat]["id"], rng.choice(play.legal_cards(play.load(conn, game_id), seat)))
+        game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+        assert game["sickness_state"] == 3
+        assert sorted(h["party"] for h in hands(conn, game_id).values()) == ["contra", "contra", "contra", "re"]
+        play_out(conn, game_id, rng)
+    assert conn.execute("SELECT status FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "gameover"
 
 
 def test_follow_suit_and_wrong_turn(app, conn):
@@ -249,6 +301,8 @@ def test_random_games_play_to_the_end(app, conn, seed):
             play.join(conn, h["id"])
             if seat in answers:
                 play.declare(conn, h["id"], *answers[seat])
+            elif seed % 2 and "wedding" in play.sickness_options(play.load(conn, game_id).start[seat], rs):
+                play.declare(conn, h["id"], "wedding")
             else:
                 play.declare(conn, h["id"], "none")
         play_out(conn, game_id, rng)
@@ -261,13 +315,12 @@ def test_random_games_play_to_the_end(app, conn, seed):
     assert conn.execute("SELECT count(*) FROM play JOIN trick ON trick.id = play.trick WHERE game = ?", (game_id,)).fetchone()[0] == 48
     hs = hands(conn, game_id)
     assert {h["status"] for h in hs.values()} == {"gameover"}
-    assert sum(h["points"] for h in hs.values()) == 0
-    # nobody has a wedding or a poverty here, so a game is 2 against 2 (re/contra),
-    # or one against three in a solo (also a silent one: both club queens in a hand)
+    # 2 against 2, or one against three in a solo (also a silent one: both club
+    # queens in a hand) and in a wedding where nobody won a trick from the bride
     parties = sorted(h["party"] for h in hs.values())
-    solo = game["type"] == "solo"
     assert parties in (["contra", "contra", "re", "re"], ["contra", "contra", "contra", "re"])
-    assert (parties.count("re") == 1) == solo
+    if game["type"] == "solo":
+        assert parties.count("re") == 1 and sum(h["points"] for h in hs.values()) == 0
     # a finished game can be shown to its players
 
 
@@ -286,7 +339,7 @@ def test_live_games_pass_the_replay_check(app, conn, database):
             )
             game_id = new_game(conn, rs)
             solo = {rng.randint(1, 4): ("solo", rng.choice(play.SOLOS))} if n % 3 == 0 else {}
-            start(conn, game_id, solo)
+            start(conn, game_id, solo, wedding=n % 2 == 1)
             play_out(conn, game_id, rng)
     ok, bad = replay_check.check(database)
     bad.pop("_diff", None)

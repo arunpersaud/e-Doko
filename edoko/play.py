@@ -292,6 +292,13 @@ def can_call(state: State, seat: int, what: int) -> int:
         for s, h in state.hands.items()
         if s != seat and h["party"] == hand["party"] and h["point_call"] is not None
     ]
+    offset = 0
+    if state.game["type"] == "wedding":
+        # calls wait until the partner is known, then count as if the game
+        # had started that many tricks later
+        offset = state.game["sickness_state"]
+        if offset is None or offset < 0:
+            return 0
     return call_allowed(
         state.rs.call,
         what,
@@ -299,6 +306,7 @@ def can_call(state: State, seat: int, what: int) -> int:
         partner=min(partner_calls) if partner_calls else None,
         cards=len(state.held[seat]),
         all_cards=sum(len(c) for c in state.held.values()),
+        offset=offset,
     )
 
 
@@ -481,8 +489,6 @@ def declare(
                 raise PlayError(_("That kind of solo does not exist."))
         elif sickness not in sickness_options(state.start[seat], state.rs):
             raise PlayError(_("Your cards do not allow that."))
-        if sickness == "wedding":
-            raise PlayError(_("A wedding can not be played on this site yet."))
         if sickness in ("poverty", "lowtrump") and not (
             sickness == "lowtrump" and state.rs.lowtrump == "cancel"
         ):
@@ -531,10 +537,20 @@ def start_play(db: sqlite3.Connection, game_id: int) -> list:
         db.execute(
             "UPDATE hand SET status = 'play', party = ? WHERE id = ?", (party, hand["id"])
         )
-    if game["type"] == "normal" and any({3, 4} <= set(c) for c in state.start.values()):
-        # both club queens in one hand and no wedding: a silent solo, played like
-        # a normal game (that player is Re alone and counts triple)
-        db.execute("UPDATE game SET type = 'solo', solo = 'silent' WHERE id = ?", (game_id,))
+    if game["type"] == "normal":
+        if any(h["sickness"] == "wedding" for h in state.hands.values()):
+            # Re is the player with both club queens; the partner is the first one
+            # to win a trick (of the first three) from them, see play_card
+            db.execute(
+                "UPDATE game SET type = 'wedding', sickness_state = -1 WHERE id = ?",
+                (game_id,),
+            )
+        elif any({3, 4} <= set(c) for c in state.start.values()):
+            # both club queens in one hand and no wedding: a silent solo, played
+            # like a normal game (that player is Re alone and counts triple)
+            db.execute(
+                "UPDATE game SET type = 'solo', solo = 'silent' WHERE id = ?", (game_id,)
+            )
     db.execute(
         "UPDATE game SET status = 'play', turn_seat = start_seat,"
         " updated_at = CURRENT_TIMESTAMP WHERE id = ?",
@@ -608,6 +624,16 @@ def play_card(
                     foxes.played(c)
             winner = rules.trick_winner(state.tricks[-1], state.mode, state.rs, foxes)
             db.execute("UPDATE trick SET winner_seat = ? WHERE id = ?", (winner, trick_id))
+            number = len(state.tricks)
+            if game["type"] == "wedding" and game["sickness_state"] == -1:
+                wedding = next(s for s, h in state.hands.items() if h["sickness"] == "wedding")
+                if number <= 3 and winner != wedding:
+                    db.execute(
+                        "UPDATE hand SET party = 're' WHERE id = ?", (state.hands[winner]["id"],)
+                    )
+                    db.execute("UPDATE game SET sickness_state = ? WHERE id = ?", (number, game["id"]))
+                elif number == 3:  # the wedding player won all three: alone
+                    db.execute("UPDATE game SET sickness_state = 3 WHERE id = ?", (game["id"],))
             if len(state.tricks) < 12:
                 db.execute(
                     "UPDATE game SET turn_seat = ?, updated_at = CURRENT_TIMESTAMP"
@@ -749,9 +775,11 @@ def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> d
         elif hand["status"] == "init":
             found["stage"] = "declare"
             options = sickness_options(state.start[seat], state.rs)
-            # (wedding and poverty are not played yet, see declare)
+            # (poverty is not played yet, see declare)
             found["sickness"] = [
-                o for o in options if o == "nines" or (o == "lowtrump" and state.rs.lowtrump == "cancel")
+                o
+                for o in options
+                if o in ("wedding", "nines") or (o == "lowtrump" and state.rs.lowtrump == "cancel")
             ]
             found["solos"] = SOLOS
     elif game["turn_seat"] == seat:

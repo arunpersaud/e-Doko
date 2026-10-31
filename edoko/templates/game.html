@@ -47,9 +47,10 @@
         </select></label>
       {% for option in controls.sickness %}
       <label><input type="radio" name="sickness" value="{{ option }}">
-        {% if option == "nines" %}{{ _("I have five or more nines") }}{% elif option == "lowtrump" %}{{ _("I only have low trump") }}{% else %}{{ option }}{% endif %}</label>
+        {% if option == "wedding" %}{{ _("I have both club queens and want a wedding (a partner will be found in the first three tricks)") }}{% elif option == "nines" %}{{ _("I have five or more nines") }}{% elif option == "lowtrump" %}{{ _("I only have low trump") }}{% else %}{{ option }}{% endif %}</label>
       {% endfor %}
     </fieldset>
+    {% if "wedding" in controls.sickness %}<p><small>{{ _("With both club queens and no wedding you play a silent solo, alone against the three others.") }}</small></p>{% endif %}
     <button type="submit">{{ _("Done") }}</button>
   </form>
   {% elif controls.stage == "wait" %}
