@@ -737,6 +737,13 @@ def notify(db: sqlite3.Connection, notices: list) -> None:
                     "turn", turn=True, game_id=game_id, first=notice[2],
                     link=_link(h["token"]),
                 )
+        elif kind == "reminder":
+            h = next((h for h in hands if h["seat"] == game["turn_seat"]), None)
+            if h is not None:
+                _mail(
+                    db, h["user"], _l("Reminder: game %(id)d, it is your turn", id=game_id),
+                    "reminder", game_id=game_id, link=_link(h["token"]),
+                )
         elif kind == "canceled":
             reasons = {
                 "cancel-noplay": _l("one of the players does not want to play"),
@@ -776,7 +783,10 @@ def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> d
     if game["status"] not in ACTIVE or seat is None:
         return None
     hand = state.hands[seat]
-    found: dict = {"base": base, "stage": "wait", "legal": set(), "calls": []}
+    found: dict = {
+        "base": base, "stage": "wait", "legal": set(), "calls": [],
+        "idle_days": idle_days(db, game_id),
+    }
     if game["status"] == "pre":
         if hand["status"] == "start":
             found["stage"] = "join"
@@ -919,3 +929,68 @@ def same_table_again(db: sqlite3.Connection, session_id: int, user_id: int) -> i
         db, user_id, [p for p in players if p != user_id],
         rules.Rules(*tuple(rs)), state["max_games"],
     )
+
+
+# ------------------------------------------------- idle games: remind, cancel ---
+
+REMIND_AFTER_DAYS = 7  # nothing happened for a week: the others may send a reminder
+CANCEL_AFTER_DAYS = 30  # ... for a month: a player may cancel the game
+
+
+def idle_days(db: sqlite3.Connection, game_id: int) -> int:
+    row = db.execute(
+        "SELECT cast(julianday('now') - julianday(updated_at) AS INTEGER) FROM game WHERE id = ?",
+        (game_id,),
+    ).fetchone()
+    return row[0] if row else 0
+
+
+def _player_hand(db: sqlite3.Connection, game_id: int, user_id: int) -> sqlite3.Row:
+    hand = db.execute(
+        "SELECT * FROM hand WHERE game = ? AND user = ?", (game_id, user_id)
+    ).fetchone()
+    if hand is None:
+        raise PlayError(_("You are not a player of this game."))
+    return hand
+
+
+def remind(db: sqlite3.Connection, game_id: int, user_id: int) -> None:
+    """Mail the player whose turn it is, if everybody has waited for a week.
+
+    One reminder per game and week.
+    """
+    with transaction(db):
+        _player_hand(db, game_id, user_id)
+        game = db.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+        if game["status"] not in ACTIVE or game["turn_seat"] is None:
+            raise PlayError(_("This game is not waiting for anybody."))
+        if idle_days(db, game_id) < REMIND_AFTER_DAYS:
+            raise PlayError(_("You need to wait longer before you can send out a reminder."))
+        target = db.execute(
+            "SELECT user FROM hand WHERE game = ? AND seat = ?", (game_id, game["turn_seat"])
+        ).fetchone()[0]
+        if target == user_id:
+            raise PlayError(_("It is your own turn."))
+        if db.execute(
+            "SELECT 1 FROM reminder WHERE game = ? AND created_at > datetime('now', ?)",
+            (game_id, f"-{REMIND_AFTER_DAYS} days"),
+        ).fetchone():
+            raise PlayError(_("A reminder has already been sent out."))
+        db.execute(
+            "INSERT INTO reminder (game, from_user, to_user) VALUES (?, ?, ?)",
+            (game_id, user_id, target),
+        )
+    notify(db, [("reminder", game_id)])
+
+
+def cancel_idle(db: sqlite3.Connection, game_id: int, user_id: int) -> None:
+    """Cancel a game nothing has happened in for a month."""
+    with transaction(db):
+        _player_hand(db, game_id, user_id)
+        game = db.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+        if game["status"] not in ACTIVE:
+            raise PlayError(_("This game is over already."))
+        if idle_days(db, game_id) < CANCEL_AFTER_DAYS:
+            raise PlayError(_("You need to wait longer before you can cancel a game."))
+        notices = cancel(db, game_id, "cancel-timedout")
+    notify(db, notices)

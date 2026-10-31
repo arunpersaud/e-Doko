@@ -130,3 +130,33 @@ def test_a_silent_solo_is_not_announced_while_it_is_played(app, conn):
     assert conn.execute("SELECT solo FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "silent"
     page = seats[2].page()
     assert "normal · play" in page and "silent" not in page and "solo" not in page.split("<main")[1].split("</main>")[0]
+
+
+def idle(conn, game_id, days):
+    conn.execute("UPDATE game SET updated_at = datetime('now', ?) WHERE id = ?", (f"-{days} days", game_id))
+
+
+def test_reminders_and_cancelling_an_idle_game(app, conn):
+    game_id = play.create_game(conn, [1, 2, 3, 4], RS)
+    app.outbox.clear()
+    seats = {seat: Seat(app, token) for seat, token in tokens(conn, game_id).items()}
+    html = seats[2].post("remind").get_data(as_text=True)
+    assert "wait longer" in html and not app.outbox
+    idle(conn, game_id, 8)
+    assert "Remind the player" in seats[2].page()
+    assert "It is your own turn" in seats[1].post("remind").get_data(as_text=True)  # seat 1 is on turn
+    assert "An email has been sent out." in seats[2].post("remind").get_data(as_text=True)
+    assert [m["To"] for m in app.outbox] == ["a@x.org"] and "reminder" in app.outbox[0]["Subject"].lower()
+    assert "already been sent" in seats[3].post("remind").get_data(as_text=True)
+    assert conn.execute("SELECT count(*) FROM reminder").fetchone()[0] == 1
+    assert "wait longer" in seats[2].post("cancel").get_data(as_text=True)
+    idle(conn, game_id, 31)
+    assert "Cancel this game" in seats[2].page()
+    app.outbox.clear()
+    seats[2].post("cancel")
+    assert conn.execute("SELECT status FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "cancel-timedout"
+    assert len(app.outbox) == 4
+    # a game that is over can not be canceled again
+    with seats[2].client.session_transaction() as session:
+        session["csrf"] = "t"
+    assert "over already" in seats[2].post("cancel", csrf="t").get_data(as_text=True)

@@ -1,0 +1,7 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans id=game_id %}It is your turn in game {{ id }}. Everybody else has been waiting for you for more than a week now ;){% endtrans %}
+
+{% trans %}Please use this link to continue:{% endtrans %}
+
+{{ link }}
