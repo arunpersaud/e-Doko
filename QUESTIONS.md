@@ -23,3 +23,13 @@ Not committed; delete when answered.
    nines/low trump (same dealer again, as PHP). Not after "a player does not want
    to play" or a timeout (as in PHP). The same dealer repeats after a solo, but not
    after a silent solo.
+6. **Poverty** is ported as in PHP (trump <27 goes to the taker, who gives the same
+   number of *any* cards back one click at a time; poor player + taker are Re).
+   Differences, on purpose: in a double poverty PHP asks seat 3 first whenever seat 1
+   is poor (a bug: seat 3 can be poor too); I ask the first seat that is not poor.
+   Three or four poor players: the game is canceled ("nobody wanted the trump").
+   A poor player's page just says "waiting" while the others decide.
+7. **Reminder/cancel**: a reminder after 7 idle days, one per game and week, to the
+   player on turn (PHP: once per player and game, ever). Cancel after 30 idle days.
+8. The **German translations** (po/de.po) are not updated for the new texts of live
+   play yet; the pages are English for German users until then.

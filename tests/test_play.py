@@ -525,3 +525,33 @@ def test_random_games_with_everything_pass_the_replay_check(app, conn, database,
     bad["incomplete tricks"].remove(1)  # the stub game of the shared fixture
     bad = {kind: games for kind, games in bad.items() if games}
     assert not bad, bad
+
+
+def remarks(conn, game_id):
+    return [
+        r[0]
+        for r in conn.execute(
+            "SELECT body FROM comment WHERE game = ? ORDER BY id", (game_id,)
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    "rule, called, expected",
+    [("both", False, 2), ("second", False, 1), ("none", False, 0),
+     ("secondaftercall", False, 0), ("secondaftercall", True, 1)],
+)
+def test_the_remark_when_schweinchen_comes_into_force(app, conn, rule, called, expected):
+    rs = rules.Rules("secondwins", rule, "none", "1st-own-card")
+    game_id = new_game(conn, rs)
+    # seat 1 has both foxes and wins the first two tricks with them: the others
+    # only have low diamonds to follow with
+    stack(conn, game_id, {1: [19, 20, 5, 6], 2: [21, 22, 3], 3: [23, 24, 4], 4: [25, 26]})
+    start(conn, game_id)
+    hs = hands(conn, game_id)
+    for fox in (19, 20):
+        play.play_card(conn, hs[1]["id"], fox, call=120 if called and fox == 19 else None)
+        for seat in (2, 3, 4):
+            play.play_card(conn, hs[seat]["id"], play.legal_cards(play.load(conn, game_id), seat)[0])
+        assert conn.execute("SELECT winner_seat FROM trick ORDER BY number DESC LIMIT 1").fetchone()[0] == 1
+    assert remarks(conn, game_id).count("Schweinchen! ") == expected

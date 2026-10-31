@@ -596,6 +596,7 @@ def play_card(
             )
             state.hands[seat] = _hand(db, hand_id)
 
+        schweinchen = _schweinchen_played(state, card)
         if state.current:
             trick_id = db.execute(
                 "SELECT id FROM trick WHERE game = ? ORDER BY number DESC LIMIT 1",
@@ -613,6 +614,12 @@ def play_card(
         ).lastrowid
         state.tricks[-1].append((seat, card))
         state.held[seat].remove(card)
+        if schweinchen:
+            db.execute(
+                "INSERT INTO comment (game, kind, play, user, body)"
+                " VALUES (?, 'move', ?, ?, 'Schweinchen! ')",
+                (game["id"], play_id, hand["user"]),
+            )
         if call is not None:
             db.execute(
                 "INSERT INTO comment (game, kind, play, user, body)"
@@ -653,6 +660,25 @@ def play_card(
             else:
                 notices += finish(db, state)
     notify(db, notices)
+
+
+def _schweinchen_played(state: State, card: int) -> bool:
+    """Does playing this fox now bring the Schweinchen into force (a remark on the move)?"""
+    if card not in rules.FOXES:
+        return False
+    foxes = state.foxes()
+    if foxes.holder is None:
+        return False
+    for trick in state.tricks:
+        for _seat, c in trick:
+            foxes.played(c)
+    foxes.played(card)
+    rule = state.rs.schweinchen
+    return (
+        rule == "both"
+        or (rule == "second" and foxes.second_played)
+        or (rule == "secondaftercall" and foxes.second_played and foxes.called)
+    )
 
 
 def finish(db: sqlite3.Connection, state: State) -> list:
