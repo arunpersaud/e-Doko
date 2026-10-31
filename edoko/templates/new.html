@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ _("New table") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("New table") }}</h1>
+<form method="post" action="{{ url_for('playviews.new') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <h2>{{ _("Select the players") }}</h2>
+  <p>{{ _("You play too. The seats are drawn by lot; everybody gets an invitation by mail.") }}</p>
+  {% for n in range(3) %}
+  <label>{{ _("Player %(n)d", n=n + 2) }}
+    <select name="player" required>
+      <option value="">–</option>
+      {% for p in players %}<option value="{{ p.id }}"{% if picked[n] == p.id %} selected{% endif %}>{{ p.name }}</option>{% endfor %}
+    </select>
+  </label>
+  {% endfor %}
+  <label>{{ _("Number of games at this table (empty: no end)") }}
+    <input type="number" name="max_games" min="1" max="99" value="{{ max_games }}">
+  </label>
+  <h2>{{ _("Rules") }}</h2>
+  <label>{{ _("Ten of hearts (dullen)") }}
+    <select name="dullen">{% for value, text in labels.dullen.items() %}<option value="{{ value }}"{% if chosen.dullen == value %} selected{% endif %}>{{ text }}</option>{% endfor %}</select>
+  </label>
+  <label>{{ _("Schweinchen (both foxes), only in normal games or silent solos") }}
+    <select name="schweinchen">{% for value, text in labels.schweinchen.items() %}<option value="{{ value }}"{% if chosen.schweinchen == value %} selected{% endif %}>{{ text }}</option>{% endfor %}</select>
+  </label>
+  <label>{{ _("Call Re/Contra, etc.") }}
+    <select name="call">{% for value, text in labels.call.items() %}<option value="{{ value }}"{% if chosen.call == value %} selected{% endif %}>{{ text }}</option>{% endfor %}</select>
+  </label>
+  <label>{{ _("Low trump (none of the trump is higher than a fox)") }}
+    <select name="lowtrump">{% for value, text in labels.lowtrump.items() %}<option value="{{ value }}"{% if chosen.lowtrump == value %} selected{% endif %}>{{ text }}</option>{% endfor %}</select>
+  </label>
+  <p><small>{{ _("Poverty (very few trump, given to a partner) is not played on this site yet.") }}</small></p>
+  <button type="submit">{{ _("Start the game") }}</button>
+</form>
+{% endblock %}

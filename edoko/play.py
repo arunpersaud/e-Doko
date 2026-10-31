@@ -350,11 +350,13 @@ def create_game(
     rs: rules.Rules | None = None,
     *,
     session: int | None = None,
+    max_games: int | None = None,
 ) -> int:
     """A new game in 'pre': players are the user ids in seat order.
 
     session: another game at the same table (the rules are taken from the last
     game of it, and it must not have a game in progress), else a new table.
+    max_games: for a new table, the number of games it is played for (None: no end).
     """
     if len(players) != 4 or len(set(players)) != 4:
         raise PlayError(_("A game needs four different players."))
@@ -369,7 +371,11 @@ def create_game(
         if session is None:
             if rs is None:
                 raise PlayError(_("The rules are missing."))
-            session = db.execute("INSERT INTO session DEFAULT VALUES").lastrowid
+            if max_games is not None and max_games < 1:
+                raise PlayError(_("A table needs at least one game."))
+            session = db.execute(
+                "INSERT INTO session (max_games) VALUES (?)", (max_games,)
+            ).lastrowid
             ruleset = ruleset_id(db, rs)
         else:
             if db.execute(
@@ -377,6 +383,8 @@ def create_game(
                 (session,),
             ).fetchone():
                 raise PlayError(_("There is already a game going on at this table."))
+            if table_state(db, session)["closed"]:
+                raise PlayError(_("This table is finished."))
             last = db.execute(
                 "SELECT ruleset FROM game WHERE session = ? ORDER BY id DESC LIMIT 1",
                 (session,),
@@ -792,3 +800,122 @@ def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> d
     else:
         found["stage"] = "wait_turn"
     return found
+
+
+# ------------------------------------------------------------- tables ---
+
+REPEATED = ("cancel-nines", "cancel-trump", "cancel-lowtrump")
+RULE_CHOICES = {
+    "dullen": ("none", "firstwins", "secondwins"),
+    "schweinchen": ("none", "both", "second", "secondaftercall"),
+    "lowtrump": ("poverty", "cancel", "none"),
+    "call": ("1st-own-card", "5th-card", "9-cards"),
+}
+
+
+def table_state(db: sqlite3.Connection, session_id: int) -> dict:
+    """How far a table is: games played, the end (if it has one), the standings.
+
+    Only finished games count (a canceled game is dealt again). The winner is the
+    player with most game points; a tie leaves several.
+    """
+    row = db.execute("SELECT max_games FROM session WHERE id = ?", (session_id,)).fetchone()
+    standings = [
+        dict(r)
+        for r in db.execute(
+            """SELECT user.id, user.name, coalesce(sum(hand.points), 0) AS points
+               FROM session_player JOIN user ON user.id = session_player.user
+               LEFT JOIN (SELECT hand.user, hand.points FROM hand
+                          JOIN game ON game.id = hand.game
+                          WHERE game.session = :s AND game.status = 'gameover') hand
+                 ON hand.user = user.id
+               WHERE session_player.session = :s
+               GROUP BY user.id ORDER BY points DESC, user.name""",
+            {"s": session_id},
+        )
+    ]
+    played = db.execute(
+        "SELECT count(*) FROM game WHERE session = ? AND status = 'gameover'", (session_id,)
+    ).fetchone()[0]
+    max_games = row["max_games"] if row else None
+    closed = max_games is not None and played >= max_games
+    best = standings[0]["points"] if standings else 0
+    return {
+        "max_games": max_games,
+        "played": played,
+        "closed": closed,
+        "standings": standings,
+        "winners": [s["name"] for s in standings if s["points"] == best] if closed else [],
+    }
+
+
+def next_players(db: sqlite3.Connection, game_id: int) -> list[int] | None:
+    """The players (seat order) of the next game at this table, if one can follow.
+
+    Seats rotate by one, unless the game was a solo (not a silent one) or was
+    canceled because of nines or low trump: then the same player deals again.
+    """
+    game = db.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+    if game is None or game["status"] not in ("gameover", *REPEATED):
+        return None
+    last = db.execute(
+        "SELECT max(id) FROM game WHERE session = ?", (game["session"],)
+    ).fetchone()[0]
+    if last != game_id or table_state(db, game["session"])["closed"]:
+        return None
+    users = [
+        r[0]
+        for r in db.execute("SELECT user FROM hand WHERE game = ? ORDER BY seat", (game_id,))
+    ]
+    solo = game["type"] == "solo" and game["solo"] != "silent"
+    return users if solo or game["status"] in REPEATED else users[1:] + users[:1]
+
+
+def next_game(db: sqlite3.Connection, game_id: int, user_id: int) -> int:
+    """"Keep playing": the next game at the same table, started by one of its players."""
+    players = next_players(db, game_id)
+    if players is None:
+        raise PlayError(_("This table can not continue."))
+    if user_id not in players:
+        raise PlayError(_("Only the players of the table can continue it."))
+    session = db.execute("SELECT session FROM game WHERE id = ?", (game_id,)).fetchone()[0]
+    return create_game(db, players, session=session)
+
+
+def new_table(
+    db: sqlite3.Connection,
+    creator: int,
+    others: list[int],
+    rs: rules.Rules,
+    max_games: int | None = None,
+) -> int:
+    """A new table with the creator and three others, in random seats."""
+    for key, choices in RULE_CHOICES.items():
+        value = rs.call if key == "call" else getattr(rs, key)
+        if value not in choices:
+            raise PlayError(_("Unknown rules."))
+    if creator in others or len(set(others)) != 3:
+        raise PlayError(_("Please choose three other players."))
+    players = [creator, *others]
+    random.SystemRandom().shuffle(players)
+    return create_game(db, players, rs, max_games=max_games)
+
+
+def same_table_again(db: sqlite3.Connection, session_id: int, user_id: int) -> int:
+    """A new table with the same players, rules and length (after one has ended)."""
+    state = table_state(db, session_id)
+    if not state["closed"]:
+        raise PlayError(_("This table is not finished yet."))
+    players = [s["id"] for s in state["standings"]]
+    if user_id not in players:
+        raise PlayError(_("Only the players of the table can do that."))
+    rs = db.execute(
+        """SELECT ruleset.dullen, ruleset.schweinchen, ruleset.lowtrump, ruleset.call
+           FROM game JOIN ruleset ON ruleset.id = game.ruleset
+           WHERE game.session = ? ORDER BY game.id DESC LIMIT 1""",
+        (session_id,),
+    ).fetchone()
+    return new_table(
+        db, user_id, [p for p in players if p != user_id],
+        rules.Rules(*tuple(rs)), state["max_games"],
+    )

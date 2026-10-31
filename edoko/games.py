@@ -133,6 +133,11 @@ def render_game(
         )
         if full:
             context["others"] = other_tables(user_id, game_id)
+    if logged_in:
+        following = play.next_players(get_db(), game_id)
+        context["can_continue"] = following is not None and user_id in following
+    else:
+        context["can_continue"] = False
     response = render_template("game.html", **context)
     return response, 200, PRIVATE
 
@@ -200,7 +205,11 @@ def table(session_id):
     rows = [x for x in my_games(g.user["id"]) if x["session"] == session_id]
     return (
         render_template(
-            "table.html", session_id=session_id, players=players, games=rows
+            "table.html",
+            session_id=session_id,
+            players=players,
+            games=rows,
+            state=play.table_state(get_db(), session_id),
         ),
         200,
         PRIVATE,

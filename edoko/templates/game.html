@@ -131,6 +131,14 @@
 {% endif %}
 </div>
 
+{% if can_continue %}
+<form method="post" action="{{ url_for('playviews.keep_playing', game_id=game.id) }}" class="play-controls">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <p>{{ _("Do you want to continue playing? This starts a new game at this table.") }}</p>
+  <button type="submit">{{ _("Keep playing") }}</button>
+</form>
+{% endif %}
+
 {% if not full %}
 <p><small>{{ _("The hands of the others are shown when the game is over, and only to players who have finished this deal themselves.") }}</small></p>
 {% endif %}

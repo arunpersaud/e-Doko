@@ -3,6 +3,26 @@
 {% block content %}
 <h1>{{ _("Table %(n)d", n=session_id) }}</h1>
 <p>{{ players | map(attribute="name") | join(", ") }}</p>
+{% if state.max_games %}
+<p>{{ _("%(played)d of %(max)d games played.", played=state.played, max=state.max_games) }}
+  {% if state.closed %}<strong>{{ _("This table is finished.") }}</strong>{% endif %}</p>
+{% endif %}
+{% if state.played %}
+<table>
+  <thead><tr><th>{{ _("Player") }}</th><th>{{ _("Points") }}</th></tr></thead>
+  <tbody>
+    {% for s in state.standings %}
+    <tr><td>{% if s.name in state.winners %}<span class="winner" role="img" aria-label="{{ _('Winner') }}" title="{{ _('Winner') }}">🏆</span> {% endif %}{{ s.name }}</td><td>{{ s.points }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% if state.closed and current_user and current_user.id in state.standings | map(attribute="id") %}
+<form method="post" action="{{ url_for('playviews.table_again', session_id=session_id) }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <button type="submit">{{ _("New table with the same players") }}</button>
+</form>
+{% endif %}
 <ul>
   {% for x in games %}{% include "_game_row.html" %}{% endfor %}
 </ul>

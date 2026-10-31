@@ -5,11 +5,13 @@ a logged-in player can do the same on /game/<id>/... Both end up at the same
 page again (post, redirect, get), with a message if something was refused.
 """
 
-from flask import Blueprint, abort, flash, g, redirect, request, url_for
+from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
+from flask_babel import gettext as _
+from flask_babel import lazy_gettext as _l
 
-from . import play
+from . import play, rules
 from .auth import login_required
-from .db import get_db, query_one
+from .db import get_db, query, query_one
 
 bp = Blueprint("playviews", __name__)
 
@@ -55,3 +57,93 @@ def game_action(game_id, action):
         abort(404)
     act(hand, action)
     return redirect(url_for("games.game", game_id=game_id, trick=None, origin=None))
+
+
+# the words of the rule choices (as on the PHP site); poverty is not offered yet
+RULE_LABELS = {
+    "dullen": {
+        "none": _l("just normal non-trump"),
+        "firstwins": _l("first ten of hearts wins the trick"),
+        "secondwins": _l("second ten of hearts wins the trick"),
+    },
+    "schweinchen": {
+        "none": _l("none"),
+        "both": _l("both become highest trump (automatic call at beginning of the game)"),
+        "second": _l("first one normal, second one becomes highest (call during the game)"),
+        "secondaftercall": _l("second one become highest only in case re/contra was announced"),
+    },
+    "call": {
+        "1st-own-card": _l("Can call re/contra on the first own card played, 90 on the second, etc."),
+        "5th-card": _l("Can call re/contra until 5th card is played, 90 until 9th card is played, etc."),
+        "9-cards": _l("Can call re/contra until 5th card is played, 90 if player still has 9 cards, etc."),
+    },
+    "lowtrump": {
+        "cancel": _l("The game will be canceled unless there is a solo."),
+        "none": _l("Bad luck, the player needs to play a normal game."),
+    },
+}
+DEFAULT_RULES = {
+    "dullen": "secondwins",
+    "schweinchen": "none",
+    "call": "1st-own-card",
+    "lowtrump": "cancel",
+}
+
+
+def candidates():
+    return query(
+        "SELECT id, name FROM user WHERE open_for_games = 1 AND disabled_at IS NULL"
+        " AND id != ? ORDER BY name",
+        (g.user["id"],),
+    )
+
+
+@bp.route("/new", methods=["GET", "POST"])
+@login_required
+def new():
+    chosen = dict(DEFAULT_RULES)
+    picked, max_games = [], ""
+    if request.method == "POST":
+        picked = request.form.getlist("player", type=int)
+        chosen = {k: request.form.get(k, v) for k, v in DEFAULT_RULES.items()}
+        max_games = request.form.get("max_games", "").strip()
+        try:
+            if chosen["lowtrump"] not in RULE_LABELS["lowtrump"]:
+                raise play.PlayError("Unknown rules.")
+            limit = int(max_games) if max_games else None
+            game_id = play.new_table(
+                get_db(), g.user["id"], picked,
+                rules.Rules(chosen["dullen"], chosen["schweinchen"], chosen["lowtrump"], chosen["call"]),
+                limit,
+            )
+        except (play.PlayError, ValueError) as error:
+            flash(str(error) if isinstance(error, play.PlayError) else "Please enter a number of games.")
+        else:
+            flash(_("The game is set up, the invitations are sent out."))
+            return redirect(url_for("games.game", game_id=game_id, trick=None, origin=None))
+    return render_template(
+        "new.html", players=candidates(), labels=RULE_LABELS, chosen=chosen,
+        picked=picked + [None] * (3 - len(picked)), max_games=max_games,
+    )
+
+
+@bp.post("/game/<int:game_id>/next")
+@login_required
+def keep_playing(game_id):
+    try:
+        new_id = play.next_game(get_db(), game_id, g.user["id"])
+    except play.PlayError as error:
+        flash(str(error))
+        return redirect(url_for("games.game", game_id=game_id, trick=None, origin=None))
+    return redirect(url_for("games.game", game_id=new_id, trick=None, origin=None))
+
+
+@bp.post("/table/<int:session_id>/again")
+@login_required
+def table_again(session_id):
+    try:
+        new_id = play.same_table_again(get_db(), session_id, g.user["id"])
+    except play.PlayError as error:
+        flash(str(error))
+        return redirect(url_for("games.table", session_id=session_id))
+    return redirect(url_for("games.game", game_id=new_id, trick=None, origin=None))

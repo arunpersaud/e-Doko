@@ -2,6 +2,7 @@
 {% block title %}{{ _("My games") }} – e-DoKo{% endblock %}
 {% block content %}
 <h1>{{ _("My games") }}</h1>
+<p><a role="button" href="{{ url_for('playviews.new') }}">{{ _("Start a new table") }}</a></p>
 
 <h2>{{ _("Your turn") }}</h2>
 {% if your_turn %}

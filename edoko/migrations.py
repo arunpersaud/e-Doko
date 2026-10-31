@@ -62,6 +62,10 @@ CREATE TABLE mail_bounce (
 ) STRICT;
 CREATE INDEX mail_bounce_address ON mail_bounce(address);
 """,
+    # a table can end: after max_games finished games (NULL: no end, the old tables)
+    5: """
+ALTER TABLE session ADD COLUMN max_games INTEGER CHECK (max_games IS NULL OR max_games > 0);
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)
