@@ -4,6 +4,9 @@ FLASK_MAIL_BACKEND  smtp (default) or memory (messages go to app.outbox)
 FLASK_SMTP_HOST (required, the SES SMTP endpoint of your region),
 FLASK_SMTP_PORT (587), FLASK_SMTP_USER, FLASK_SMTP_PASSWORD
 FLASK_MAIL_FROM     the sender address (required), a verified SES identity
+FLASK_MAIL_ALLOW    optional, comma separated addresses: mail goes only to these,
+                    everything else is logged and skipped (test instance with a
+                    copy of the real user data)
 """
 
 import logging
@@ -22,6 +25,10 @@ SUBJECT_PREFIX = "[DoKo] "
 def send(to: str, subject: str, body: str) -> bool:
     """Send one plain text mail; False if it could not be sent."""
     config = current_app.config
+    allow = {a.strip().lower() for a in (config.get("MAIL_ALLOW") or "").split(",") if a.strip()}
+    if allow and to.lower() not in allow:
+        log.info("mail to %s skipped (not in FLASK_MAIL_ALLOW): %s", to, subject)
+        return True
     message = EmailMessage()
     message["From"] = config["MAIL_FROM"]
     message["To"] = to
