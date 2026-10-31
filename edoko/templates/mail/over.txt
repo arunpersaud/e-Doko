@@ -1,0 +1,11 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans id=game_id %}Game {{ id }} is over. Thanks for playing!{% endtrans %}
+
+{% trans %}Points:{% endtrans %}
+{% for name, points in scores %}
+  {{ name }}: {{ points }}{% endfor %}
+
+{% trans %}Have a look at the game:{% endtrans %}
+
+{{ link }}

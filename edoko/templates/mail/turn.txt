@@ -1,0 +1,7 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% if first %}{% trans id=game_id %}Game {{ id }} starts, and you play the first card.{% endtrans %}{% else %}{% trans id=game_id %}A card has been played in game {{ id }}. It is your turn now.{% endtrans %}{% endif %}
+
+{% trans %}Use this link to play a card:{% endtrans %}
+
+{{ link }}

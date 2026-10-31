@@ -1,0 +1,726 @@
+"""Live play: a new game, the declaration phase, playing cards, calls, scoring.
+
+Everything here works on one sqlite connection and changes the database in
+a transaction; the mails go out after the commit. The rules themselves
+(card order, trick winner, scoring) are in rules.py.
+
+The flow of a game (as on the PHP site):
+
+  game.status 'pre'   every hand: start -> init (wants to play) -> check
+                      (said whether it is sick: solo, wedding, poverty,
+                      nines, low trump). When all four are at 'check' the
+                      kind of game is decided (resolve)
+  game.status 'play'  the hands are at 'play', game.turn_seat plays a card
+  game.status 'gameover' (or cancel-*)
+
+Seat k is dealt cards 12(k-1) .. 12k-1 of the deal.
+"""
+
+import random
+import secrets
+import sqlite3
+from collections import defaultdict
+from contextlib import contextmanager
+from dataclasses import dataclass, field
+
+from flask import current_app
+from flask_babel import gettext as _
+from flask_babel import lazy_gettext as _l
+
+from . import mail, rules
+
+SOLOS = ("trumpless", "jack", "queen", "trump", "club", "spade", "heart")
+NINES = frozenset({25, 26, 33, 34, 41, 42, 47, 48})
+GROUPS = ("trump", "clubs", "spades", "hearts", "diamonds")
+CALLS = (120, 90, 60, 30, 0)
+# the words of an announcement, as the site writes them into the comment on the move
+CALL_WORDS = {"re": "Re", "contra": "Contra", 90: "No 90", 60: "No 60", 30: "No 30", 0: "Zero"}
+ACTIVE = ("pre", "play")
+
+
+class PlayError(Exception):
+    """Something a player asked for is not possible; the text is for them."""
+
+
+@contextmanager
+def transaction(db: sqlite3.Connection):
+    db.execute("BEGIN IMMEDIATE")
+    try:
+        yield
+    except BaseException:
+        db.execute("ROLLBACK")
+        raise
+    db.execute("COMMIT")
+
+
+# ---------------------------------------------------------------- dealing ---
+
+
+def pick_deal(db: sqlite3.Connection, users: list[int]) -> int:
+    """The oldest deal none of the four has a hand in, else a fresh shuffle.
+
+    A player must never play a deal they have already seen.
+    """
+    marks = ",".join("?" * len(users))
+    row = db.execute(
+        f"""SELECT deal.id FROM deal WHERE NOT EXISTS (
+              SELECT 1 FROM game JOIN hand ON hand.game = game.id
+              WHERE game.deal = deal.id AND hand.user IN ({marks}))
+            ORDER BY deal.id LIMIT 1""",
+        users,
+    ).fetchone()
+    if row:
+        return row["id"]
+    shuffler = random.SystemRandom()
+    while True:
+        cards = list(range(1, 49))
+        shuffler.shuffle(cards)
+        cur = db.execute(
+            "INSERT OR IGNORE INTO deal (cards) VALUES (?)",
+            (":".join(map(str, cards)),),
+        )
+        if cur.rowcount:
+            return cur.lastrowid
+
+
+def deal_cards(db: sqlite3.Connection, deal_id: int) -> dict[int, list[int]]:
+    row = db.execute("SELECT cards FROM deal WHERE id = ?", (deal_id,)).fetchone()
+    cards = [int(c) for c in row["cards"].split(":")]
+    return {seat: cards[12 * (seat - 1) : 12 * seat] for seat in range(1, 5)}
+
+
+# ------------------------------------------------------ sickness (pure) ---
+
+
+def trump_count(cards, rs: rules.Rules) -> int:
+    """Trump for the poverty rule: the foxes don't count, unless Schweinchen."""
+    cards = set(cards)
+    count = sum(1 for c in cards if c < 27) - (19 in cards) - (20 in cards)
+    if 19 in cards and 20 in cards:
+        if rs.schweinchen == "both":
+            count += 2
+        elif rs.schweinchen in ("second", "secondaftercall"):
+            count += 1
+    return count
+
+
+def has_low_trump(cards, rs: rules.Rules) -> bool:
+    """Only diamond trump (nines, kings, tens, aces), and no Schweinchen."""
+    if rs.lowtrump == "none":
+        return False
+    cards = set(cards)
+    if any(c < 19 for c in cards):
+        return False
+    return not (19 in cards and 20 in cards and rs.schweinchen != "none")
+
+
+def sickness_options(cards, rs: rules.Rules) -> list[str]:
+    """What this hand may declare besides a solo (and "nothing")."""
+    cards = set(cards)
+    options = []
+    if 3 in cards and 4 in cards:
+        options.append("wedding")
+    if trump_count(cards, rs) < 4:
+        options.append("poverty")
+    if len(cards & NINES) > 4:
+        options.append("nines")
+    if rs.lowtrump in ("cancel", "poverty") and has_low_trump(cards, rs):
+        options.append("lowtrump")
+    return options
+
+
+# ------------------------------------------------------------------ state ---
+
+
+@dataclass
+class State:
+    """A game as the rules need it."""
+
+    game: sqlite3.Row
+    rs: rules.Rules
+    hands: dict[int, sqlite3.Row]  # by seat
+    start: dict[int, list[int]]  # seat -> the cards dealt
+    held: dict[int, list[int]]  # seat -> cards not played yet
+    hand_card: dict[tuple[int, int], int]  # (seat, card) -> hand_card.id
+    tricks: list[list[tuple[int, int]]] = field(default_factory=list)  # (seat, card)
+
+    @property
+    def mode(self) -> str:
+        """The kind of game for the rules: normal, wedding, ... or the solo."""
+        game = self.game
+        if game["type"] == "solo" and game["solo"]:
+            return game["solo"]
+        return game["type"] or "normal"
+
+    @property
+    def current(self) -> list[tuple[int, int]]:
+        """The cards of the trick being played (empty if it is complete)."""
+        if self.tricks and len(self.tricks[-1]) < 4:
+            return self.tricks[-1]
+        return []
+
+    def foxes(self) -> rules.Foxes:
+        foxes = rules.foxes_for(self.start, self.mode, self.rs)
+        if foxes.holder is not None and self.rs.schweinchen == "secondaftercall":
+            party = self.hands[foxes.holder]["party"]
+            foxes.called = any(
+                h["point_call"] is not None and h["party"] == party
+                for h in self.hands.values()
+            )
+        return foxes
+
+
+def load(db: sqlite3.Connection, game_id: int) -> State:
+    game = db.execute(
+        """SELECT game.*, ruleset.dullen, ruleset.schweinchen, ruleset.lowtrump,
+                  ruleset.call
+           FROM game JOIN ruleset ON ruleset.id = game.ruleset WHERE game.id = ?""",
+        (game_id,),
+    ).fetchone()
+    if game is None:
+        raise PlayError(_("There is no such game."))
+    rs = rules.Rules(game["dullen"], game["schweinchen"], game["lowtrump"], game["call"])
+    hands = {
+        h["seat"]: h
+        for h in db.execute("SELECT * FROM hand WHERE game = ?", (game_id,))
+    }
+    seat_of = {h["id"]: seat for seat, h in hands.items()}
+    start = defaultdict(list)
+    held = defaultdict(list)
+    hand_card = {}
+    played = {
+        r[0]
+        for r in db.execute(
+            "SELECT play.hand_card FROM play JOIN trick ON trick.id = play.trick"
+            " WHERE trick.game = ?",
+            (game_id,),
+        )
+    }
+    for r in db.execute(
+        "SELECT id, hand, card FROM hand_card WHERE hand IN"
+        " (SELECT id FROM hand WHERE game = ?) ORDER BY id",
+        (game_id,),
+    ):
+        seat = seat_of[r["hand"]]
+        start[seat].append(r["card"])
+        hand_card[(seat, r["card"])] = r["id"]
+        if r["id"] not in played:
+            held[seat].append(r["card"])
+    tricks = []
+    for t in db.execute(
+        "SELECT id FROM trick WHERE game = ? ORDER BY number", (game_id,)
+    ):
+        tricks.append(
+            [
+                (seat_of[r["hand"]], r["card"])
+                for r in db.execute(
+                    "SELECT hand_card.hand, hand_card.card FROM play"
+                    " JOIN hand_card ON hand_card.id = play.hand_card"
+                    " WHERE play.trick = ? ORDER BY play.sequence",
+                    (t["id"],),
+                )
+            ]
+        )
+    return State(game, rs, hands, dict(start), dict(held), hand_card, tricks)
+
+
+def legal_cards(state: State, seat: int) -> list[int]:
+    """The cards this seat may play now: follow the lead if possible."""
+    hand = state.held[seat]
+    trick = state.current
+    if not trick:
+        return list(hand)
+    layout = rules.layout(state.mode, state.rs.dullen)
+    lead = trick[0][1]
+    group = next((g for g in GROUPS if lead in layout[g]), None)
+    same = [c for c in hand if group and c in layout[group]]
+    return same or list(hand)
+
+
+# ----------------------------------------------------------------- calls ---
+
+
+def call_allowed(
+    rule: str,
+    what: int,
+    *,
+    own: int | None,
+    partner: int | None,
+    cards: int,
+    all_cards: int,
+    offset: int = 0,
+) -> int:
+    """Port of can_call(): 0 not possible, 1 possible, 2 possible for the last time.
+
+    what: 120 (Re/Contra), 90, 60, 30 or 0.
+    own, partner: the lowest call already made by this player and by the partner.
+    cards: the cards this player still holds; all_cards: the cards of all four.
+    offset: delay in a wedding, until the partner is known (tricks played).
+    """
+    if (partner is not None and what >= partner) or (own is not None and what >= own):
+        return 0
+    n = cards + offset
+    if rule == "1st-own-card":
+        if 4 - what // 30 == 12 - n:
+            return 2
+        if 4 - what // 30 > 12 - n:
+            return 1
+    elif rule == "5th-card":
+        total = all_cards + offset * 4
+        if 27 + 4 * (what // 30) == total:
+            return 2
+        if 27 + 4 * (what // 30) < total:
+            return 1
+    elif rule == "9-cards":
+        made = [c for c in (own, partner) if c is not None]
+        lowest = min(made) if made else -1
+        # (cards needed, highest earlier call that allows it, the lowest call allowed)
+        for need, earlier, limit in ((12, None, 120), (9, 120, 90), (6, 90, 60), (3, 60, 30), (0, 30, 0)):
+            if n < need:
+                continue
+            if earlier is None or (0 <= lowest <= earlier and what <= limit):
+                return 2 if n == need else 1
+            break
+    return 0
+
+
+def can_call(state: State, seat: int, what: int) -> int:
+    hand = state.hands[seat]
+    own = int(hand["point_call"]) if hand["point_call"] is not None else None
+    partner_calls = [
+        int(h["point_call"])
+        for s, h in state.hands.items()
+        if s != seat and h["party"] == hand["party"] and h["point_call"] is not None
+    ]
+    return call_allowed(
+        state.rs.call,
+        what,
+        own=own,
+        partner=min(partner_calls) if partner_calls else None,
+        cards=len(state.held[seat]),
+        all_cards=sum(len(c) for c in state.held.values()),
+    )
+
+
+def possible_calls(state: State, seat: int) -> list[int]:
+    """The calls this seat may make now (when it is on turn)."""
+    hand = state.hands[seat]
+    if state.game["status"] != "play" or hand["party"] is None:
+        return []
+    return [what for what in CALLS if can_call(state, seat, what)]
+
+
+def call_words(party: str, what: int) -> str:
+    return CALL_WORDS[party] if what == 120 else CALL_WORDS[what]
+
+
+# ------------------------------------------------------------- new game ---
+
+
+def ruleset_id(db: sqlite3.Connection, rs: rules.Rules) -> int:
+    key = (rs.dullen, rs.schweinchen, rs.lowtrump, rs.call)
+    row = db.execute(
+        "SELECT id FROM ruleset WHERE dullen = ? AND schweinchen = ? AND lowtrump = ?"
+        " AND call = ?",
+        key,
+    ).fetchone()
+    if row:
+        return row["id"]
+    return db.execute(
+        "INSERT INTO ruleset (dullen, schweinchen, lowtrump, call) VALUES (?, ?, ?, ?)",
+        key,
+    ).lastrowid
+
+
+def new_token() -> str:
+    return secrets.token_urlsafe(16)
+
+
+def create_game(
+    db: sqlite3.Connection,
+    players: list[int],
+    rs: rules.Rules | None = None,
+    *,
+    session: int | None = None,
+) -> int:
+    """A new game in 'pre': players are the user ids in seat order.
+
+    session: another game at the same table (the rules are taken from the last
+    game of it, and it must not have a game in progress), else a new table.
+    """
+    if len(players) != 4 or len(set(players)) != 4:
+        raise PlayError(_("A game needs four different players."))
+    with transaction(db):
+        marks = ",".join("?" * 4)
+        found = db.execute(
+            f"SELECT count(*) FROM user WHERE id IN ({marks}) AND disabled_at IS NULL",
+            players,
+        ).fetchone()[0]
+        if found != 4:
+            raise PlayError(_("One of the players does not exist."))
+        if session is None:
+            if rs is None:
+                raise PlayError(_("The rules are missing."))
+            session = db.execute("INSERT INTO session DEFAULT VALUES").lastrowid
+            ruleset = ruleset_id(db, rs)
+        else:
+            if db.execute(
+                "SELECT 1 FROM game WHERE session = ? AND status IN ('pre', 'play')",
+                (session,),
+            ).fetchone():
+                raise PlayError(_("There is already a game going on at this table."))
+            last = db.execute(
+                "SELECT ruleset FROM game WHERE session = ? ORDER BY id DESC LIMIT 1",
+                (session,),
+            ).fetchone()
+            if last is None:
+                raise PlayError(_("There is no such table."))
+            ruleset = last["ruleset"]
+        for user in players:
+            db.execute(
+                "INSERT OR IGNORE INTO session_player (session, user) VALUES (?, ?)",
+                (session, user),
+            )
+        deal = pick_deal(db, players)
+        game_id = db.execute(
+            "INSERT INTO game (session, deal, ruleset, status, type, start_seat, turn_seat)"
+            " VALUES (?, ?, ?, 'pre', 'normal', 1, 1)",
+            (session, deal, ruleset),
+        ).lastrowid
+        for seat, cards in deal_cards(db, deal).items():
+            hand = db.execute(
+                "INSERT INTO hand (game, seat, user, token) VALUES (?, ?, ?, ?)",
+                (game_id, seat, players[seat - 1], new_token()),
+            ).lastrowid
+            db.executemany(
+                "INSERT INTO hand_card (hand, card) VALUES (?, ?)",
+                [(hand, card) for card in cards],
+            )
+    notify(db, [("invite", game_id)])
+    return game_id
+
+
+# ---------------------------------------------------- declaration phase ---
+
+
+def _hand(db: sqlite3.Connection, hand_id: int) -> sqlite3.Row:
+    hand = db.execute("SELECT * FROM hand WHERE id = ?", (hand_id,)).fetchone()
+    if hand is None:
+        raise PlayError(_("There is no such seat."))
+    return hand
+
+
+def _first_open_seat(db: sqlite3.Connection, game_id: int) -> int | None:
+    row = db.execute(
+        "SELECT min(seat) FROM hand WHERE game = ? AND status != 'check'", (game_id,)
+    ).fetchone()
+    return row[0]
+
+
+def join(db: sqlite3.Connection, hand_id: int) -> None:
+    """"Yes, I want to play this game."""
+    with transaction(db):
+        hand = _hand(db, hand_id)
+        game = db.execute("SELECT * FROM game WHERE id = ?", (hand["game"],)).fetchone()
+        if game["status"] != "pre":
+            raise PlayError(_("This game is not waiting for players."))
+        if hand["status"] == "start":
+            db.execute("UPDATE hand SET status = 'init' WHERE id = ?", (hand_id,))
+            db.execute(
+                "UPDATE game SET turn_seat = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                (_first_open_seat(db, hand["game"]), hand["game"]),
+            )
+
+
+def cancel(db: sqlite3.Connection, game_id: int, status: str) -> list:
+    """End a game that is not played: the status says why."""
+    db.execute(
+        "UPDATE game SET status = ?, turn_seat = NULL, updated_at = CURRENT_TIMESTAMP"
+        " WHERE id = ?",
+        (status, game_id),
+    )
+    db.execute("UPDATE hand SET status = 'gameover' WHERE game = ?", (game_id,))
+    return [("canceled", game_id, status)]
+
+
+def decline(db: sqlite3.Connection, hand_id: int) -> None:
+    """"No, I don't want to play": the game is canceled."""
+    with transaction(db):
+        hand = _hand(db, hand_id)
+        game = db.execute("SELECT status FROM game WHERE id = ?", (hand["game"],)).fetchone()
+        if game["status"] != "pre":
+            raise PlayError(_("This game is not waiting for players."))
+        notices = cancel(db, hand["game"], "cancel-noplay")
+    notify(db, notices)
+
+
+def declare(
+    db: sqlite3.Connection, hand_id: int, sickness: str, solo: str | None = None
+) -> None:
+    """The answer to "are you sick?": none, solo (with the kind), wedding, ...
+
+    When it was the last of the four answers the game is decided and starts
+    (or is canceled).
+    """
+    notices: list = []
+    with transaction(db):
+        hand = _hand(db, hand_id)
+        state = load(db, hand["game"])
+        game = state.game
+        if game["status"] != "pre":
+            raise PlayError(_("This game is not waiting for players."))
+        if hand["status"] not in ("init", "start"):
+            raise PlayError(_("You have answered already."))
+        if hand["status"] == "start":
+            raise PlayError(_("Please say first that you want to play."))
+        seat = hand["seat"]
+        if sickness == "none":
+            sickness = None
+        elif sickness == "solo":
+            if solo not in SOLOS:
+                raise PlayError(_("That kind of solo does not exist."))
+        elif sickness not in sickness_options(state.start[seat], state.rs):
+            raise PlayError(_("Your cards do not allow that."))
+        if sickness == "wedding":
+            raise PlayError(_("A wedding can not be played on this site yet."))
+        if sickness in ("poverty", "lowtrump") and not (
+            sickness == "lowtrump" and state.rs.lowtrump == "cancel"
+        ):
+            raise PlayError(_("Poverty can not be played on this site yet."))
+        db.execute(
+            "UPDATE hand SET status = 'check', sickness = ?, solo = ? WHERE id = ?",
+            (sickness, solo if sickness == "solo" else None, hand_id),
+        )
+        if sickness == "solo" and not (game["type"] == "solo" and game["start_seat"] < seat):
+            # the first solo (the lowest seat) is the one that is played
+            db.execute(
+                "UPDATE game SET type = 'solo', solo = ?, start_seat = ? WHERE id = ?",
+                (solo, seat, game["id"]),
+            )
+        db.execute(
+            "UPDATE game SET turn_seat = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (_first_open_seat(db, game["id"]), game["id"]),
+        )
+        if _first_open_seat(db, game["id"]) is None:
+            notices = resolve(db, game["id"])
+    notify(db, notices)
+
+
+def resolve(db: sqlite3.Connection, game_id: int) -> list:
+    """All four have answered: a solo, a cancelled game or a normal start."""
+    state = load(db, game_id)
+    game, rs = state.game, state.rs
+    sick = {seat: h["sickness"] for seat, h in state.hands.items()}
+    if game["type"] == "solo":
+        return start_play(db, game_id)
+    if any(s == "nines" for s in sick.values()):
+        return cancel(db, game_id, "cancel-nines")
+    if rs.lowtrump == "cancel" and any(s == "lowtrump" for s in sick.values()):
+        return cancel(db, game_id, "cancel-lowtrump")
+    return start_play(db, game_id)
+
+
+def start_play(db: sqlite3.Connection, game_id: int) -> list:
+    state = load(db, game_id)
+    game = state.game
+    for seat, hand in state.hands.items():
+        if game["type"] == "solo":
+            party = "re" if seat == game["start_seat"] else "contra"
+        else:
+            party = "re" if {3, 4} & set(state.start[seat]) else "contra"
+        db.execute(
+            "UPDATE hand SET status = 'play', party = ? WHERE id = ?", (party, hand["id"])
+        )
+    if game["type"] == "normal" and any({3, 4} <= set(c) for c in state.start.values()):
+        # both club queens in one hand and no wedding: a silent solo, played like
+        # a normal game (that player is Re alone and counts triple)
+        db.execute("UPDATE game SET type = 'solo', solo = 'silent' WHERE id = ?", (game_id,))
+    db.execute(
+        "UPDATE game SET status = 'play', turn_seat = start_seat,"
+        " updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (game_id,),
+    )
+    return [("turn", game_id, True)]
+
+
+# ------------------------------------------------------------- the play ---
+
+
+def play_card(
+    db: sqlite3.Connection, hand_id: int, card: int, call: int | None = None
+) -> None:
+    """Play a card (with a call, if the player makes one with it)."""
+    notices: list = []
+    with transaction(db):
+        hand = _hand(db, hand_id)
+        state = load(db, hand["game"])
+        game, seat = state.game, hand["seat"]
+        if game["status"] != "play" or hand["status"] != "play":
+            raise PlayError(_("This game is not being played."))
+        if game["turn_seat"] != seat:
+            raise PlayError(_("It is not your turn."))
+        if card not in state.held[seat]:
+            raise PlayError(_("You do not have that card."))
+        if card not in legal_cards(state, seat):
+            raise PlayError(_("You have to follow suit."))
+        if call is not None and not can_call(state, seat, call):
+            raise PlayError(_("You can not make that call now."))
+        if call is not None:
+            db.execute(
+                "UPDATE hand SET point_call = ? WHERE id = ?", (str(call), hand_id)
+            )
+            state.hands[seat] = _hand(db, hand_id)
+
+        if state.current:
+            trick_id = db.execute(
+                "SELECT id FROM trick WHERE game = ? ORDER BY number DESC LIMIT 1",
+                (game["id"],),
+            ).fetchone()[0]
+        else:
+            trick_id = db.execute(
+                "INSERT INTO trick (game, number) VALUES (?, ?)",
+                (game["id"], len(state.tricks) + 1),
+            ).lastrowid
+            state.tricks.append([])
+        play_id = db.execute(
+            "INSERT INTO play (trick, sequence, hand_card) VALUES (?, ?, ?)",
+            (trick_id, len(state.tricks[-1]) + 1, state.hand_card[(seat, card)]),
+        ).lastrowid
+        state.tricks[-1].append((seat, card))
+        state.held[seat].remove(card)
+        if call is not None:
+            db.execute(
+                "INSERT INTO comment (game, kind, play, user, body)"
+                " VALUES (?, 'move', ?, ?, ?)",
+                (game["id"], play_id, hand["user"], call_words(hand["party"], call)),
+            )
+
+        if len(state.tricks[-1]) < 4:
+            db.execute(
+                "UPDATE game SET turn_seat = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                (seat % 4 + 1, game["id"]),
+            )
+            notices.append(("turn", game["id"], False))
+        else:
+            foxes = state.foxes()
+            for trick in state.tricks:
+                for _seat, c in trick:
+                    foxes.played(c)
+            winner = rules.trick_winner(state.tricks[-1], state.mode, state.rs, foxes)
+            db.execute("UPDATE trick SET winner_seat = ? WHERE id = ?", (winner, trick_id))
+            if len(state.tricks) < 12:
+                db.execute(
+                    "UPDATE game SET turn_seat = ?, updated_at = CURRENT_TIMESTAMP"
+                    " WHERE id = ?",
+                    (winner, game["id"]),
+                )
+                notices.append(("turn", game["id"], False))
+            else:
+                notices += finish(db, state)
+    notify(db, notices)
+
+
+def finish(db: sqlite3.Connection, state: State) -> list:
+    """The last card is played: score the game, set the points, close the table."""
+    game = state.game
+    parties = {seat: h["party"] for seat, h in state.hands.items()}
+    calls = {
+        seat: int(h["point_call"]) if h["point_call"] is not None else None
+        for seat, h in state.hands.items()
+    }
+    result = rules.replay(
+        state.tricks,
+        mode=game["type"],
+        solo=game["solo"],
+        rules=state.rs,
+        parties=parties,
+        calls=calls,
+        foxes=state.foxes(),
+    )
+    users = {seat: h["user"] for seat, h in state.hands.items()}
+    for item in result.items:
+        db.execute(
+            "INSERT INTO score_item (game, party, kind, winner, loser)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (
+                game["id"],
+                item.party,
+                item.kind,
+                users.get(item.winner_seat),
+                users.get(item.loser_seat),
+            ),
+        )
+    points = rules.player_points(result, parties, solo=game["type"] == "solo")
+    for seat, value in points.items():
+        db.execute(
+            "UPDATE hand SET status = 'gameover', points = ? WHERE id = ?",
+            (value, state.hands[seat]["id"]),
+        )
+    db.execute(
+        "UPDATE game SET status = 'gameover', turn_seat = NULL,"
+        " updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (game["id"],),
+    )
+    return [("over", game["id"])]
+
+
+# ---------------------------------------------------------------- mails ---
+
+
+def _link(token: str) -> str:
+    return f"{current_app.config['ORIGIN']}/{token}"
+
+
+def _mail(db, user_id: int, subject, template: str, *, turn: bool = False, **context):
+    user = db.execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
+    if user["mail_mode"] == "none" or (turn and user["mail_mode"] == "fewer"):
+        return
+    mail.send_template(user, subject, template, **context)
+
+
+def notify(db: sqlite3.Connection, notices: list) -> None:
+    """Send the mails for what has just happened (after the commit)."""
+    for notice in notices:
+        kind, game_id = notice[0], notice[1]
+        hands = db.execute(
+            "SELECT hand.*, user.name FROM hand JOIN user ON user.id = hand.user"
+            " WHERE game = ? ORDER BY seat",
+            (game_id,),
+        ).fetchall()
+        names = [h["name"] for h in hands]
+        game = db.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+        if kind == "invite":
+            for h in hands:
+                _mail(
+                    db, h["user"], _l("You are invited to game %(id)d", id=game_id),
+                    "invite", game_id=game_id, players=names, link=_link(h["token"]),
+                )
+        elif kind == "turn":
+            h = next((h for h in hands if h["seat"] == game["turn_seat"]), None)
+            if h is not None:
+                _mail(
+                    db, h["user"], _l("Game %(id)d: it is your turn", id=game_id),
+                    "turn", turn=True, game_id=game_id, first=notice[2],
+                    link=_link(h["token"]),
+                )
+        elif kind == "canceled":
+            reasons = {
+                "cancel-noplay": _l("one of the players does not want to play"),
+                "cancel-nines": _l("a player has five or more nines"),
+                "cancel-lowtrump": _l("a player has only low trump"),
+                "cancel-timedout": _l("it took too long"),
+            }
+            for h in hands:
+                _mail(
+                    db, h["user"], _l("Game %(id)d was canceled", id=game_id),
+                    "canceled", game_id=game_id, reason=reasons.get(notice[2], ""),
+                    link=_link(h["token"]),
+                )
+        elif kind == "over":
+            for h in hands:
+                _mail(
+                    db, h["user"], _l("Game %(id)d is over", id=game_id),
+                    "over", game_id=game_id,
+                    scores=[(x["name"], x["points"]) for x in hands],
+                    link=_link(h["token"]),
+                )

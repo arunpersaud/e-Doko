@@ -1,0 +1,5 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans id=game_id, reason=reason %}Game {{ id }} was canceled: {{ reason }}.{% endtrans %}
+
+{{ link }}

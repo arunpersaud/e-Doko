@@ -20,7 +20,7 @@ from functools import cache
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from flask import Flask, request
+from flask import Flask, has_request_context, request
 from flask_babel import Babel, get_locale
 
 from . import (
@@ -64,6 +64,8 @@ SECURITY_HEADERS = {
 
 
 def select_locale() -> str | None:
+    if not has_request_context():  # mail from a command or a timer
+        return None
     return request.accept_languages.best_match(LANGUAGES)
 
 

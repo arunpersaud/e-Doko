@@ -1,0 +1,9 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans %}You are invited to play a game of DoKo. The table:{% endtrans %}
+{% for name in players %}
+  {{ name }}{% endfor %}
+
+{% trans %}If you want to join this game, please follow this link:{% endtrans %}
+
+{{ link }}
