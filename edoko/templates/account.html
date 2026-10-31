@@ -3,6 +3,38 @@
 {% block content %}
 <h1>{{ _("Settings") }}</h1>
 
+<h2>{{ _("Games and mail") }}</h2>
+<form method="post" action="{{ url_for('account.preferences') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <label>{{ _("Language of the mails") }}
+    <select name="language">
+      <option value=""{% if not current_user.language %} selected{% endif %}>{{ _("as the browser says") }}</option>
+      <option value="en"{% if current_user.language == "en" %} selected{% endif %}>English</option>
+      <option value="de"{% if current_user.language == "de" %} selected{% endif %}>Deutsch</option>
+    </select>
+  </label>
+  <label>{{ _("Your time zone (for the digest)") }}
+    <input type="text" name="timezone" list="zones" value="{{ current_user.timezone }}" required>
+    <datalist id="zones">{% for zone in zones %}<option value="{{ zone }}">{% endfor %}</datalist>
+  </label>
+  <label>{{ _("Which mails do you want?") }}
+    <select name="mail_mode">
+      <option value="normal"{% if current_user.mail_mode == "normal" %} selected{% endif %}>{{ _("All mails, including 'it is your turn'") }}</option>
+      <option value="fewer"{% if current_user.mail_mode == "fewer" %} selected{% endif %}>{{ _("No 'it is your turn' mails (I look at the site myself)") }}</option>
+      <option value="none"{% if current_user.mail_mode == "none" %} selected{% endif %}>{{ _("No mails about games at all") }}</option>
+    </select>
+  </label>
+  <label>{{ _("Combine the mails about games into a digest") }}
+    <select name="digest_hours">
+      <option value=""{% if not current_user.digest_hours %} selected{% endif %}>{{ _("no, send them right away") }}</option>
+      {% for h in digest_hours %}<option value="{{ h }}"{% if current_user.digest_hours == h %} selected{% endif %}>{{ ngettext("every %(num)d hour", "every %(num)d hours", h) }}</option>{% endfor %}
+    </select>
+  </label>
+  <label><input type="checkbox" name="open_for_games"{% if current_user.open_for_games %} checked{% endif %}> {{ _("Other players may invite me to new games") }}</label>
+  <label><input type="checkbox" name="autosetup"{% if current_user.autosetup %} checked{% endif %}> {{ _("Do not ask me if I want to play a game I am invited to") }}</label>
+  <button type="submit">{{ _("Save") }}</button>
+</form>
+
 {% set chosen = kept.values() | selectattr('chosen') | map(attribute='source') | first %}
 <h2>{{ _("Your picture") }}</h2>
 <div class="pictures">

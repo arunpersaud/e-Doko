@@ -403,15 +403,26 @@ def create_game(
             " VALUES (?, ?, ?, 'pre', 'normal', 1, 1)",
             (session, deal, ruleset),
         ).lastrowid
+        auto = {
+            r[0]
+            for r in db.execute(
+                f"SELECT id FROM user WHERE id IN ({marks}) AND autosetup = 1", players
+            )
+        }
         for seat, cards in deal_cards(db, deal).items():
+            user = players[seat - 1]
             hand = db.execute(
-                "INSERT INTO hand (game, seat, user, token) VALUES (?, ?, ?, ?)",
-                (game_id, seat, players[seat - 1], new_token()),
+                "INSERT INTO hand (game, seat, user, token, status) VALUES (?, ?, ?, ?, ?)",
+                (game_id, seat, user, new_token(), "init" if user in auto else "start"),
             ).lastrowid
             db.executemany(
                 "INSERT INTO hand_card (hand, card) VALUES (?, ?)",
                 [(hand, card) for card in cards],
             )
+        db.execute(
+            "UPDATE game SET turn_seat = ? WHERE id = ?",
+            (_first_open_seat(db, game_id), game_id),
+        )
     notify(db, [("invite", game_id)])
     return game_id
 
@@ -427,10 +438,15 @@ def _hand(db: sqlite3.Connection, hand_id: int) -> sqlite3.Row:
 
 
 def _first_open_seat(db: sqlite3.Connection, game_id: int) -> int | None:
-    row = db.execute(
-        "SELECT min(seat) FROM hand WHERE game = ? AND status != 'check'", (game_id,)
-    ).fetchone()
-    return row[0]
+    """Who is to answer next while the game is being set up: whoever has not said
+    yet that they want to play, else whoever has not said if they are sick."""
+    for status in ("start", "init"):
+        row = db.execute(
+            "SELECT min(seat) FROM hand WHERE game = ? AND status = ?", (game_id, status)
+        ).fetchone()
+        if row[0] is not None:
+            return row[0]
+    return None
 
 
 def join(db: sqlite3.Connection, hand_id: int) -> None:
@@ -736,7 +752,10 @@ def _mail(db, user_id: int, subject, template: str, *, turn: bool = False, **con
     user = db.execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
     if user["mail_mode"] == "none" or (turn and user["mail_mode"] == "fewer"):
         return
-    mail.send_template(user, subject, template, **context)
+    mail.deliver(
+        db, user, subject, template,
+        kind="turn" if turn else "other", game=context.get("game_id"), **context,
+    )
 
 
 def notify(db: sqlite3.Connection, notices: list) -> None:

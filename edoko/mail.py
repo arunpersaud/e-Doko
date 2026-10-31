@@ -50,6 +50,13 @@ def send(to: str, subject: str, body: str) -> bool:
     return True
 
 
+def render(user, subject, template: str, **context) -> tuple[str, str]:
+    """The subject and the text of a mail to a user, in their language."""
+    with force_locale(user["language"] or "en"):
+        body = render_template(f"mail/{template}.txt", user=user, **context)
+        return str(subject), body
+
+
 def send_template(user, subject, template: str, **context) -> bool:
     """Mail to a user (row with email, language), in their language.
 
@@ -58,6 +65,28 @@ def send_template(user, subject, template: str, **context) -> bool:
     if user["mail_status"] != "ok":
         log.info("no mail to user %s: %s", user["id"], user["mail_status"])
         return False
-    with force_locale(user["language"] or "en"):
-        body = render_template(f"mail/{template}.txt", user=user, **context)
-        return send(user["email"], str(subject), body)
+    subject, body = render(user, subject, template, **context)
+    return send(user["email"], subject, body)
+
+
+def deliver(db, user, subject, template: str, *, kind="other", game=None, **context) -> bool:
+    """A mail about a game: at once, or kept for the user's digest.
+
+    kind 'turn' is dropped from the digest if it is no longer the user's turn then.
+    """
+    if not user["digest_hours"]:
+        return send_template(user, subject, template, **context)
+    if user["mail_status"] != "ok":
+        return False
+    subject, body = render(user, subject, template, **context)
+    db.execute(
+        "INSERT INTO mail_queue (user, kind, game, subject, body) VALUES (?, ?, ?, ?, ?)",
+        (user["id"], kind, game, subject, body),
+    )
+    return True
+
+
+def render_digest(user, entries: list[tuple[str, str]]) -> str:
+    from .digest import SEPARATOR
+
+    return render_template("mail/digest.txt", user=user, entries=entries, separator=SEPARATOR)

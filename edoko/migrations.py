@@ -66,6 +66,19 @@ CREATE INDEX mail_bounce_address ON mail_bounce(address);
     5: """
 ALTER TABLE session ADD COLUMN max_games INTEGER CHECK (max_games IS NULL OR max_games > 0);
 """,
+    # mails of the game for people with a digest: kept here until digest.run sends them
+    6: """
+CREATE TABLE mail_queue (
+  id              INTEGER PRIMARY KEY,
+  user            INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+  kind            TEXT NOT NULL CHECK (kind IN ('turn', 'other')),
+  game            INTEGER REFERENCES game(id) ON DELETE CASCADE,
+  subject         TEXT NOT NULL,
+  body            TEXT NOT NULL,
+  created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+) STRICT;
+CREATE INDEX mail_queue_user ON mail_queue(user, id);
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

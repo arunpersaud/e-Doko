@@ -1,4 +1,6 @@
-"""The account page: your picture and your passkeys."""
+"""The account page: your preferences, your picture and your passkeys."""
+
+from zoneinfo import available_timezones
 
 from flask import (
     Blueprint,
@@ -13,14 +15,52 @@ from flask_babel import gettext as _
 
 from . import avatars
 from .auth import login_required, rate_limited
+from .db import get_db
 
 bp = Blueprint("account", __name__)
+
+
+DIGEST_HOURS = (1, 2, 3, 4, 6, 12, 24)
+MAIL_MODES = ("normal", "fewer", "none")
 
 
 @bp.route("/account")
 @login_required
 def index():
-    return render_template("account.html", kept=avatars.kept(g.user["id"]))
+    return render_template(
+        "account.html",
+        kept=avatars.kept(g.user["id"]),
+        zones=sorted(available_timezones()),
+        digest_hours=DIGEST_HOURS,
+    )
+
+
+@bp.post("/account/preferences")
+@login_required
+def preferences():
+    form = request.form
+    language = form.get("language") or None
+    zone = form.get("timezone", "").strip()
+    mode = form.get("mail_mode", "")
+    digest = form.get("digest_hours", "")
+    if (
+        language not in (None, "en", "de")
+        or zone not in available_timezones()
+        or mode not in MAIL_MODES
+        or digest not in ("", *map(str, DIGEST_HOURS))
+    ):
+        flash(_("Something in the form was not right, nothing was saved."))
+        return redirect(url_for("account.index"))
+    get_db().execute(
+        """UPDATE user SET language = ?, timezone = ?, mail_mode = ?, digest_hours = ?,
+                  open_for_games = ?, autosetup = ? WHERE id = ?""",
+        (
+            language, zone, mode, int(digest) if digest else None,
+            int("open_for_games" in form), int("autosetup" in form), g.user["id"],
+        ),
+    )
+    flash(_("Your settings were saved."))
+    return redirect(url_for("account.index"))
 
 
 @bp.post("/account/avatar/upload")

@@ -1,0 +1,9 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans %}Here is a digest of the latest emails:{% endtrans %}
+{% for subject, body in entries %}
+{{ separator }}
+{{ subject }}
+
+{{ body }}{% endfor %}
+{{ separator }}

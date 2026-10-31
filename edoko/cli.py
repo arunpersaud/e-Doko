@@ -6,7 +6,7 @@ import click
 from flask import current_app
 from flask.cli import AppGroup
 
-from . import bounces, db, migrations
+from . import bounces, db, digest as digest_mails, migrations
 
 edoko = AppGroup("edoko", help="e-DoKo database tools.")
 
@@ -69,3 +69,10 @@ def make_admin(email: str, remove: bool) -> None:
     if not changed:
         raise click.ClickException(f"no user with the address {email}")
     click.echo(("removed admin rights of " if remove else "admin: ") + email)
+
+
+@edoko.command("digest")
+def digest() -> None:
+    """Send the digests that are due (run every hour)."""
+    conn = db.connect(current_app.config["DATABASE"])
+    click.echo(f"{digest_mails.run(conn)} digests sent")
