@@ -173,15 +173,131 @@ def test_the_lowest_seat_wins_two_solos(app, conn):
     assert (game["solo"], game["start_seat"]) == ("heart", 2)
 
 
-def test_poverty_is_refused_for_now(app, conn):
-    with app.app_context():
-        game_id = new_game(conn)
-        stack(conn, game_id, {1: [1, 25, 33, 34, 27, 28, 29, 30, 31, 32, 35, 36]})
-        h = hands(conn, game_id)[1]
-        play.join(conn, h["id"])
-        assert "poverty" in play.sickness_options(play.load(conn, game_id).start[1], RS)
-        with pytest.raises(play.PlayError, match="Poverty"):
-            play.declare(conn, h["id"], "poverty")
+# a partition of the deck: two poor hands (two trump each) and two rich ones
+POOR_A = [1, 25, 33, 34, 27, 28, 29, 30, 31, 32, 35, 36]
+POOR_B = [2, 26, 43, 44, 37, 38, 39, 40, 41, 42, 45, 46]
+RICH_A = list(range(3, 15))
+RICH_B = list(range(15, 25)) + [47, 48]
+
+
+def status(conn, game_id):
+    return conn.execute("SELECT status FROM game WHERE id = ?", (game_id,)).fetchone()[0]
+
+
+def poverty_game(conn, poor_seats, rs=RS):
+    """A game where these seats declared poverty."""
+    game_id = new_game(conn, rs)
+    seat_cards = {}
+    for seat, cards in zip(poor_seats, (POOR_A, POOR_B)):
+        seat_cards[seat] = cards
+    rich = iter((RICH_A, RICH_B))
+    for seat in range(1, 5):
+        if seat not in seat_cards:
+            seat_cards[seat] = next(rich, None) or []
+    stack(conn, game_id, seat_cards)
+    start(conn, game_id, {seat: ("poverty", None) for seat in poor_seats})
+    return game_id
+
+
+def test_poverty_taker_gets_the_trump_and_gives_cards_back(app, conn):
+    game_id = poverty_game(conn, [2])
+    game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+    assert (game["type"], game["status"], game["turn_seat"]) == ("poverty", "pre", 1)
+    hs = hands(conn, game_id)
+    assert [hs[s]["status"] for s in (1, 2, 3, 4)] == ["poverty", "play", "check", "check"]
+    app.outbox.clear()
+    play.refuse_trump(conn, hs[1]["id"])  # seat 2 is poor: seat 3 is asked next
+    game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+    assert game["turn_seat"] == 3 and hands(conn, game_id)[3]["status"] == "poverty"
+    assert [m["To"] for m in app.outbox] == ["u3@x.org"]
+    controls = play.controls(conn, game_id, 3, "/x")
+    assert controls["stage"] == "poverty_ask"
+    assert controls["poor"] == [{"user": 2, "name": "User2", "trump": 2, "low": False}]
+    play.take_trump(conn, hs[3]["id"], 2)
+    hs = hands(conn, game_id)
+    assert {s: h["party"] for s, h in hs.items()} == {1: "contra", 2: "re", 3: "re", 4: "contra"}
+    held = lambda seat: [r[0] for r in conn.execute("SELECT card FROM hand_card WHERE hand = ?", (hs[seat]["id"],))]
+    assert len(held(3)) == 14 and len(held(2)) == 10 and not {1, 25} & set(held(2))
+    controls = play.controls(conn, game_id, 3, "/x")
+    assert (controls["stage"], controls["give_back"]) == ("exchange", 2)
+    with pytest.raises(play.PlayError):
+        play.give_back(conn, hs[2]["id"], 33)  # the poor player gives nothing back
+    with pytest.raises(play.PlayError, match="do not have"):
+        play.give_back(conn, hs[3]["id"], 99)
+    play.give_back(conn, hs[3]["id"], 15)
+    assert status(conn, game_id) == "pre" and len(held(3)) == 13
+    app.outbox.clear()
+    play.give_back(conn, hs[3]["id"], 16)
+    assert status(conn, game_id) == "play" and len(held(2)) == 12 and len(held(3)) == 12
+    assert {15, 16} <= set(held(2))
+    game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+    assert game["turn_seat"] == game["start_seat"] == 1
+    assert [m["To"] for m in app.outbox] == ["a@x.org"]  # the first player is told
+    # (all trump exchanged are on record: 2 taken, 2 given back)
+    assert conn.execute("SELECT count(*) FROM card_exchange").fetchone()[0] == 4
+    play_out(conn, game_id, random.Random(2))
+    assert status(conn, game_id) == "gameover"
+
+
+def test_nobody_takes_the_trump_the_game_is_canceled(app, conn):
+    game_id = poverty_game(conn, [2])
+    for seat in (1, 3, 4):
+        play.refuse_trump(conn, hands(conn, game_id)[seat]["id"])
+    assert status(conn, game_id) == "cancel-trump"
+    assert play.next_players(conn, game_id) == [1, 2, 3, 4]  # the same dealer again
+
+
+def test_a_poverty_without_trump_starts_right_away(app, conn):
+    game_id = new_game(conn)
+    stack(conn, game_id, {2: [33, 34, 27, 28, 29, 30, 31, 32, 35, 36, 37, 38]})
+    start(conn, game_id, {2: ("poverty", None)})
+    play.take_trump(conn, hands(conn, game_id)[1]["id"], 2)
+    assert status(conn, game_id) == "play"
+    assert {h["party"] for h in hands(conn, game_id).values() if h["seat"] in (1, 2)} == {"re"}
+
+
+def test_double_poverty(app, conn):
+    game_id = poverty_game(conn, [1, 3])
+    game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+    assert (game["type"], game["turn_seat"]) == ("dpoverty", 2)  # the first seat that is not poor
+    hs = hands(conn, game_id)
+    play.take_trump(conn, hs[2]["id"], 3)  # seat 2 takes the trump of seat 3's player
+    game = conn.execute("SELECT * FROM game WHERE id = ?", (game_id,)).fetchone()
+    assert game["turn_seat"] == 2  # still to give cards back
+    assert hands(conn, game_id)[4]["status"] == "poverty"  # the other one is asked
+    assert play.controls(conn, game_id, 4, "/x")["poor"][0]["user"] == 1  # only the poverty left
+    for card in [r[0] for r in conn.execute("SELECT card FROM hand_card WHERE hand = ? ORDER BY id DESC LIMIT 2", (hs[2]["id"],))]:
+        play.give_back(conn, hs[2]["id"], card)
+    assert status(conn, game_id) == "pre"
+    play.take_trump(conn, hs[4]["id"], 1)
+    hs = hands(conn, game_id)
+    assert {s: h["party"] for s, h in hs.items()} == {2: "re", 3: "re", 4: "contra", 1: "contra"}
+    for card in [r[0] for r in conn.execute("SELECT card FROM hand_card WHERE hand = ? ORDER BY id DESC LIMIT 2", (hs[4]["id"],))]:
+        play.give_back(conn, hs[4]["id"], card)
+    assert status(conn, game_id) == "play"
+    play_out(conn, game_id, random.Random(5))
+    assert status(conn, game_id) == "gameover"
+
+
+def test_double_poverty_is_canceled_if_one_player_says_no(app, conn):
+    game_id = poverty_game(conn, [1, 3])
+    play.refuse_trump(conn, hands(conn, game_id)[2]["id"])
+    assert status(conn, game_id) == "cancel-trump"
+
+
+def test_only_the_asked_player_decides(app, conn):
+    game_id = poverty_game(conn, [2])
+    hs = hands(conn, game_id)
+    for seat in (2, 3, 4):
+        with pytest.raises(play.PlayError):
+            play.take_trump(conn, hs[seat]["id"], 2)
+        with pytest.raises(play.PlayError):
+            play.refuse_trump(conn, hs[seat]["id"])
+    with pytest.raises(play.PlayError):
+        play.take_trump(conn, hs[1]["id"], 3)  # seat 3 has no poverty
+    play.take_trump(conn, hs[1]["id"], 2)
+    with pytest.raises(play.PlayError):
+        play.take_trump(conn, hs[1]["id"], 2)  # taken already
 
 
 def test_wedding_partner_is_the_first_to_win_a_trick_from_the_bride(app, conn):
@@ -347,3 +463,65 @@ def test_live_games_pass_the_replay_check(app, conn, database):
     bad = {kind: games for kind, games in bad.items() if games}
     assert not bad, bad
     assert ok["games"] == 13  # 12 played here, and the stub
+
+
+def settle(conn, game_id, rng):
+    """Answer the poverty questions (mostly yes) until the game starts or is canceled."""
+    while status(conn, game_id) == "pre":
+        asked = conn.execute("SELECT * FROM hand WHERE game = ? AND status = 'poverty'", (game_id,)).fetchone()
+        assert asked is not None, "the game is stuck"
+        c = play.controls(conn, game_id, asked["user"], "/x")
+        if c["stage"] == "poverty_ask":
+            if rng.random() < 0.85:
+                play.take_trump(conn, asked["id"], rng.choice(c["poor"])["user"])
+            else:
+                play.refuse_trump(conn, asked["id"])
+        else:
+            assert c["stage"] == "exchange"
+            play.give_back(conn, asked["id"], rng.choice(sorted(c["legal"])))
+
+
+def test_random_games_with_everything_pass_the_replay_check(app, conn, database, monkeypatch):
+    import replay_check
+
+    rng = random.Random(11)
+    monkeypatch.setattr(play.random, "SystemRandom", lambda: rng)
+    kinds = {}
+    for n in range(120):
+        rs = rules.Rules(
+            rng.choice(["none", "firstwins", "secondwins"]),
+            rng.choice(["none", "both", "second", "secondaftercall"]),
+            "poverty",
+            rng.choice(["1st-own-card", "5th-card", "9-cards"]),
+        )
+        game_id = new_game(conn, rs)
+        for seat, h in hands(conn, game_id).items():
+            play.join(conn, h["id"])
+            options = play.sickness_options(play.load(conn, game_id).start[seat], rs)
+            if "nines" in options and rng.random() < 0.5:
+                answer = ("nines", None)
+            elif n % 7 == 0 and seat == 4:
+                answer = ("solo", rng.choice(play.SOLOS))
+            elif "poverty" in options:
+                answer = ("poverty", None)
+            elif "lowtrump" in options:
+                answer = ("lowtrump", None)
+            elif "wedding" in options and rng.random() < 0.7:
+                answer = ("wedding", None)
+            else:
+                answer = ("none", None)
+            play.declare(conn, h["id"], *answer)
+        settle(conn, game_id, rng)
+        kind = conn.execute("SELECT type, status FROM game WHERE id = ?", (game_id,)).fetchone()
+        kinds[(kind["type"], kind["status"] if kind["status"].startswith("cancel") else "played")] = kinds.get((kind["type"], kind["status"] if kind["status"].startswith("cancel") else "played"), 0) + 1
+        if status(conn, game_id) == "play":
+            play_out(conn, game_id, rng)
+            assert status(conn, game_id) == "gameover"
+            assert {h["status"] for h in hands(conn, game_id).values()} == {"gameover"}
+    assert kinds.get(("poverty", "played"), 0) >= 5, kinds
+    assert kinds.get(("dpoverty", "played"), 0) >= 1, kinds
+    ok, bad = replay_check.check(database)
+    bad.pop("_diff", None)
+    bad["incomplete tricks"].remove(1)  # the stub game of the shared fixture
+    bad = {kind: games for kind, games in bad.items() if games}
+    assert not bad, bad

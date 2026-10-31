@@ -23,7 +23,7 @@
   {% endif %}
 </div>
 
-{% if controls and controls.stage in ("join", "declare", "wait", "wait_turn") %}
+{% if controls and controls.stage in ("join", "declare", "wait", "wait_turn", "poverty_ask", "exchange") %}
 <section class="play-controls" aria-live="polite">
   {% if controls.stage == "join" %}
   <p><strong>{{ _("Do you want to play this game?") }}</strong></p>
@@ -53,6 +53,24 @@
     {% if "wedding" in controls.sickness %}<p><small>{{ _("With both club queens and no wedding you play a silent solo, alone against the three others.") }}</small></p>{% endif %}
     <button type="submit">{{ _("Done") }}</button>
   </form>
+  {% elif controls.stage == "poverty_ask" %}
+  <p><strong>{{ _("Somebody has poverty. Do you want to take their trump?") }}</strong></p>
+  <ul>
+    {% for p in controls.poor %}
+    <li>{{ ngettext("%(name)s has %(num)d trump.", "%(name)s has %(num)d trump.", p.trump, name=p.name) }}{% if p.low %} {{ _("(low trump)") }}{% endif %}
+      <form method="post" action="{{ controls.base }}/take" class="inline">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <input type="hidden" name="poor" value="{{ p.user }}">
+        <button type="submit">{{ _("Yes, take it") }}</button>
+      </form></li>
+    {% endfor %}
+  </ul>
+  <form method="post" action="{{ controls.base }}/refuse" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button type="submit" class="secondary outline">{{ _("No way") }}</button>
+  </form>
+  {% elif controls.stage == "exchange" %}
+  <p><strong>{{ ngettext("Click %(num)d card to give it back to your partner.", "Click %(num)d cards, one after the other, to give them back to your partner.", controls.give_back) }}</strong></p>
   {% elif controls.stage == "wait" %}
   <p>{{ _("Waiting for the other players. You get a mail when the game starts.") }}</p>
   {% else %}
@@ -80,6 +98,11 @@
       <p><strong>{{ _("It is your turn: click a card.") }}</strong>
       {% if controls.calls %}<label class="announce">{{ _("Announce with it:") }}
         <select name="call"><option value="">–</option>{% for c in controls.calls %}<option value="{{ c.value }}">{{ c.words }}</option>{% endfor %}</select></label>{% endif %}</p>
+    </form>
+    {% elif s.cards and s.is_me and controls and controls.stage == "exchange" %}
+    <form method="post" action="{{ controls.base }}/giveback" class="play-form">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <div class="hand">{% for c in s.cards %}<button type="submit" name="card" value="{{ c.id }}" class="card-button" title="{{ _('Give back %(card)s', card=card_name(c)) }}">{{ card(c, "small") }}</button>{% endfor %}</div>
     </form>
     {% elif s.cards %}
     <div class="hand">{% for c in s.cards %}{{ card(c, "small") }}{% endfor %}</div>

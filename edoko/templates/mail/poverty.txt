@@ -1,0 +1,5 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans id=game_id %}Somebody has poverty in game {{ id }}: it is your turn to decide if you want to take the trump. Please visit:{% endtrans %}
+
+{{ link }}

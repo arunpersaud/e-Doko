@@ -160,3 +160,28 @@ def test_reminders_and_cancelling_an_idle_game(app, conn):
     with seats[2].client.session_transaction() as session:
         session["csrf"] = "t"
     assert "over already" in seats[2].post("cancel", csrf="t").get_data(as_text=True)
+
+
+def test_poverty_pages_over_http(app, conn):
+    from test_play import poverty_game
+
+    game_id = poverty_game(conn, [2], RS)
+    seats = {seat: Seat(app, token) for seat, token in tokens(conn, game_id).items()}
+    html = seats[1].page()
+    assert "Do you want to take their trump?" in html and "User2 has 2 trump." in html
+    assert "Yes, take it" in html and "No way" in html
+    assert "Waiting for the other players" in seats[2].page()
+    html = seats[1].post("refuse").get_data(as_text=True)
+    assert "Do you want to take their trump?" not in html  # the question went on to seat 3
+    html = seats[3].page()
+    assert "Do you want to take their trump?" in html
+    html = seats[3].post("take", poor="2").get_data(as_text=True)
+    assert "Click 2 cards" in html
+    buttons = re.findall(r'name="card" value="(\d+)"', html)
+    assert len(buttons) == 14
+    html = seats[3].post("giveback", card=buttons[0]).get_data(as_text=True)
+    assert "Click 1 card to give it back" in html
+    html = seats[3].post("giveback", card=buttons[1]).get_data(as_text=True)
+    assert conn.execute("SELECT status FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "play"
+    assert "It is not your turn" in html
+    assert "It is your turn: click a card." in seats[1].page()

@@ -497,10 +497,6 @@ def declare(
                 raise PlayError(_("That kind of solo does not exist."))
         elif sickness not in sickness_options(state.start[seat], state.rs):
             raise PlayError(_("Your cards do not allow that."))
-        if sickness in ("poverty", "lowtrump") and not (
-            sickness == "lowtrump" and state.rs.lowtrump == "cancel"
-        ):
-            raise PlayError(_("Poverty can not be played on this site yet."))
         db.execute(
             "UPDATE hand SET status = 'check', sickness = ?, solo = ? WHERE id = ?",
             (sickness, solo if sickness == "solo" else None, hand_id),
@@ -531,6 +527,11 @@ def resolve(db: sqlite3.Connection, game_id: int) -> list:
         return cancel(db, game_id, "cancel-nines")
     if rs.lowtrump == "cancel" and any(s == "lowtrump" for s in sick.values()):
         return cancel(db, game_id, "cancel-lowtrump")
+    poor = poor_seats(state)
+    if len(poor) > 2:  # nobody can take that much trump
+        return cancel(db, game_id, "cancel-trump")
+    if poor:
+        return start_poverty(db, state, poor)
     return start_play(db, game_id)
 
 
@@ -737,6 +738,13 @@ def notify(db: sqlite3.Connection, notices: list) -> None:
                     "turn", turn=True, game_id=game_id, first=notice[2],
                     link=_link(h["token"]),
                 )
+        elif kind == "poverty":
+            h = next((h for h in hands if h["seat"] == game["turn_seat"]), None)
+            if h is not None:
+                _mail(
+                    db, h["user"], _l("Game %(id)d: poverty, do you take the trump?", id=game_id),
+                    "poverty", game_id=game_id, link=_link(h["token"]),
+                )
         elif kind == "reminder":
             h = next((h for h in hands if h["seat"] == game["turn_seat"]), None)
             if h is not None:
@@ -749,6 +757,7 @@ def notify(db: sqlite3.Connection, notices: list) -> None:
                 "cancel-noplay": _l("one of the players does not want to play"),
                 "cancel-nines": _l("a player has five or more nines"),
                 "cancel-lowtrump": _l("a player has only low trump"),
+                "cancel-trump": _l("nobody wanted to take the trump"),
                 "cancel-timedout": _l("it took too long"),
             }
             for h in hands:
@@ -793,13 +802,27 @@ def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> d
         elif hand["status"] == "init":
             found["stage"] = "declare"
             options = sickness_options(state.start[seat], state.rs)
-            # (poverty is not played yet, see declare)
-            found["sickness"] = [
-                o
-                for o in options
-                if o in ("wedding", "nines") or (o == "lowtrump" and state.rs.lowtrump == "cancel")
-            ]
+            found["sickness"] = options
             found["solos"] = SOLOS
+        elif hand["status"] == "poverty":
+            if hand["party"] is None:
+                found["stage"] = "poverty_ask"
+                found["poor"] = [
+                    {
+                        "user": state.hands[s]["user"],
+                        "name": db.execute(
+                            "SELECT name FROM user WHERE id = ?", (state.hands[s]["user"],)
+                        ).fetchone()[0],
+                        "trump": sum(1 for c in state.held[s] if c < 27),
+                        "low": state.hands[s]["sickness"] == "lowtrump",
+                    }
+                    for s in poor_seats(state)
+                    if state.hands[s]["party"] is None
+                ]
+            elif len(state.held[seat]) > 12:
+                found["stage"] = "exchange"
+                found["give_back"] = len(state.held[seat]) - 12
+                found["legal"] = set(state.held[seat])
     elif game["turn_seat"] == seat:
         found["stage"] = "play"
         found["legal"] = set(legal_cards(state, seat))
@@ -993,4 +1016,173 @@ def cancel_idle(db: sqlite3.Connection, game_id: int, user_id: int) -> None:
         if idle_days(db, game_id) < CANCEL_AFTER_DAYS:
             raise PlayError(_("You need to wait longer before you can cancel a game."))
         notices = cancel(db, game_id, "cancel-timedout")
+    notify(db, notices)
+
+
+# ---------------------------------------------------------------- poverty ---
+
+
+def is_poor(rs: rules.Rules, sickness: str | None) -> bool:
+    return sickness == "poverty" or (rs.lowtrump == "poverty" and sickness == "lowtrump")
+
+
+def poor_seats(state: State) -> list[int]:
+    return [s for s, h in sorted(state.hands.items()) if is_poor(state.rs, h["sickness"])]
+
+
+def start_poverty(db: sqlite3.Connection, state: State, poor: list[int]) -> list:
+    """One or two players have poverty: their trump is offered to the others in
+    seat order, the first seat that is not poor is asked first."""
+    game_id = state.game["id"]
+    kind = "poverty" if len(poor) == 1 else "dpoverty"
+    db.execute("UPDATE game SET type = ? WHERE id = ?", (kind, game_id))
+    for seat, hand in state.hands.items():
+        db.execute(
+            "UPDATE hand SET status = ? WHERE id = ?",
+            ("play" if seat in poor else "check", hand["id"]),
+        )
+    first = next(s for s in sorted(state.hands) if s not in poor)
+    return ask_trump(db, game_id, first)
+
+
+def ask_trump(db: sqlite3.Connection, game_id: int, seat: int) -> list:
+    db.execute("UPDATE hand SET status = 'poverty' WHERE game = ? AND seat = ?", (game_id, seat))
+    db.execute(
+        "UPDATE game SET turn_seat = ?, sickness_state = ?, updated_at = CURRENT_TIMESTAMP"
+        " WHERE id = ?",
+        (seat, seat, game_id),
+    )
+    return [("poverty", game_id)]
+
+
+def _asked(db: sqlite3.Connection, hand_id: int) -> State:
+    """The state of a game where this hand has been asked about poverty trump."""
+    hand = _hand(db, hand_id)
+    state = load(db, hand["game"])
+    if (
+        state.game["status"] != "pre"
+        or state.game["type"] not in ("poverty", "dpoverty")
+        or hand["status"] != "poverty"
+        or hand["party"] is not None
+    ):
+        raise PlayError(_("Nobody is asking you about trump now."))
+    return state
+
+
+def maybe_start(db: sqlite3.Connection, game_id: int) -> list:
+    """Everybody is ready: the game starts."""
+    if db.execute(
+        "SELECT 1 FROM hand WHERE game = ? AND status != 'play'", (game_id,)
+    ).fetchone():
+        return []
+    db.execute(
+        "UPDATE game SET status = 'play', turn_seat = start_seat,"
+        " updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (game_id,),
+    )
+    return [("turn", game_id, True)]
+
+
+def refuse_trump(db: sqlite3.Connection, hand_id: int) -> None:
+    """"No way": the next player is asked; nobody left (or a double poverty): canceled."""
+    with transaction(db):
+        state = _asked(db, hand_id)
+        game_id = state.game["id"]
+        seat = next(s for s, h in state.hands.items() if h["id"] == hand_id)
+        db.execute("UPDATE hand SET status = 'play' WHERE id = ?", (hand_id,))
+        poor = poor_seats(state)
+        later = [s for s in range(seat + 1, 5) if s not in poor]
+        if state.game["type"] == "dpoverty" or not later:
+            notices = cancel(db, game_id, "cancel-trump")
+        else:
+            notices = ask_trump(db, game_id, later[0])
+    notify(db, notices)
+
+
+def take_trump(db: sqlite3.Connection, hand_id: int, poor_user: int) -> None:
+    """Take the trump of a poor player; the cards to give back follow."""
+    notices: list = []
+    with transaction(db):
+        state = _asked(db, hand_id)
+        game_id = state.game["id"]
+        me = next(s for s, h in state.hands.items() if h["id"] == hand_id)
+        target = next(
+            (
+                s for s in poor_seats(state)
+                if state.hands[s]["user"] == poor_user and state.hands[s]["party"] is None
+            ),
+            None,
+        )
+        if target is None:
+            raise PlayError(_("That player has no trump to take."))
+        mine, theirs = state.hands[me]["id"], state.hands[target]["id"]
+        for row in db.execute(
+            "SELECT id, card FROM hand_card WHERE hand = ? AND card < 27", (theirs,)
+        ).fetchall():
+            db.execute("UPDATE hand_card SET hand = ? WHERE id = ?", (mine, row["id"]))
+            db.execute(
+                "INSERT INTO card_exchange (from_hand, to_hand, card) VALUES (?, ?, ?)",
+                (theirs, mine, row["card"]),
+            )
+        pair = (me, target)
+        if state.game["type"] == "poverty":
+            for seat, hand in state.hands.items():
+                db.execute(
+                    "UPDATE hand SET party = ? WHERE id = ?",
+                    ("re" if seat in pair else "contra", hand["id"]),
+                )
+                if seat not in pair:
+                    db.execute("UPDATE hand SET status = 'play' WHERE id = ?", (hand["id"],))
+        else:
+            first = not any(h["party"] == "re" for h in state.hands.values())
+            for seat in pair:
+                db.execute(
+                    "UPDATE hand SET party = ? WHERE id = ?",
+                    ("re" if first else "contra", state.hands[seat]["id"]),
+                )
+            if first:  # the other player who is not poor decides about the other poverty
+                other = next(
+                    s for s in sorted(state.hands) if s not in poor_seats(state) and s != me
+                )
+                notices += ask_trump(db, game_id, other)
+        taken = db.execute("SELECT count(*) FROM hand_card WHERE hand = ?", (mine,)).fetchone()[0]
+        if taken == 12:  # a poverty without trump
+            db.execute("UPDATE hand SET status = 'play' WHERE id = ?", (mine,))
+            notices += maybe_start(db, game_id)
+        else:
+            db.execute("UPDATE game SET turn_seat = ? WHERE id = ?", (me, game_id))
+    notify(db, notices)
+
+
+def give_back(db: sqlite3.Connection, hand_id: int, card: int) -> None:
+    """Return one card to the poor player (as many as trump was taken)."""
+    notices: list = []
+    with transaction(db):
+        hand = _hand(db, hand_id)
+        state = load(db, hand["game"])
+        seat = hand["seat"]
+        if (
+            state.game["status"] != "pre"
+            or hand["status"] != "poverty"
+            or hand["party"] is None
+            or len(state.held[seat]) <= 12
+        ):
+            raise PlayError(_("You do not have to give cards back."))
+        if card not in state.held[seat]:
+            raise PlayError(_("You do not have that card."))
+        partner = db.execute(
+            "SELECT from_hand FROM card_exchange WHERE to_hand = ? ORDER BY id LIMIT 1",
+            (hand_id,),
+        ).fetchone()[0]
+        db.execute(
+            "UPDATE hand_card SET hand = ? WHERE hand = ? AND card = ?",
+            (partner, hand_id, card),
+        )
+        db.execute(
+            "INSERT INTO card_exchange (from_hand, to_hand, card) VALUES (?, ?, ?)",
+            (hand_id, partner, card),
+        )
+        if len(state.held[seat]) - 1 == 12:
+            db.execute("UPDATE hand SET status = 'play' WHERE id = ?", (hand_id,))
+            notices = maybe_start(db, hand["game"])
     notify(db, notices)

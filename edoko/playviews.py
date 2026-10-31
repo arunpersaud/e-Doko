@@ -15,7 +15,7 @@ from .db import get_db, query, query_one
 
 bp = Blueprint("playviews", __name__)
 
-ACTIONS = ("join", "decline", "declare", "play", "remind", "cancel")
+ACTIONS = ("join", "decline", "declare", "play", "remind", "cancel", "take", "refuse", "giveback")
 
 
 def act(hand, action: str):
@@ -34,6 +34,15 @@ def act(hand, action: str):
             if card is None:
                 raise play.PlayError("Please choose a card.")
             play.play_card(db, hand["id"], card, call)
+        elif action == "take":
+            play.take_trump(db, hand["id"], form.get("poor", type=int, default=0))
+        elif action == "refuse":
+            play.refuse_trump(db, hand["id"])
+        elif action == "giveback":
+            card = form.get("card", type=int)
+            if card is None:
+                raise play.PlayError("Please choose a card.")
+            play.give_back(db, hand["id"], card)
         elif action == "remind":
             play.remind(db, hand["game"], hand["user"])
             flash(_("An email has been sent out."))
