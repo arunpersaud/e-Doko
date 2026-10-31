@@ -244,3 +244,5 @@ button.card-button[type="submit"]:hover, button.card-button[type="submit"]:focus
 .bubble-edit input[type="text"], .bubble-edit button { margin: 0; }
 .remark-form { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.6rem 0; }
 .remark-form select, .remark-form input[type="text"], .remark-form button { margin: 0; width: auto; flex: 1 1 10rem; }
+.play-form p { margin-bottom: 0.5rem; }
+.play-form input[type="text"] { margin-bottom: 0; }
