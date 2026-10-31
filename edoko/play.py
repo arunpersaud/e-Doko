@@ -724,3 +724,43 @@ def notify(db: sqlite3.Connection, notices: list) -> None:
                     scores=[(x["name"], x["points"]) for x in hands],
                     link=_link(h["token"]),
                 )
+
+
+# ------------------------------------------------------ what a page shows ---
+
+
+def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> dict | None:
+    """What this player can do in the game now (None: nothing, or not a player).
+
+    base: the address the forms post to (".../join", ".../play" are added).
+    stage: join (asked whether to play), declare (asked whether sick), wait
+    (for the others to answer), play (on turn), wait_turn.
+    """
+    state = load(db, game_id)
+    game = state.game
+    seat = next((s for s, h in state.hands.items() if h["user"] == user_id), None)
+    if game["status"] not in ACTIVE or seat is None:
+        return None
+    hand = state.hands[seat]
+    found: dict = {"base": base, "stage": "wait", "legal": set(), "calls": []}
+    if game["status"] == "pre":
+        if hand["status"] == "start":
+            found["stage"] = "join"
+        elif hand["status"] == "init":
+            found["stage"] = "declare"
+            options = sickness_options(state.start[seat], state.rs)
+            # (wedding and poverty are not played yet, see declare)
+            found["sickness"] = [
+                o for o in options if o == "nines" or (o == "lowtrump" and state.rs.lowtrump == "cancel")
+            ]
+            found["solos"] = SOLOS
+    elif game["turn_seat"] == seat:
+        found["stage"] = "play"
+        found["legal"] = set(legal_cards(state, seat))
+        found["calls"] = [
+            {"value": what, "words": call_words(hand["party"], what)}
+            for what in possible_calls(state, seat)
+        ]
+    else:
+        found["stage"] = "wait_turn"
+    return found

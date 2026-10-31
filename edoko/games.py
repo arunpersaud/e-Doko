@@ -13,9 +13,9 @@ from flask import Blueprint, abort, g, redirect, render_template, request, url_f
 from flask_babel import lazy_gettext as _l
 from werkzeug.routing import BaseConverter
 
-from . import gameview
+from . import gameview, play
 from .auth import login_required
-from .db import query, query_one
+from .db import get_db, query, query_one
 
 bp = Blueprint("games", __name__)
 
@@ -99,6 +99,7 @@ def render_game(
     trick: int | None = None,
     logged_in: bool = True,
     origin: int | None = None,
+    base: str | None = None,
 ):
     """The page of a game for one of its players or for a qualified viewer.
 
@@ -106,6 +107,7 @@ def render_game(
     the tricks so far and their own cards.
     origin: another game of the same deal; the table is turned so that its
     seats are at the same places as in that game.
+    base: where the forms of live play post to (the seat link or the game page).
     """
     anchor = gameview.viewpoint_seat(origin, user_id) if origin else None
     context = gameview.build(
@@ -119,6 +121,7 @@ def render_game(
         previous=None,
         next=None,
         trick_url=trick_url,
+        controls=None if full or base is None else play.controls(get_db(), game_id, user_id, base),
     )
     if logged_in:
         # only games this viewer may open: their own, and those of the same deals
@@ -235,7 +238,9 @@ def game(game_id, trick, origin):
     if origin is not None and not (details and comparable(user_id, game_id, origin)):
         # not the same deal, or not a game this viewer may see: the plain page
         return redirect(url_for("games.game", game_id=game_id, trick=trick))
-    return render_game(game_id, user_id, full=details, trick=trick, origin=origin)
+    return render_game(
+        game_id, user_id, full=details, trick=trick, origin=origin, base=f"/game/{game_id}"
+    )
 
 
 @bp.route("/<token:token>", defaults={"trick": None})
@@ -263,6 +268,7 @@ def seat(token, trick):
         full=hand["status"] == OVER,
         trick=trick,
         logged_in=logged_in,
+        base=f"/{token}",
     )
 
 

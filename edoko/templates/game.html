@@ -23,6 +23,43 @@
   {% endif %}
 </div>
 
+{% if controls and controls.stage in ("join", "declare", "wait", "wait_turn") %}
+<section class="play-controls" aria-live="polite">
+  {% if controls.stage == "join" %}
+  <p><strong>{{ _("Do you want to play this game?") }}</strong></p>
+  <form method="post" action="{{ controls.base }}/join" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button type="submit">{{ _("Yes, let's play") }}</button>
+  </form>
+  <form method="post" action="{{ controls.base }}/decline" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button type="submit" class="secondary outline">{{ _("No, cancel the game") }}</button>
+  </form>
+  {% elif controls.stage == "declare" %}
+  <form method="post" action="{{ controls.base }}/declare">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <fieldset>
+      <legend><strong>{{ _("Look at your cards. Is there anything to say before the game starts?") }}</strong></legend>
+      <label><input type="radio" name="sickness" value="none" checked> {{ _("No, everything is fine") }}</label>
+      <label><input type="radio" name="sickness" value="solo"> {{ _("I want to play a solo:") }}
+        <select name="solo" aria-label="{{ _('Kind of solo') }}">
+          {% for s in controls.solos %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+        </select></label>
+      {% for option in controls.sickness %}
+      <label><input type="radio" name="sickness" value="{{ option }}">
+        {% if option == "nines" %}{{ _("I have five or more nines") }}{% elif option == "lowtrump" %}{{ _("I only have low trump") }}{% else %}{{ option }}{% endif %}</label>
+      {% endfor %}
+    </fieldset>
+    <button type="submit">{{ _("Done") }}</button>
+  </form>
+  {% elif controls.stage == "wait" %}
+  <p>{{ _("Waiting for the other players. You get a mail when the game starts.") }}</p>
+  {% else %}
+  <p>{{ _("It is not your turn. You get a mail when it is.") }}</p>
+  {% endif %}
+</section>
+{% endif %}
+
 <div id="table">
 <div class="table-view">
   {% for s in seats %}
@@ -35,7 +72,15 @@
       {% for icon, title in s.badges %}<img class="badge" src="{{ url_for('static', filename='icons/%s_button.png' % icon) }}" alt="{{ title }}" title="{{ title }}" width="28" height="28">{% endfor %}
       <small class="muted">{{ ngettext("%(num)d trick", "%(num)d tricks", s.tricks) }}{% if s.on_turn %} · {{ _("on turn") }}{% endif %}</small>
     </header>
-    {% if s.cards %}
+    {% if s.cards and s.is_me and controls and controls.stage == "play" %}
+    <form method="post" action="{{ controls.base }}/play" class="play-form">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <div class="hand">{% for c in s.cards %}{% if c.id in controls.legal %}<button type="submit" name="card" value="{{ c.id }}" class="card-button" title="{{ _('Play %(card)s', card=card_name(c)) }}">{{ card(c, "small") }}</button>{% else %}<span class="unplayable">{{ card(c, "small") }}</span>{% endif %}{% endfor %}</div>
+      <p><strong>{{ _("It is your turn: click a card.") }}</strong>
+      {% if controls.calls %}<label class="announce">{{ _("Announce with it:") }}
+        <select name="call"><option value="">–</option>{% for c in controls.calls %}<option value="{{ c.value }}">{{ c.words }}</option>{% endfor %}</select></label>{% endif %}</p>
+    </form>
+    {% elif s.cards %}
     <div class="hand">{% for c in s.cards %}{{ card(c, "small") }}{% endfor %}</div>
     {% endif %}
     {% if s.bubbles %}

@@ -33,6 +33,7 @@ from . import (
     games,
     migrations,
     passkeys,
+    playviews,
     views,
 )
 from .cli import edoko
@@ -146,6 +147,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     auth.init_app(app)
     passkeys.init_app(app)
     games.init_app(app)
+    app.register_blueprint(playviews.bp)
     avatars.init_app(app)
     account.init_app(app)
     admin.init_app(app)
