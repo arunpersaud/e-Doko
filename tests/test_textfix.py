@@ -25,5 +25,16 @@ def test_migration_repairs_comments(tmp_path):
         c.execute("INSERT INTO ruleset (id, dullen, schweinchen, lowtrump, call) VALUES (1, 'none', 'none', 'poverty', '1st-own-card')")
         c.execute("INSERT INTO game (id, session, deal, ruleset, status) VALUES (1, 1, 1, 1, 'gameover')")
         c.execute("INSERT INTO comment (game, kind, user, body) VALUES (1, 'pre', 1, 'zurÃ¼ck')")
-        assert migrations.apply(c, 6) == [7]
+        assert migrations.apply(c, 6) == [7, 8]
         assert c.execute("SELECT body FROM comment").fetchone()[0] == "zurück"
+
+
+def test_migration_gives_a_nameless_user_a_name(tmp_path):
+    path = tmp_path / "e.sqlite"
+    db.init_db(path)
+    with closing(db.connect(path)) as c:
+        c.execute("PRAGMA user_version = 7")
+        c.execute("INSERT INTO user (id, name, email) VALUES (51, '', 'a@x.org')")
+        c.execute("INSERT INTO user (id, name, email) VALUES (52, 'Bo', 'b@x.org')")
+        assert migrations.apply(c, 7) == [8]
+        assert [r[0] for r in c.execute("SELECT name FROM user ORDER BY id")] == ["Player 51", "Bo"]

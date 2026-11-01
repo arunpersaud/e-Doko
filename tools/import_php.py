@@ -88,7 +88,7 @@ def _copy(old: sqlite3.Connection, new: sqlite3.Connection, report: Counter) -> 
         insert(
             "user",
             id=r["id"],
-            name=r["fullname"],
+            name=(r["fullname"] or "").strip() or f"Player {r['id']}",
             email=r["email"],
             timezone=r["timezone"] or "Europe/London",
             language=p.get("language") if p.get("language") in ("en", "de") else None,

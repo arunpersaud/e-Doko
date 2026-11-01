@@ -9,7 +9,7 @@ with the real database or with mail credentials: the app refuses to start.
 import re
 from itertools import count
 
-from flask import Blueprint, abort, current_app, redirect, render_template, url_for
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 from markupsafe import Markup, escape
 
 from . import auth, digest
@@ -88,7 +88,11 @@ def login(user_id):
     if get_db().execute("SELECT 1 FROM user WHERE id = ?", (user_id,)).fetchone() is None:
         abort(404)
     auth.log_in(user_id)
-    return redirect(url_for("site.index"))
+    # back to the page the button was on (a path on this site only)
+    target = request.form.get("next", "")
+    if not target.startswith("/") or target.startswith("//") or "\\" in target:
+        target = url_for("site.index")
+    return redirect(target)
 
 
 @bp.route("/digest", methods=["POST"])

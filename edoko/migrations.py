@@ -86,6 +86,11 @@ CREATE INDEX mail_queue_user ON mail_queue(user, id);
 UPDATE comment SET body = repair_text(body) WHERE body != repair_text(body);
 UPDATE note SET body = repair_text(body) WHERE body != repair_text(body);
 """,
+    # a user without a name (an old account that never filled it in) is
+    # invisible at the tables
+    8: """
+UPDATE user SET name = 'Player ' || id WHERE trim(name) = '';
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

@@ -65,3 +65,14 @@ def test_demo_over_plain_http_accepts_origin_null_with_the_token(demo_app):
     token = re.search(r'name="csrf" value="([^"]+)"', html).group(1)
     assert client.post("/demo/login/1", data={"csrf": token}, headers={"Origin": "null"}).status_code == 302
     assert client.post("/demo/login/1", data={"csrf": "wrong"}, headers={"Origin": "null"}).status_code == 403
+
+
+def test_continue_as_returns_to_the_page_and_only_to_this_site(demo_app):
+    client = demo_app.test_client()
+    for sent, expected in (("/game/1/trick/2", "/game/1/trick/2"), ("//evil.example/", "/"),
+                           ("https://evil.example/", "/"), ("", "/")):
+        html = client.get("/demo/").get_data(as_text=True)  # (a login renews the token)
+        token = re.search(r'name="csrf" value="([^"]+)"', html).group(1)
+        response = client.post("/demo/login/2", data={"csrf": token, "next": sent})
+        assert response.status_code == 302 and response.headers["Location"].endswith(expected), sent
+        assert "evil" not in response.headers["Location"]
