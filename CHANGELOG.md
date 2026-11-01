@@ -1,7 +1,15 @@
 # Changelog
 
-What changed on the new e-DoKo site (the Python rewrite), newest first. Every entry
-starts with labels in backticks so you can see at a glance what it is about:
+All notable changes to the new e-DoKo site (the Python rewrite) are documented in this
+file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Until the cutover from the old PHP site the versions are 0.x: milestones of the rewrite,
+where anything may change. The cutover is 1.0.0. After that a new major version means
+that something players or admins rely on changed incompatibly, a minor version adds
+features, and a patch version fixes bugs.
+
+Every entry starts with labels in backticks, so you can see at a glance what it is about:
 
 | Label | What it is about |
 | --- | --- |
@@ -15,22 +23,36 @@ starts with labels in backticks so you can see at a glance what it is about:
 | `data` | the data of the old site |
 
 Wishes and bugs are welcome as [issues on GitHub](https://github.com/arunpersaud/e-Doko/issues).
-The same list is shown on the site at `/changes` for now; the plan is to show this file
-there instead.
+The site shows a hand-written copy of this list at `/changes` for now; the plan is to show
+this file there instead.
 
-## 2026-11-01
+## [Unreleased]
 
-- `account` A start page for newcomers, and sign-up with a passkey: an emailed link, a name, a passkey. Only one mail per address at a time.
+### Added
+
+- `account` A start page for newcomers that explains the site, and sign-up with a passkey: an emailed link, a name, a passkey. Only one mail per address at a time, with limits against abuse.
 - `admin` `account` Admins can set sign-up to open, invitation-only or closed, and invite people by email (admin page or `flask --app edoko edoko invite`).
-- `design` The start page explains the site and shows an example table, in a light and a dark version.
+- `design` An example table on the start page, in a light and a dark version.
 - `game play` A finished table shows a summary: points, games won, solos, foxes caught and a game-by-game table.
 - `game play` `design` What was said before the game is shown as "Before the game", next to the trick numbers.
+- `design` A page with the changes (`/changes`), linked from the start page and the footer.
+- `admin` A demo mode (`FLASK_DEMO=1`) to try the site with nobody getting mail: the mails are shown in the pages, and you can continue as any player.
+
+### Changed
+
 - `game play` `design` The remark box is below your own cards, with a hint to write the remark before clicking the card.
 - `design` The "nothing has happened for N days" box is above the table.
 - `privacy` The privacy page says that a Gravatar picture is stored on our server and can be deleted.
-- `data` Umlauts in old comments are repaired; a player without a name is called "Player N".
 
-## 2026-10-31
+### Fixed
+
+- `rules` With the rule "Schweinchen after a call", a call made after the second fox no longer counts retroactively; the final scoring now agrees with the game as it was played.
+- `data` Umlauts in old comments are repaired, and a player without a name is called "Player N".
+- `design` The remark box fits into a narrow player box.
+
+## [0.4.0] - 2026-10-31
+
+### Added
 
 - `game play` `rules` Playing on the new site: join a game, declare a solo, wedding, poverty or nines, and play your cards, with all the rules of the old site (calls, Schweinchen, dullen).
 - `game play` Tables: start a table with house rules and an optional number of games; keep playing with the seats rotating; standings and a winner at the end.
@@ -38,16 +60,23 @@ there instead.
 - `game play` Remarks with a card: on any card of the trick shown, editable for 15 minutes.
 - `privacy` A privacy page that says what is stored.
 
-## 2026-10-22
+## [0.3.0] - 2026-10-22
+
+### Added
 
 - `mail` Mail that bounces or draws a complaint is noticed, so nobody is mailed at an address that does not work.
 
-## 2026-10-19
+## [0.2.0] - 2026-10-19
+
+### Added
 
 - `game play` Compare a game with how other tables played the same deal: the hands stay in the same places.
 
-## 2026-10-18
+## [0.1.0] - 2026-10-18
 
+### Added
+
+- `data` The games, players and comments of the old site are converted, and the finished games are replayed with the new rules engine to check them.
 - `design` `game play` A new game page: the table with four fixed places, the tricks one by one, speech bubbles for remarks, and an explanation of the game points.
 - `account` `design` Profile pictures: generated, uploaded or from Gravatar when you ask for it.
 - `account` `admin` Passkeys for logging in, a settings page and an admin page.
