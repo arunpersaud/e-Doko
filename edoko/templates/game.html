@@ -124,7 +124,7 @@
 
   <div class="felt">
     {% if selected %}
-    <div class="on-table">
+    <div class="on-table">{% if selected.plays %}
       <svg class="ring" viewBox="0 0 100 100" aria-hidden="true" data-lead="{{ ring.lead }}">
         <path class="ring-arc" d="{{ ring.arc }}"/>
         <polygon class="ring-head" points="{{ ring.head }}"/>
@@ -136,12 +136,12 @@
           {{ card(p) }}<span class="seq">{{ p.sequence }}</span>
         </figure>
         {% endfor %}
-      </div>
+      </div>{% endif %}
     </div>
     <nav class="trick-nav" aria-label="{{ _('Tricks') }}">
       {% set n = selected.number %}
-      {% if n > 1 %}<a href="{{ trick_url(n - 1) }}#table" rel="prev" hx-get="{{ trick_url(n - 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Previous trick') }}">‹</a>{% else %}<span class="off">‹</span>{% endif %}
-      <span class="trick-label"><span>{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}</span><span class="trick-winner">{% if selected.winner_seat %}{{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% else %}&nbsp;{% endif %}</span></span>
+      {% if n > 1 or (n == 1 and has_pre) %}<a href="{{ trick_url(n - 1) }}#table" rel="prev" hx-get="{{ trick_url(n - 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Previous trick') }}">‹</a>{% else %}<span class="off">‹</span>{% endif %}
+      <span class="trick-label"><span>{% if n == 0 %}{{ _("Before the game") }}{% else %}{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}{% endif %}</span><span class="trick-winner">{% if selected.winner_seat %}{{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% else %}&nbsp;{% endif %}</span></span>
       {% if n < tricks | length %}<a href="{{ trick_url(n + 1) }}#table" rel="next" hx-get="{{ trick_url(n + 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Next trick') }}">›</a>{% else %}<span class="off">›</span>{% endif %}
     </nav>
     {% if can_remark and base and selected.plays and not (controls and controls.stage == "play") %}
@@ -152,6 +152,7 @@
       <button type="submit" class="compact">{{ _("Say it") }}</button>
     </form>
     {% endif %}
+    {% if has_pre %}<p class="trick-numbers trick-pre"><a href="{{ trick_url(0) }}#table"{% if selected.number == 0 %} aria-current="true"{% endif %} hx-get="{{ trick_url(0) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true">{{ _("Before the game") }}</a></p>{% endif %}
     <p class="trick-numbers">
       {% for t in tricks %}<a href="{{ trick_url(t.number) }}#table"{% if t.number == selected.number %} aria-current="true"{% endif %} hx-get="{{ trick_url(t.number) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true">{{ t.number }}</a>{% endfor %}
     </p>
@@ -196,10 +197,6 @@
 
 {% if not full %}
 <p><small>{{ _("The hands of the others are shown when the game is over, and only to players who have finished this deal themselves.") }}</small></p>
-{% endif %}
-
-{% if full and not pre_as_bubbles %}
-{% for c in before %}<p class="remark"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
 {% endif %}
 
 {% if others_hidden or (full and not logged_in) %}

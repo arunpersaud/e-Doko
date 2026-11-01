@@ -196,7 +196,21 @@ def build(
         )
         cards[h["seat"]] = [rows[card_id] for card_id in order]
 
-    if tricks:
+    # what was said before the game starts is shown as "trick 0"
+    pre = [
+        {**dict(row), "edited_at": None, "pre": True}
+        for row in query(
+            """SELECT comment.id, comment.body, user.id AS user_id, user.name FROM comment
+               JOIN user ON user.id = comment.user
+               WHERE comment.game = ? AND comment.kind != 'move'
+                 AND comment.deleted_at IS NULL ORDER BY comment.id""",
+            (game_id,),
+        )
+    ]
+    if pre and (trick == 0 or not tricks):
+        selected = {"number": 0, "id": None, "plays": [], "comments": pre, "winner_seat": None}
+        lead = "bottom"
+    elif tricks:
         if trick is None or not 1 <= trick <= len(tricks):
             trick = len(tricks) if not over else 1
         selected = tricks[trick - 1]
@@ -204,22 +218,6 @@ def build(
     else:
         selected, lead = None, "bottom"
     bubbles, strangers = speech_bubbles(selected, hands)
-    # what was said before the game starts hangs off the speaker as well, while the
-    # first trick (or nothing yet) is shown; at the other tricks it stays in the list
-    pre_as_bubbles = full and (selected is None or selected["number"] == 1)
-    if pre_as_bubbles:
-        seat_of = {h["user_id"]: h["seat"] for h in hands}
-        for row in query(
-            """SELECT comment.id, comment.body, user.id AS user_id, user.name FROM comment
-               JOIN user ON user.id = comment.user
-               WHERE comment.game = ? AND comment.kind != 'move'
-                 AND comment.deleted_at IS NULL ORDER BY comment.id""",
-            (game_id,),
-        ):
-            if row["user_id"] in seat_of:
-                bubbles.setdefault(seat_of[row["user_id"]], []).insert(
-                    0, {**dict(row), "edited_at": None, "pre": True}
-                )
     for remark in (r for rs in bubbles.values() for r in rs):
         remark["own"] = (
             remark["user_id"] == viewer_id and "icon" not in remark and not remark.get("pre")
@@ -260,7 +258,7 @@ def build(
         "names": {h["seat"]: h["name"] for h in hands},
         "tricks": tricks,
         "full": full,
-        "pre_as_bubbles": pre_as_bubbles,
+        "has_pre": bool(pre),
         "over": over,
         "hands": hands,
         "can_remark": mine is not None,
