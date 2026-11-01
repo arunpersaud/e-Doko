@@ -13,6 +13,8 @@ from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 
+from . import textfix
+
 MIGRATIONS: dict[int, str] = {
     # profile pictures: uploaded or fetched from Gravatar (else generated)
     2: """
@@ -79,6 +81,11 @@ CREATE TABLE mail_queue (
 ) STRICT;
 CREATE INDEX mail_queue_user ON mail_queue(user, id);
 """,
+    # comments and notes from the PHP site with "GrÃ¼ÃŸe" for "Grüße" (textfix.py)
+    7: """
+UPDATE comment SET body = repair_text(body) WHERE body != repair_text(body);
+UPDATE note SET body = repair_text(body) WHERE body != repair_text(body);
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)
@@ -102,6 +109,7 @@ def backup(db: sqlite3.Connection, path: Path, label: str) -> Path:
 def apply(db: sqlite3.Connection, current: int) -> list[int]:
     """Run the migrations after version current on an open connection."""
     applied = []
+    db.create_function("repair_text", 1, textfix.repair, deterministic=True)
     for target in range(current + 1, LATEST + 1):
         db.executescript(
             "BEGIN;\n"

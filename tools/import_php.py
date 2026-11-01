@@ -21,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from edoko import db  # noqa: E402
+from edoko.textfix import repair  # noqa: E402
 
 PREFS = {
     "cardset": "card_set",
@@ -251,7 +252,7 @@ def _copy(old: sqlite3.Connection, new: sqlite3.Connection, report: Counter) -> 
             kind=kind,
             play=pid if kind == "move" else None,
             user=c["user_id"],
-            body=c["comment"],
+            body=repair(c["comment"]),
             created_at=c["create_date"] or c["mod_date"],
             edited_at=c["mod_date"] if c["mod_date"] != c["create_date"] else None,
         )
@@ -265,7 +266,7 @@ def _copy(old: sqlite3.Connection, new: sqlite3.Connection, report: Counter) -> 
             id=n["id"],
             user=n["user_id"],
             game=n["game_id"],
-            body=n["comment"],
+            body=repair(n["comment"]),
             created_at=n["create_date"],
         )
     for r in rows("SELECT * FROM Reminder ORDER BY id"):
