@@ -270,6 +270,7 @@ button.demo-name:focus-visible { outline: 2px solid var(--pico-primary); }
 
 /* start page: text and an example table side by side */
 .home-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: start; }
-@media (min-width: 62rem) { .home-grid { grid-template-columns: minmax(0, 1fr) 24rem; } }
+@media (min-width: 62rem) { .home-grid { grid-template-columns: minmax(0, 1fr) 28rem; } }
 figure.example { margin: 0; }
-figure.example img { width: 100%; height: auto; border-radius: var(--pico-border-radius); border: 1px solid var(--pico-muted-border-color); }
+figure.example img { width: 100%; height: auto; }
+.remark-form input[type="text"] { min-width: 0; max-width: 100%; }

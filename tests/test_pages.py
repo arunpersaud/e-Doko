@@ -34,7 +34,7 @@ def test_the_privacy_page_is_public_and_linked_from_every_page(client):
 
 def test_start_page_changes_page_and_footer_link(client):
     home = client.get("/").text
-    assert "home-table.png" in home and "open an issue on GitHub" in home
+    assert "home-table-light.png" in home and "home-table-dark.png" in home and "open an issue on GitHub" in home
     assert 'href="/changes"' in home and "digest" in home
     changes = client.get("/changes")
     assert changes.status_code == 200 and "2026-10-31" in changes.text

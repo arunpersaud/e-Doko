@@ -14,8 +14,11 @@
   <p><small>{{ ngettext("%(num)d game so far.", "%(num)d games so far.", games) }} · <a href="{{ url_for('site.changes') }}">{{ _("What is new") }}</a></small></p>
 </section>
 <figure class="example">
-  <img src="{{ url_for('static', filename='home-table.png') }}" width="408" height="855"
-       alt="{{ _('An example table: four tricks have been played; Anna has called Re, Carla and Dieter comment on the last trick.') }}">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="{{ url_for('static', filename='home-table-dark.png') }}">
+    <img src="{{ url_for('static', filename='home-table-light.png') }}" width="510" height="695"
+         alt="{{ _('An example table: four tricks have been played; Anna has called Re, Carla and Dieter comment on the last trick.') }}">
+  </picture>
   <figcaption><small>{{ _("An example table with made-up players: four tricks played, Anna has called Re, and the others comment.") }}</small></figcaption>
 </figure>
 </div>

@@ -9,8 +9,11 @@ calling Re and two remarks on the fourth trick. Prints "game=N viewer=ID".
 
 To take the picture: run the app in demo mode on that database (FLASK_DEMO=1
 FLASK_DATABASE=DIR/edoko.sqlite ...), log in as the viewer with the demo
-page, open /game/N/trick/4 and save a screenshot of the element #table and
-the hand of the viewer (edoko/static/home-table.png).
+page, open /game/N/trick/4 in a window 720 px wide (so the remarks hang off the
+players as speech bubbles) and save a screenshot of the element #table with a
+transparent background, once with the browser in light and once in dark mode
+(edoko/static/home-table-light.png and home-table-dark.png; hide .remark-form
+first). The start page picks one with prefers-color-scheme.
 """
 
 import random
