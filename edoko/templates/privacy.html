@@ -2,7 +2,7 @@
 {% block title %}{{ _("Privacy") }} – e-DoKo{% endblock %}
 {% block content %}
 <h1>{{ _("Privacy") }}</h1>
-<p><small>{{ _("Last changed: 2026-10-31") }}</small></p>
+<p><small>{{ _("Last changed: 2026-11-01") }}</small></p>
 
 <p>{% trans %}e-DoKo is a small site to play Doppelkopf with friends. It is run by Arun Persaud as a hobby. This page says what the site stores about you, who else gets to see it, and how to get rid of it.{% endtrans %}</p>
 
@@ -13,9 +13,10 @@
   <li>{% trans %}Private notes you write on a game are only shown to you.{% endtrans %}</li>
   <li>{% trans %}Passkeys: the public part of each passkey, its name, and when it was last used. The private part never leaves your device.{% endtrans %}</li>
   <li>{% trans %}Login links by mail: only a scrambled form (a hash) of the link is kept, until it has been used or has expired.{% endtrans %}</li>
+  <li>{% trans %}Sign-up and invitations: the email address and a scrambled form (a hash) of the link are kept until the link has been used, and at most two days after it has expired. Nothing else is stored until you have set up your passkey and your account exists.{% endtrans %}</li>
   <li>{% trans %}Your picture: a generated one, or the one you uploaded, or a copy of your Gravatar if you asked for it. You can delete the copies in the settings.{% endtrans %}</li>
   <li>{% trans %}Mails that could not be delivered: if a mail to your address bounces or is reported as unwanted, the address and the reason are noted, and no more mail is sent until it is fixed.{% endtrans %}</li>
-  <li>{% trans %}For a short time, a scrambled form of your address or your network address is kept to limit how often login links can be asked for.{% endtrans %}</li>
+  <li>{% trans %}To limit how often login and sign-up links can be asked for, a scrambled form of the address asked for, and a keyed hash of your network address (which cannot be turned back into the address), are kept for one day.{% endtrans %}</li>
 </ul>
 
 <h2>{{ _("Logs") }}</h2>

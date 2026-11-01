@@ -4,10 +4,10 @@ All notable changes to the new e-DoKo site (the Python rewrite) are documented i
 file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Until the cutover from the old PHP site the versions are 0.x: milestones of the rewrite,
-where anything may change. The cutover is 1.0.0. After that a new major version means
-that something players or admins rely on changed incompatibly, a minor version adds
-features, and a patch version fixes bugs.
+The versions before 1.0.0 are milestones of the rewrite, while it was tried on a test
+instance. 1.0.0 is the first version that replaces the old PHP site. From here on a new
+major version means that something players or admins rely on changed incompatibly, a
+minor version adds features, and a patch version fixes bugs.
 
 Every entry starts with labels in backticks, so you can see at a glance what it is about:
 
@@ -28,6 +28,10 @@ this file there instead.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-01
+
+The first version that replaces the old PHP site.
+
 ### Added
 
 - `account` A start page for newcomers that explains the site, and sign-up with a passkey: an emailed link, a name, a passkey. Only one mail per address at a time, with limits against abuse.
@@ -42,7 +46,7 @@ this file there instead.
 
 - `game play` `design` The remark box is below your own cards, with a hint to write the remark before clicking the card.
 - `design` The "nothing has happened for N days" box is above the table.
-- `privacy` The privacy page says that a Gravatar picture is stored on our server and can be deleted.
+- `privacy` The privacy page says that a Gravatar picture is stored on our server and can be deleted, and what sign-up and invitations store.
 
 ### Fixed
 
