@@ -186,3 +186,20 @@ def test_poverty_pages_over_http(app, conn):
     assert "It is not your turn" in html
     assert "It is your turn: click a card." in seats[1].page()
 
+
+
+def test_the_hand_shows_every_card_still_held_and_greys_out_the_unplayable(app, conn):
+    game_id = play.create_game(conn, [1, 2, 3, 4], RS)
+    seats = {seat: Seat(app, token) for seat, token in tokens(conn, game_id).items()}
+    for seat in seats.values():
+        seat.post("join")
+    for seat in seats.values():
+        seat.post("declare", sickness="none")
+    state = play.load(conn, game_id)
+    on_turn = state.game["turn_seat"]
+    html = seats[on_turn].page()
+    legal = len(play.legal_cards(state, on_turn))
+    held = len(state.held[on_turn])
+    assert held == 12
+    assert html.count('class="card-button"') == legal
+    assert html.count('class="unplayable"') == held - legal
