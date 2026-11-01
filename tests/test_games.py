@@ -916,3 +916,13 @@ def test_other_tables_link_with_the_origin(world):
     page = ann.get("/game/11/compare/10/").text
     assert "/game/16/compare/10/" in page
     assert 'href="/game/10/"' in page and "/game/10/compare" not in page
+
+
+def test_remarks_before_the_game_hang_off_the_speaker(world):
+    with closing(db.connect(world.config["DATABASE"])) as conn:
+        conn.execute("INSERT INTO comment (game, kind, user, body) VALUES (10, 'pre', 4, 'Los gehts')")
+    client = client_for(world, 1)
+    first = client.get("/game/10/trick/1").text
+    assert first.count("Los gehts") == 1 and '<span class="who">' in first.split("Los gehts")[0][-300:]
+    later = client.get("/game/10/trick/2").text
+    assert later.count("Los gehts") == 1 and 'class="remark"' in later

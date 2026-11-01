@@ -204,8 +204,26 @@ def build(
     else:
         selected, lead = None, "bottom"
     bubbles, strangers = speech_bubbles(selected, hands)
+    # what was said before the game starts hangs off the speaker as well, while the
+    # first trick (or nothing yet) is shown; at the other tricks it stays in the list
+    pre_as_bubbles = full and (selected is None or selected["number"] == 1)
+    if pre_as_bubbles:
+        seat_of = {h["user_id"]: h["seat"] for h in hands}
+        for row in query(
+            """SELECT comment.id, comment.body, user.id AS user_id, user.name FROM comment
+               JOIN user ON user.id = comment.user
+               WHERE comment.game = ? AND comment.kind != 'move'
+                 AND comment.deleted_at IS NULL ORDER BY comment.id""",
+            (game_id,),
+        ):
+            if row["user_id"] in seat_of:
+                bubbles.setdefault(seat_of[row["user_id"]], []).insert(
+                    0, {**dict(row), "edited_at": None, "pre": True}
+                )
     for remark in (r for rs in bubbles.values() for r in rs):
-        remark["own"] = remark["user_id"] == viewer_id and "icon" not in remark
+        remark["own"] = (
+            remark["user_id"] == viewer_id and "icon" not in remark and not remark.get("pre")
+        )
         remark["editable"] = remark["own"] and play.remark_editable(get_db(), remark["id"])
     seats = []
     for h in hands:
@@ -242,6 +260,7 @@ def build(
         "names": {h["seat"]: h["name"] for h in hands},
         "tricks": tricks,
         "full": full,
+        "pre_as_bubbles": pre_as_bubbles,
         "over": over,
         "hands": hands,
         "can_remark": mine is not None,

@@ -198,7 +198,7 @@
 <p><small>{{ _("The hands of the others are shown when the game is over, and only to players who have finished this deal themselves.") }}</small></p>
 {% endif %}
 
-{% if full %}
+{% if full and not pre_as_bubbles %}
 {% for c in before %}<p class="remark"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
 {% endif %}
 
