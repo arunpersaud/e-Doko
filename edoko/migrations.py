@@ -91,6 +91,17 @@ UPDATE note SET body = repair_text(body) WHERE body != repair_text(body);
     8: """
 UPDATE user SET name = 'Player ' || id WHERE trim(name) = '';
 """,
+    # sign-up: a mailed single-use link proves the address, there the name is chosen
+    9: """
+CREATE TABLE signup_token (
+  id              INTEGER PRIMARY KEY,
+  email           TEXT NOT NULL COLLATE NOCASE,
+  token_hash      TEXT NOT NULL UNIQUE,
+  created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at      TEXT NOT NULL,
+  used_at         TEXT
+) STRICT;
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

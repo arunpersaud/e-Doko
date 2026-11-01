@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Choose your name") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Choose your name") }}</h1>
+<div class="login-box">
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <input type="text" name="name" value="{{ name }}" required minlength="2" maxlength="40" autocomplete="nickname"
+           placeholder="{{ _('The name other players see') }}" aria-label="{{ _('Your name') }}"{% if problem %} aria-invalid="true"{% endif %}>
+    {% if problem %}<p class="error" role="alert">{{ problem }}</p>{% endif %}
+    <button type="submit">{{ _("Create my account") }}</button>
+  </form>
+  <p><small>{{ _("You can change your settings, such as the language and the time zone, afterwards.") }}</small></p>
+</div>
+{% endblock %}

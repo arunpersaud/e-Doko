@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>{{ _("Welcome to e-DoKo") }}</h1>
-<p>{{ ngettext("%(num)d game so far.", "%(num)d games so far.", games) }}</p>
+<section class="intro">
+  <h1>{{ _("Doppelkopf, one trick at a time") }}</h1>
+  <p class="lead">{{ _("e-DoKo is a place to play Doppelkopf, the German card game for four, with friends over the internet. You play at your own pace: when it is your turn we send you a short mail with a link, you play your card, and the game waits for the next player. A game can take a few days, like a table where the cards stay out between visits.") }}</p>
+  <ul class="features">
+    <li><strong>{{ _("Your rules") }}</strong> – {{ _("normal games, solos, weddings and poverty; whoever starts a table chooses the house rules, such as the second ten of hearts, Schweinchen and when you may call Re or Contra.") }}</li>
+    <li><strong>{{ _("Talk at the table") }}</strong> – {{ _("add a remark to your card and it appears next to your name, as if you said it across the table.") }}</li>
+    <li><strong>{{ _("Look back") }}</strong> – {{ _("step through every finished game trick by trick, and see how the other tables played the same deal.") }}</li>
+    <li><strong>{{ _("Small and private") }}</strong> – {{ _("no ads, no tracking, nothing from third parties and no passwords: you log in with a link by mail or with a passkey.") }} <a href="{{ url_for('site.privacy') }}">{{ _("Privacy") }}</a></li>
+  </ul>
+  <p><small>{{ ngettext("%(num)d game so far.", "%(num)d games so far.", games) }}</small></p>
+</section>
+
+<section class="signup-box">
+  <h2>{{ _("New here?") }}</h2>
+  <p>{{ _("Sign up with your email address. We send you a link; there you choose the name the other players see and set up a passkey (fingerprint, face or device PIN).") }}</p>
+  <p><a role="button" href="{{ url_for('signup.form') }}">{{ _("Sign up") }}</a></p>
+  <p><small>{{ _("Already playing? Use “Log in” at the top right.") }}</small></p>
+</section>
 {% endblock %}

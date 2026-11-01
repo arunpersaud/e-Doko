@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Sign up") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Sign up") }}</h1>
+<div class="login-box">
+  <form method="post" action="{{ url_for('signup.request_link') }}">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <input type="email" name="email" autocomplete="email" required
+           placeholder="{{ _('Your email address') }}" aria-label="{{ _('Your email address') }}">
+    <button type="submit">{{ _("Send me a sign-up link") }}</button>
+  </form>
+  <p><small>{{ _("There are no passwords. We email you a link; there you choose your name and set up a passkey.") }}</small></p>
+</div>
+{% endblock %}

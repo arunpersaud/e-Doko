@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Sign up") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("This link does not work any more") }}</h1>
+<p>{{ _("It was used already or it has expired.") }} <a href="{{ url_for('signup.form') }}">{{ _("Sign up again") }}</a></p>
+{% endblock %}

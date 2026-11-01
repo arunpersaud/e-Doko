@@ -49,6 +49,14 @@ def mails_for(user_id: int, limit: int = 8) -> list:
     )
 
 
+def mails_to(address: str, limit: int = 3) -> list:
+    """The latest mails to an address (it may belong to nobody yet: a sign-up)."""
+    return query_all(
+        "SELECT * FROM demo_mail WHERE lower(to_addr) = lower(?) ORDER BY id DESC LIMIT ?",
+        (address, limit),
+    )
+
+
 def linkify(text: str) -> Markup:
     """A mail text as HTML: the links to this site work (relative), others stay text."""
     origin = current_app.config["ORIGIN"].rstrip("/")

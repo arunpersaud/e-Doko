@@ -1,0 +1,7 @@
+{% trans %}Hello,{% endtrans %}
+
+{% trans hours=hours %}use this link to finish your sign-up at e-DoKo and choose your name. It works once and for {{ hours }} hours:{% endtrans %}
+
+{{ link }}
+
+{% trans %}If you did not ask for it, you can ignore this mail; nothing happens without the link.{% endtrans %}

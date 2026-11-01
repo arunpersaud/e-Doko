@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Check your mail") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Check your mail") }}</h1>
+<p>{{ _("If that address can sign up, we have sent a link to it. It works once and for 24 hours. If you already have an account, the mail has a login link instead.") }}</p>
+{% for m in demo_mails %}
+<article class="demo-mail"><header><strong>Demo – {{ m.subject }}</strong></header><pre>{{ demo_linkify(m.body) }}</pre></article>
+{% endfor %}
+{% endblock %}

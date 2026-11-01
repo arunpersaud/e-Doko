@@ -7,6 +7,7 @@ removing the last passkey is allowed.
 """
 
 import json
+import secrets
 
 import webauthn
 from flask import (
@@ -34,6 +35,7 @@ from webauthn.helpers.structs import (
     UserVerificationRequirement,
 )
 
+from . import signup
 from .auth import SKIP_COOKIE, log_in, login_required, now, safe_next
 from .db import get_db, query, query_one
 
@@ -123,17 +125,20 @@ def delete(key):
 
 @bp.post("/passkey/register/options")
 def register_options():
-    if g.user is None:
-        return jsonify(error=_("Please log in first.")), 401
     data = request.get_json(silent=True) or {}
-    existing = query(
-        "SELECT credential_id FROM passkey WHERE user = ?", (g.user["id"],)
-    )
+    signing_up = g.user is None and signup.pending()
+    if g.user is None and not signing_up:
+        return jsonify(error=_("Please log in first.")), 401
+    if signing_up:  # a new account: made when the passkey is verified
+        webauthn_id, user_name, existing = secrets.token_bytes(32), signing_up["name"], []
+    else:
+        webauthn_id, user_name = g.user["webauthn_id"], g.user["name"]
+        existing = query("SELECT credential_id FROM passkey WHERE user = ?", (g.user["id"],))
     options = webauthn.generate_registration_options(
         rp_id=rp_id(),
         rp_name=RP_NAME,
-        user_id=g.user["webauthn_id"],
-        user_name=g.user["name"],
+        user_id=webauthn_id,
+        user_name=user_name,
         authenticator_selection=AuthenticatorSelectionCriteria(
             resident_key=ResidentKeyRequirement.REQUIRED,
             user_verification=UserVerificationRequirement.REQUIRED,
@@ -144,7 +149,8 @@ def register_options():
     )
     session["registration"] = {
         "challenge": bytes_to_base64url(options.challenge),
-        "user": g.user["id"],
+        "user": None if signing_up else g.user["id"],
+        "webauthn_id": bytes_to_base64url(webauthn_id) if signing_up else None,
         "name": " ".join((data.get("name") or "").split())[:60],
     }
     return current_app.response_class(
@@ -155,7 +161,10 @@ def register_options():
 @bp.post("/passkey/register/verify")
 def register_verify():
     state = session.pop("registration", None)
-    if state is None or g.user is None or g.user["id"] != state["user"]:
+    signing_up = state is not None and state["user"] is None and signup.pending()
+    if state is None or not (
+        signing_up or (g.user is not None and g.user["id"] == state["user"])
+    ):
         return jsonify(error=_("Please start again.")), 400
     try:
         verified = webauthn.verify_registration_response(
@@ -167,16 +176,29 @@ def register_verify():
         )
     except InvalidRegistrationResponse:
         return jsonify(error=_("The passkey could not be verified.")), 400
+    credential = (
+        verified.credential_id,
+        verified.credential_public_key,
+        verified.sign_count,
+        state["name"],
+    )
+    if signing_up:
+        try:
+            user_id = signup.create_account(
+                signing_up,
+                webauthn.base64url_to_bytes(state["webauthn_id"]),
+                credential,
+                request.accept_languages.best_match(["en", "de"]),
+            )
+        except ValueError as problem:
+            return jsonify(error=str(problem)), 400
+        session.pop("signup", None)
+        log_in(user_id)
+        return jsonify(ok=True, next=url_for("site.index"))
     get_db().execute(
         "INSERT INTO passkey (user, credential_id, public_key, sign_count, name)"
         " VALUES (?, ?, ?, ?, ?)",
-        (
-            state["user"],
-            verified.credential_id,
-            verified.credential_public_key,
-            verified.sign_count,
-            state["name"],
-        ),
+        (state["user"], *credential),
     )
     return jsonify(ok=True, next=url_for("passkeys.manage"))
 

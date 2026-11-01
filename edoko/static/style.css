@@ -256,3 +256,12 @@ button.demo-name:focus-visible { outline: 2px solid var(--pico-primary); }
 .demo-pop article { margin: 0.75rem 0 0; padding: 0.75rem; }
 .demo-pop h3 small { font-weight: normal; }
 .scroll { overflow-x: auto; }
+
+/* start page */
+.intro .lead { font-size: 1.15rem; }
+.features { padding-left: 1.2rem; }
+.features li { margin-bottom: 0.5rem; }
+.signup-box { max-width: 26rem; margin-top: 2rem; padding: 1rem 1.25rem; border: 1px solid var(--pico-muted-border-color); border-radius: var(--pico-border-radius); }
+.signup-box h2 { margin-top: 0; }
+.signup-box input[type="email"] { margin-bottom: 0.75rem; }
+.demo-mail pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }

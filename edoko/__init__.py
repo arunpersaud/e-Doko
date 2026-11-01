@@ -37,6 +37,7 @@ from . import (
     migrations,
     passkeys,
     playviews,
+    signup,
     views,
 )
 from .cli import edoko
@@ -156,6 +157,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     account.init_app(app)
     admin.init_app(app)
     bounces.init_app(app)
+    signup.init_app(app)
     demo.init_app(app)
     app.register_blueprint(views.site)
     app.cli.add_command(edoko)

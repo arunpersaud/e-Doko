@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Set up your passkey") }} – e-DoKo{% endblock %}
+{% block head %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endblock %}
+{% block content %}
+<h1>{{ _("Welcome, %(name)s", name=name) }}</h1>
+<p>{{ _("New accounts log in with a passkey: your fingerprint, face or device PIN. There is no password. Your account is created when you set up the passkey.") }}</p>
+<label>{{ _("Name for this passkey (optional)") }}
+  <input type="text" data-passkey-name placeholder="{{ _('e.g. my phone') }}" maxlength="60">
+</label>
+<button type="button" data-passkey="register">{{ _("Set up a passkey and create my account") }}</button>
+<p class="error" role="alert" data-passkey-error hidden></p>
+<p><small>{{ _("If you lose the passkey, a login link to this address gets you back in.") }}</small></p>
+{% endblock %}
