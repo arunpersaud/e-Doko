@@ -1,14 +1,3 @@
-*~
-config.php
-db*sql
-cache/stats.html
-pics/arrow0.svg
-pics/arrow1.svg
-pics/arrow2.svg
-pics/arrow3.svg
-scoretest.txt
-testscoring.php
-.htaccess
 .venv/
 __pycache__/
 .pytest_cache/
@@ -16,3 +5,4 @@ __pycache__/
 instance/
 *.mo
 messages.pot
+*~

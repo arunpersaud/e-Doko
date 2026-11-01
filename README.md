@@ -1,9 +1,9 @@
 # e-DoKo (Flask rewrite)
 
-Online Doppelkopf, the successor of the PHP site
-([e-Doko](https://github.com/arunpersaud/e-Doko)). Same SQLite schema
-(version 5) and the same URLs, so running games carry over.
-Plan and status: `~/gitop/ROADMAP.md`, section B, e-Doko.
+Online Doppelkopf by email and browser, licensed under the GPL (see `gpl.txt`).
+Version 1.0.0 is the Python rewrite of the original PHP site; the PHP code is in the
+git history before the tag `v1.0.0`, and `tools/import_php.py` converts its database.
+Changes: `CHANGELOG.md`.
 
 ## Development
 
