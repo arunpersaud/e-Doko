@@ -128,7 +128,8 @@ def check_post() -> None:
         abort(403)
     sent_origin = request.headers.get("Origin")
     if sent_origin == "null":
-        if site != "same-origin":
+        # (plain http, as in the demo, sends no Sec-Fetch-Site: the token decides)
+        if site != "same-origin" and not current_app.config.get("DEMO"):
             abort(403)
     elif sent_origin is not None and sent_origin != current_app.config["ORIGIN"]:
         abort(403)

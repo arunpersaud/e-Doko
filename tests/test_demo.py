@@ -57,3 +57,11 @@ def test_a_bounced_address_still_shows_its_mail_in_demo(demo_app, database):
         user = c.execute("SELECT * FROM user WHERE id = 2").fetchone()
     with demo_app.app_context():
         assert mail.send_template(user, "Hello", "login", link="http://localhost:5000/l", name="x") is not None
+
+
+def test_demo_over_plain_http_accepts_origin_null_with_the_token(demo_app):
+    client = demo_app.test_client()
+    html = client.get("/demo/").get_data(as_text=True)
+    token = re.search(r'name="csrf" value="([^"]+)"', html).group(1)
+    assert client.post("/demo/login/1", data={"csrf": token}, headers={"Origin": "null"}).status_code == 302
+    assert client.post("/demo/login/1", data={"csrf": "wrong"}, headers={"Origin": "null"}).status_code == 403
