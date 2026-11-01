@@ -143,6 +143,8 @@ class State:
     held: dict[int, list[int]]  # seat -> cards not played yet
     hand_card: dict[tuple[int, int], int]  # (seat, card) -> hand_card.id
     tricks: list[list[tuple[int, int]]] = field(default_factory=list)  # (seat, card)
+    # the Schweinchen came into force (its remark was made); see foxes()
+    fox_in_force: bool = False
 
     @property
     def mode(self) -> str:
@@ -162,11 +164,16 @@ class State:
     def foxes(self) -> rules.Foxes:
         foxes = rules.foxes_for(self.start, self.mode, self.rs)
         if foxes.holder is not None and self.rs.schweinchen == "secondaftercall":
-            party = self.hands[foxes.holder]["party"]
-            foxes.called = any(
-                h["point_call"] is not None and h["party"] == party
-                for h in self.hands.values()
-            )
+            if sum(c in rules.FOXES for t in self.tricks for _s, c in t) >= 2:
+                # both foxes are out: a call made later changes nothing, the
+                # rule is in force only if it was when the second one fell
+                foxes.called = self.fox_in_force
+            else:
+                party = self.hands[foxes.holder]["party"]
+                foxes.called = any(
+                    h["point_call"] is not None and h["party"] == party
+                    for h in self.hands.values()
+                )
         return foxes
 
 
@@ -221,7 +228,14 @@ def load(db: sqlite3.Connection, game_id: int) -> State:
                 )
             ]
         )
-    return State(game, rs, hands, dict(start), dict(held), hand_card, tricks)
+    in_force = (
+        db.execute(
+            "SELECT 1 FROM comment WHERE game = ? AND kind = 'move' AND body = 'Schweinchen! '",
+            (game_id,),
+        ).fetchone()
+        is not None
+    )
+    return State(game, rs, hands, dict(start), dict(held), hand_card, tricks, in_force)
 
 
 def legal_cards(state: State, seat: int) -> list[int]:
@@ -641,6 +655,7 @@ def play_card(
                 " VALUES (?, 'move', ?, ?, 'Schweinchen! ')",
                 (game["id"], play_id, hand["user"]),
             )
+            state.fox_in_force = True
         if call is not None:
             db.execute(
                 "INSERT INTO comment (game, kind, play, user, body)"

@@ -555,3 +555,19 @@ def test_the_remark_when_schweinchen_comes_into_force(app, conn, rule, called, e
             play.play_card(conn, hs[seat]["id"], play.legal_cards(play.load(conn, game_id), seat)[0])
         assert conn.execute("SELECT winner_seat FROM trick ORDER BY number DESC LIMIT 1").fetchone()[0] == 1
     assert remarks(conn, game_id).count("Schweinchen! ") == expected
+
+
+def test_a_call_after_the_second_fox_does_not_bring_schweinchen_into_force(app, conn):
+    """secondaftercall: not retroactive, and the final scoring agrees with the live game."""
+    rs = rules.Rules("secondwins", "secondaftercall", "none", "5th-card")
+    game_id = new_game(conn, rs)
+    stack(conn, game_id, {1: [19, 20, 5, 6], 2: [21, 22, 3], 3: [23, 24, 4], 4: [25, 26]})
+    start(conn, game_id)
+    hs = hands(conn, game_id)
+    for fox, call in ((19, None), (20, None), (5, 90)):  # the call comes after both foxes
+        play.play_card(conn, hs[1]["id"], fox, call=call)
+        for seat in (2, 3, 4):
+            play.play_card(conn, hs[seat]["id"], play.legal_cards(play.load(conn, game_id), seat)[0])
+    assert remarks(conn, game_id).count("Schweinchen! ") == 0
+    state = play.load(conn, game_id)
+    assert not state.foxes().active(state.rs)
