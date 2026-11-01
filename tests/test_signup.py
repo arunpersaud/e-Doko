@@ -48,8 +48,11 @@ def test_an_existing_address_gets_a_login_link_and_the_same_answer(app, client):
 
 
 def test_requests_are_limited(app, client):
+    # (the address limit is a second line of defence: it counts mails, one per expired link)
     for _ in range(3):
         ask(client, "many@example.org")
+        with closing(db.connect(app.config["DATABASE"])) as conn:
+            conn.execute("UPDATE signup_token SET expires_at = '2000-01-01 00:00:00'")
     assert len(app.outbox) == 3
     ask(client, "many@example.org")
     assert len(app.outbox) == 3  # the fourth gets the page but no mail
@@ -183,3 +186,20 @@ def test_cli_invite_and_mode(app):
     result = runner.invoke(args=["edoko", "invite", "--mail", "cli2@example.org"])
     assert [m["To"] for m in app.outbox] == ["cli2@example.org"]
     assert runner.invoke(args=["edoko", "invite", "a@x.org"]).exit_code != 0
+
+
+def test_only_one_sign_up_mail_while_its_link_works(app, client):
+    for _ in range(3):
+        assert "Check your mail" in ask(app.test_client(), "bot@example.org").text
+    assert [m["To"] for m in app.outbox] == ["bot@example.org"]
+    # once the link has expired, the address may ask again
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE signup_token SET expires_at = '2000-01-01 00:00:00'")
+    ask(app.test_client(), "bot@example.org")
+    assert len(app.outbox) == 2
+
+
+def test_an_existing_address_gets_one_login_mail_an_hour_from_the_form(app):
+    for _ in range(3):
+        ask(app.test_client(), "a@x.org")
+    assert len(app.outbox) == 1

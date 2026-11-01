@@ -145,6 +145,15 @@ def mail_cap_wait() -> int:
     return 0
 
 
+def demo_mails_for(address: str) -> list:
+    """In demo mode no mail goes out: the page shows it instead."""
+    if not current_app.config.get("DEMO"):
+        return []
+    from . import demo
+
+    return demo.mails_to(address)
+
+
 @bp.route("/signup")
 def form():
     if mode() != "open":
@@ -168,16 +177,27 @@ def request_link():
         return render_template("signup_sent.html", demo_mails=[])
     if wait := mail_cap_wait():
         return render_template("signup_limited.html", minutes=wait, busy=True), 503
-    if not auth.rate_limited("addr:" + auth.sha256(address), LIMIT_ADDRESS) and not bounced(address):
-        user = query_one("SELECT * FROM user WHERE email = ? AND disabled_at IS NULL", (address,))
+    user = query_one("SELECT * FROM user WHERE email = ? AND disabled_at IS NULL", (address,))
+    taken = user is not None or query_one("SELECT 1 FROM user WHERE email = ?", (address,))
+    # one mail at a time: while the link of an earlier one works, a bot gets nothing
+    # more out of us (and does not use up the limit of the real owner of the address)
+    waiting = not taken and query_one(
+        "SELECT 1 FROM signup_token WHERE email = ? AND used_at IS NULL AND expires_at > ?",
+        (address, auth.now()),
+    )
+    if not waiting and not bounced(address) and not auth.rate_limited(
+        "addr:" + auth.sha256(address), LIMIT_ADDRESS
+    ):
         if user is not None:  # already has an account: the login link is what they need
+            if auth.rate_limited("login-via-signup:" + auth.sha256(address), 1):
+                return render_template("signup_sent.html", demo_mails=[])  # one an hour
             token = auth.create_link(user["id"])
             link = current_app.config["ORIGIN"] + url_for("auth.link", token=token)
             get_db().execute("INSERT INTO rate_limit (key) VALUES ('signup-mail')")
             mail.send_template(
                 user, _l("Your login link"), "login", link=link, hours=auth.LINK_HOURS
             )
-        elif query_one("SELECT 1 FROM user WHERE email = ?", (address,)) is None:
+        elif not taken:
             token = secrets.token_urlsafe(32)
             expires = datetime.now(UTC) + timedelta(hours=LINK_HOURS)
             get_db().execute(
@@ -190,12 +210,7 @@ def request_link():
                 body = render_template("mail/signup.txt", link=link, hours=LINK_HOURS)
             get_db().execute("INSERT INTO rate_limit (key) VALUES ('signup-mail')")
             mail.send(address, subject, body)
-    demo_mails = []
-    if current_app.config.get("DEMO"):  # (see demo.py: no mail goes out, show it here)
-        from . import demo
-
-        demo_mails = demo.mails_to(address)
-    return render_template("signup_sent.html", demo_mails=demo_mails)
+    return render_template("signup_sent.html", demo_mails=demo_mails_for(address))
 
 
 @bp.route("/signup/<token>")
