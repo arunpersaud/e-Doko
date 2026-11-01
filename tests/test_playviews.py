@@ -185,3 +185,4 @@ def test_poverty_pages_over_http(app, conn):
     assert conn.execute("SELECT status FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "play"
     assert "It is not your turn" in html
     assert "It is your turn: click a card." in seats[1].page()
+

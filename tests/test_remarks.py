@@ -77,8 +77,10 @@ def test_remarks_over_http_are_escaped_and_can_be_changed(app, conn):
     game_id, hs = started(conn)
     first_play(conn, game_id, hs)
     seats = {seat: Seat(app, token) for seat, token in tokens(conn, game_id).items()}
-    html = seats[2].page()
+    html = seats[3].page()  # (not on turn: the box below the table)
     assert 'class="remark-form"' in html and "Say it" in html
+    # whose turn it is has the box with the card below the hand instead
+    assert 'class="remark-form"' not in seats[2].page()
     play_id = conn.execute("SELECT id FROM play").fetchone()[0]
     page = seats[2].post("remark", play=play_id, body="<script>alert(1)</script> hi").get_data(as_text=True)
     assert "<script>alert(1)</script>" not in page and "&lt;script&gt;alert(1)&lt;/script&gt; hi" in page
