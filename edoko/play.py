@@ -953,6 +953,55 @@ def table_state(db: sqlite3.Connection, session_id: int) -> dict:
     }
 
 
+def table_summary(db: sqlite3.Connection, session_id: int) -> dict:
+    """Statistics of the finished games of a table: per player and per game.
+
+    players: in the order of the standings, with games, points, won games,
+    games as Re, solos (and won), best/worst game, caught foxes, Karlchen,
+    Doppelkopf. rounds: for each game its number, kind and every player's points.
+    """
+    standings = table_state(db, session_id)["standings"]
+    players = {
+        s["id"]: {
+            "id": s["id"], "name": s["name"], "points": s["points"], "games": 0, "won": 0,
+            "re": 0, "solos": 0, "solos_won": 0, "best": None, "worst": None,
+            "fox": 0, "karlchen": 0, "doko": 0,
+        }
+        for s in standings
+    }
+    rounds = []
+    games = db.execute(
+        "SELECT id, type, solo FROM game WHERE session = ? AND status = 'gameover' ORDER BY id",
+        (session_id,),
+    ).fetchall()
+    for number, game in enumerate(games, 1):
+        points = {}
+        for h in db.execute("SELECT user, party, sickness, solo, points FROM hand WHERE game = ?", (game["id"],)):
+            p = players.get(h["user"])
+            if p is None or h["points"] is None:
+                continue
+            points[h["user"]] = h["points"]
+            p["games"] += 1
+            p["won"] += h["points"] > 0
+            p["re"] += h["party"] == "re"
+            p["best"] = h["points"] if p["best"] is None else max(p["best"], h["points"])
+            p["worst"] = h["points"] if p["worst"] is None else min(p["worst"], h["points"])
+            if game["type"] == "solo" and h["sickness"] == "solo" and game["solo"] != "silent":
+                p["solos"] += 1
+                p["solos_won"] += h["points"] > 0
+        rounds.append({"number": number, "id": game["id"], "type": game["type"], "solo": game["solo"], "points": points})
+    for item in db.execute(
+        """SELECT winner, kind, count(*) AS n FROM score_item
+           WHERE kind IN ('fox', 'karlchen', 'doko') AND winner IS NOT NULL
+             AND game IN (SELECT id FROM game WHERE session = ? AND status = 'gameover')
+           GROUP BY winner, kind""",
+        (session_id,),
+    ):
+        if item["winner"] in players:
+            players[item["winner"]][item["kind"]] = item["n"]
+    return {"players": [players[s["id"]] for s in standings], "rounds": rounds}
+
+
 def next_players(db: sqlite3.Connection, game_id: int) -> list[int] | None:
     """The players (seat order) of the next game at this table, if one can follow.
 

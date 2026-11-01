@@ -18,6 +18,26 @@
   </tbody>
 </table>
 {% endif %}
+{% if summary %}
+<h2>{{ _("Summary") }}</h2>
+<div class="scroll"><table>
+  <thead><tr><th>{{ _("Player") }}</th><th>{{ _("Points") }}</th><th>{{ _("Games won") }}</th><th>{{ _("As Re") }}</th><th>{{ _("Solos (won)") }}</th><th>{{ _("Best") }}</th><th>{{ _("Worst") }}</th><th>{{ _("Foxes caught") }}</th><th>Karlchen</th><th>Doppelkopf</th></tr></thead>
+  <tbody>
+    {% for p in summary.players %}
+    <tr><td>{{ p.name }}</td><td>{{ p.points }}</td><td>{{ p.won }} / {{ p.games }}</td><td>{{ p.re }}</td><td>{{ p.solos }} ({{ p.solos_won }})</td><td>{{ p.best }}</td><td>{{ p.worst }}</td><td>{{ p.fox }}</td><td>{{ p.karlchen }}</td><td>{{ p.doko }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table></div>
+<h3>{{ _("Game by game") }}</h3>
+<div class="scroll"><table>
+  <thead><tr><th>#</th><th>{{ _("Game") }}</th>{% for p in summary.players %}<th>{{ p.name }}</th>{% endfor %}</tr></thead>
+  <tbody>
+    {% for r in summary.rounds %}
+    <tr><td>{{ r.number }}</td><td><a href="{{ url_for('games.game', game_id=r.id) }}">{{ r.kind }}</a></td>{% for p in summary.players %}<td>{{ r.points.get(p.id, "") }}</td>{% endfor %}</tr>
+    {% endfor %}
+  </tbody>
+</table></div>
+{% endif %}
 {% if state.closed and current_user and current_user.id in state.standings | map(attribute="id") %}
 <form method="post" action="{{ url_for('playviews.table_again', session_id=session_id) }}">
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">

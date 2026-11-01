@@ -149,3 +149,22 @@ def test_keep_playing_and_the_table_page_over_http(app, conn):
     before = conn.execute("SELECT count(*) FROM game").fetchone()[0]
     outsider.post(f"/game/{open_table}/next", data={"csrf": "t"})
     assert conn.execute("SELECT count(*) FROM game").fetchone()[0] == before
+
+
+def test_a_finished_table_shows_a_summary_and_no_keep_playing(app, conn):
+    first = play.new_table(conn, 1, [2, 3, 4], RS, max_games=1)
+    finish_game(conn, first, seed=2)
+    session = conn.execute("SELECT session FROM game WHERE id = ?", (first,)).fetchone()[0]
+    summary = play.table_summary(conn, session)
+    assert sorted(p["id"] for p in summary["players"]) == [1, 2, 3, 4]
+    assert all(p["games"] == 1 for p in summary["players"])
+    assert sum(p["points"] for p in summary["players"]) == 0
+    assert [r["id"] for r in summary["rounds"]] == [first]
+    assert sorted(summary["rounds"][0]["points"]) == [1, 2, 3, 4]
+    client = app.test_client()
+    with client.session_transaction() as s:
+        s["user_id"] = 1
+    html = client.get(f"/table/{session}/").get_data(as_text=True)
+    assert "Summary" in html and "Game by game" in html
+    game_page = client.get(f"/game/{first}/").get_data(as_text=True)
+    assert f"/game/{first}/next" not in game_page

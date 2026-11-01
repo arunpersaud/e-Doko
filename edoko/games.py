@@ -197,6 +197,13 @@ def dashboard(user_id: int) -> dict:
     }
 
 
+KINDS = {
+    "normal": _l("Normal game"), "wedding": _l("Wedding"), "poverty": _l("Poverty"),
+    "dpoverty": _l("Double poverty"), "silent": _l("Silent solo"),
+    **{k: label for k, (_icon, label) in gameview.SOLO_ICONS.items()},
+}
+
+
 @bp.route("/table/<int:session_id>/")
 @login_required
 def table(session_id):
@@ -204,13 +211,18 @@ def table(session_id):
     if g.user["id"] not in {p["id"] for p in players}:
         abort(404)
     rows = [x for x in my_games(g.user["id"]) if x["session"] == session_id]
+    state = play.table_state(get_db(), session_id)
+    summary = play.table_summary(get_db(), session_id) if state["closed"] else None
+    for r in summary["rounds"] if summary else []:
+        r["kind"] = KINDS.get(r["solo"] if r["type"] == "solo" else r["type"], r["type"])
     return (
         render_template(
             "table.html",
             session_id=session_id,
             players=players,
             games=rows,
-            state=play.table_state(get_db(), session_id),
+            state=state,
+            summary=summary,
         ),
         200,
         PRIVATE,
