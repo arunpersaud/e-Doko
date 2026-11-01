@@ -38,5 +38,5 @@
 <p>{% trans %}Your data is not sold and not given to anybody else.{% endtrans %}</p>
 
 <h2>{{ _("Your rights") }}</h2>
-<p>{% trans %}You can ask for a copy of your data, for corrections, or to have your account deleted. Write to{% endtrans %} <!--email_off-->arun@nubati.net<!--/email_off-->.</p>
+<p>{% trans %}You can change your email address in the settings. You can ask for a copy of your data, for corrections, or to have your account deleted.{% endtrans %}{% if contact_email %} {% trans %}Write to{% endtrans %} <!--email_off-->{{ contact_email }}<!--/email_off-->.{% endif %}</p>
 {% endblock %}

@@ -1,0 +1,7 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans hours=hours %}this address was entered as the new email address of your e-DoKo account. If that was you, open this link while you are logged in. It works once and for {{ hours }} hour(s):{% endtrans %}
+
+{{ link }}
+
+{% trans %}If you did not ask for it, ignore this mail: nothing changes.{% endtrans %}

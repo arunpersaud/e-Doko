@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Link not valid") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Link not valid") }}</h1>
+<p>{{ _("This link has been used, has expired, belongs to another account, or the address can no longer be used. Please log in as the account owner and ask again in the settings.") }}</p>
+<p><a href="{{ url_for('account.index') }}">{{ _("Settings") }}</a></p>
+{% endblock %}

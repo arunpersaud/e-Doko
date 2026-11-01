@@ -109,6 +109,18 @@ CREATE TABLE setting (
   value           TEXT NOT NULL
 ) STRICT;
 """,
+    # a new address is only taken over after a link mailed to it was used
+    10: """
+CREATE TABLE email_change (
+  id              INTEGER PRIMARY KEY,
+  user            INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+  new_email       TEXT NOT NULL COLLATE NOCASE,
+  token_hash      TEXT NOT NULL UNIQUE,
+  created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at      TEXT NOT NULL,
+  used_at         TEXT
+) STRICT;
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

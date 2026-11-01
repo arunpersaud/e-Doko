@@ -28,6 +28,11 @@ this file there instead.
 
 ## [Unreleased]
 
+### Added
+
+- `account` `mail` Change your email address in the settings. A link goes to the new address and the address only changes after it was opened while logged in; the old address is told about the request and about the change, with the contact address to write to if it was wrong. Login links mailed to the old address stop working.
+- `privacy` The contact address on the privacy page and in these mails is a setting of the server (`FLASK_CONTACT_EMAIL`).
+
 ## [1.0.0] - 2026-11-01
 
 The first version that replaces the old PHP site.

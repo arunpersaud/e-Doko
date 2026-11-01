@@ -290,4 +290,8 @@ def init_app(app) -> None:
 
     @app.context_processor
     def auth_context():
-        return {"current_user": g.get("user"), "csrf_token": csrf_token}
+        return {
+            "current_user": g.get("user"),
+            "csrf_token": csrf_token,
+            "contact_email": current_app.config.get("CONTACT_EMAIL"),
+        }

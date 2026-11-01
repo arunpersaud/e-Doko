@@ -5,6 +5,7 @@ Configuration comes from environment variables with a FLASK_ prefix:
     FLASK_DATABASE     SQLite file (default: instance/edoko.sqlite)
     FLASK_SECRET_KEY   signs the session cookie
     FLASK_ORIGIN       the site's address, e.g. https://doko.nubati.net
+    FLASK_CONTACT_EMAIL  (optional) the address people write to for help
     FLASK_MAIL_FROM, FLASK_SMTP_HOST, FLASK_SMTP_USER, FLASK_SMTP_PASSWORD, ...
                        mail, see mail.py
     FLASK_SES_TOPIC_ARN  bounce notices from SES, see bounces.py

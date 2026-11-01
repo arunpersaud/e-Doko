@@ -1,0 +1,5 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% if done %}{% trans new=new %}the email address of your e-DoKo account was changed to {{ new }}. From now on, mails go there and not to this address.{% endtrans %}{% else %}{% trans new=new %}somebody asked to change the email address of your e-DoKo account to {{ new }}. Nothing has changed yet: it only happens if the link we sent to the new address is opened by somebody who is logged in to your account.{% endtrans %}{% endif %}
+
+{% trans %}If this was not you, please contact the administrator{% endtrans %}{% if contact %}: {{ contact }}{% endif %}.
