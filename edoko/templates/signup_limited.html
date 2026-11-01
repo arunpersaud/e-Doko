@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Sign up") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Please wait a little") }}</h1>
+{% if busy %}
+<p>{{ _("Many people are signing up right now. Please try again in about %(minutes)d minutes.", minutes=minutes) }}</p>
+{% else %}
+<p>{{ _("There were too many requests from your network. Please try again in about %(minutes)d minutes.", minutes=minutes) }}</p>
+{% endif %}
+{% endblock %}

@@ -99,7 +99,14 @@ CREATE TABLE signup_token (
   token_hash      TEXT NOT NULL UNIQUE,
   created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   expires_at      TEXT NOT NULL,
-  used_at         TEXT
+  used_at         TEXT,
+  invited         INTEGER NOT NULL DEFAULT 0 CHECK (invited IN (0, 1))  -- by an admin
+) STRICT;
+
+-- settings an admin changes on the site (signup: open, invite, closed)
+CREATE TABLE setting (
+  key             TEXT PRIMARY KEY,
+  value           TEXT NOT NULL
 ) STRICT;
 """,
 }

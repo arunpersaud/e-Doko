@@ -2,6 +2,24 @@
 {% block title %}{{ _("Admin") }} – e-DoKo{% endblock %}
 {% block content %}
 <h1>{{ _("Admin") }}</h1>
+<h2 id="signup">{{ _("Sign-up") }}</h2>
+<form method="post" action="{{ url_for('admin.set_signup') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <fieldset>
+    <label><input type="radio" name="mode" value="open"{% if signup_mode == "open" %} checked{% endif %}> {{ _("Open: anybody can sign up") }}</label>
+    <label><input type="radio" name="mode" value="invite"{% if signup_mode == "invite" %} checked{% endif %}> {{ _("By invitation: only people invited below") }}</label>
+    <label><input type="radio" name="mode" value="closed"{% if signup_mode == "closed" %} checked{% endif %}> {{ _("Closed: nobody, invitations do not work either") }}</label>
+  </fieldset>
+  <button type="submit" class="compact">{{ _("Save") }}</button>
+</form>
+<form method="post" action="{{ url_for('admin.invite') }}" class="remark-form">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="email" name="email" required placeholder="{{ _('Email address to invite') }}" aria-label="{{ _('Email address to invite') }}">
+  <button type="submit" class="compact">{{ _("Send invitation") }}</button>
+</form>
+{% if invitations %}
+<p><small>{{ _("Open invitations:") }} {% for i in invitations %}{{ i.email }} ({{ _("until") }} {{ i.expires_at[:10] }}){% if not loop.last %}, {% endif %}{% endfor %}</small></p>
+{% endif %}
 <h2>{{ _("Users") }} ({{ users | length }})</h2>
 <div class="overflow-auto">
 <table class="users">

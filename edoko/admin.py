@@ -1,8 +1,10 @@
 """The admin pages (for users with is_admin; several are fine)."""
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_babel import gettext as _
 
-from .auth import admin_required
+from . import signup
+from .auth import admin_required, now
 from .db import query
 
 bp = Blueprint("admin", __name__)
@@ -67,7 +69,39 @@ def index():
         sort=sort,
         direction=direction,
         links=links,
+        signup_mode=signup.mode(),
+        modes=signup.MODES,
+        invitations=query(
+            """SELECT email, expires_at FROM signup_token
+               WHERE invited = 1 AND used_at IS NULL AND expires_at > ? ORDER BY id DESC""",
+            (now(),),
+        ),
     )
+
+
+@bp.post("/admin/signup")
+@admin_required
+def set_signup():
+    value = request.form.get("mode", "")
+    if value not in signup.MODES:
+        flash(_("Unknown setting."))
+    else:
+        signup.set_mode(value)
+        flash(_("Sign-up is now: %(mode)s.", mode=value))
+    return redirect(url_for("admin.index") + "#signup")
+
+
+@bp.post("/admin/invite")
+@admin_required
+def invite():
+    address = request.form.get("email", "")
+    try:
+        signup.send_invitation(address)
+    except ValueError as problem:
+        flash(str(problem))
+    else:
+        flash(_("Invitation sent to %(address)s.", address=address.strip().lower()))
+    return redirect(url_for("admin.index") + "#signup")
 
 
 def init_app(app) -> None:

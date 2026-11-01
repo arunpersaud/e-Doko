@@ -2,7 +2,7 @@ import re
 
 from flask import Blueprint, g, redirect, render_template, request, url_for
 
-from . import db, games
+from . import db, games, signup
 
 site = Blueprint("site", __name__)
 
@@ -12,7 +12,7 @@ def index():
     if g.user is not None:
         return render_template("home.html", **games.dashboard(g.user["id"]))
     count = db.query_one("SELECT count(*) AS n FROM game")["n"]
-    return render_template("index.html", games=count)
+    return render_template("index.html", games=count, signup_mode=signup.mode())
 
 
 @site.route("/privacy")

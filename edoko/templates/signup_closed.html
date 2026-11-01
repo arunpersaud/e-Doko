@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Sign up") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("Sign up") }}</h1>
+{% if mode == "invite" %}
+<p>{{ _("New accounts are by invitation at the moment. If you were invited, use the link in the mail you got.") }}</p>
+{% else %}
+<p>{{ _("New accounts are closed at the moment.") }}</p>
+{% endif %}
+{% endblock %}

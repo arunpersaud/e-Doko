@@ -6,7 +6,7 @@ import click
 from flask import current_app
 from flask.cli import AppGroup
 
-from . import bounces, db, digest as digest_mails, migrations
+from . import bounces, db, digest as digest_mails, migrations, signup
 
 edoko = AppGroup("edoko", help="e-DoKo database tools.")
 
@@ -76,3 +76,27 @@ def digest() -> None:
     """Send the digests that are due (run every hour)."""
     conn = db.connect(current_app.config["DATABASE"])
     click.echo(f"{digest_mails.run(conn)} digests sent")
+
+
+@edoko.command("invite")
+@click.argument("email")
+@click.option("--mail/--no-mail", default=False, help="send the link by mail (else only print it)")
+def invite(email: str, mail: bool) -> None:
+    """Invite an address to sign up (works in every sign-up mode but 'closed')."""
+    try:
+        if mail:
+            link = signup.send_invitation(email)
+        else:
+            link = current_app.config["ORIGIN"] + signup.invite(email)
+    except ValueError as problem:
+        raise click.ClickException(str(problem)) from None
+    click.echo(link)
+
+
+@edoko.command("signup-mode")
+@click.argument("mode", required=False, type=click.Choice(signup.MODES))
+def signup_mode(mode: str | None) -> None:
+    """Show or set who may sign up: open, invite or closed."""
+    if mode:
+        signup.set_mode(mode)
+    click.echo(signup.mode())

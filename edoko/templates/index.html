@@ -14,8 +14,14 @@
 
 <section class="signup-box">
   <h2>{{ _("New here?") }}</h2>
+  {% if signup_mode == "open" %}
   <p>{{ _("Sign up with your email address. We send you a link; there you choose the name the other players see and set up a passkey (fingerprint, face or device PIN).") }}</p>
   <p><a role="button" href="{{ url_for('signup.form') }}">{{ _("Sign up") }}</a></p>
+  {% elif signup_mode == "invite" %}
+  <p>{{ _("New accounts are by invitation at the moment. If you were invited, use the link in the mail you got.") }}</p>
+  {% else %}
+  <p>{{ _("New accounts are closed at the moment.") }}</p>
+  {% endif %}
   <p><small>{{ _("Already playing? Use “Log in” at the top right.") }}</small></p>
 </section>
 {% endblock %}

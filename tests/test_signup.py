@@ -88,3 +88,98 @@ def test_no_account_without_a_sign_up_link(client):
     with client.session_transaction() as session:
         session["csrf"] = "t"
     assert client.post("/passkey/register/options", json={}, headers={"X-CSRF-Token": "t"}).status_code == 401
+
+
+# --- protection, the setting and invitations ---------------------------------
+
+
+def as_admin(client):
+    with client.session_transaction() as session:
+        session["user_id"] = 1
+        session["csrf"] = "t"
+    return client
+
+
+@pytest.fixture
+def admin(app):
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET is_admin = 1 WHERE id = 1")
+    return as_admin(app.test_client())
+
+
+def post_admin(client, url, **data):
+    return client.post(url, data={"csrf": "t", **data}, follow_redirects=True)
+
+
+def test_too_many_requests_from_one_client_get_a_message_with_minutes(app, client):
+    for n in range(10):
+        assert ask(client, f"p{n}@example.org").status_code == 200
+    response = ask(client, "one-more@example.org")
+    assert response.status_code == 429 and re.search(r"about \d+ minutes", response.text)
+
+
+def test_the_global_cap_protects_the_mail_reputation(app, client, monkeypatch):
+    from edoko import signup
+
+    monkeypatch.setattr(signup, "CAP_HOUR", 2)
+    for n in range(2):
+        ask(app.test_client(), f"c{n}@example.org")
+    app.outbox.clear()
+    response = ask(app.test_client(), "late@example.org")
+    assert response.status_code == 503 and "Many people" in response.text
+    assert app.outbox == []
+
+
+def test_no_sign_up_mail_to_an_address_that_bounced(app, client):
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute(
+            "INSERT INTO mail_bounce (notice, address, kind, occurred_at) VALUES ('n', 'gone@example.org', 'permanent', '2026-01-01')"
+        )
+    assert ask(client, "gone@example.org").status_code == 200
+    assert app.outbox == []
+
+
+def test_the_hidden_field_catches_bots(app, client):
+    token = csrf(client.get("/signup").text)
+    response = client.post("/signup", data={"csrf": token, "email": "bot@example.org", "website": "http://spam"})
+    assert response.status_code == 200 and app.outbox == []
+
+
+def test_the_setting_decides_who_can_sign_up(app, client, admin):
+    post_admin(admin, "/admin/signup", mode="invite")
+    assert client.get("/signup").status_code == 403
+    assert "by invitation" in client.get("/").text and 'href="/signup"' not in client.get("/").text
+    # an open request link stops working when the setting turns away from open
+    post_admin(admin, "/admin/signup", mode="open")
+    ask(client, "early@example.org")
+    path = "/" + link_in(app).split("/", 3)[3]
+    assert client.get(path).status_code == 200
+    post_admin(admin, "/admin/signup", mode="invite")
+    assert client.get(path).status_code == 404
+    post_admin(admin, "/admin/signup", mode="nonsense")
+    assert "by invitation" in client.get("/").text  # unchanged
+
+
+def test_an_admin_invites_by_email(app, client, admin):
+    post_admin(admin, "/admin/signup", mode="invite")
+    page = post_admin(admin, "/admin/invite", email="Friend@Example.org").text
+    assert "Invitation sent to friend@example.org" in page and "friend@example.org" in page
+    mail = app.outbox[-1]
+    assert mail["To"] == "friend@example.org" and "invited" in mail.get_content()
+    path = "/" + re.search(r"http://\S+/signup/\S+", mail.get_content())[0].split("/", 3)[3]
+    assert client.get(path).status_code == 200  # works although sign-up is by invitation
+    post_admin(admin, "/admin/signup", mode="closed")
+    assert client.get(path).status_code == 404  # closed means closed
+    assert "has an account already" in post_admin(admin, "/admin/invite", email="a@x.org").text
+    assert client.post("/admin/invite", data={"csrf": "x", "email": "z@example.org"}).status_code == 403  # not logged in
+
+
+def test_cli_invite_and_mode(app):
+    runner = app.test_cli_runner()
+    assert runner.invoke(args=["edoko", "signup-mode", "invite"]).output.strip() == "invite"
+    assert runner.invoke(args=["edoko", "signup-mode"]).output.strip() == "invite"
+    result = runner.invoke(args=["edoko", "invite", "cli@example.org"])
+    assert result.exit_code == 0 and "/signup/" in result.output and app.outbox == []
+    result = runner.invoke(args=["edoko", "invite", "--mail", "cli2@example.org"])
+    assert [m["To"] for m in app.outbox] == ["cli2@example.org"]
+    assert runner.invoke(args=["edoko", "invite", "a@x.org"]).exit_code != 0

@@ -12,6 +12,8 @@ matches ORIGIN.
 """
 
 import hashlib
+import hmac
+import ipaddress
 import secrets
 from datetime import UTC, datetime, timedelta
 from functools import wraps
@@ -155,18 +157,43 @@ def safe_next(target: str | None) -> str:
 # --- login links -------------------------------------------------------------
 
 
-def rate_limited(key: str, limit: int) -> bool:
-    """Count an attempt under key; True if there were too many this hour."""
+def ip_key() -> str:
+    """The client for the rate limits: a keyed hash of the address (of the /64
+    network for IPv6, where one person has billions of addresses). Nobody can
+    turn it back into an address without the secret key."""
+    raw = client_ip()
+    try:
+        ip = ipaddress.ip_address(raw)
+        if ip.version == 6:
+            ip = ipaddress.ip_network(f"{ip}/64", strict=False).network_address
+        raw = str(ip)
+    except ValueError:
+        pass
+    key = str(current_app.config["SECRET_KEY"]).encode()
+    return hmac.new(key, raw.encode(), "sha256").hexdigest()
+
+
+def rate_wait(key: str, limit: int, hours: int = 1) -> int:
+    """Count an attempt under key. 0 if it is fine, else the minutes until the
+    oldest counted attempt leaves the window (a new attempt is not counted)."""
     db = get_db()
     db.execute("DELETE FROM rate_limit WHERE at < datetime('now', '-1 day')")
-    since = (datetime.now(UTC) - timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
-    count = db.execute(
-        "SELECT count(*) FROM rate_limit WHERE key = ? AND at >= ?", (key, since)
-    ).fetchone()[0]
-    if count >= limit:
-        return True
+    now_ = datetime.now(UTC)
+    since = (now_ - timedelta(hours=hours)).strftime("%Y-%m-%d %H:%M:%S")
+    rows = db.execute(
+        "SELECT at FROM rate_limit WHERE key = ? AND at >= ? ORDER BY at", (key, since)
+    ).fetchall()
+    if len(rows) >= limit:
+        oldest = datetime.strptime(rows[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
+        left = oldest + timedelta(hours=hours) - now_
+        return max(1, -(-int(left.total_seconds()) // 60))
     db.execute("INSERT INTO rate_limit (key) VALUES (?)", (key,))
-    return False
+    return 0
+
+
+def rate_limited(key: str, limit: int) -> bool:
+    """Count an attempt under key; True if there were too many this hour."""
+    return rate_wait(key, limit) > 0
 
 
 def create_link(user_id: int) -> str:
@@ -203,7 +230,7 @@ def login():
 def login_email():
     address = " ".join((request.form.get("email") or "").split()).lower()
     # the same answer whatever happens, so nobody can probe for addresses
-    limited = rate_limited("ip:" + sha256(client_ip()), LIMIT_CLIENT)
+    limited = rate_limited("ip:" + ip_key(), LIMIT_CLIENT)
     if (
         address
         and not limited

@@ -1,0 +1,9 @@
+{% trans %}Hello,{% endtrans %}
+
+{% trans %}you are invited to e-DoKo, a place to play Doppelkopf with friends. Use this link to choose your name and set up a passkey:{% endtrans %}
+
+{{ link }}
+
+{% trans days=days %}The link works once and for {{ days }} days.{% endtrans %}
+
+{% trans %}If you did not expect this mail, you can ignore it.{% endtrans %}

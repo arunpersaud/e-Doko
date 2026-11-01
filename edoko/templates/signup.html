@@ -5,6 +5,7 @@
 <div class="login-box">
   <form method="post" action="{{ url_for('signup.request_link') }}">
     <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
     <input type="email" name="email" autocomplete="email" required
            placeholder="{{ _('Your email address') }}" aria-label="{{ _('Your email address') }}">
     <button type="submit">{{ _("Send me a sign-up link") }}</button>
