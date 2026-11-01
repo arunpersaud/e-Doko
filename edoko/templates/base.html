@@ -14,6 +14,7 @@
 </head>
 
 <body>
+  {% if demo %}<p class="demo-banner" role="note"><strong>Demo:</strong> no mail is sent and nothing is kept. Click a player's name to see their mail. <a href="{{ url_for('demo.index') }}">Demo page</a></p>{% endif %}
   <header class="container">
     <nav>
       <ul><li><a href="{{ url_for('site.index') }}" class="brand"><strong>e-DoKo</strong></a></li></ul>

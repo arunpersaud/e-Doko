@@ -1,0 +1,14 @@
+{# demo mode only (demo.py): a player's name as a button that shows this person's mail #}
+{% macro person(user_id, name) %}{% if demo %}{% set pid = "demo-" ~ demo_id() %}<button type="button" class="demo-name" popovertarget="{{ pid }}">{{ name }}</button>
+<aside popover id="{{ pid }}" class="demo-pop">
+  <h3>{{ name }} <small>– demo</small></h3>
+  <form method="post" action="{{ url_for('demo.login', user_id=user_id) }}" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button type="submit" class="compact">Continue as {{ name }}</button>
+  </form>
+  <a href="{{ url_for('demo.inbox', user_id=user_id) }}">all mail</a>
+  {% set mails = demo_mails(user_id, 5) %}
+  {% for m in mails %}
+  <article><header><strong>{{ m.subject }}</strong> <small>{{ m.created }}</small></header><pre>{{ demo_linkify(m.body) }}</pre></article>
+  {% else %}<p>No mail yet.</p>{% endfor %}
+</aside>{% else %}{{ name }}{% endif %}{% endmacro %}

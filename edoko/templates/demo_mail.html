@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Demo mail – e-DoKo{% endblock %}
+{% block content %}
+<h1>Mail for {{ person.name }}</h1>
+<p><a href="{{ url_for('demo.index') }}">All players</a></p>
+{% for m in mails %}
+<article><header><strong>{{ m.subject }}</strong> <small>{{ m.created }}</small></header><pre>{{ demo_linkify(m.body) }}</pre></article>
+{% else %}<p>No mail yet.</p>{% endfor %}
+{% endblock %}

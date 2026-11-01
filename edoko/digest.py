@@ -47,19 +47,20 @@ def current_entries(db: sqlite3.Connection, user) -> tuple[list, list[int]]:
     return keep, [row["id"] for row in rows]
 
 
-def run(db: sqlite3.Connection, now: datetime | None = None) -> int:
-    """Send the digests that are due; returns how many mails went out."""
+def run(db: sqlite3.Connection, now: datetime | None = None, force: bool = False) -> int:
+    """Send the digests that are due (all of them if force); returns how many mails went out."""
     now = now or datetime.now(UTC)
     sent = 0
     users = db.execute(
-        """SELECT * FROM user WHERE mail_status = 'ok' AND mail_mode != 'none'
+        """SELECT * FROM user WHERE (mail_status = 'ok' OR ?) AND mail_mode != 'none'
              AND disabled_at IS NULL
              AND (digest_hours IS NOT NULL
-                  OR EXISTS (SELECT 1 FROM mail_queue WHERE mail_queue.user = user.id))"""
+                  OR EXISTS (SELECT 1 FROM mail_queue WHERE mail_queue.user = user.id))""",
+        (mail.demo_mode(),),
     ).fetchall()
     for user in users:
         # (somebody who turned the digest off gets what is left at the next run)
-        if user["digest_hours"] and not is_due(user, now):
+        if user["digest_hours"] and not force and not is_due(user, now):
             continue
         entries, ids = current_entries(db, user)
         if entries:

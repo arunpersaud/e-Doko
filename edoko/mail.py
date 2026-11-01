@@ -22,9 +22,18 @@ log = logging.getLogger(__name__)
 SUBJECT_PREFIX = "[DoKo] "
 
 
+def demo_mode() -> bool:
+    return current_app.config["MAIL_BACKEND"] == "demo"
+
+
 def send(to: str, subject: str, body: str) -> bool:
     """Send one plain text mail; False if it could not be sent."""
     config = current_app.config
+    if config["MAIL_BACKEND"] == "demo":  # shown in the pages, see demo.py
+        from . import demo
+
+        demo.store(to, SUBJECT_PREFIX + subject, body)
+        return True
     allow = {a.strip().lower() for a in (config.get("MAIL_ALLOW") or "").split(",") if a.strip()}
     if allow and to.lower() not in allow:
         log.info("mail to %s skipped (not in FLASK_MAIL_ALLOW): %s", to, subject)
@@ -62,7 +71,7 @@ def send_template(user, subject, template: str, **context) -> bool:
 
     subject is a lazy string, so it is translated here as well.
     """
-    if user["mail_status"] != "ok":
+    if user["mail_status"] != "ok" and not demo_mode():
         log.info("no mail to user %s: %s", user["id"], user["mail_status"])
         return False
     subject, body = render(user, subject, template, **context)
@@ -76,7 +85,7 @@ def deliver(db, user, subject, template: str, *, kind="other", game=None, **cont
     """
     if not user["digest_hours"]:
         return send_template(user, subject, template, **context)
-    if user["mail_status"] != "ok":
+    if user["mail_status"] != "ok" and not demo_mode():
         return False
     subject, body = render(user, subject, template, **context)
     db.execute(

@@ -8,9 +8,11 @@ Configuration comes from environment variables with a FLASK_ prefix:
     FLASK_MAIL_FROM, FLASK_SMTP_HOST, FLASK_SMTP_USER, FLASK_SMTP_PASSWORD, ...
                        mail, see mail.py
     FLASK_SES_TOPIC_ARN  bounce notices from SES, see bounces.py
+    FLASK_DEMO         1: no mail is sent, it is shown in the pages (demo.py)
 
 FLASK_SECRET_KEY, FLASK_ORIGIN, FLASK_MAIL_FROM and FLASK_SMTP_HOST are
-required unless the app runs in debug or testing mode.
+required unless the app runs in debug or testing mode (in demo mode the mail settings
+are not needed).
 """
 
 import hashlib
@@ -30,6 +32,7 @@ from . import (
     avatars,
     bounces,
     db,
+    demo,
     games,
     migrations,
     passkeys,
@@ -89,7 +92,8 @@ def create_app(test_config: dict | None = None) -> Flask:
     }
     for key, value in defaults.items():
         if not app.config.get(key):
-            if not (app.debug or app.testing):
+            mailless = app.config.get("DEMO") and key in ("MAIL_FROM", "SMTP_HOST")
+            if not (app.debug or app.testing or mailless):
                 raise RuntimeError(f"FLASK_{key} is not set")
             app.config[key] = value
     if app.testing:
@@ -152,6 +156,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     account.init_app(app)
     admin.init_app(app)
     bounces.init_app(app)
+    demo.init_app(app)
     app.register_blueprint(views.site)
     app.cli.add_command(edoko)
 

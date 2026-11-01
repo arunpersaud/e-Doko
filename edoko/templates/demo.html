@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Demo – e-DoKo{% endblock %}
+{% block content %}
+<h1>Demo</h1>
+<p>No mail is sent. It is kept here, with working links. Nothing you do is saved for good.</p>
+<form method="post" action="{{ url_for('demo.run_digest') }}" class="inline">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <button type="submit" class="compact secondary">Send all digests now</button>
+</form>
+<table>
+  <thead><tr><th>Player</th><th>Mails</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr><td>{{ u.name }}</td><td>{% if u.mails %}<a href="{{ url_for('demo.inbox', user_id=u.id) }}">{{ u.mails }}</a>{% else %}0{% endif %}</td>
+  <td><form method="post" action="{{ url_for('demo.login', user_id=u.id) }}" class="inline"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit" class="compact secondary">Continue as</button></form></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
