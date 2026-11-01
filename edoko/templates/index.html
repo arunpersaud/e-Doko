@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="home-grid">
 <section class="intro">
   <h1>{{ _("Doppelkopf, one trick at a time") }}</h1>
   <p class="lead">{{ _("e-DoKo is a place to play Doppelkopf, the German card game for four, with friends over the internet. You play at your own pace: when it is your turn we send you a short mail with a link, you play your card, and the game waits for the next player. A game can take a few days, like a table where the cards stay out between visits.") }}</p>
   <ul class="features">
-    <li><strong>{{ _("Your rules") }}</strong> – {{ _("normal games, solos, weddings and poverty; whoever starts a table chooses the house rules, such as the second ten of hearts, Schweinchen and when you may call Re or Contra.") }}</li>
+    <li><strong>{{ _("Your rules") }}</strong> – {{ _("normal games, solos, weddings and poverty; whoever starts a table chooses the house rules, such as the second ten of hearts, Schweinchen and when you may call Re or Contra. We already support several custom rules and are happy to add new ones: just") }} <a href="https://github.com/arunpersaud/e-Doko/issues">{{ _("open an issue on GitHub") }}</a>.</li>
     <li><strong>{{ _("Talk at the table") }}</strong> – {{ _("add a remark to your card and it appears next to your name, as if you said it across the table.") }}</li>
     <li><strong>{{ _("Look back") }}</strong> – {{ _("step through every finished game trick by trick, and see how the other tables played the same deal.") }}</li>
+    <li><strong>{{ _("Mostly by email") }}</strong> – {{ _("the game tells you by mail when it is your turn. Too much mail? Choose a digest that collects everything in one mail, or no mail at all and just visit the site.") }}</li>
     <li><strong>{{ _("Small and private") }}</strong> – {{ _("no ads, no tracking, nothing from third parties and no passwords: you log in with a link by mail or with a passkey.") }} <a href="{{ url_for('site.privacy') }}">{{ _("Privacy") }}</a></li>
   </ul>
-  <p><small>{{ ngettext("%(num)d game so far.", "%(num)d games so far.", games) }}</small></p>
+  <p><small>{{ ngettext("%(num)d game so far.", "%(num)d games so far.", games) }} · <a href="{{ url_for('site.changes') }}">{{ _("What is new") }}</a></small></p>
 </section>
+<figure class="example">
+  <img src="{{ url_for('static', filename='home-table.png') }}" width="408" height="855"
+       alt="{{ _('An example table: four tricks have been played; Anna has called Re, Carla and Dieter comment on the last trick.') }}">
+  <figcaption><small>{{ _("An example table with made-up players: four tricks played, Anna has called Re, and the others comment.") }}</small></figcaption>
+</figure>
+</div>
 
 <section class="signup-box">
   <h2>{{ _("New here?") }}</h2>

@@ -30,3 +30,12 @@ def test_the_privacy_page_is_public_and_linked_from_every_page(client):
     for word in ("Cloudflare", "Amazon", "Gravatar", "passkey", "cookie"):
         assert word in text
     assert 'href="/privacy"' in client.get("/").get_data(as_text=True)
+
+
+def test_start_page_changes_page_and_footer_link(client):
+    home = client.get("/").text
+    assert "home-table.png" in home and "open an issue on GitHub" in home
+    assert 'href="/changes"' in home and "digest" in home
+    changes = client.get("/changes")
+    assert changes.status_code == 200 and "2026-10-31" in changes.text
+    assert 'href="/changes"' in client.get("/privacy").text  # in the footer of every page

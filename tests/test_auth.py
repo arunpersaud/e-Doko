@@ -93,10 +93,10 @@ def test_disabled_user_gets_no_link_and_is_logged_out(app, client):
     path = link_from(app)
     _, token = request_link(client, app)
     client.post(path, data={"csrf": token})
-    assert "Ann" in client.get("/").text
+    assert "Log out" in client.get("/").text
     with closing(db.connect(app.config["DATABASE"])) as conn:
         conn.execute("UPDATE user SET disabled_at = '2026-01-01 00:00:00'")
-    assert "Ann" not in client.get("/").text
+    assert "Log out" not in client.get("/").text
     count = len(app.outbox)
     request_link(client, app)
     assert len(app.outbox) == count

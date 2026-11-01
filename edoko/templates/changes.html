@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Changes") }} – e-DoKo{% endblock %}
+{% block content %}
+<h1>{{ _("What is new") }}</h1>
+<p><small>{{ _("Newest first. Wishes and bugs are welcome on") }} <a href="https://github.com/arunpersaud/e-Doko/issues">GitHub</a>.</small></p>
+
+<article>
+  <h2>2026-11-01</h2>
+  <ul>
+    <li>A start page for newcomers, and sign-up with a passkey. Admins can close sign-up or make it invitation-only.</li>
+    <li>A finished table shows a summary: points, games won, solos, foxes caught and a game-by-game table.</li>
+    <li>What was said before the game is shown as “Before the game”, next to the trick numbers.</li>
+    <li>The remark box is below your own cards, with a hint to write the remark before clicking the card.</li>
+    <li>Umlauts in old comments are repaired.</li>
+  </ul>
+</article>
+<article>
+  <h2>2026-10-31</h2>
+  <ul>
+    <li>Playing on the new site: join a game, declare a solo, wedding, poverty or nines, and play your cards, with all the rules of the old site (calls, Schweinchen, dullen).</li>
+    <li>Tables: start a table with house rules and an optional number of games; keep playing with the seats rotating; standings and a winner at the end.</li>
+    <li>Mail: choose normal, fewer or no mails, or a digest at the hours you like; your time zone and language; reminders for games that wait for a week, and cancelling after a month.</li>
+    <li>Remarks with a card: on any card of the trick shown, editable for 15 minutes.</li>
+    <li>A privacy page that says what is stored.</li>
+  </ul>
+</article>
+<article>
+  <h2>2026-10-22</h2>
+  <ul><li>Mail that bounces or draws a complaint is noticed, so nobody is mailed at an address that does not work.</li></ul>
+</article>
+<article>
+  <h2>2026-10-19</h2>
+  <ul><li>Compare a game with how other tables played the same deal: the hands stay in the same places.</li></ul>
+</article>
+<article>
+  <h2>2026-10-18</h2>
+  <ul>
+    <li>A new game page: the table with four fixed places, the tricks one by one, speech bubbles for remarks, and an explanation of the game points.</li>
+    <li>Profile pictures: generated, uploaded or from Gravatar when you ask for it.</li>
+    <li>Passkeys for logging in, a settings page and an admin page.</li>
+  </ul>
+</article>
+{% endblock %}

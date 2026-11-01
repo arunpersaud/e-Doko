@@ -266,3 +266,10 @@ button.demo-name:focus-visible { outline: 2px solid var(--pico-primary); }
 .signup-box input[type="email"] { margin-bottom: 0.75rem; }
 .demo-mail pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.play-form label { font-size: 0.9rem; }
+
+/* start page: text and an example table side by side */
+.home-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: start; }
+@media (min-width: 62rem) { .home-grid { grid-template-columns: minmax(0, 1fr) 24rem; } }
+figure.example { margin: 0; }
+figure.example img { width: 100%; height: auto; border-radius: var(--pico-border-radius); border: 1px solid var(--pico-muted-border-color); }
