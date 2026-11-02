@@ -12,6 +12,21 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "tools"))
 PHP_SCHEMA = Path(__file__).parent.parent / "schema-sqlite.sql"
 
 
+@pytest.fixture(scope="session", autouse=True)
+def compiled_translations():
+    """The .mo files are not in git: build the ones that are missing or older than
+    their .po (the container image does the same)."""
+    from babel.messages import mofile, pofile
+
+    for po in (PHP_SCHEMA.parent / "edoko" / "translations").glob("*/LC_MESSAGES/messages.po"):
+        mo = po.with_suffix(".mo")
+        if not mo.exists() or mo.stat().st_mtime < po.stat().st_mtime:
+            with po.open("rb") as source:
+                catalog = pofile.read_po(source)
+            with mo.open("wb") as target:
+                mofile.write_mo(target, catalog)
+
+
 @pytest.fixture
 def database(tmp_path):
     path = tmp_path / "edoko.sqlite"

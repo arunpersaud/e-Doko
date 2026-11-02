@@ -22,6 +22,8 @@ Translations (en msgids, de in `edoko/translations/de`):
     uv run pybabel update -i messages.pot -d edoko/translations
     uv run pybabel compile -d edoko/translations
 
+The compiled `.mo` files are not in git: the container build and the test run create them.
+
 ## Configuration
 
 All settings are environment variables with the prefix `FLASK_` (see
