@@ -87,3 +87,13 @@ def test_login_links_to_the_old_address_die(app, client):
     client.post(path, data={"csrf": csrf(page.text)})
     with closing(db.connect(app.config["DATABASE"])) as conn:
         assert conn.execute("SELECT count(*) FROM login_token").fetchone()[0] == 0
+
+
+def test_the_notice_comes_in_the_users_language(app, client):
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET language = 'de' WHERE id = 1")
+    log_in(client)
+    ask(client, "new@x.org")
+    old = [m for m in app.outbox if m["To"] == "a@x.org"][0]
+    assert "jemand hat darum gebeten" in old.get_content()
+    assert "Hello" not in old.get_content()

@@ -28,6 +28,14 @@ this file there instead.
 
 ## [Unreleased]
 
+### Fixed
+
+- `mail` The texts of the mails (login link, "it is your turn", invitations, reminders, the digest) were missing from the translation file, so they always came in English. They are included now.
+
+### Changed
+
+- `design` German translation of all texts that were still English (about 240 texts: settings, game page, start page, sign-up, privacy page, mails). Please tell us about wrong or clumsy wording.
+
 ### Removed
 
 - `data` The code of the old PHP site is no longer in the repository (it stays in the git history, up to the tag `v1.0.0`). `schema-sqlite.sql` and `tools/import_php.py` remain to read its database.

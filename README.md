@@ -18,8 +18,8 @@ Changes: `CHANGELOG.md`.
 
 Translations (en msgids, de in `edoko/translations/de`):
 
-    uv run pybabel extract -F babel.cfg -o messages.pot .
-    uv run pybabel update -i messages.pot -d edoko/translations
+    uv run pybabel extract -F babel.cfg -k _l -k lazy_gettext -o messages.pot .
+    uv run pybabel update -N -i messages.pot -d edoko/translations
     uv run pybabel compile -d edoko/translations
 
 The compiled `.mo` files are not in git: the container build and the test run create them.
