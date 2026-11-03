@@ -392,3 +392,19 @@ def test_sorting_does_not_open_the_page_to_others(app):
 def test_unsorted_headers_hint_that_they_can_be_clicked(app):
     page = admin_with_users(app).get("/admin?sort=name").text
     assert page.count('class="idle"') == 4  # the four other sortable columns
+
+
+def test_pages_use_the_language_from_the_settings_not_the_browser(app, client):
+    request_link(client, app)
+    path = link_from(app)
+    _, token = request_link(client, app)
+    client.post(path, data={"csrf": token})
+    english = client.get("/", headers={"Accept-Language": "en"}).text
+    assert 'lang="en"' in english and "Log out" in english
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET language = 'de'")
+    german = client.get("/", headers={"Accept-Language": "en"}).text
+    assert 'lang="de"' in german and "Log out" not in german
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        conn.execute("UPDATE user SET language = NULL")  # NULL: the browser decides
+    assert 'lang="de"' in client.get("/", headers={"Accept-Language": "de"}).text
