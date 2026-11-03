@@ -27,7 +27,9 @@
 {% if controls and controls.idle_days >= 7 %}
 <section class="play-controls">
   <p>{{ ngettext("Nothing has happened in this game for %(num)d day.", "Nothing has happened in this game for %(num)d days.", controls.idle_days) }}</p>
-  {% if controls.stage != "play" %}
+  {% if controls.stage != "play" and controls.reminded %}
+  <p>{% if controls.reminded.name %}{{ _("Someone reminded %(name)s to play recently.", name=controls.reminded.name) }}{% else %}{{ _("Someone sent a reminder recently.") }}{% endif %}</p>
+  {% elif controls.stage != "play" %}
   <form method="post" action="{{ controls.base }}/remind" class="inline">
     <input type="hidden" name="csrf" value="{{ csrf_token() }}">
     <button type="submit" class="secondary">{{ _("Remind the player whose turn it is") }}</button>

@@ -149,6 +149,13 @@ def test_reminders_and_cancelling_an_idle_game(app, conn):
     assert [m["To"] for m in app.outbox] == ["a@x.org"] and "reminder" in app.outbox[0]["Subject"].lower()
     assert "already been sent" in seats[3].post("remind").get_data(as_text=True)
     assert conn.execute("SELECT count(*) FROM reminder").fetchone()[0] == 1
+    # after that nobody gets the button, the page says who was reminded
+    for seat in (2, 3, 4):
+        page = seats[seat].page()
+        assert "Remind the player" not in page and "reminded Ann to play recently" in page
+    conn.execute("UPDATE reminder SET created_at = datetime('now', '-8 days')")  # a week later
+    assert "Remind the player" in seats[2].page()
+    conn.execute("UPDATE reminder SET created_at = datetime('now')")
     assert "wait longer" in seats[2].post("cancel").get_data(as_text=True)
     idle(conn, game_id, 31)
     assert "Cancel this game" in seats[2].page()

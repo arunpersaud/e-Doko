@@ -866,6 +866,8 @@ def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> d
     found: dict = {
         "base": base, "stage": "wait", "legal": set(), "calls": [],
         "idle_days": idle_days(db, game_id),
+        # a reminder went out within the last week: no second one (see remind)
+        "reminded": reminded(db, game_id),
     }
     if game["status"] == "pre":
         if hand["status"] == "start":
@@ -1088,6 +1090,17 @@ def idle_days(db: sqlite3.Connection, game_id: int) -> int:
     return row[0] if row else 0
 
 
+def reminded(db: sqlite3.Connection, game_id: int) -> dict | None:
+    """The reminder sent in the last week, if any: {"name": who got it, or None}."""
+    row = db.execute(
+        """SELECT user.name FROM reminder LEFT JOIN user ON user.id = reminder.to_user
+           WHERE reminder.game = ? AND reminder.created_at > datetime('now', ?)
+           ORDER BY reminder.id DESC LIMIT 1""",
+        (game_id, f"-{REMIND_AFTER_DAYS} days"),
+    ).fetchone()
+    return {"name": row[0]} if row else None
+
+
 def _player_hand(db: sqlite3.Connection, game_id: int, user_id: int) -> sqlite3.Row:
     hand = db.execute(
         "SELECT * FROM hand WHERE game = ? AND user = ?", (game_id, user_id)
@@ -1114,10 +1127,7 @@ def remind(db: sqlite3.Connection, game_id: int, user_id: int) -> None:
         ).fetchone()[0]
         if target == user_id:
             raise PlayError(_("It is your own turn."))
-        if db.execute(
-            "SELECT 1 FROM reminder WHERE game = ? AND created_at > datetime('now', ?)",
-            (game_id, f"-{REMIND_AFTER_DAYS} days"),
-        ).fetchone():
+        if reminded(db, game_id):
             raise PlayError(_("A reminder has already been sent out."))
         db.execute(
             "INSERT INTO reminder (game, from_user, to_user) VALUES (?, ?, ?)",
