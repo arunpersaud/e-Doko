@@ -160,7 +160,7 @@
       <div class="cross large">
         {% for p in selected.plays %}
         <figure class="play spot-{{ spot_of[p.seat] }}{% if p.seat == selected.winner_seat %} winner{% endif %}" title="{{ names[p.seat] }}">
-          {{ card(p) }}<span class="seq">{{ p.sequence }}</span>
+          {{ card(p) }}
         </figure>
         {% endfor %}
       </div>{% endif %}

@@ -467,10 +467,10 @@ def test_the_arrow_ring_starts_at_the_player_who_leads(world):
     assert 'data-lead="right"' in page  # for Bob at the right
 
 
-def test_the_selected_trick_shows_in_play_order(world):
+def test_cards_on_the_table_have_no_number_the_arrow_shows_the_order(world):
     page = client_for(world, 1).get("/game/10/trick/2").text
-    seq = on_table(page)
-    assert seq.index('<span class="seq">1') < seq.index('<span class="seq">4')
+    table = on_table(page)
+    assert table.count('<figure class="play') == 4 and 'class="seq"' not in table
 
 
 def test_clean_urls_also_for_seat_links(world):

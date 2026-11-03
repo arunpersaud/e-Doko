@@ -123,12 +123,6 @@ img.card.small { height: 3.6rem; }
 }
 .cross img.card { height: var(--card-h); width: var(--card-w); }
 figure.play { margin: 0; position: relative; }
-figure.play .seq {
-  position: absolute; top: 0; left: 0;
-  font-size: 0.65em; line-height: 1;
-  padding: 0.15em 0.35em; border-radius: 0 0 0.4em 0;
-  background: rgba(0, 0, 0, 0.6); color: #fff;
-}
 figure.play.winner img { outline: 3px solid var(--pico-primary); border-radius: 4px; }
 div.trick-comments { margin: -0.75rem 0 1.5rem; }
 p.comment { font-size: 0.9em; margin: 0.25rem 0 0; }
