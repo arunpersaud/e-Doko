@@ -283,3 +283,11 @@ header nav a.brand, header nav button { white-space: nowrap; }
   header nav button { padding: 0.25rem 0.5rem; }
   .lang-switch { gap: 0.25rem; }
 }
+
+/* cancelling a game: opens a warning first, the red button is the second click */
+details.cancel-confirm { display: inline-block; margin: 0.5rem 0 0; border: 0; padding: 0; }
+details.cancel-confirm > summary { display: inline-block; width: auto; margin: 0; }
+details.cancel-confirm > summary::after { display: none; }
+details.cancel-confirm .danger-note { margin: 0.75rem 0 0.5rem; padding: 0.5rem 0.75rem; border-left: 4px solid #c62828; background: rgba(198, 40, 40, 0.1); }
+button.danger { margin: 0; background: #c62828; border-color: #c62828; color: #fff; }
+button.danger:hover, button.danger:focus-visible { background: #a31f1f; border-color: #a31f1f; }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2026-11-02 20:16-0800\n"
+"POT-Creation-Date: 2026-11-02 20:20-0800\n"
 "PO-Revision-Date: 2026-11-01 14:30-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language: de\n"
@@ -406,7 +406,7 @@ msgstr "Dieses Spiel wird gerade nicht gespielt."
 msgid "It is not your turn."
 msgstr "Du bist nicht dran."
 
-#: edoko/play.py:623 edoko/play.py:1302
+#: edoko/play.py:623 edoko/play.py:1308
 msgid "You do not have that card."
 msgstr "Du hast diese Karte nicht."
 
@@ -468,88 +468,96 @@ msgstr "Spiel %(id)d wurde abgebrochen"
 msgid "Game %(id)d is over"
 msgstr "Spiel %(id)d ist vorbei"
 
-#: edoko/play.py:1033
+#: edoko/play.py:1034
 msgid "This table can not continue."
 msgstr "Dieser Tisch kann nicht weitergehen."
 
-#: edoko/play.py:1035
+#: edoko/play.py:1036
 msgid "Only the players of the table can continue it."
 msgstr "Nur die Spieler des Tisches können ihn fortsetzen."
 
-#: edoko/play.py:1051
+#: edoko/play.py:1052
 msgid "Unknown rules."
 msgstr "Unbekannte Regeln."
 
-#: edoko/play.py:1053
+#: edoko/play.py:1054
 msgid "Please choose three other players."
 msgstr "Bitte wähle drei andere Spieler aus."
 
-#: edoko/play.py:1063
+#: edoko/play.py:1064
 msgid "This table is not finished yet."
 msgstr "Dieser Tisch ist noch nicht beendet."
 
-#: edoko/play.py:1066
+#: edoko/play.py:1067
 msgid "Only the players of the table can do that."
 msgstr "Das können nur die Spieler des Tisches."
 
-#: edoko/play.py:1109
+#: edoko/play.py:1113
 msgid "You are not a player of this game."
 msgstr "Du spielst in diesem Spiel nicht mit."
 
-#: edoko/play.py:1122
+#: edoko/play.py:1126
 msgid "This game is not waiting for anybody."
 msgstr "Dieses Spiel wartet auf niemanden."
 
-#: edoko/play.py:1124
+#: edoko/play.py:1128
 msgid "You need to wait longer before you can send out a reminder."
 msgstr "Du musst länger warten, bevor du eine Erinnerung verschicken kannst."
 
-#: edoko/play.py:1129
+#: edoko/play.py:1133
 msgid "It is your own turn."
 msgstr "Du bist selbst dran."
 
-#: edoko/play.py:1131
+#: edoko/play.py:1135
 msgid "A reminder has already been sent out."
 msgstr "Es wurde schon eine Erinnerung verschickt."
 
-#: edoko/play.py:1145
+#: edoko/play.py:1149
 msgid "This game is over already."
 msgstr "Dieses Spiel ist schon vorbei."
 
-#: edoko/play.py:1147
+#: edoko/play.py:1151
 msgid "You need to wait longer before you can cancel a game."
 msgstr "Du musst länger warten, bevor du ein Spiel abbrechen kannst."
 
-#: edoko/play.py:1198
+#: edoko/play.py:1153
+msgid ""
+"A reminder was sent out a moment ago: give the player a few days to "
+"answer first."
+msgstr ""
+"Es wurde gerade eine Erinnerung verschickt: Gib dem Spieler zuerst ein "
+"paar Tage Zeit zu antworten."
+
+#: edoko/play.py:1204
 msgid "Nobody is asking you about trump now."
 msgstr "Dich fragt gerade niemand nach Trumpf."
 
-#: edoko/play.py:1247
+#: edoko/play.py:1253
 msgid "That player has no trump to take."
 msgstr "Dieser Spieler hat keinen Trumpf zum Nehmen."
 
-#: edoko/play.py:1300
+#: edoko/play.py:1306
 msgid "You do not have to give cards back."
 msgstr "Du musst keine Karten zurückgeben."
 
-#: edoko/play.py:1332
+#: edoko/play.py:1338
 #, python-format
 msgid "A remark can have at most %(n)d characters."
 msgstr "Eine Bemerkung darf höchstens %(n)d Zeichen lang sein."
 
-#: edoko/play.py:1340 edoko/play.py:1373
+#: edoko/play.py:1346 edoko/play.py:1379
 msgid "Please write something."
 msgstr "Bitte schreib etwas."
 
-#: edoko/play.py:1347
+#: edoko/play.py:1353
 msgid "There is no such card in this game."
 msgstr "Diese Karte gibt es in diesem Spiel nicht."
 
-#: edoko/play.py:1357
+#: edoko/play.py:1363
 msgid "You can only change your own remarks."
 msgstr "Du kannst nur deine eigenen Bemerkungen ändern."
 
-#: edoko/play.py:1378
+#: edoko/play.py:1384
 msgid "It is too late to change this remark, but you can delete it."
 msgstr "Es ist zu spät, diese Bemerkung zu ändern, aber du kannst sie löschen."
 
@@ -658,7 +666,7 @@ msgstr "Dieser Link funktioniert nicht mehr."
 
 #: edoko/templates/_game_row.html:3 edoko/templates/game.html:4
 #: edoko/templates/game.html:7 edoko/templates/game.html:9
-#: edoko/templates/game.html:12 edoko/templates/game.html:212
+#: edoko/templates/game.html:12 edoko/templates/game.html:218
 #, python-format
 msgid "Game %(id)d"
 msgstr "Spiel %(id)d"
@@ -729,7 +737,7 @@ msgid "Do not ask me if I want to play a game I am invited to"
 msgstr "Frag mich nicht, ob ich ein Spiel spielen will, zu dem ich eingeladen bin"
 
 #: edoko/templates/account.html:35 edoko/templates/admin.html:13
-#: edoko/templates/game.html:145 edoko/templates/passkeys.html:20
+#: edoko/templates/game.html:151 edoko/templates/passkeys.html:20
 msgid "Save"
 msgstr "Speichern"
 
@@ -764,7 +772,7 @@ msgid "Upload"
 msgstr "Hochladen"
 
 #: edoko/templates/account.html:78 edoko/templates/account.html:106
-#: edoko/templates/game.html:146
+#: edoko/templates/game.html:152
 msgid "Delete"
 msgstr "Lösche"
 
@@ -922,7 +930,7 @@ msgstr "erledigt"
 msgid "Log out"
 msgstr "Abmelden"
 
-#: edoko/templates/base.html:39 edoko/templates/game.html:206
+#: edoko/templates/base.html:39 edoko/templates/game.html:212
 #: edoko/templates/login.html:2 edoko/templates/login.html:5
 #: edoko/templates/login_link.html:2 edoko/templates/login_link.html:8
 msgid "Log in"
@@ -1030,39 +1038,63 @@ msgstr "Jemand hat kürzlich eine Erinnerung geschickt."
 msgid "Remind the player whose turn it is"
 msgstr "Den Spieler erinnern, der dran ist"
 
-#: edoko/templates/game.html:41
-msgid "Cancel this game"
-msgstr "Dieses Spiel abbrechen"
+#: edoko/templates/game.html:39
+msgid ""
+"A reminder has just been sent. This game can be canceled if there is "
+"still no answer in a few days."
+msgstr ""
+"Es wurde gerade eine Erinnerung geschickt. Das Spiel kann abgebrochen "
+"werden, wenn in ein paar Tagen immer noch keine Antwort kommt."
 
-#: edoko/templates/game.html:50
+#: edoko/templates/game.html:42
+msgid "Cancel this game…"
+msgstr "Dieses Spiel abbrechen…"
+
+#: edoko/templates/game.html:43
+msgid "Warning:"
+msgstr "Achtung:"
+
+#: edoko/templates/game.html:43
+msgid ""
+"This ends the game for all four players and cannot be undone. Everybody "
+"gets an email about it."
+msgstr ""
+"Das beendet das Spiel für alle vier Spieler und kann nicht rückgängig "
+"gemacht werden. Alle bekommen dazu eine E-Mail."
+
+#: edoko/templates/game.html:46
+msgid "Yes, cancel this game for everybody"
+msgstr "Ja, dieses Spiel für alle abbrechen"
+
+#: edoko/templates/game.html:56
 msgid "Do you want to play this game?"
 msgstr "Möchtest du dieses Spiel spielen?"
 
-#: edoko/templates/game.html:53
+#: edoko/templates/game.html:59
 msgid "Yes, let's play"
 msgstr "Ja, los geht's"
 
-#: edoko/templates/game.html:57
+#: edoko/templates/game.html:63
 msgid "No, cancel the game"
 msgstr "Nein, das Spiel abbrechen"
 
-#: edoko/templates/game.html:63
+#: edoko/templates/game.html:69
 msgid "Look at your cards. Is there anything to say before the game starts?"
 msgstr "Sieh dir deine Karten an. Gibt es etwas zu sagen, bevor das Spiel beginnt?"
 
-#: edoko/templates/game.html:64
+#: edoko/templates/game.html:70
 msgid "No, everything is fine"
 msgstr "Nein, alles in Ordnung"
 
-#: edoko/templates/game.html:65
+#: edoko/templates/game.html:71
 msgid "I want to play a solo:"
 msgstr "Ich möchte ein Solo spielen:"
 
-#: edoko/templates/game.html:66
+#: edoko/templates/game.html:72
 msgid "Kind of solo"
 msgstr "Art des Solos"
 
-#: edoko/templates/game.html:71
+#: edoko/templates/game.html:77
 msgid ""
 "I have both club queens and want a wedding (a partner will be found in "
 "the first three tricks)"
@@ -1070,15 +1102,15 @@ msgstr ""
 "Ich habe beide Kreuzdamen und möchte eine Hochzeit (ein Partner wird in "
 "den ersten drei Stichen gefunden)"
 
-#: edoko/templates/game.html:71
+#: edoko/templates/game.html:77
 msgid "I have five or more nines"
 msgstr "Ich habe fünf oder mehr Neunen"
 
-#: edoko/templates/game.html:71
+#: edoko/templates/game.html:77
 msgid "I only have low trump"
 msgstr "Ich habe nur niedrige Trümpfe"
 
-#: edoko/templates/game.html:74
+#: edoko/templates/game.html:80
 msgid ""
 "With both club queens and no wedding you play a silent solo, alone "
 "against the three others."
@@ -1086,34 +1118,34 @@ msgstr ""
 "Mit beiden Kreuzdamen und ohne Hochzeit spielst du ein stilles Solo, "
 "allein gegen die drei anderen."
 
-#: edoko/templates/game.html:75
+#: edoko/templates/game.html:81
 msgid "Done"
 msgstr "Fertig"
 
-#: edoko/templates/game.html:78
+#: edoko/templates/game.html:84
 msgid "Somebody has poverty. Do you want to take their trump?"
 msgstr "Jemand hat Armut. Möchtest du seine Trümpfe nehmen?"
 
-#: edoko/templates/game.html:81
+#: edoko/templates/game.html:87
 #, python-format
 msgid "%(name)s has %(num)d trump."
 msgid_plural "%(name)s has %(num)d trump."
 msgstr[0] "%(name)s hat %(num)d Trumpf."
 msgstr[1] "%(name)s hat %(num)d Trümpfe."
 
-#: edoko/templates/game.html:81
+#: edoko/templates/game.html:87
 msgid "(low trump)"
 msgstr "(niedrige Trümpfe)"
 
-#: edoko/templates/game.html:85
+#: edoko/templates/game.html:91
 msgid "Yes, take it"
 msgstr "Ja, nehmen"
 
-#: edoko/templates/game.html:91
+#: edoko/templates/game.html:97
 msgid "No way"
 msgstr "Auf keinen Fall"
 
-#: edoko/templates/game.html:94
+#: edoko/templates/game.html:100
 #, python-format
 msgid "Click %(num)d card to give it back to your partner."
 msgid_plural ""
@@ -1124,116 +1156,116 @@ msgstr[1] ""
 "Klicke nacheinander auf %(num)d Karten, um sie deinem Partner "
 "zurückzugeben."
 
-#: edoko/templates/game.html:96
+#: edoko/templates/game.html:102
 msgid "Waiting for the other players. You get a mail when the game starts."
 msgstr ""
 "Wir warten auf die anderen Spieler. Du bekommst eine E-Mail, wenn das "
 "Spiel beginnt."
 
-#: edoko/templates/game.html:98
+#: edoko/templates/game.html:104
 msgid "It is not your turn. You get a mail when it is."
 msgstr "Du bist nicht dran. Du bekommst eine E-Mail, wenn es so weit ist."
 
-#: edoko/templates/game.html:110
+#: edoko/templates/game.html:116
 msgid "Starting player"
 msgstr "Startspieler"
 
-#: edoko/templates/game.html:113
+#: edoko/templates/game.html:119
 #, python-format
 msgid "%(num)d trick"
 msgid_plural "%(num)d tricks"
 msgstr[0] "%(num)d Stich"
 msgstr[1] "%(num)d Stiche"
 
-#: edoko/templates/game.html:113
+#: edoko/templates/game.html:119
 msgid "on turn"
 msgstr "am Zug"
 
-#: edoko/templates/game.html:118
+#: edoko/templates/game.html:124
 #, python-format
 msgid "Play %(card)s"
 msgstr "%(card)s spielen"
 
-#: edoko/templates/game.html:119
+#: edoko/templates/game.html:125
 msgid "Optional: write your remark here first, then click the card."
 msgstr "Optional: Schreibe zuerst hier deine Bemerkung, klicke dann auf die Karte."
 
-#: edoko/templates/game.html:120 edoko/templates/game.html:145
+#: edoko/templates/game.html:126 edoko/templates/game.html:151
 msgid "Your remark"
 msgstr "Deine Bemerkung"
 
-#: edoko/templates/game.html:121
+#: edoko/templates/game.html:127
 msgid "It is your turn: click a card."
 msgstr "Du bist dran: Klicke auf eine Karte."
 
-#: edoko/templates/game.html:122
+#: edoko/templates/game.html:128
 msgid "Announce with it:"
 msgstr "Dazu ansagen:"
 
-#: edoko/templates/game.html:128
+#: edoko/templates/game.html:134
 #, python-format
 msgid "Give back %(card)s"
 msgstr "%(card)s zurückgeben"
 
-#: edoko/templates/game.html:137
+#: edoko/templates/game.html:143
 msgid "Add a comment"
 msgstr "Kommentar"
 
-#: edoko/templates/game.html:137
+#: edoko/templates/game.html:143
 msgid "Your comment on this trick"
 msgstr "Dein Kommentar zu diesem Stich"
 
-#: edoko/templates/game.html:138
+#: edoko/templates/game.html:144
 msgid "Send"
 msgstr "Senden"
 
-#: edoko/templates/game.html:143
+#: edoko/templates/game.html:149
 msgid "edited"
 msgstr "bearbeitet"
 
-#: edoko/templates/game.html:144
+#: edoko/templates/game.html:150
 msgid "change"
 msgstr "ändern"
 
-#: edoko/templates/game.html:170
+#: edoko/templates/game.html:176
 msgid "Tricks"
 msgstr "Stiche"
 
-#: edoko/templates/game.html:172
+#: edoko/templates/game.html:178
 msgid "Previous trick"
 msgstr "Voriger Stich"
 
-#: edoko/templates/game.html:173 edoko/templates/game.html:176
+#: edoko/templates/game.html:179 edoko/templates/game.html:182
 msgid "Before the game"
 msgstr "Vor dem Spiel"
 
-#: edoko/templates/game.html:173
+#: edoko/templates/game.html:179
 #, python-format
 msgid "Trick %(n)d"
 msgstr "Stich %(n)d"
 
-#: edoko/templates/game.html:173
+#: edoko/templates/game.html:179
 #, python-format
 msgid "won by %(name)s"
 msgstr "geht an %(name)s"
 
-#: edoko/templates/game.html:174
+#: edoko/templates/game.html:180
 msgid "Next trick"
 msgstr "Nächster Stich"
 
-#: edoko/templates/game.html:181
+#: edoko/templates/game.html:187
 msgid "No card has been played yet."
 msgstr "Es wurde noch keine Karte gespielt."
 
-#: edoko/templates/game.html:196
+#: edoko/templates/game.html:202
 msgid "Do you want to continue playing? This starts a new game at this table."
 msgstr "Möchtest du weiterspielen? Das beginnt ein neues Spiel an diesem Tisch."
 
-#: edoko/templates/game.html:197
+#: edoko/templates/game.html:203
 msgid "Keep playing"
 msgstr "Weiterspielen"
 
-#: edoko/templates/game.html:202
+#: edoko/templates/game.html:208
 msgid ""
 "The hands of the others are shown when the game is over, and only to "
 "players who have finished this deal themselves."
@@ -1241,11 +1273,11 @@ msgstr ""
 "Die Karten der anderen werden gezeigt, wenn das Spiel zu Ende ist, und "
 "nur Spielern, die diese Karten selbst zu Ende gespielt haben."
 
-#: edoko/templates/game.html:206
+#: edoko/templates/game.html:212
 msgid "to see how the other tables played this deal."
 msgstr "um zu sehen, wie die anderen Tische diese Karten gespielt haben."
 
-#: edoko/templates/game.html:209
+#: edoko/templates/game.html:215
 msgid "Other tables that played this deal"
 msgstr "Andere Tische, die diese Karten gespielt haben"
 
@@ -3290,4 +3322,7 @@ msgstr "Benutze diesen Link, um eine Karte zu spielen:"
 
 #~ msgid "Say it"
 #~ msgstr "Sagen"
+
+#~ msgid "Cancel this game"
+#~ msgstr "Dieses Spiel abbrechen"
 

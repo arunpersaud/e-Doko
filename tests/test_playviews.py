@@ -158,7 +158,12 @@ def test_reminders_and_cancelling_an_idle_game(app, conn):
     conn.execute("UPDATE reminder SET created_at = datetime('now')")
     assert "wait longer" in seats[2].post("cancel").get_data(as_text=True)
     idle(conn, game_id, 31)
-    assert "Cancel this game" in seats[2].page()
+    # right after a reminder: no cancel button, and the server says no as well
+    assert "Cancel this game" not in seats[2].page() and "reminder has just been sent" in seats[2].page()
+    assert "give the player a few days" in seats[2].post("cancel").get_data(as_text=True)
+    conn.execute("UPDATE reminder SET created_at = datetime('now', '-4 days')")
+    page = seats[2].page()
+    assert "Cancel this game" in page and "cannot be undone" in page and "Yes, cancel this game" in page
     app.outbox.clear()
     seats[2].post("cancel")
     assert conn.execute("SELECT status FROM game WHERE id = ?", (game_id,)).fetchone()[0] == "cancel-timedout"

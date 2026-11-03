@@ -868,6 +868,7 @@ def controls(db: sqlite3.Connection, game_id: int, user_id: int, base: str) -> d
         "idle_days": idle_days(db, game_id),
         # a reminder went out within the last week: no second one (see remind)
         "reminded": reminded(db, game_id),
+        "cancel_paused": reminded(db, game_id, CANCEL_PAUSE_DAYS) is not None,
     }
     if game["status"] == "pre":
         if hand["status"] == "start":
@@ -1080,6 +1081,7 @@ def same_table_again(db: sqlite3.Connection, session_id: int, user_id: int) -> i
 
 REMIND_AFTER_DAYS = 7  # nothing happened for a week: the others may send a reminder
 CANCEL_AFTER_DAYS = 30  # ... for a month: a player may cancel the game
+CANCEL_PAUSE_DAYS = 3  # ... but not right after a reminder: give the player time
 
 
 def idle_days(db: sqlite3.Connection, game_id: int) -> int:
@@ -1090,13 +1092,15 @@ def idle_days(db: sqlite3.Connection, game_id: int) -> int:
     return row[0] if row else 0
 
 
-def reminded(db: sqlite3.Connection, game_id: int) -> dict | None:
-    """The reminder sent in the last week, if any: {"name": who got it, or None}."""
+def reminded(
+    db: sqlite3.Connection, game_id: int, days: int = REMIND_AFTER_DAYS
+) -> dict | None:
+    """The reminder sent in the last days (a week), if any: {"name": who got it, or None}."""
     row = db.execute(
         """SELECT user.name FROM reminder LEFT JOIN user ON user.id = reminder.to_user
            WHERE reminder.game = ? AND reminder.created_at > datetime('now', ?)
            ORDER BY reminder.id DESC LIMIT 1""",
-        (game_id, f"-{REMIND_AFTER_DAYS} days"),
+        (game_id, f"-{days} days"),
     ).fetchone()
     return {"name": row[0]} if row else None
 
@@ -1145,6 +1149,8 @@ def cancel_idle(db: sqlite3.Connection, game_id: int, user_id: int) -> None:
             raise PlayError(_("This game is over already."))
         if idle_days(db, game_id) < CANCEL_AFTER_DAYS:
             raise PlayError(_("You need to wait longer before you can cancel a game."))
+        if reminded(db, game_id, CANCEL_PAUSE_DAYS):
+            raise PlayError(_("A reminder was sent out a moment ago: give the player a few days to answer first."))
         notices = cancel(db, game_id, "cancel-timedout")
     notify(db, notices)
 

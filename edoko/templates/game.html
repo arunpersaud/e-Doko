@@ -35,11 +35,17 @@
     <button type="submit" class="secondary">{{ _("Remind the player whose turn it is") }}</button>
   </form>
   {% endif %}
-  {% if controls.idle_days >= 30 %}
-  <form method="post" action="{{ controls.base }}/cancel" class="inline">
-    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-    <button type="submit" class="secondary outline">{{ _("Cancel this game") }}</button>
-  </form>
+  {% if controls.idle_days >= 30 and controls.cancel_paused %}
+  <p><small>{{ _("A reminder has just been sent. This game can be canceled if there is still no answer in a few days.") }}</small></p>
+  {% elif controls.idle_days >= 30 %}
+  <details class="cancel-confirm">
+    <summary role="button" class="secondary outline">{{ _("Cancel this game…") }}</summary>
+    <p class="danger-note" role="alert"><strong>⚠ {{ _("Warning:") }}</strong> {{ _("This ends the game for all four players and cannot be undone. Everybody gets an email about it.") }}</p>
+    <form method="post" action="{{ controls.base }}/cancel" class="inline">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="danger">{{ _("Yes, cancel this game for everybody") }}</button>
+    </form>
+  </details>
   {% endif %}
 </section>
 {% endif %}
