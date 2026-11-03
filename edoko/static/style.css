@@ -274,3 +274,8 @@ button.demo-name:focus-visible { outline: 2px solid var(--pico-primary); }
 figure.example { margin: 0; }
 figure.example img { width: 100%; height: auto; }
 .remark-form input[type="text"] { min-width: 0; max-width: 100%; }
+
+.lang-switch { display: flex; gap: 0.5rem; align-items: center; }
+.lang-switch a[aria-current], .lang-switch button[aria-current] { font-weight: bold; }
+.lang-switch button { padding: 0.15rem 0.5rem; font-size: 0.85em; }
+.lang-switch button[aria-current] { background: var(--pico-secondary-background); color: var(--pico-secondary-inverse); }

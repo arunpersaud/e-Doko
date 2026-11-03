@@ -6,7 +6,7 @@
 <h2>{{ _("Games and mail") }}</h2>
 <form method="post" action="{{ url_for('account.preferences') }}">
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-  <label>{{ _("Language of the mails") }}
+  <label>{{ _("Language") }}
     <select name="language">
       <option value=""{% if not current_user.language %} selected{% endif %}>{{ _("as the browser says") }}</option>
       <option value="en"{% if current_user.language == "en" %} selected{% endif %}>English</option>

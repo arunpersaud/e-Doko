@@ -276,6 +276,37 @@ def link_use(token):
     return redirect(target)
 
 
+LANGUAGE_COOKIE_DAYS = 365
+
+
+def language_target() -> str:
+    return safe_next(request.values.get("next"))
+
+
+@bp.get("/language/<code>")
+def language_cookie(code):
+    """The language switcher for visitors who are not logged in: a cookie."""
+    if code not in ("en", "de"):
+        abort(404)
+    response = redirect(language_target())
+    response.set_cookie(
+        "lang", code, max_age=LANGUAGE_COOKIE_DAYS * 86400,
+        secure=current_app.config["ORIGIN"].startswith("https://"),
+        httponly=True, samesite="Lax",
+    )
+    return response
+
+
+@bp.post("/language")
+def language_setting():
+    """The switcher for logged in users: it changes the language in the settings."""
+    code = request.form.get("language")
+    if g.user is None or code not in ("en", "de"):
+        abort(400)
+    get_db().execute("UPDATE user SET language = ? WHERE id = ?", (code, g.user["id"]))
+    return redirect(language_target())
+
+
 @bp.post("/logout")
 def logout():
     session.clear()

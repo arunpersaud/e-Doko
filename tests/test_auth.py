@@ -408,3 +408,28 @@ def test_pages_use_the_language_from_the_settings_not_the_browser(app, client):
     with closing(db.connect(app.config["DATABASE"])) as conn:
         conn.execute("UPDATE user SET language = NULL")  # NULL: the browser decides
     assert 'lang="de"' in client.get("/", headers={"Accept-Language": "de"}).text
+
+
+def test_switcher_for_visitors_sets_a_cookie_that_beats_the_browser(client):
+    page = client.get("/", headers={"Accept-Language": "en"}).text
+    assert "/language/de?next=" in page
+    response = client.get("/language/de?next=/privacy", headers={"Accept-Language": "en"})
+    assert response.status_code == 302 and response.headers["Location"] == "/privacy"
+    assert 'lang="de"' in client.get("/", headers={"Accept-Language": "en"}).text
+    assert client.get("/language/fr").status_code == 404
+    # no open redirect
+    assert client.get("/language/en?next=//evil.org").headers["Location"] == "/"
+
+
+def test_switcher_for_users_changes_the_setting(app, client):
+    request_link(client, app)
+    path = link_from(app)
+    _, token = request_link(client, app)
+    client.post(path, data={"csrf": token})
+    token = re.search(r'name="csrf" value="([^"]+)"', client.get("/").text)[1]  # a new session
+    response = client.post("/language", data={"csrf": token, "language": "de", "next": "/"})
+    assert response.status_code == 302
+    with closing(db.connect(app.config["DATABASE"])) as conn:
+        assert conn.execute("SELECT language FROM user WHERE id = 1").fetchone()[0] == "de"
+    assert client.post("/language", data={"csrf": token, "language": "fr"}).status_code == 400
+    assert client.post("/language", data={"language": "en"}).status_code == 403  # no token
