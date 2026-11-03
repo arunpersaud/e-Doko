@@ -1361,7 +1361,9 @@ def edit_remark(db: sqlite3.Connection, comment_id: int, user_id: int, text: str
     body = clean_remark(text)
     if body is None:
         raise PlayError(_("Please write something."))
-    _own_remark(db, comment_id, user_id)
+    row = _own_remark(db, comment_id, user_id)
+    if body == row["body"]:
+        return  # nothing changed: not marked as edited
     if not remark_editable(db, comment_id):
         raise PlayError(_("It is too late to change this remark, but you can delete it."))
     db.execute(

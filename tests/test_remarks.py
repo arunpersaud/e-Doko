@@ -50,6 +50,17 @@ def test_players_remark_on_any_card_of_their_game(app, conn):
         play.add_remark(conn, game_id, 5, play_id, "x")  # nobody at this table
 
 
+def test_saving_a_remark_unchanged_does_not_mark_it_as_edited(app, conn):
+    game_id, hs = started(conn)
+    play_id = first_play(conn, game_id, hs)
+    play.add_remark(conn, game_id, 2, play_id, "first")
+    comment = conn.execute("SELECT id FROM comment").fetchone()[0]
+    play.edit_remark(conn, comment, 2, "  first ")
+    assert conn.execute("SELECT edited_at FROM comment WHERE id = ?", (comment,)).fetchone()[0] is None
+    play.edit_remark(conn, comment, 2, "second")
+    assert conn.execute("SELECT edited_at FROM comment WHERE id = ?", (comment,)).fetchone()[0] is not None
+
+
 def test_you_can_edit_your_remark_for_a_while_and_delete_it_always(app, conn):
     game_id, hs = started(conn)
     play_id = first_play(conn, game_id, hs)
