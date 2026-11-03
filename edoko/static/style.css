@@ -303,3 +303,10 @@ details.live-help { margin: 0; border: 0; padding: 0; flex-basis: 100%; }
 details.live-help > summary { display: inline; width: auto; margin: 0; font-size: 0.85em; color: var(--pico-muted-color); }
 details.live-help > summary::after { display: none; }
 details.live-help p { margin: 0.5rem 0 0; font-size: 0.9em; }
+
+/* going on at a table: the proposal box */
+.extension form.inline-form { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem 1rem; margin: 0; }
+.extension form.inline-form label { flex: 1 1 18rem; margin: 0; }
+.extension form.inline-form input { width: 6rem; margin: 0.25rem 0 0; display: block; }
+.extension form.inline-form button { width: auto; margin: 0; }
+.extension form.inline button { margin: 0 0.5rem 0 0; }

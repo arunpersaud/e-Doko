@@ -928,11 +928,19 @@ RULE_CHOICES = {
 }
 
 
+# a game that counts towards the length of a table: finished, and not a solo (after
+# a solo the same player deals again, as after a canceled game). A silent solo
+# is not announced: it counts like any game.
+GAMES_PER_ROUND = 4
+COUNTED = "status = 'gameover' AND NOT (type = 'solo' AND coalesce(solo, '') != 'silent')"
+
+
 def table_state(db: sqlite3.Connection, session_id: int) -> dict:
     """How far a table is: games played, the end (if it has one), the standings.
 
-    Only finished games count (a canceled game is dealt again). The winner is the
-    player with most game points; a tie leaves several.
+    Only finished games count, and no solos (see COUNTED): a table is played for
+    rounds of four games. The winner is the player with most game points; a tie
+    leaves several.
     """
     row = db.execute("SELECT max_games FROM session WHERE id = ?", (session_id,)).fetchone()
     standings = [
@@ -950,7 +958,7 @@ def table_state(db: sqlite3.Connection, session_id: int) -> dict:
         )
     ]
     played = db.execute(
-        "SELECT count(*) FROM game WHERE session = ? AND status = 'gameover'", (session_id,)
+        f"SELECT count(*) FROM game WHERE session = ? AND {COUNTED}", (session_id,)
     ).fetchone()[0]
     max_games = row["max_games"] if row else None
     closed = max_games is not None and played >= max_games

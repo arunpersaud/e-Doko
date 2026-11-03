@@ -43,6 +43,8 @@ from . import (
 )
 from .cli import edoko
 
+__version__ = "1.1.0"  # (also in pyproject.toml, and the top release of CHANGELOG.md)
+
 LANGUAGES = ["en", "de"]
 
 # Everything is served from this site: no inline scripts or styles, no
@@ -121,6 +123,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     Babel(app, locale_selector=select_locale)
     app.jinja_env.globals["get_locale"] = get_locale
+    app.jinja_env.globals["version"] = __version__
     db.init_app(app)
     if not app.testing and Path(app.config["DATABASE"]).exists():
         migrations.migrate(Path(app.config["DATABASE"]))

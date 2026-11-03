@@ -110,7 +110,7 @@ def test_the_new_table_form(app, conn):
     page = client.get("/new").get_data(as_text=True)
     assert "Select the players" in page and "User2" in page and ">Ann<" not in page
     data = {"csrf": "t", "player": ["2", "3", "4"], "dullen": "secondwins", "schweinchen": "both",
-            "call": "9-cards", "lowtrump": "cancel", "max_games": "3"}
+            "call": "9-cards", "lowtrump": "cancel", "rounds": "3"}
     response = client.post("/new", data=data, follow_redirects=True)
     assert response.status_code == 200
     html = response.get_data(as_text=True)
@@ -118,11 +118,14 @@ def test_the_new_table_form(app, conn):
     game = conn.execute("SELECT game.*, ruleset.call, ruleset.schweinchen FROM game JOIN ruleset ON ruleset.id = game.ruleset ORDER BY game.id DESC").fetchone()
     assert (game["call"], game["schweinchen"]) == ("9-cards", "both")
     assert sorted(users(conn, game["id"])) == [1, 2, 3, 4]
+    # three rounds are twelve games
+    assert conn.execute("SELECT max_games FROM session WHERE id = ?", (game["session"],)).fetchone()[0] == 12
     # a wrong form shows the form again, with the message
     bad = client.post("/new", data={**data, "player": ["2", "2", "3"]})
     assert bad.status_code == 200 and "three other players" in bad.get_data(as_text=True)
     assert client.post("/new", data={**data, "lowtrump": "poverty"}).status_code == 200
-    assert client.post("/new", data={**data, "max_games": "x"}).status_code == 200
+    for wrong in ("x", "0", "26"):
+        assert client.post("/new", data={**data, "rounds": wrong}).status_code == 200
 
 
 def test_keep_playing_and_the_table_page_over_http(app, conn):

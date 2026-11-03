@@ -1,0 +1,7 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans proposer=proposer, num=rounds, table=session %}{{ proposer }} proposes to play {{ num }} more round (4 games) at table {{ table }}. Everybody has to agree for it to happen.{% pluralize %}{{ proposer }} proposes to play {{ num }} more rounds (4 games each) at table {{ table }}. Everybody has to agree for it to happen.{% endtrans %}
+
+{% trans %}Please answer on the page of the game, below the table:{% endtrans %}
+
+{{ link }}

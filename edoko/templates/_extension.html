@@ -1,0 +1,34 @@
+{# going on at a table: the proposal box (see extend.py). ext_base: where the forms post to #}
+{% if extension and (extension.proposal or extension.can_propose or extension.nobody_agreed) %}
+<section class="play-controls extension">
+  {% set p = extension.proposal %}
+  {% if p %}
+    {% if p.i_proposed %}
+    <p>{{ ngettext("You proposed %(num)d more round (4 games). Waiting for %(w)d players to answer.", "You proposed %(num)d more rounds (4 games each). Waiting for %(w)d players to answer.", p.rounds, w=p.waiting) }}</p>
+    {% elif p.i_answered %}
+    <p>{{ ngettext("You agreed to %(num)d more round. The others still have to answer.", "You agreed to %(num)d more rounds. The others still have to answer.", p.rounds) }}</p>
+    {% else %}
+    <p><strong>{{ ngettext("%(name)s proposes %(num)d more round (4 games) at this table. Everybody has to agree.", "%(name)s proposes %(num)d more rounds (4 games each) at this table. Everybody has to agree.", p.rounds, name=p.proposer) }}</strong></p>
+    <form method="post" action="{{ ext_base }}/extend-yes" class="inline">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <button type="submit">{{ _("Agree") }}</button>
+    </form>
+    <form method="post" action="{{ ext_base }}/extend-no" class="inline">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="secondary outline">{{ _("Decline") }}</button>
+    </form>
+    {% endif %}
+  {% else %}
+    {% if extension.nobody_agreed %}<p>{{ _("Not everybody agreed to go on. You can propose another number of rounds.") }}</p>{% endif %}
+    {% if extension.can_propose %}
+    <form method="post" action="{{ ext_base }}/extend" class="inline-form">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <label>{{ _("Go on at this table: propose more rounds (4 games each, the others have to agree)") }}
+        <input type="number" name="rounds" min="1" max="{{ extension.max_rounds }}" value="{{ extension.default_rounds }}" required>
+      </label>
+      <button type="submit" class="secondary">{{ _("Propose") }}</button>
+    </form>
+    {% endif %}
+  {% endif %}
+</section>
+{% endif %}

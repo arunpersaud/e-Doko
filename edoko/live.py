@@ -161,11 +161,20 @@ def version(db: sqlite3.Connection, game_id: int) -> str:
         (game_id,),
     ).fetchone()[0]
     reminders = db.execute("SELECT count(*) FROM reminder WHERE game = ?", (game_id,)).fetchone()[0]
+    table = db.execute(  # (a proposal of more rounds: new, answered, closed; the length of the table)
+        "SELECT session.max_games, count(table_extension.id), coalesce(max(table_extension.id), 0),"
+        " count(table_extension.closed_at),"
+        " (SELECT count(*) FROM table_extension_vote JOIN table_extension e ON e.id = extension"
+        "  WHERE e.session = session.id)"
+        " FROM game JOIN session ON session.id = game.session"
+        " LEFT JOIN table_extension ON table_extension.session = session.id WHERE game.id = ?",
+        (game_id,),
+    ).fetchone()
     hands = [
         f"{h['seat']}{h['status']}{h['party']}{h['sickness']}{h['point_call']}{int(live)}"
         for h, live in (
             (h, is_live(h)) for h in db.execute("SELECT * FROM hand WHERE game = ? ORDER BY seat", (game_id,))
         )
     ]
-    parts = [tuple(game), tuple(plays), tuple(comments), exchanged, reminders, hands]
+    parts = [tuple(game), tuple(plays), tuple(comments), exchanged, reminders, tuple(table), hands]
     return hashlib.sha1(repr(parts).encode()).hexdigest()[:12]

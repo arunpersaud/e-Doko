@@ -39,3 +39,17 @@ def test_start_page_changes_page_and_footer_link(client):
     changes = client.get("/changes")
     assert changes.status_code == 200 and "2026-10-31" in changes.text
     assert 'href="/changes"' in client.get("/privacy").text  # in the footer of every page
+
+
+def test_the_version_is_the_same_everywhere_and_shown_in_the_footer(client):
+    import re
+    import tomllib
+    from pathlib import Path
+
+    import edoko
+
+    root = Path(edoko.__file__).parent.parent
+    declared = tomllib.loads((root / "pyproject.toml").read_text())["project"]["version"]
+    released = re.search(r"^## \[(\d+\.\d+\.\d+)\]", (root / "CHANGELOG.md").read_text(), re.M)[1]
+    assert edoko.__version__ == declared == released
+    assert f"(v{declared})" in client.get("/").get_data(as_text=True)

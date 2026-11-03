@@ -1,6 +1,6 @@
 [project]
 name = "edoko"
-version = "1.0.0"
+version = "1.1.0"
 description = "e-DoKo: online Doppelkopf (Flask rewrite)"
 readme = "README.md"
 license = "GPL-3.0-or-later"

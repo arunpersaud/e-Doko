@@ -28,6 +28,10 @@ this file there instead.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-03
+
+Live play: a live mode for playing in real time, and more rounds at a table that has an end.
+
 ### Fixed
 
 - `data` `game play` The standings and the summary of the tables of the old site showed 0 points for everybody: the PHP site never stored the points of a player, it added up the scoring items. Migration 11 fills them in for all finished games (and the importer does it for a fresh import).
@@ -38,6 +42,8 @@ this file there instead.
 
 ### Changed
 
+- `game play` The length of a table is given in rounds of four games (so everybody deals once) when it is created. Solos, and every game that is dealt again (after a solo or a cancelled game), do not count. Tables that were already there have no end and are not changed.
+- `design` The version is shown in the footer, next to the link to the changes.
 - `design` Bigger cards on the table and in the own hand (the box of the player is bigger too).
 - `design` The cards of a trick have no play-order number any more, the arrow shows the order. The "on turn" text at the seats is gone, the outline shows it.
 - `game play` The comment box reads "Add a comment" / "Send" (German "Kommentar" / "Senden").
@@ -52,6 +58,7 @@ this file there instead.
 
 ### Added
 
+- `game play` `mail` Going on at a table: during its last game, or when it is finished, any player can propose N more rounds; the other three get a mail and answer on the game or table page. If all agree the table goes on (its length grows by N rounds, "Keep playing" is there again), if one says no the proposal is off and nobody is told who. One proposal at a time, it lapses after 14 days. New: `extend.py`, migration 13 (`table_extension`, `table_extension_vote`).
 - `game play` `mail` Live mode for playing in real time. A "Live" button on the game page makes the page look for news every 10 seconds (it only asks while the tab is in front; the answer is empty when nothing changed) and holds back the "your turn" mail of that game. A green dot at a name shows who is live, with an explanation on hover and a short help text for touch screens. The mail goes out when the heartbeat stops (tab closed or hidden, or live mode switched off) or when it is still your turn after 5 minutes. Live mode is off whenever the page is opened anew and ends by itself after 30 minutes without a move or comment. New: `live.py`, migration 12 (`hand.live_until`, `hand.live_expires`, table `turn_hold`), `static/live.js`, `flask --app edoko edoko release-holds` and a systemd timer for it (`edoko-live.timer`, every minute, in the gitop repository).
 - `account` `design` A language switcher (EN / DE) at the top of the page for visitors who are not logged in; it is remembered in a cookie (`lang`, a year, only set when clicked). Logged in people use the language in their settings, which is now named "Language" and no longer only for mails.
 - `account` `mail` Change your email address in the settings. A link goes to the new address and the address only changes after it was opened while logged in; the old address is told about the request and about the change, with the contact address to write to if it was wrong. Login links mailed to the old address stop working.

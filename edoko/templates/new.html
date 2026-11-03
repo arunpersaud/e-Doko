@@ -14,8 +14,9 @@
     </select>
   </label>
   {% endfor %}
-  <label>{{ _("Number of games at this table (empty: no end)") }}
-    <input type="number" name="max_games" min="1" max="99" value="{{ max_games }}">
+  <label>{{ _("Number of rounds at this table (empty: no end)") }}
+    <input type="number" name="rounds" min="1" max="{{ max_rounds }}" value="{{ rounds }}" aria-describedby="rounds-help">
+    <small id="rounds-help">{{ _("A round is four games, so everybody deals once. Solos and games that are dealt again do not count. When the rounds are played, the players can agree to go on for more.") }}</small>
   </label>
   <h2>{{ _("Rules") }}</h2>
   <label>{{ _("Ten of hearts (dullen)") }}

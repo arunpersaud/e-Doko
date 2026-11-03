@@ -42,6 +42,7 @@
 </div>
 {% endif %}
 
+{% with ext_base = base %}{% include "_extension.html" %}{% endwith %}
 {% if controls and controls.idle_days >= 7 %}
 <section class="play-controls">
   <p>{{ ngettext("Nothing has happened in this game for %(num)d day.", "Nothing has happened in this game for %(num)d days.", controls.idle_days) }}</p>

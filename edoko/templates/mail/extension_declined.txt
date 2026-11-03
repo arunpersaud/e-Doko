@@ -1,0 +1,5 @@
+{% trans name=user.name %}Hello {{ name }},{% endtrans %}
+
+{% trans num=rounds, table=session %}Not everybody agreed to {{ num }} more round at table {{ table }}. You can propose a different number of rounds, or start a new table.{% pluralize %}Not everybody agreed to {{ num }} more rounds at table {{ table }}. You can propose a different number of rounds, or start a new table.{% endtrans %}
+
+{{ link }}

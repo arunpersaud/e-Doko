@@ -151,6 +151,26 @@ CREATE TABLE turn_hold (
   first           INTEGER NOT NULL DEFAULT 0 CHECK (first IN (0, 1))
 ) STRICT;
 """,
+    # going on at a table (extend.py): a proposal of more rounds and the answers
+    13: """
+CREATE TABLE table_extension (
+  id              INTEGER PRIMARY KEY,
+  session         INTEGER NOT NULL REFERENCES session(id) ON DELETE CASCADE,
+  proposer        INTEGER NOT NULL REFERENCES user(id),
+  rounds          INTEGER NOT NULL CHECK (rounds > 0),
+  created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  closed_at       TEXT,
+  outcome         TEXT CHECK (outcome IN ('accepted', 'declined', 'expired'))
+) STRICT;
+-- one proposal at a time
+CREATE UNIQUE INDEX table_extension_open ON table_extension(session) WHERE closed_at IS NULL;
+CREATE TABLE table_extension_vote (
+  extension       INTEGER NOT NULL REFERENCES table_extension(id) ON DELETE CASCADE,
+  user            INTEGER NOT NULL REFERENCES user(id),
+  agree           INTEGER NOT NULL CHECK (agree IN (0, 1)),
+  PRIMARY KEY (extension, user)
+) STRICT;
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

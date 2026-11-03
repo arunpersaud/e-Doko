@@ -5,8 +5,9 @@
 <h1>{{ _("Table %(n)d", n=session_id) }}</h1>
 <p>{% for p in players %}{{ person(p.id, p.name) }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
 {% if state.max_games %}
-<p>{{ _("%(played)d of %(max)d games played.", played=state.played, max=state.max_games) }}
+<p>{% if state.max_games % 4 == 0 %}{{ _("%(played)d of %(max)d games played (%(rounds)d rounds). Solos and games that are dealt again do not count.", played=state.played, max=state.max_games, rounds=state.max_games // 4) }}{% else %}{{ _("%(played)d of %(max)d games played.", played=state.played, max=state.max_games) }}{% endif %}
   {% if state.closed %}<strong>{{ _("This table is finished.") }}</strong>{% endif %}</p>
+{% with ext_base = extension_base %}{% include "_extension.html" %}{% endwith %}
 {% endif %}
 {% if state.played %}
 <table>

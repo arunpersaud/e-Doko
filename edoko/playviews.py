@@ -9,7 +9,7 @@ from flask import Blueprint, abort, flash, g, redirect, render_template, request
 from flask_babel import gettext as _
 from flask_babel import lazy_gettext as _l
 
-from . import live, play, rules
+from . import extend, live, play, rules
 from .auth import login_required
 from .db import get_db, query, query_one
 
@@ -17,8 +17,12 @@ bp = Blueprint("playviews", __name__)
 
 ACTIONS = (
     "join", "decline", "declare", "play", "remind", "cancel", "take", "refuse", "giveback",
-    "remark", "editremark", "deleteremark",
+    "remark", "editremark", "deleteremark", "extend", "extend-yes", "extend-no",
 )
+
+
+def session_of(hand) -> int:
+    return query_one("SELECT session FROM game WHERE id = ?", (hand["game"],))["session"]
 
 
 def act(hand, action: str):
@@ -52,6 +56,16 @@ def act(hand, action: str):
             play.edit_remark(db, form.get("remark", type=int, default=0), hand["user"], form.get("body", ""))
         elif action == "deleteremark":
             play.delete_remark(db, form.get("remark", type=int, default=0), hand["user"])
+        elif action == "extend":
+            extend.propose(db, session_of(hand), hand["user"], form.get("rounds", type=int, default=0))
+            flash(_("Your proposal has been sent to the other players."))
+        elif action in ("extend-yes", "extend-no"):
+            outcome = extend.vote(db, session_of(hand), hand["user"], action == "extend-yes")
+            flash({
+                "accepted": _("Everybody agreed: the table goes on."),
+                "declined": _("You said no, so the proposal is off."),
+                "waiting": _("Thank you, you agreed. The others still have to answer."),
+            }[outcome])
         elif action == "remind":
             play.remind(db, hand["game"], hand["user"])
             flash(_("An email has been sent out."))
@@ -128,28 +142,31 @@ def candidates():
 @login_required
 def new():
     chosen = dict(DEFAULT_RULES)
-    picked, max_games = [], ""
+    picked, rounds = [], ""
     if request.method == "POST":
         picked = request.form.getlist("player", type=int)
         chosen = {k: request.form.get(k, v) for k, v in DEFAULT_RULES.items()}
-        max_games = request.form.get("max_games", "").strip()
+        rounds = request.form.get("rounds", "").strip()
         try:
             if chosen["lowtrump"] not in RULE_LABELS["lowtrump"]:
                 raise play.PlayError("Unknown rules.")
-            limit = int(max_games) if max_games else None
+            number = int(rounds) if rounds else None
+            if number is not None and not 1 <= number <= extend.MAX_ROUNDS:
+                raise play.PlayError(_("Please choose between 1 and %(n)d rounds.", n=extend.MAX_ROUNDS))
+            limit = number * play.GAMES_PER_ROUND if number else None
             game_id = play.new_table(
                 get_db(), g.user["id"], picked,
                 rules.Rules(chosen["dullen"], chosen["schweinchen"], chosen["lowtrump"], chosen["call"]),
                 limit,
             )
         except (play.PlayError, ValueError) as error:
-            flash(str(error) if isinstance(error, play.PlayError) else "Please enter a number of games.")
+            flash(str(error) if isinstance(error, play.PlayError) else _("Please enter a number of rounds."))
         else:
             flash(_("The game is set up, the invitations are sent out."))
             return redirect(url_for("games.game", game_id=game_id, trick=None, origin=None))
     return render_template(
         "new.html", players=candidates(), labels=RULE_LABELS, chosen=chosen,
-        picked=picked + [None] * (3 - len(picked)), max_games=max_games,
+        picked=picked + [None] * (3 - len(picked)), rounds=rounds, max_rounds=extend.MAX_ROUNDS,
     )
 
 

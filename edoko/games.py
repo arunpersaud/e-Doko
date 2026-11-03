@@ -13,7 +13,7 @@ from flask import Blueprint, abort, g, make_response, redirect, render_template,
 from flask_babel import lazy_gettext as _l
 from werkzeug.routing import BaseConverter
 
-from . import gameview, live, play
+from . import extend, gameview, live, play
 from .auth import login_required
 from .db import get_db, query, query_one
 
@@ -168,6 +168,10 @@ def render_game(
         live_cap=live.CAP_MINUTES,
         live_grace=live.GRACE_MINUTES,
     )
+    session_id = context["game"]["session"]
+    context["extension"] = None
+    if base is not None and extend.last_game(get_db(), session_id) == game_id:
+        context["extension"] = extend.status(get_db(), session_id, user_id)
     if context["game"]["status"] in play.ACTIVE:
         watching = live.seats_live(get_db(), game_id)
         for seat in context["seats"]:
@@ -262,6 +266,7 @@ def table(session_id):
     rows = [x for x in my_games(g.user["id"]) if x["session"] == session_id]
     state = play.table_state(get_db(), session_id)
     summary = play.table_summary(get_db(), session_id) if state["closed"] else None
+    last = extend.last_game(get_db(), session_id)
     for r in summary["rounds"] if summary else []:
         r["kind"] = KINDS.get(r["solo"] if r["type"] == "solo" else r["type"], r["type"])
     return (
@@ -272,6 +277,8 @@ def table(session_id):
             games=rows,
             state=state,
             summary=summary,
+            extension=extend.status(get_db(), session_id, g.user["id"]),
+            extension_base=f"/game/{last}",
         ),
         200,
         PRIVATE,
