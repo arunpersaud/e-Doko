@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2026-11-02 20:20-0800\n"
+"POT-Creation-Date: 2026-11-02 20:27-0800\n"
 "PO-Revision-Date: 2026-11-01 14:30-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language: de\n"
@@ -1176,10 +1176,6 @@ msgid "%(num)d trick"
 msgid_plural "%(num)d tricks"
 msgstr[0] "%(num)d Stich"
 msgstr[1] "%(num)d Stiche"
-
-#: edoko/templates/game.html:119
-msgid "on turn"
-msgstr "am Zug"
 
 #: edoko/templates/game.html:124
 #, python-format
@@ -3325,4 +3321,7 @@ msgstr "Benutze diesen Link, um eine Karte zu spielen:"
 
 #~ msgid "Cancel this game"
 #~ msgstr "Dieses Spiel abbrechen"
+
+#~ msgid "on turn"
+#~ msgstr "am Zug"
 

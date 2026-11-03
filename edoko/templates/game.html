@@ -116,7 +116,7 @@
       {% if s.starts %}<span class="start">{{ _("Starting player") }}</span>{% endif %}
       {% if s.label %}<span class="party">{{ s.label }}</span>{% endif %}
       {% for icon, title in s.badges %}<img class="badge" src="{{ url_for('static', filename='icons/%s_button.png' % icon) }}" alt="{{ title }}" title="{{ title }}" width="28" height="28">{% endfor %}
-      <small class="muted">{{ ngettext("%(num)d trick", "%(num)d tricks", s.tricks) }}{% if s.on_turn %} · {{ _("on turn") }}{% endif %}</small>
+      <small class="muted">{{ ngettext("%(num)d trick", "%(num)d tricks", s.tricks) }}</small>
     </header>
     {% if s.cards and s.is_me and controls and controls.stage == "play" %}
     <form method="post" action="{{ controls.base }}/play" class="play-form">
