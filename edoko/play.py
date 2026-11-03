@@ -27,7 +27,7 @@ from flask import current_app
 from flask_babel import gettext as _
 from flask_babel import lazy_gettext as _l
 
-from . import mail, rules
+from . import live, mail, rules
 
 SOLOS = ("trumpless", "jack", "queen", "trump", "club", "spade", "heart")
 NINES = frozenset({25, 26, 33, 34, 41, 42, 47, 48})
@@ -784,6 +784,14 @@ def _mail(db, user_id: int, subject, template: str, *, turn: bool = False, **con
     )
 
 
+def send_turn_mail(db, hand, first: bool) -> None:
+    """The mail "it is your turn" to the player of this hand (row of hand)."""
+    _mail(
+        db, hand["user"], _l("Game %(id)d: it is your turn", id=hand["game"]),
+        "turn", turn=True, game_id=hand["game"], first=first, link=_link(hand["token"]),
+    )
+
+
 def notify(db: sqlite3.Connection, notices: list) -> None:
     """Send the mails for what has just happened (after the commit)."""
     for notice in notices:
@@ -802,13 +810,13 @@ def notify(db: sqlite3.Connection, notices: list) -> None:
                     "invite", game_id=game_id, players=names, link=_link(h["token"]),
                 )
         elif kind == "turn":
+            live.clear_holds(db, game_id)  # (held for the turn before)
             h = next((h for h in hands if h["seat"] == game["turn_seat"]), None)
             if h is not None:
-                _mail(
-                    db, h["user"], _l("Game %(id)d: it is your turn", id=game_id),
-                    "turn", turn=True, game_id=game_id, first=notice[2],
-                    link=_link(h["token"]),
-                )
+                if live.holds_mail(db, h):  # watching live: see live.py
+                    live.hold(db, h, notice[2])
+                else:
+                    send_turn_mail(db, h, notice[2])
         elif kind == "poverty":
             h = next((h for h in hands if h["seat"] == game["turn_seat"]), None)
             if h is not None:

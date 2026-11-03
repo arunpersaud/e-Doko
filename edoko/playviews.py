@@ -9,7 +9,7 @@ from flask import Blueprint, abort, flash, g, redirect, render_template, request
 from flask_babel import gettext as _
 from flask_babel import lazy_gettext as _l
 
-from . import play, rules
+from . import live, play, rules
 from .auth import login_required
 from .db import get_db, query, query_one
 
@@ -60,6 +60,8 @@ def act(hand, action: str):
             flash(_("The game has been canceled."))
     except play.PlayError as error:
         flash(str(error))
+    else:
+        live.touch(db, hand["id"])  # whoever acts is there: live mode runs on
 
 
 @bp.post("/<token:token>/<action>")

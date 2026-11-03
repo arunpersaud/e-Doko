@@ -291,3 +291,15 @@ details.cancel-confirm > summary::after { display: none; }
 details.cancel-confirm .danger-note { margin: 0.75rem 0 0.5rem; padding: 0.5rem 0.75rem; border-left: 4px solid #c62828; background: rgba(198, 40, 40, 0.1); }
 button.danger { margin: 0; background: #c62828; border-color: #c62828; color: #fff; }
 button.danger:hover, button.danger:focus-visible { background: #a31f1f; border-color: #a31f1f; }
+
+/* live mode: the button, the dots at the names */
+.live-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin: 0 0 1rem; }
+.live-bar button { margin: 0; width: auto; }
+.live-toggle.on { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+.live-toggle.on .live-dot { background: #fff; }
+.live-dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: #2e7d32; vertical-align: middle; }
+.live-bar .live-info { color: var(--pico-muted-color); }
+details.live-help { margin: 0; border: 0; padding: 0; flex-basis: 100%; }
+details.live-help > summary { display: inline; width: auto; margin: 0; font-size: 0.85em; color: var(--pico-muted-color); }
+details.live-help > summary::after { display: none; }
+details.live-help p { margin: 0.5rem 0 0; font-size: 0.9em; }

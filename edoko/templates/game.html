@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "_demo.html" import person with context %}
 {% macro card(c, size="") %}<img class="card {{ size }}" src="{{ url_for('static', filename='cards/english/%d.png' % image_number(c.card_id or c.id)) }}" alt="{{ card_name(c) }}" title="{{ card_name(c) }}" width="169" height="245">{% endmacro %}
+{% macro trick_hx(url, live_on) %}hx-get="{{ url }}" hx-target="#live-region" hx-select="#live-region" hx-swap="outerHTML" hx-push-url="{{ url }}"{% if live_on %} hx-vals='{"live": "on"}'{% endif %}{% endmacro %}
 {% block title %}{{ _("Game %(id)d", id=game.id) }} – e-DoKo{% endblock %}
 {% block content %}
 <nav class="game-nav" aria-label="{{ _('Games of this table') }}">
@@ -23,6 +24,23 @@
   {% endif %}
   {% endif %}
 </div>
+
+<div id="live-region">
+{% if can_live %}
+<div class="live-bar">
+  {% if live_on %}
+  <button type="button" class="compact live-toggle on" aria-pressed="true" hx-get="{{ live_url }}?live=off" hx-target="#live-region" hx-select="#live-region" hx-swap="outerHTML" title="{{ _('Live mode is on: this page checks for moves every %(n)d seconds, and email about this game is held back while you watch. It is sent if you leave, or if it is your turn and you do not move within %(m)d minutes. Live mode switches itself off after %(c)d minutes without a move. Click to stop.', n=live_poll, m=live_grace, c=live_cap) }}"><span class="live-dot" aria-hidden="true"></span> {{ _("Live: on") }}</button>
+  <span data-live-poller data-live-seconds="{{ live_poll }}" hx-get="{{ live_url }}?live={{ live_version }}" hx-trigger="live-poll" hx-target="#live-region" hx-select="#live-region" hx-swap="outerHTML"></span>
+  {% else %}
+  <button type="button" class="compact secondary outline live-toggle" aria-pressed="false" hx-get="{{ live_url }}?live=on" hx-target="#live-region" hx-select="#live-region" hx-swap="outerHTML" title="{{ _('Live mode: this page checks for moves every %(n)d seconds, and you get no email about this game while you watch. If it is your turn and you do not move within %(m)d minutes, you get the email anyway.', n=live_poll, m=live_grace) }}">{{ _("Live: off") }}</button>
+  {% endif %}
+  <small class="live-info">{{ ngettext("%(num)d of 4 players is live", "%(num)d of 4 players are live", live_count) }}</small>
+  <details class="live-help">
+    <summary>{{ _("What is this?") }}</summary>
+    <p>{{ _("Live mode is for playing a game in real time. While it is on, this page looks for new moves every %(n)d seconds, and you get no email about this game. A green dot next to a name shows who else is live. Live mode is off again whenever you open the page anew, and it switches itself off after %(c)d minutes without a move. If you leave, or if it is your turn and you do not move within %(m)d minutes, you get the email as usual.", n=live_poll, c=live_cap, m=live_grace) }}</p>
+  </details>
+</div>
+{% endif %}
 
 {% if controls and controls.idle_days >= 7 %}
 <section class="play-controls">
@@ -101,7 +119,7 @@
   {% elif controls.stage == "wait" %}
   <p>{{ _("Waiting for the other players. You get a mail when the game starts.") }}</p>
   {% else %}
-  <p>{{ _("It is not your turn. You get a mail when it is.") }}</p>
+  <p>{% if live_on %}{{ _("It is not your turn. You are live: this page updates by itself, and you get the mail if you leave or do not move in time.") }}{% else %}{{ _("It is not your turn. You get a mail when it is.") }}{% endif %}</p>
   {% endif %}
 </section>
 {% endif %}
@@ -112,7 +130,7 @@
   <section class="seat spot-{{ s.spot }}{% if s.is_me %} me{% endif %}{% if s.on_turn %} on-turn{% endif %}">
     <header>
       <img class="avatar" src="{{ url_for('avatars.avatar', user_id=s.user_id) }}" alt="" width="32" height="32">
-      <strong>{{ person(s.user_id, s.name) }}</strong>
+      <strong>{{ person(s.user_id, s.name) }}</strong>{% if s.live %}<span class="live-dot" role="img" aria-label="{{ _('%(name)s is live', name=s.name) }}" title="{% if s.is_me %}{{ _('You are live: this page updates by itself and your email for this game is held back while you watch.') }}{% else %}{{ _('%(name)s is watching this game live right now.', name=s.name) }}{% endif %}"></span>{% endif %}
       {% if s.starts %}<span class="start">{{ _("Starting player") }}</span>{% endif %}
       {% if s.label %}<span class="party">{{ s.label }}</span>{% endif %}
       {% for icon, title in s.badges %}<img class="badge" src="{{ url_for('static', filename='icons/%s_button.png' % icon) }}" alt="{{ title }}" title="{{ title }}" width="28" height="28">{% endfor %}
@@ -175,13 +193,13 @@
     </div>
     <nav class="trick-nav" aria-label="{{ _('Tricks') }}">
       {% set n = selected.number %}
-      {% if n > 1 or (n == 1 and has_pre) %}<a href="{{ trick_url(n - 1) }}#table" rel="prev" hx-get="{{ trick_url(n - 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Previous trick') }}">‹</a>{% else %}<span class="off">‹</span>{% endif %}
+      {% if n > 1 or (n == 1 and has_pre) %}<a href="{{ trick_url(n - 1) }}#table" rel="prev" {{ trick_hx(trick_url(n - 1), live_on) }} title="{{ _('Previous trick') }}">‹</a>{% else %}<span class="off">‹</span>{% endif %}
       <span class="trick-label"><span>{% if n == 0 %}{{ _("Before the game") }}{% else %}{{ _("Trick %(n)d", n=n) }} / {{ tricks | length }}{% endif %}</span><span class="trick-winner">{% if selected.winner_seat %}{{ _("won by %(name)s", name=names[selected.winner_seat]) }}{% else %}&nbsp;{% endif %}</span></span>
-      {% if n < tricks | length %}<a href="{{ trick_url(n + 1) }}#table" rel="next" hx-get="{{ trick_url(n + 1) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true" title="{{ _('Next trick') }}">›</a>{% else %}<span class="off">›</span>{% endif %}
+      {% if n < tricks | length %}<a href="{{ trick_url(n + 1) }}#table" rel="next" {{ trick_hx(trick_url(n + 1), live_on) }} title="{{ _('Next trick') }}">›</a>{% else %}<span class="off">›</span>{% endif %}
     </nav>
-    {% if has_pre %}<p class="trick-numbers trick-pre"><a href="{{ trick_url(0) }}#table"{% if selected.number == 0 %} aria-current="true"{% endif %} hx-get="{{ trick_url(0) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true">{{ _("Before the game") }}</a></p>{% endif %}
+    {% if has_pre %}<p class="trick-numbers trick-pre"><a href="{{ trick_url(0) }}#table"{% if selected.number == 0 %} aria-current="true"{% endif %} {{ trick_hx(trick_url(0), live_on) }}>{{ _("Before the game") }}</a></p>{% endif %}
     <p class="trick-numbers">
-      {% for t in tricks %}<a href="{{ trick_url(t.number) }}#table"{% if t.number == selected.number %} aria-current="true"{% endif %} hx-get="{{ trick_url(t.number) }}" hx-target="#table" hx-select="#table" hx-swap="outerHTML" hx-push-url="true">{{ t.number }}</a>{% endfor %}
+      {% for t in tricks %}<a href="{{ trick_url(t.number) }}#table"{% if t.number == selected.number %} aria-current="true"{% endif %} {{ trick_hx(trick_url(t.number), live_on) }}>{{ t.number }}</a>{% endfor %}
     </p>
     {% else %}
     <p class="empty">{{ _("No card has been played yet.") }}</p>
@@ -194,6 +212,7 @@
   {% for c in strangers %}<p class="comment"><strong>{{ c.name }}:</strong> {{ c.body }}</p>{% endfor %}
 </div>
 {% endif %}
+</div>
 </div>
 
 {% if can_continue %}

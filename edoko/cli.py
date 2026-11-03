@@ -6,7 +6,7 @@ import click
 from flask import current_app
 from flask.cli import AppGroup
 
-from . import bounces, db, digest as digest_mails, migrations, signup
+from . import bounces, db, digest as digest_mails, live, migrations, signup
 
 edoko = AppGroup("edoko", help="e-DoKo database tools.")
 
@@ -25,6 +25,14 @@ def migrate() -> None:
     """Apply missing schema migrations (also done at startup)."""
     applied = migrations.migrate(Path(current_app.config["DATABASE"]))
     click.echo(f"applied: {applied}" if applied else "up to date")
+
+
+@edoko.command("release-holds")
+def release_holds() -> None:
+    """Send the "your turn" mails that live mode held back and are due (every minute)."""
+    sent = live.release(db.connect(current_app.config["DATABASE"]))
+    if sent:
+        click.echo(f"sent {sent} held mails")
 
 
 @edoko.command("users")

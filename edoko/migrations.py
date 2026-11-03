@@ -138,6 +138,19 @@ CREATE TABLE email_change (
     # the finished games of the PHP site have no points per player: the standings
     # and the table summary were all zeros
     11: POINTS_FROM_ITEMS,
+    # live mode (live.py): who is watching a game right now (unix seconds), and the
+    # "your turn" mails held back for them
+    12: """
+ALTER TABLE hand ADD COLUMN live_until INTEGER;
+ALTER TABLE hand ADD COLUMN live_expires INTEGER;
+CREATE TABLE turn_hold (
+  id              INTEGER PRIMARY KEY,
+  game            INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+  hand            INTEGER NOT NULL UNIQUE REFERENCES hand(id) ON DELETE CASCADE,
+  since           INTEGER NOT NULL,
+  first           INTEGER NOT NULL DEFAULT 0 CHECK (first IN (0, 1))
+) STRICT;
+""",
 }
 
 LATEST = max(MIGRATIONS, default=1)

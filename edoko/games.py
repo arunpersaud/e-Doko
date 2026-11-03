@@ -9,11 +9,11 @@ Games in progress are never shown to anybody else, not even their hands.
 Everybody else gets a 404, as if the game didn't exist.
 """
 
-from flask import Blueprint, abort, g, redirect, render_template, request, url_for
+from flask import Blueprint, abort, g, make_response, redirect, render_template, request, url_for
 from flask_babel import lazy_gettext as _l
 from werkzeug.routing import BaseConverter
 
-from . import gameview, play
+from . import gameview, live, play
 from .auth import login_required
 from .db import get_db, query, query_one
 
@@ -91,6 +91,40 @@ def trick_url(number: int) -> str:
     return url_for(request.endpoint, **{**request.view_args, "trick": number})
 
 
+def live_step(game_id: int, user_id: int, full: bool, base: str | None):
+    """Live mode of this request: (can_live, live_on, version, answer).
+
+    The page's own requests carry ?live=: "on" (the button), "off" (the button
+    again), or the version the page shows (the poll). answer is a finished
+    response when nothing changed (204: the page keeps what it has).
+    """
+    db = get_db()
+    hand = query_one("SELECT * FROM hand WHERE game = ? AND user = ?", (game_id, user_id))
+    status = query_one("SELECT status FROM game WHERE id = ?", (game_id,))
+    can_live = bool(
+        not full and base is not None and hand is not None and status
+        and status["status"] in play.ACTIVE
+    )
+    asked = request.args.get("live")
+    # (only the page's own htmx requests: a reloaded or shared address is never live)
+    if not can_live or asked is None or not request.headers.get("HX-Request"):
+        return can_live, False, None, None
+    if asked == "off":
+        live.stop(db, hand["id"])
+        return can_live, False, None, None
+    if asked == "on":
+        live.start(db, hand["id"])
+        live.release(db, game_id)
+        # (the version is taken before the page is built: never newer than the page)
+        return can_live, True, live.version(db, game_id), None
+    version = live.version(db, game_id)
+    on = live.beat(db, hand["id"])
+    live.release(db, game_id)
+    if on and asked == version:
+        return can_live, True, version, make_response("", 204)
+    return can_live, on, version, None
+
+
 def render_game(
     game_id: int,
     user_id: int,
@@ -109,6 +143,9 @@ def render_game(
     seats are at the same places as in that game.
     base: where the forms of live play post to (the seat link or the game page).
     """
+    can_live, live_on, live_version, answer = live_step(game_id, user_id, full, base)
+    if answer is not None:
+        return answer
     anchor = gameview.viewpoint_seat(origin, user_id) if origin else None
     context = gameview.build(
         game_id, user_id, full=full, trick=trick, anchor_seat=anchor
@@ -123,7 +160,19 @@ def render_game(
         trick_url=trick_url,
         controls=None if full or base is None else play.controls(get_db(), game_id, user_id, base),
         base=base,
+        can_live=can_live,
+        live_on=live_on,
+        live_version=live_version,
+        live_url=request.path,
+        live_poll=live.POLL_SECONDS,
+        live_cap=live.CAP_MINUTES,
+        live_grace=live.GRACE_MINUTES,
     )
+    if context["game"]["status"] in play.ACTIVE:
+        watching = live.seats_live(get_db(), game_id)
+        for seat in context["seats"]:
+            seat["live"] = watching.get(seat["seat"], False)
+        context["live_count"] = sum(watching.values())
     if logged_in:
         # only games this viewer may open: their own, and those of the same deals
         def allowed(other_id: int) -> bool:
