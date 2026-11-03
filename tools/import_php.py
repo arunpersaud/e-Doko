@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from edoko import db  # noqa: E402
+from edoko import db, migrations  # noqa: E402
 from edoko.textfix import repair  # noqa: E402
 
 PREFS = {
@@ -50,6 +50,7 @@ def import_php(old_path: Path, new_path: Path) -> Counter:
         new.execute("BEGIN")
         try:
             _copy(old, new, report)
+            new.execute(migrations.POINTS_FROM_ITEMS)  # (the PHP site stored none)
             bad = new.execute("PRAGMA foreign_key_check").fetchall()
             if bad:
                 kinds = Counter((r[0], r[2]) for r in bad)

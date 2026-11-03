@@ -15,6 +15,20 @@ from pathlib import Path
 
 from . import textfix
 
+# The PHP site never stored the points of a hand, it added up the scoring items.
+# Game points = re items - contra items (one point each); re gets them (times 3 in a
+# solo), contra minus (as rules.player_points does for a game played here).
+POINTS_FROM_ITEMS = """
+UPDATE hand SET points = (
+  SELECT CASE WHEN hand.party = 're' THEN 1 ELSE -1 END
+         * (CASE WHEN hand.party = 're' AND game.type = 'solo' THEN 3 ELSE 1 END)
+         * (SELECT coalesce(sum(CASE score_item.party WHEN 're' THEN 1 ELSE -1 END), 0)
+              FROM score_item WHERE score_item.game = hand.game)
+    FROM game WHERE game.id = hand.game)
+WHERE points IS NULL AND party IS NOT NULL
+  AND game IN (SELECT id FROM game WHERE status = 'gameover');
+"""
+
 MIGRATIONS: dict[int, str] = {
     # profile pictures: uploaded or fetched from Gravatar (else generated)
     2: """
@@ -121,6 +135,9 @@ CREATE TABLE email_change (
   used_at         TEXT
 ) STRICT;
 """,
+    # the finished games of the PHP site have no points per player: the standings
+    # and the table summary were all zeros
+    11: POINTS_FROM_ITEMS,
 }
 
 LATEST = max(MIGRATIONS, default=1)
