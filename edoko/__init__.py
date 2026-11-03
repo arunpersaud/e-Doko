@@ -72,11 +72,12 @@ SECURITY_HEADERS = {
 def select_locale() -> str | None:
     if not has_request_context():  # mail from a command or a timer
         return None
-    # the settings, then the switcher's cookie (not logged in), then the browser
+    # logged in: the settings, else the browser; not logged in: the switcher's cookie
     user = g.get("user")
-    if user is not None and user["language"] in LANGUAGES:
-        return user["language"]
-    if (chosen := request.cookies.get("lang")) in LANGUAGES:
+    if user is not None:
+        if user["language"] in LANGUAGES:
+            return user["language"]
+    elif (chosen := request.cookies.get("lang")) in LANGUAGES:
         return chosen
     return request.accept_languages.best_match(LANGUAGES)
 

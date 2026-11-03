@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  edoko\n"
 "Report-Msgid-Bugs-To: arun@nubati.net\n"
-"POT-Creation-Date: 2026-11-02 19:54-0800\n"
+"POT-Creation-Date: 2026-11-02 20:00-0800\n"
 "PO-Revision-Date: 2026-11-01 14:30-0800\n"
 "Last-Translator: Arun Persaud <arun@nubati.net>\n"
 "Language: de\n"
@@ -1167,16 +1167,16 @@ msgid "Give back %(card)s"
 msgstr "%(card)s zurückgeben"
 
 #: edoko/templates/game.html:135
-msgid "Say something"
-msgstr "Sag etwas"
+msgid "Add a comment"
+msgstr "Kommentar"
 
 #: edoko/templates/game.html:135
-msgid "Your remark on this trick"
-msgstr "Deine Bemerkung zu diesem Stich"
+msgid "Your comment on this trick"
+msgstr "Dein Kommentar zu diesem Stich"
 
 #: edoko/templates/game.html:136
-msgid "Say it"
-msgstr "Sagen"
+msgid "Send"
+msgstr "Senden"
 
 #: edoko/templates/game.html:141
 msgid "edited"
@@ -1776,9 +1776,9 @@ msgid ""
 "the page, if you were not logged in. It is only set when you click the "
 "language."
 msgstr ""
-"Ein Cookie, das ein Jahr lang die Sprache merkt, die du oben auf der Seite "
-"gewählt hast, wenn du nicht angemeldet warst. Es wird nur gesetzt, wenn du "
-"auf die Sprache klickst."
+"Ein Cookie, das ein Jahr lang die Sprache merkt, die du oben auf der "
+"Seite gewählt hast, wenn du nicht angemeldet warst. Es wird nur gesetzt, "
+"wenn du auf die Sprache klickst."
 
 #: edoko/templates/privacy.html:31
 msgid ""
@@ -3272,4 +3272,13 @@ msgstr "Benutze diesen Link, um eine Karte zu spielen:"
 
 #~ msgid "Language of the mails"
 #~ msgstr "Sprache der E-Mails"
+
+#~ msgid "Say something"
+#~ msgstr "Sag etwas"
+
+#~ msgid "Your remark on this trick"
+#~ msgstr "Deine Bemerkung zu diesem Stich"
+
+#~ msgid "Say it"
+#~ msgstr "Sagen"
 

@@ -421,15 +421,11 @@ def test_switcher_for_visitors_sets_a_cookie_that_beats_the_browser(client):
     assert client.get("/language/en?next=//evil.org").headers["Location"] == "/"
 
 
-def test_switcher_for_users_changes_the_setting(app, client):
+def test_logged_in_users_get_no_switcher_and_ignore_the_cookie(app, client):
     request_link(client, app)
     path = link_from(app)
     _, token = request_link(client, app)
     client.post(path, data={"csrf": token})
-    token = re.search(r'name="csrf" value="([^"]+)"', client.get("/").text)[1]  # a new session
-    response = client.post("/language", data={"csrf": token, "language": "de", "next": "/"})
-    assert response.status_code == 302
-    with closing(db.connect(app.config["DATABASE"])) as conn:
-        assert conn.execute("SELECT language FROM user WHERE id = 1").fetchone()[0] == "de"
-    assert client.post("/language", data={"csrf": token, "language": "fr"}).status_code == 400
-    assert client.post("/language", data={"language": "en"}).status_code == 403  # no token
+    client.get("/language/de")  # (a cookie left from before the login)
+    page = client.get("/", headers={"Accept-Language": "en"}).text
+    assert "/language/" not in page and 'lang="en"' in page

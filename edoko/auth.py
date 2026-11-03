@@ -285,7 +285,10 @@ def language_target() -> str:
 
 @bp.get("/language/<code>")
 def language_cookie(code):
-    """The language switcher for visitors who are not logged in: a cookie."""
+    """The language switcher (only shown when not logged in): a cookie.
+
+    Logged in users have their language in the settings.
+    """
     if code not in ("en", "de"):
         abort(404)
     response = redirect(language_target())
@@ -295,16 +298,6 @@ def language_cookie(code):
         httponly=True, samesite="Lax",
     )
     return response
-
-
-@bp.post("/language")
-def language_setting():
-    """The switcher for logged in users: it changes the language in the settings."""
-    code = request.form.get("language")
-    if g.user is None or code not in ("en", "de"):
-        abort(400)
-    get_db().execute("UPDATE user SET language = ? WHERE id = ?", (code, g.user["id"]))
-    return redirect(language_target())
 
 
 @bp.post("/logout")

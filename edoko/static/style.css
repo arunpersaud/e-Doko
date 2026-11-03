@@ -73,7 +73,7 @@ nav.game-nav { display: flex; justify-content: space-between; gap: 1rem; margin-
 .ring-arc { fill: none; stroke: rgba(255, 255, 255, 0.55); stroke-width: 1.6; stroke-linecap: round; }
 .ring-head { fill: rgba(255, 255, 255, 0.8); }
 .ring-dot { fill: #fff; }
-.cross.large { --card-h: 4.4rem; position: relative; gap: 0.25rem; }
+.cross.large { --card-h: clamp(4.4rem, 12cqw, 6.4rem); position: relative; gap: 0.25rem; }
 /* the buttons stay where they are for every trick: fixed columns, and a label of
    always two lines that never wraps */
 nav.trick-nav { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) 2.2rem; align-items: center; font-size: 0.85em; }
@@ -104,7 +104,11 @@ p.trick-numbers a[aria-current] { background: #fff; color: #2f6f4f; }
 img.badge { width: 1.5rem; height: 1.5rem; }
 .hand { display: flex; flex-wrap: wrap; gap: 0.1rem; }
 img.card { height: 5rem; width: auto; }
-img.card.small { height: 3.2rem; }
+img.card.small { height: 3.6rem; }
+/* the viewer's own seat is the biggest: these are the cards to play */
+.seat.me { padding: 0.75rem; }
+.seat.me .hand { gap: 0.2rem; }
+.seat.me img.card.small { height: clamp(4.6rem, 11cqw, 5.8rem); }
 /* a trick: the cards lie at the spots of their players. The tracks have the size
    of a card whether or not it has been played, so a lone card stays at its spot */
 .cross {
@@ -276,6 +280,12 @@ figure.example img { width: 100%; height: auto; }
 .remark-form input[type="text"] { min-width: 0; max-width: 100%; }
 
 .lang-switch { display: flex; gap: 0.5rem; align-items: center; }
-.lang-switch a[aria-current], .lang-switch button[aria-current] { font-weight: bold; }
-.lang-switch button { padding: 0.15rem 0.5rem; font-size: 0.85em; }
-.lang-switch button[aria-current] { background: var(--pico-secondary-background); color: var(--pico-secondary-inverse); }
+header nav .lang-switch a { padding: 0.25rem 0.5rem; margin: 0; }
+header nav .lang-switch a + a { border-left: 1px solid var(--pico-muted-border-color); border-radius: 0; }
+.lang-switch a[aria-current] { font-weight: bold; text-decoration: none; }
+header nav a.brand, header nav button { white-space: nowrap; }
+@media (max-width: 36rem) {
+  header nav li { padding-left: 0.3rem; padding-right: 0.3rem; }
+  header nav button { padding: 0.25rem 0.5rem; }
+  .lang-switch { gap: 0.25rem; }
+}

@@ -30,22 +30,14 @@
           </form>
         </li>
         {% else %}
-        <li><a href="{{ url_for('auth.login') }}">{{ _("Log in") }}</a></li>
-        {% endif %}
         <li class="lang-switch" aria-label="{{ _('Language') }}">
           {% set here = request.full_path.rstrip('?') %}
           {% for code, label, name in (('en', 'EN', 'English'), ('de', 'DE', 'Deutsch')) %}
-          {% if current_user %}
-          <form method="post" action="{{ url_for('auth.language_setting') }}" class="inline">
-            <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-            <input type="hidden" name="next" value="{{ here }}">
-            <button type="submit" name="language" value="{{ code }}" lang="{{ code }}" title="{{ name }}" class="secondary outline"{% if get_locale()|string == code %} aria-current="true"{% endif %}>{{ label }}</button>
-          </form>
-          {% else %}
           <a href="{{ url_for('auth.language_cookie', code=code, next=here) }}" lang="{{ code }}" hreflang="{{ code }}" title="{{ name }}" rel="nofollow"{% if get_locale()|string == code %} aria-current="true"{% endif %}>{{ label }}</a>
-          {% endif %}
           {% endfor %}
         </li>
+        <li><a href="{{ url_for('auth.login') }}">{{ _("Log in") }}</a></li>
+        {% endif %}
       </ul>
     </nav>
   </header>
